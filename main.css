@@ -1,0 +1,91 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  background-color: #111827;
+  color: grey;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.main-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: #ffffff;
+  text-shadow: 0 4px 10px rgba(99, 102, 241, 0.5);
+}
+
+.sub-title {
+  color: #9ca3af;
+  margin-bottom: 40px;
+  font-size: 1.1rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.link-card {
+  background-color: #1f2937;
+  padding: 30px;
+  border-radius: 16px;
+  width: 240px;
+  text-decoration: none;
+  color: white;
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
+  border: 1px solid #374151;
+}
+
+.link-card:hover {
+  transform: translateY(-5px);
+  background-color: #374151;
+}
+
+.card-icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.link-card h2 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.link-card p {
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+.link-card.highlight {
+  border: 2px solid #6366f1;
+  background-color: #1e1b4b;
+}
+
+@media (max-width: 600px) {
+  .button-group {
+    flex-direction: column;
+  }
+  .link-card {
+    width: 100%;
+  }
+}
