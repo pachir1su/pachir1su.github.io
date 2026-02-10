@@ -98,10 +98,65 @@ ul {
   display: flex;
   align-items: center;
   padding-top: 70px;
+  position: relative;
+  overflow: hidden;
 }
 
 .hero-content {
   max-width: 800px;
+  position: relative;
+  z-index: 1;
+}
+
+.floating-icon {
+  position: absolute;
+  opacity: 0.15;
+  color: var(--accent);
+  z-index: 0;
+  animation: floatIcon 6s ease-in-out infinite;
+}
+
+.icon-1 {
+  top: 15%;
+  left: 10%;
+  animation-delay: 0s;
+  font-size: 4rem;
+}
+.icon-2 {
+  top: 20%;
+  right: 15%;
+  animation-delay: 1s;
+  font-size: 3.5rem;
+}
+.icon-3 {
+  bottom: 20%;
+  left: 15%;
+  animation-delay: 2s;
+  font-size: 3rem;
+}
+.icon-4 {
+  bottom: 15%;
+  right: 10%;
+  animation-delay: 3s;
+  font-size: 4rem;
+}
+.icon-5 {
+  top: 50%;
+  left: 5%;
+  animation-delay: 4s;
+  font-size: 3rem;
+}
+
+@keyframes floatIcon {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(10deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
 }
 
 .greeting {
@@ -125,6 +180,26 @@ ul {
 
 .role .highlight {
   color: var(--text-main);
+}
+
+.typing-cursor {
+  display: inline-block;
+  width: 3px;
+  height: 1em;
+  background-color: var(--accent);
+  margin-left: 5px;
+  vertical-align: middle;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 .description {
@@ -244,10 +319,10 @@ ul {
   border: 1px solid var(--border);
   transition: transform 0.3s;
   height: 100%;
+  transform-style: preserve-3d;
 }
 
 .skill-card:hover {
-  transform: translateY(-5px);
   border-color: var(--accent);
 }
 
@@ -255,11 +330,13 @@ ul {
   font-size: 2rem;
   color: var(--accent);
   margin-bottom: 20px;
+  transform: translateZ(20px);
 }
 
 .skill-card h3 {
   margin-bottom: 16px;
   font-size: 1.25rem;
+  transform: translateZ(20px);
 }
 
 .skill-card p {
@@ -269,6 +346,7 @@ ul {
   display: flex;
   align-items: center;
   gap: 8px;
+  transform: translateZ(20px);
 }
 
 .skill-card i.colored {
@@ -285,18 +363,10 @@ ul {
   background-color: var(--bg-card);
   border-radius: 12px;
   border: 1px solid var(--border);
-  transition:
-    transform 0.3s,
-    border-color 0.3s;
-
   display: flex;
   flex-direction: column;
   height: 100%;
-}
-
-.project-card:hover {
-  transform: translateY(-7px);
-  border-color: var(--accent);
+  transform-style: preserve-3d;
 }
 
 .card-header {
@@ -305,6 +375,7 @@ ul {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  transform: translateZ(20px);
 }
 
 .card-header i.fa-folder,
@@ -331,6 +402,7 @@ ul {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  transform: translateZ(20px);
 }
 
 .card-body h3 {
@@ -384,6 +456,48 @@ footer {
 
 .social-links a:hover {
   color: var(--accent);
+}
+
+.progress-container {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-dark);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2000;
+}
+
+.progress-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #8b5cf6, #00d4ff);
+  width: 0%;
+  transition: width 0.1s ease;
+}
+
+#btn-back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: none;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.4);
+  z-index: 1000;
+  transition:
+    transform 0.3s,
+    background-color 0.3s;
+}
+
+#btn-back-to-top:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-5px);
 }
 
 @media (max-width: 768px) {
