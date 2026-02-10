@@ -36,11 +36,7 @@
 
       .progress-bar {
         height: 4px;
-        background: linear-gradient(
-          90deg,
-          #8b5cf6,
-          #00d4ff
-        );
+        background: linear-gradient(90deg, #8b5cf6, #00d4ff);
         width: 0%;
         transition: width 0.1s ease;
       }
@@ -68,6 +64,26 @@
       #btn-back-to-top:hover {
         background-color: #7c3aed;
         transform: translateY(-5px);
+      }
+
+      .typing-cursor {
+        display: inline-block;
+        width: 3px;
+        height: 1em;
+        background-color: #8b5cf6;
+        margin-left: 5px;
+        vertical-align: middle;
+        animation: blink 1s infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
       }
     </style>
   </head>
@@ -99,7 +115,8 @@
         <p class="greeting">안녕하세요, 저는</p>
         <h1 class="name">이건영입니다.</h1>
         <h2 class="role">
-          혁신의 기업가 <span class="highlight">& 풀스택 개발자</span>
+          혁신의 기업가 & <span class="highlight" id="typing-text"></span
+          ><span class="typing-cursor"></span>
         </h2>
         <p class="description">
           이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br />
@@ -643,6 +660,39 @@
         var scrolled = (winScroll / height) * 100;
         document.getElementById("myBar").style.width = scrolled + "%";
       }
+
+      const typingText = document.getElementById("typing-text");
+      const words = ["풀스택 개발자", "메이커", "아이디어 뱅크", "팀 리더"];
+      let wordIndex = 0;
+      let charIndex = 0;
+      let isDeleting = false;
+      let typeSpeed = 100;
+
+      function type() {
+        const currentWord = words[wordIndex];
+
+        if (isDeleting) {
+          typingText.textContent = currentWord.substring(0, charIndex - 1);
+          charIndex--;
+          typeSpeed = 50;
+        } else {
+          typingText.textContent = currentWord.substring(0, charIndex + 1);
+          charIndex++;
+          typeSpeed = 100;
+        }
+
+        if (!isDeleting && charIndex === currentWord.length) {
+          isDeleting = true;
+          typeSpeed = 2000;
+        } else if (isDeleting && charIndex === 0) {
+          isDeleting = false;
+          wordIndex = (wordIndex + 1) % words.length;
+          typeSpeed = 500;
+        }
+
+        setTimeout(type, typeSpeed);
+      }
+      document.addEventListener("DOMContentLoaded", type);
     </script>
   </body>
 </html>
