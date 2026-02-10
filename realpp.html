@@ -4,149 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>이건영 | Innovative Entrepreneur & Developer</title>
+
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
     />
+
     <link rel="stylesheet" href="portfolio.css" />
 
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
-
     <link
       rel="stylesheet"
       type="text/css"
       href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
     />
-
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-
-    <style>
-      .progress-container {
-        width: 100%;
-        height: 4px;
-        background: #0f172a;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 2000;
-      }
-
-      .progress-bar {
-        height: 4px;
-        background: linear-gradient(90deg, #8b5cf6, #00d4ff);
-        width: 0%;
-        transition: width 0.1s ease;
-      }
-
-      #btn-back-to-top {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        display: none;
-        background-color: #8b5cf6;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-        cursor: pointer;
-        box-shadow: 0 4px 10px rgba(139, 92, 246, 0.4);
-        z-index: 1000;
-        transition:
-          transform 0.3s,
-          background-color 0.3s;
-      }
-
-      #btn-back-to-top:hover {
-        background-color: #7c3aed;
-        transform: translateY(-5px);
-      }
-
-      .typing-cursor {
-        display: inline-block;
-        width: 3px;
-        height: 1em;
-        background-color: #8b5cf6;
-        margin-left: 5px;
-        vertical-align: middle;
-        animation: blink 1s infinite;
-      }
-
-      @keyframes blink {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0;
-        }
-      }
-
-      .hero {
-        position: relative;
-        overflow: hidden;
-      }
-
-      .floating-icon {
-        position: absolute;
-        font-size: 3rem;
-        opacity: 0.15;
-        color: #8b5cf6;
-        z-index: 0;
-        animation: floatIcon 6s ease-in-out infinite;
-      }
-
-      .icon-1 {
-        top: 15%;
-        left: 10%;
-        animation-delay: 0s;
-        font-size: 4rem;
-      }
-      .icon-2 {
-        top: 20%;
-        right: 15%;
-        animation-delay: 1s;
-        font-size: 3.5rem;
-      }
-      .icon-3 {
-        bottom: 20%;
-        left: 15%;
-        animation-delay: 2s;
-        font-size: 3rem;
-      }
-      .icon-4 {
-        bottom: 15%;
-        right: 10%;
-        animation-delay: 3s;
-        font-size: 4rem;
-      }
-      .icon-5 {
-        top: 50%;
-        left: 5%;
-        animation-delay: 4s;
-      }
-
-      @keyframes floatIcon {
-        0% {
-          transform: translateY(0) rotate(0deg);
-        }
-        50% {
-          transform: translateY(-20px) rotate(10deg);
-        }
-        100% {
-          transform: translateY(0) rotate(0deg);
-        }
-      }
-
-      .hero-content {
-        position: relative;
-        z-index: 1;
-      }
-    </style>
   </head>
   <body>
     <div class="progress-container">
@@ -819,88 +694,7 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
-    <script>
-      AOS.init({
-        once: true,
-      });
 
-      VanillaTilt.init(
-        document.querySelectorAll(".skill-card, .project-card"),
-        {
-          max: 10,
-          speed: 400,
-          glare: true,
-          "max-glare": 0.5,
-        },
-      );
-
-      const mybutton = document.getElementById("btn-back-to-top");
-
-      window.onscroll = function () {
-        scrollFunction();
-        updateProgressBar();
-      };
-
-      function scrollFunction() {
-        if (
-          document.body.scrollTop > 20 ||
-          document.documentElement.scrollTop > 20
-        ) {
-          mybutton.style.display = "block";
-        } else {
-          mybutton.style.display = "none";
-        }
-      }
-
-      mybutton.addEventListener("click", backToTop);
-
-      function backToTop() {
-        document.body.scrollTop = 0;
-        document.documentElement.scrollTop = 0;
-      }
-
-      function updateProgressBar() {
-        var winScroll =
-          document.body.scrollTop || document.documentElement.scrollTop;
-        var height =
-          document.documentElement.scrollHeight -
-          document.documentElement.clientHeight;
-        var scrolled = (winScroll / height) * 100;
-        document.getElementById("myBar").style.width = scrolled + "%";
-      }
-
-      const typingText = document.getElementById("typing-text");
-      const words = ["풀스택 개발자", "메이커", "아이디어 뱅크", "팀 리더"];
-      let wordIndex = 0;
-      let charIndex = 0;
-      let isDeleting = false;
-      let typeSpeed = 100;
-
-      function type() {
-        const currentWord = words[wordIndex];
-
-        if (isDeleting) {
-          typingText.textContent = currentWord.substring(0, charIndex - 1);
-          charIndex--;
-          typeSpeed = 50;
-        } else {
-          typingText.textContent = currentWord.substring(0, charIndex + 1);
-          charIndex++;
-          typeSpeed = 100;
-        }
-
-        if (!isDeleting && charIndex === currentWord.length) {
-          isDeleting = true;
-          typeSpeed = 2000;
-        } else if (isDeleting && charIndex === 0) {
-          isDeleting = false;
-          wordIndex = (wordIndex + 1) % words.length;
-          typeSpeed = 500;
-        }
-
-        setTimeout(type, typeSpeed);
-      }
-      document.addEventListener("DOMContentLoaded", type);
-    </script>
+    <script src="portfolio.js"></script>
   </body>
 </html>
