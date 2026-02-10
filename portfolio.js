@@ -41,7 +41,7 @@ function updateProgressBar() {
 }
 
 const typingText = document.getElementById("typing-text");
-const words = ["풀스택 개발자", "메이커", "아이디어 뱅크", "팀 리더"];
+const words = ["풀스택 개발자", "메이커", "아이디어 뱅크", "팀 리더", "엔지니어"];
 let wordIndex = 0;
 let charIndex = 0;
 let isDeleting = false;
