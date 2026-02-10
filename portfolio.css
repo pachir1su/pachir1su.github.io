@@ -94,7 +94,7 @@ ul {
 }
 
 .hero {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   padding-top: 70px;
@@ -144,6 +144,9 @@ ul {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btn.primary {
@@ -224,14 +227,13 @@ ul {
   color: var(--accent);
 }
 
-/* Skills 섹션 */
 .bg-dark {
   background-color: #0b1120;
 }
 
 .skills-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
 }
 
@@ -241,6 +243,7 @@ ul {
   border-radius: 12px;
   border: 1px solid var(--border);
   transition: transform 0.3s;
+  height: 100%;
 }
 
 .skill-card:hover {
@@ -263,9 +266,15 @@ ul {
   color: var(--text-muted);
   margin-bottom: 8px;
   font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* Projects 섹션 */
+.skill-card i.colored {
+  font-size: 1.1em;
+}
+
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -275,14 +284,14 @@ ul {
 .project-card {
   background-color: var(--bg-card);
   border-radius: 12px;
-  padding: 32px;
   border: 1px solid var(--border);
   transition:
     transform 0.3s,
     border-color 0.3s;
+
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  height: 100%;
 }
 
 .project-card:hover {
@@ -291,6 +300,7 @@ ul {
 }
 
 .card-header {
+  padding: 32px 32px 0 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -299,18 +309,28 @@ ul {
 
 .card-header i.fa-folder,
 .card-header i.fa-discord,
-.card-header i.fas {
+.card-header i.fas,
+.card-header i.fab {
   font-size: 2.5rem;
   color: var(--accent);
 }
 
 .card-header .links a {
   color: var(--text-muted);
-  font-size: 1.25rem;
+  font-size: 1.5rem;
+  padding: 8px;
+  transition: color 0.2s;
 }
 
 .card-header .links a:hover {
-  color: var(--accent);
+  color: white;
+}
+
+.card-body {
+  padding: 0 32px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .card-body h3 {
@@ -329,22 +349,27 @@ ul {
 .tech-stack {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .tech-stack span {
   font-size: 0.8rem;
   color: var(--accent);
   font-family: monospace;
+  background: rgba(139, 92, 246, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
 }
 
-/* 푸터 */
 footer {
   padding: 40px 0;
   text-align: center;
   color: var(--text-muted);
   border-top: 1px solid var(--border);
+  margin-top: auto;
 }
 
 .social-links {
@@ -380,6 +405,6 @@ footer {
 
   .btn {
     width: 100%;
-    text-align: center;
+    justify-content: center;
   }
 }
