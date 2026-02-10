@@ -85,6 +85,67 @@
           opacity: 0;
         }
       }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .floating-icon {
+        position: absolute;
+        font-size: 3rem;
+        opacity: 0.15;
+        color: #8b5cf6;
+        z-index: 0;
+        animation: floatIcon 6s ease-in-out infinite;
+      }
+
+      .icon-1 {
+        top: 15%;
+        left: 10%;
+        animation-delay: 0s;
+        font-size: 4rem;
+      }
+      .icon-2 {
+        top: 20%;
+        right: 15%;
+        animation-delay: 1s;
+        font-size: 3.5rem;
+      }
+      .icon-3 {
+        bottom: 20%;
+        left: 15%;
+        animation-delay: 2s;
+        font-size: 3rem;
+      }
+      .icon-4 {
+        bottom: 15%;
+        right: 10%;
+        animation-delay: 3s;
+        font-size: 4rem;
+      }
+      .icon-5 {
+        top: 50%;
+        left: 5%;
+        animation-delay: 4s;
+      }
+
+      @keyframes floatIcon {
+        0% {
+          transform: translateY(0) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(10deg);
+        }
+        100% {
+          transform: translateY(0) rotate(0deg);
+        }
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 1;
+      }
     </style>
   </head>
   <body>
@@ -111,6 +172,12 @@
     </nav>
 
     <section id="home" class="hero" data-aos="fade-up" data-aos-duration="1000">
+      <i class="devicon-python-plain floating-icon icon-1"></i>
+      <i class="devicon-react-original floating-icon icon-2"></i>
+      <i class="devicon-java-plain floating-icon icon-3"></i>
+      <i class="devicon-cplusplus-plain floating-icon icon-4"></i>
+      <i class="devicon-arduino-plain floating-icon icon-5"></i>
+
       <div class="container hero-content">
         <p class="greeting">안녕하세요, 저는</p>
         <h1 class="name">이건영입니다.</h1>
