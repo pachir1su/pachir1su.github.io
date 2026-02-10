@@ -9,10 +9,19 @@
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
     />
     <link rel="stylesheet" href="portfolio.css" />
+
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+    />
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
   </head>
   <body>
     <nav class="navbar">
@@ -29,7 +38,7 @@
       </div>
     </nav>
 
-    <section id="home" class="hero">
+    <section id="home" class="hero" data-aos="fade-up" data-aos-duration="1000">
       <div class="container hero-content">
         <p class="greeting">안녕하세요, 저는</p>
         <h1 class="name">이건영입니다.</h1>
@@ -56,9 +65,9 @@
 
     <section id="about" class="section">
       <div class="container">
-        <h2 class="section-title">My Vision</h2>
+        <h2 class="section-title" data-aos="fade-right">My Vision</h2>
         <div class="about-grid">
-          <div class="about-text">
+          <div class="about-text" data-aos="fade-up" data-aos-delay="100">
             <h3>"아이디어를 현실로 만드는 혁신가"</h3>
             <p>
               안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고
@@ -106,6 +115,7 @@
                   border-radius: 8px;
                   font-size: 0.9rem;
                   border: 1px solid #334155;
+                  text-decoration: none;
                 "
               >
                 <i class="fab fa-github"></i> GitHub 활동 보러가기
@@ -118,57 +128,75 @@
 
     <section id="skills" class="section bg-dark">
       <div class="container">
-        <h2 class="section-title">Capabilities</h2>
+        <h2 class="section-title" data-aos="fade-right">Capabilities</h2>
         <div class="skills-container">
-          <div class="skill-card">
+          <div class="skill-card" data-aos="flip-left" data-aos-delay="0">
             <div class="icon-box"><i class="fas fa-code"></i></div>
             <h3>핵심 언어</h3>
-            <p>Python</p>
-            <p>C / C++</p>
-            <p>Java</p>
-            <p>JavaScript</p>
+            <p><i class="devicon-python-plain colored"></i> Python</p>
+            <p><i class="devicon-c-plain colored"></i> C / C++</p>
+            <p><i class="devicon-java-plain colored"></i> Java</p>
+            <p><i class="devicon-javascript-plain colored"></i> JavaScript</p>
           </div>
-          <div class="skill-card">
+
+          <div class="skill-card" data-aos="flip-left" data-aos-delay="100">
             <div class="icon-box"><i class="fas fa-brain"></i></div>
             <h3>AI & 데이터 사이언스</h3>
-            <p>Scikit-learn / Keras</p>
-            <p>머신러닝 & 딥러닝</p>
-            <p>NLP (자연어 처리)</p>
-            <p>데이터 시각화 & 전처리</p>
+            <p>
+              <i class="devicon-scikitlearn-plain colored"></i> Scikit-learn /
+              Keras
+            </p>
+            <p><i class="fas fa-project-diagram"></i> 머신러닝 & 딥러닝</p>
+            <p><i class="fas fa-language"></i> NLP (자연어 처리)</p>
+            <p><i class="fas fa-chart-bar"></i> 데이터 시각화 & 전처리</p>
           </div>
-          <div class="skill-card">
+
+          <div class="skill-card" data-aos="flip-left" data-aos-delay="200">
             <div class="icon-box"><i class="fas fa-laptop-code"></i></div>
             <h3>웹 & 앱 개발</h3>
-            <p>React / HTML / CSS</p>
-            <p>Flask</p>
-            <p>Flutter</p>
-            <p>API 연동 & Tkinter</p>
-            <p>Discord 봇 개발</p>
+            <p>
+              <i class="devicon-react-original colored"></i> React / HTML / CSS
+            </p>
+            <p><i class="devicon-flask-original colored"></i> Flask</p>
+            <p><i class="devicon-flutter-plain colored"></i> Flutter</p>
+            <p><i class="fas fa-plug"></i> API 연동 & Tkinter</p>
+            <p><i class="fab fa-discord"></i> Discord 봇 개발</p>
           </div>
-          <div class="skill-card">
+
+          <div class="skill-card" data-aos="flip-left" data-aos-delay="300">
             <div class="icon-box"><i class="fas fa-microchip"></i></div>
             <h3>하드웨어 & 메이커</h3>
-            <p>아두이노 / 라즈베리파이</p>
-            <p>3D 프린팅 / 모델링</p>
-            <p>레이저 커팅</p>
-            <p>IoT 시스템 구축</p>
-            <p>용접 & 납땜</p>
+            <p>
+              <i class="devicon-arduino-plain colored"></i> 아두이노 /
+              라즈베리파이
+            </p>
+            <p><i class="fas fa-cube"></i> 3D 프린팅 / 모델링</p>
+            <p><i class="fas fa-burn"></i> 레이저 커팅</p>
+            <p><i class="fas fa-network-wired"></i> IoT 시스템 구축</p>
+            <p><i class="fas fa-tools"></i> 용접 & 납땜</p>
           </div>
-          <div class="skill-card">
+
+          <div class="skill-card" data-aos="flip-left" data-aos-delay="400">
             <div class="icon-box"><i class="fas fa-file-alt"></i></div>
             <h3>문서화 & 협업</h3>
-            <p>Notion (포트폴리오/협업)</p>
-            <p>탁월한 보고서 작성</p>
-            <p>체계적인 자료 정리</p>
-            <p>기술 문서 작성</p>
+            <p>
+              <i class="devicon-notion-plain colored"></i> Notion
+              (포트폴리오/협업)
+            </p>
+            <p><i class="fas fa-file-contract"></i> 탁월한 보고서 작성</p>
+            <p><i class="fas fa-folder-open"></i> 체계적인 자료 정리</p>
+            <p><i class="fas fa-pen-nib"></i> 기술 문서 작성</p>
           </div>
-          <div class="skill-card">
+
+          <div class="skill-card" data-aos="flip-left" data-aos-delay="500">
             <div class="icon-box"><i class="fas fa-crown"></i></div>
             <h3>리더십 & 커뮤니케이션</h3>
-            <p>프로젝트 총괄 관리</p>
-            <p>팀 리딩 경험 다수</p>
-            <p>능숙한 발표 능력</p>
-            <p>효과적인 프레젠테이션</p>
+            <p><i class="fas fa-tasks"></i> 프로젝트 총괄 관리</p>
+            <p><i class="fas fa-user-friends"></i> 팀 리딩 경험 다수</p>
+            <p><i class="fas fa-microphone-alt"></i> 능숙한 발표 능력</p>
+            <p>
+              <i class="fas fa-chalkboard-teacher"></i> 효과적인 프레젠테이션
+            </p>
           </div>
         </div>
       </div>
@@ -176,9 +204,15 @@
 
     <section id="awards" class="section">
       <div class="container">
-        <h2 class="section-title">Awards & Achievements</h2>
+        <h2 class="section-title" data-aos="fade-right">
+          Awards & Achievements
+        </h2>
         <div class="skills-container">
-          <div class="skill-card" style="border-color: #ffd700">
+          <div
+            class="skill-card"
+            style="border-color: #ffd700"
+            data-aos="zoom-in"
+          >
             <div class="icon-box">
               <i class="fas fa-trophy" style="color: #ffd700"></i>
             </div>
@@ -189,7 +223,12 @@
             <p>총 581팀 / 1661명 참가</p>
             <p>알고리즘 및 문제해결 능력 입증</p>
           </div>
-          <div class="skill-card" style="border-color: #00d4ff">
+          <div
+            class="skill-card"
+            style="border-color: #00d4ff"
+            data-aos="zoom-in"
+            data-aos-delay="100"
+          >
             <div class="icon-box">
               <i class="fas fa-award" style="color: #00d4ff"></i>
             </div>
@@ -200,7 +239,12 @@
             <p>산불 조기 감지 알림 시스템 개발</p>
             <p>Raspberry Pi & OpenCV 활용</p>
           </div>
-          <div class="skill-card" style="border-color: #cd7f32">
+          <div
+            class="skill-card"
+            style="border-color: #cd7f32"
+            data-aos="zoom-in"
+            data-aos-delay="200"
+          >
             <div class="icon-box">
               <i class="fas fa-medal" style="color: #cd7f32"></i>
             </div>
@@ -217,9 +261,9 @@
 
     <section id="projects" class="section bg-dark">
       <div class="container">
-        <h2 class="section-title">Featured Projects</h2>
+        <h2 class="section-title" data-aos="fade-right">Featured Projects</h2>
         <div class="projects-grid">
-          <div class="project-card">
+          <div class="project-card" data-aos="fade-up">
             <div class="card-header">
               <i class="fas fa-water"></i>
               <div class="links">
@@ -243,7 +287,7 @@
             </div>
           </div>
 
-          <div class="project-card">
+          <div class="project-card" data-aos="fade-up" data-aos-delay="100">
             <div class="card-header">
               <i class="fas fa-fire-extinguisher"></i>
               <div class="links">
@@ -269,7 +313,7 @@
             </div>
           </div>
 
-          <div class="project-card">
+          <div class="project-card" data-aos="fade-up" data-aos-delay="200">
             <div class="card-header">
               <i class="fas fa-laptop-code"></i>
               <div class="links">
@@ -292,7 +336,7 @@
             </div>
           </div>
 
-          <div class="project-card">
+          <div class="project-card" data-aos="fade-up">
             <div class="card-header">
               <i class="fas fa-robot"></i>
               <div class="links">
@@ -317,7 +361,7 @@
             </div>
           </div>
 
-          <div class="project-card">
+          <div class="project-card" data-aos="fade-up" data-aos-delay="100">
             <div class="card-header">
               <i class="fab fa-discord"></i>
               <div class="links">
@@ -340,7 +384,7 @@
             </div>
           </div>
 
-          <div class="project-card">
+          <div class="project-card" data-aos="fade-up" data-aos-delay="200">
             <div class="card-header">
               <i class="fas fa-robot"></i>
               <div class="links">
@@ -365,7 +409,7 @@
             </div>
           </div>
 
-          <div class="project-card">
+          <div class="project-card" data-aos="fade-up">
             <div class="card-header">
               <i class="fas fa-id-card"></i>
               <div class="links">
@@ -388,7 +432,7 @@
             </div>
           </div>
 
-          <div class="project-card">
+          <div class="project-card" data-aos="fade-up" data-aos-delay="100">
             <div class="card-header">
               <i class="fas fa-leaf"></i>
               <div class="links">
@@ -412,7 +456,7 @@
             </div>
           </div>
 
-          <div class="project-card">
+          <div class="project-card" data-aos="fade-up" data-aos-delay="200">
             <div class="card-header">
               <i class="fas fa-heartbeat"></i>
               <div class="links">
@@ -436,7 +480,7 @@
             </div>
           </div>
 
-          <div class="project-card">
+          <div class="project-card" data-aos="fade-up">
             <div class="card-header">
               <i class="fas fa-book-open"></i>
               <div class="links">
@@ -470,8 +514,16 @@
           <a href="https://github.com/pachir1su" target="_blank"
             ><i class="fab fa-github"></i
           ></a>
+          <a href="mailto:" title="Email Me"><i class="fas fa-envelope"></i></a>
         </div>
       </div>
     </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        once: true,
+      });
+    </script>
   </body>
 </html>
