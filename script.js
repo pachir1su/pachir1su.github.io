@@ -73,3 +73,16 @@ function type() {
 }
 
 document.addEventListener("DOMContentLoaded", type);
+
+// 좌클릭(드래그, 텍스트 선택) 및 우클릭(컨텍스트 메뉴) 방지
+document.addEventListener("contextmenu", (e) => {
+  e.preventDefault(); // 우클릭 방지
+});
+
+document.addEventListener("dragstart", (e) => {
+  e.preventDefault(); // 드래그 방지
+});
+
+document.addEventListener("selectstart", (e) => {
+  e.preventDefault(); // 텍스트 선택 방지
+});
