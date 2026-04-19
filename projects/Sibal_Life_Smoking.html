@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>온라인술담 | 이건영 포트폴리오</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <div class="progress-container">
+      <div class="progress-bar" id="myBar"></div>
+    </div>
+    <button type="button" id="btn-back-to-top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <nav class="navbar">
+      <div class="container nav-content">
+        <a href="../index.html" class="logo"
+          ><span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span></a
+        >
+        <ul class="nav-links">
+          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li>
+            <a
+              href="https://github.com/pachir1su"
+              target="_blank"
+              class="nav-github"
+              ><i class="fab fa-github"></i
+            ></a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <section class="detail-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="detail-hero-glow"></div>
+      <div class="container" style="position: relative; z-index: 1">
+        <div class="detail-breadcrumb">
+          <a href="../index.html">홈</a> /
+          <a href="../index.html#projects">프로젝트</a> / 온라인술담
+        </div>
+        <div class="detail-hero-icon">
+          <i class="fas fa-wine-glass-alt"></i>
+        </div>
+        <h1 class="detail-title" data-aos="fade-up">온라인술담</h1>
+        <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
+          <span class="detail-badge">HTML/CSS/JS</span>
+          <span class="detail-badge">GitHub Pages</span>
+          <span
+            class="detail-badge"
+            style="
+              border-color: rgba(124, 109, 245, 0.4);
+              color: var(--accent2);
+              background: rgba(124, 109, 245, 0.1);
+            "
+            >진행 예정</span
+          >
+        </div>
+        <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
+          <a
+            href="https://github.com/pachir1su/Sibal_Life_Smoking"
+            target="_blank"
+            class="btn btn-primary"
+            ><i class="fab fa-github"></i> GitHub</a
+          >
+          <a href="../index.html#projects" class="btn btn-ghost"
+            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-body">
+      <div class="container">
+        <div class="detail-grid">
+          <div class="detail-main">
+            <div class="detail-section" data-aos="fade-up">
+              <h2>프로젝트 개요</h2>
+              <p>
+                온라인담타 사이트를 벤치마킹하여 기획한 술담(술 + 담배)
+                사이트입니다.
+              </p>
+              <p>
+                별도 서버 없이 GitHub Pages로 배포할 예정이므로 순수
+                HTML/CSS/JS와 브라우저 기반 기술만으로 최대한의 기능을 구현하는
+                것이 목표입니다.
+              </p>
+            </div>
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
+              <h2>주요 기능 / 내용</h2>
+              <ul>
+                <li>야무진 술담배 UI/UX 디자인</li>
+                <li>GitHub Pages 정적 사이트 배포</li>
+                <li>온라인담타 벤치마킹 기반 기능 설계</li>
+                <li>서버 없이 동작하는 프론트엔드 중심 구현</li>
+              </ul>
+            </div>
+            <div
+              class="detail-section"
+              data-aos="fade-up"
+              data-aos-delay="100"
+            ></div>
+          </div>
+
+          <div class="detail-sidebar">
+            <div class="sidebar-card" data-aos="fade-left">
+              <h4>Tech Stack</h4>
+              <div class="sidebar-stack">
+                <span class="tech-stack"><span>HTML</span></span>
+                <span class="tech-stack"><span>CSS</span></span>
+                <span class="tech-stack"><span>JavaScript</span></span>
+                <span class="tech-stack"><span>GitHub Pages</span></span>
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
+              <h4>Links</h4>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <a
+                  href="https://github.com/pachir1su/Sibal_Life_Smoking"
+                  target="_blank"
+                  class="github-activity-btn"
+                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                >
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
+              <h4>프로젝트 유형</h4>
+              <p
+                style="
+                  color: var(--text-muted);
+                  font-size: 0.88rem;
+                  line-height: 1.6;
+                "
+              >
+                개인 기획 프로젝트<br />정적 웹사이트
+              </p>
+            </div>
+            <div
+              class="sidebar-card"
+              data-aos="fade-left"
+              data-aos-delay="200"
+              style="border-color: rgba(124, 109, 245, 0.3)"
+            >
+              <h4 style="color: var(--accent2)">진행 상태</h4>
+              <p
+                style="
+                  color: var(--text-muted);
+                  font-size: 0.88rem;
+                  line-height: 1.6;
+                "
+              >
+                🔧 기획 단계
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">
+          <span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span>
+        </div>
+        <p class="footer-copy">
+          &copy; 2026 Lee Geon Yeong. All rights reserved.
+        </p>
+        <div class="social-links">
+          <a href="https://github.com/pachir1su" target="_blank"
+            ><i class="fab fa-github"></i
+          ></a>
+          <a href="mailto:capybara@koreatech.ac.kr"
+            ><i class="fas fa-envelope"></i
+          ></a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="../script.js"></script>
+  </body>
+</html>
