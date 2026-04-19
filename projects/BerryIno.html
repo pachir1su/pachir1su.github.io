@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NFC 출석 체크 시스템 | 이건영 포트폴리오</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <div class="progress-container">
+      <div class="progress-bar" id="myBar"></div>
+    </div>
+    <button type="button" id="btn-back-to-top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <nav class="navbar">
+      <div class="container nav-content">
+        <a href="../index.html" class="logo"
+          ><span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span></a
+        >
+        <ul class="nav-links">
+          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li>
+            <a
+              href="https://github.com/pachir1su"
+              target="_blank"
+              class="nav-github"
+              ><i class="fab fa-github"></i
+            ></a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <section class="detail-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="detail-hero-glow"></div>
+      <div class="container" style="position: relative; z-index: 1">
+        <div class="detail-breadcrumb">
+          <a href="../index.html">홈</a> /
+          <a href="../index.html#projects">프로젝트</a> / NFC 출석 체크 시스템
+        </div>
+        <div class="detail-hero-icon"><i class="fas fa-id-card"></i></div>
+        <h1 class="detail-title" data-aos="fade-up">NFC 출석 체크 시스템</h1>
+        <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
+          <span class="detail-badge">Arduino</span
+          ><span class="detail-badge">Raspberry Pi</span
+          ><span class="detail-badge">IoT</span
+          ><span class="detail-badge">팀 프로젝트</span>
+        </div>
+        <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
+          <a
+            href="https://github.com/pachir1su/BerryIno"
+            target="_blank"
+            class="btn btn-primary"
+            ><i class="fab fa-github"></i> GitHub</a
+          >
+
+          <a href="../index.html#projects" class="btn btn-ghost"
+            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-body">
+      <div class="container">
+        <div class="detail-grid">
+          <div class="detail-main">
+            <div class="detail-section" data-aos="fade-up">
+              <h2>프로젝트 개요</h2>
+              <p>
+                NFC 태그를 활용한 스마트 출석 체크 시스템입니다. 아두이노로 NFC
+                리더를 제어하고 라즈베리파이로 데이터를 처리 및 저장하는 IoT
+                구조로 설계했습니다.
+              </p>
+            </div>
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
+              <h2>주요 기능 / 내용</h2>
+              <ul>
+                <li>NFC 태그 인식 및 사용자 인증</li>
+                <li>아두이노 RC522 NFC 모듈 연동</li>
+                <li>출석 데이터 저장</li>
+                <li>실시간 출석 현황 웹 대시보드</li>
+                <li>아두이노 ↔ 라즈베리파이 시리얼 통신</li>
+                <li>4x4 매트릭스 키패드로도 학번을 입력해 출석 가능</li>
+              </ul>
+            </div>
+            <div
+              class="detail-section"
+              data-aos="fade-up"
+              data-aos-delay="100"
+            ></div>
+          </div>
+
+          <div class="detail-sidebar">
+            <div class="sidebar-card" data-aos="fade-left">
+              <h4>Tech Stack</h4>
+              <div class="sidebar-stack">
+                <span class="tech-stack"><span>Arduino</span></span
+                ><span class="tech-stack"><span>Raspberry Pi</span></span
+                ><span class="tech-stack"><span>Python</span></span
+                ><span class="tech-stack"><span>NFC/RFID</span></span
+                ><span class="tech-stack"><span>IoT</span></span>
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
+              <h4>Links</h4>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <a
+                  href="https://github.com/pachir1su/BerryIno"
+                  target="_blank"
+                  class="github-activity-btn"
+                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                >
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
+              <h4>프로젝트 유형</h4>
+              <p
+                style="
+                  color: var(--text-muted);
+                  font-size: 0.88rem;
+                  line-height: 1.6;
+                "
+              >
+                IoT 시스템 프로젝트<br />팀 개발
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">
+          <span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span>
+        </div>
+        <p class="footer-copy">
+          &copy; 2026 Lee Geon Yeong. All rights reserved.
+        </p>
+        <div class="social-links">
+          <a href="https://github.com/pachir1su" target="_blank"
+            ><i class="fab fa-github"></i
+          ></a>
+          <a href="mailto:capybara@koreatech.ac.kr"
+            ><i class="fas fa-envelope"></i
+          ></a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="../script.js"></script>
+  </body>
+</html>
