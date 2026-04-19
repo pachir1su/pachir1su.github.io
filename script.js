@@ -1,88 +1,83 @@
-AOS.init({
-  once: true,
+// AOS
+AOS.init({ once: true, duration: 700, easing: 'ease-out-cubic' });
+
+// VanillaTilt
+VanillaTilt.init(document.querySelectorAll(".skill-card, .project-card, .award-card"), {
+  max: 8, speed: 400, glare: true, "max-glare": 0.15,
 });
 
-VanillaTilt.init(document.querySelectorAll(".skill-card, .project-card"), {
-  max: 10,
-  speed: 400,
-  glare: true,
-  "max-glare": 0.5,
-});
+// Custom Cursor
+const dot = document.querySelector('.cursor-dot');
+const outline = document.querySelector('.cursor-outline');
+if (dot && outline) {
+  window.addEventListener('mousemove', (e) => {
+    dot.style.left = e.clientX + 'px';
+    dot.style.top = e.clientY + 'px';
+    outline.style.left = e.clientX + 'px';
+    outline.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      outline.style.transform = 'translate(-50%,-50%) scale(1.5)';
+      outline.style.borderColor = 'rgba(79,142,247,0.8)';
+    });
+    el.addEventListener('mouseleave', () => {
+      outline.style.transform = 'translate(-50%,-50%) scale(1)';
+      outline.style.borderColor = 'rgba(79,142,247,0.5)';
+    });
+  });
+}
 
+// Progress bar & scroll button
 const mybutton = document.getElementById("btn-back-to-top");
-
 window.onscroll = function () {
-  scrollFunction();
-  updateProgressBar();
+  const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  document.getElementById("myBar").style.width = (winScroll / height * 100) + "%";
+  if (mybutton) mybutton.style.display = winScroll > 300 ? "flex" : "none";
 };
 
-function scrollFunction() {
-  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    mybutton.style.display = "block";
-  } else {
-    mybutton.style.display = "none";
-  }
+if (mybutton) {
+  mybutton.style.alignItems = 'center';
+  mybutton.style.justifyContent = 'center';
+  mybutton.addEventListener("click", () => {
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+  });
 }
 
-mybutton.addEventListener("click", backToTop);
-
-function backToTop() {
-  document.body.scrollTop = 0;
-  document.documentElement.scrollTop = 0;
-}
-
-function updateProgressBar() {
-  var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-  var height =
-    document.documentElement.scrollHeight -
-    document.documentElement.clientHeight;
-  var scrolled = (winScroll / height) * 100;
-  document.getElementById("myBar").style.width = scrolled + "%";
-}
-
+// Typing effect
 const typingText = document.getElementById("typing-text");
-const words = ["풀스택 개발자", "메이커", "아이디어 뱅크", "팀 리더", "엔지니어"];
-let wordIndex = 0;
-let charIndex = 0;
-let isDeleting = false;
-let typeSpeed = 100;
-
-function type() {
-  const currentWord = words[wordIndex];
-
-  if (isDeleting) {
-    typingText.textContent = currentWord.substring(0, charIndex - 1);
-    charIndex--;
-    typeSpeed = 50;
-  } else {
-    typingText.textContent = currentWord.substring(0, charIndex + 1);
-    charIndex++;
-    typeSpeed = 100;
+if (typingText) {
+  const words = ["풀스택 개발자", "메이커", "아이디어 뱅크", "팀 리더", "엔지니어"];
+  let wordIndex = 0, charIndex = 0, isDeleting = false, typeSpeed = 100;
+  function type() {
+    const currentWord = words[wordIndex];
+    typingText.textContent = isDeleting
+      ? currentWord.substring(0, charIndex - 1)
+      : currentWord.substring(0, charIndex + 1);
+    isDeleting ? charIndex-- : charIndex++;
+    typeSpeed = isDeleting ? 50 : 100;
+    if (!isDeleting && charIndex === currentWord.length) { isDeleting = true; typeSpeed = 2000; }
+    else if (isDeleting && charIndex === 0) { isDeleting = false; wordIndex = (wordIndex + 1) % words.length; typeSpeed = 500; }
+    setTimeout(type, typeSpeed);
   }
-
-  if (!isDeleting && charIndex === currentWord.length) {
-    isDeleting = true;
-    typeSpeed = 2000;
-  } else if (isDeleting && charIndex === 0) {
-    isDeleting = false;
-    wordIndex = (wordIndex + 1) % words.length;
-    typeSpeed = 500;
-  }
-
-  setTimeout(type, typeSpeed);
+  type();
 }
 
-document.addEventListener("DOMContentLoaded", type);
+// Mobile menu
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+if (hamburger && mobileMenu) {
+  hamburger.addEventListener('click', () => {
+    mobileMenu.classList.toggle('open');
+  });
+}
+function closeMobile() {
+  if (mobileMenu) mobileMenu.classList.remove('open');
+}
 
-// 좌클릭(드래그, 텍스트 선택) 및 우클릭(컨텍스트 메뉴) 방지
-document.addEventListener("contextmenu", (e) => {
-  e.preventDefault(); // 우클릭 방지
-});
-
-document.addEventListener("dragstart", (e) => {
-  e.preventDefault(); // 드래그 방지
-});
-
-document.addEventListener("selectstart", (e) => {
-  e.preventDefault(); // 텍스트 선택 방지
-});
+// Context menu / drag / select prevention
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("dragstart", e => e.preventDefault());
+document.addEventListener("selectstart", e => e.preventDefault());

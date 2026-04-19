@@ -3,749 +3,426 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>이건영 | Innovative Entrepreneur & Developer</title>
-
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
-    />
-
-    <link rel="stylesheet" href="style.css" />
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
-    />
+    <title>이건영 | Developer & Innovator</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="progress-container">
-      <div class="progress-bar" id="myBar"></div>
-    </div>
+    <div class="progress-container"><div class="progress-bar" id="myBar"></div></div>
+    <button type="button" id="btn-back-to-top" title="맨 위로"><i class="fas fa-arrow-up"></i></button>
 
-    <button type="button" id="btn-back-to-top" title="맨 위로">
-      <i class="fas fa-arrow-up"></i>
-    </button>
+    <!-- Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
 
     <nav class="navbar">
       <div class="container nav-content">
-        <a href="#" class="logo">건영사이트 </a>
+        <a href="#" class="logo"><span class="logo-bracket">{</span> GY <span class="logo-bracket">}</span></a>
         <ul class="nav-links">
           <li><a href="#home">홈</a></li>
           <li><a href="#about">비전</a></li>
           <li><a href="#skills">역량</a></li>
-          <li><a href="#awards">수상 & 성과</a></li>
+          <li><a href="#awards">수상</a></li>
           <li><a href="#projects">프로젝트</a></li>
-          <li><a href="index.html" class="btn-back">메인으로</a></li>
+          <li><a href="https://github.com/pachir1su" target="_blank" class="nav-github"><i class="fab fa-github"></i></a></li>
         </ul>
+        <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
       </div>
     </nav>
 
-    <section id="home" class="hero" data-aos="fade-up" data-aos-duration="1000">
-      <i class="devicon-python-plain floating-icon icon-1"></i>
-      <i class="devicon-react-original floating-icon icon-2"></i>
-      <i class="devicon-java-plain floating-icon icon-3"></i>
-      <i class="devicon-cplusplus-plain floating-icon icon-4"></i>
-      <i class="devicon-arduino-plain floating-icon icon-5"></i>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#home" onclick="closeMobile()">홈</a>
+      <a href="#about" onclick="closeMobile()">비전</a>
+      <a href="#skills" onclick="closeMobile()">역량</a>
+      <a href="#awards" onclick="closeMobile()">수상</a>
+      <a href="#projects" onclick="closeMobile()">프로젝트</a>
+      <a href="https://github.com/pachir1su" target="_blank">GitHub</a>
+    </div>
+
+    <!-- HERO -->
+    <section id="home" class="hero">
+      <div class="hero-grid-bg"></div>
+      <div class="hero-glow"></div>
+
+      <div class="floating-icons">
+        <i class="devicon-python-plain fi fi-1"></i>
+        <i class="devicon-react-original fi fi-2"></i>
+        <i class="devicon-java-plain fi fi-3"></i>
+        <i class="devicon-cplusplus-plain fi fi-4"></i>
+        <i class="devicon-arduino-plain fi fi-5"></i>
+      </div>
 
       <div class="container hero-content">
-        <p class="greeting">안녕하세요, 저는</p>
-        <h1 class="name">이건영입니다.</h1>
-        <h2 class="role">
-          혁신의 기업가 & <span class="highlight" id="typing-text"></span
-          ><span class="typing-cursor"></span>
-        </h2>
-        <p class="description">
-          이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br />
-          <strong>월 100만 명</strong>이 사용하는 서비스를 만드는 것이
-          목표입니다.
-        </p>
-        <div class="hero-btns">
-          <a href="#projects" class="btn primary">프로젝트 보기</a>
-          <a
-            href="https://github.com/pachir1su"
-            target="_blank"
-            class="btn secondary"
-          >
-            <i class="fab fa-github"></i> GitHub
-          </a>
+        <div class="hero-tag" data-aos="fade-down">안녕하세요 👋</div>
+        <h1 class="hero-name" data-aos="fade-up" data-aos-delay="100">
+          <span class="name-kr">이건영</span>
+          <span class="name-en">Lee Geon Yeong</span>
+        </h1>
+        <div class="hero-role" data-aos="fade-up" data-aos-delay="200">
+          혁신의 기업가 &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>
         </div>
+        <p class="hero-desc" data-aos="fade-up" data-aos-delay="300">
+          이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br/>
+          <strong>월 100만 명</strong>이 사용하는 서비스를 만드는 것이 목표입니다.
+        </p>
+        <div class="hero-btns" data-aos="fade-up" data-aos-delay="400">
+          <a href="#projects" class="btn btn-primary"><i class="fas fa-folder-open"></i> 프로젝트 보기</a>
+          <a href="https://github.com/pachir1su" target="_blank" class="btn btn-ghost"><i class="fab fa-github"></i> GitHub</a>
+        </div>
+
+        <div class="hero-stats" data-aos="fade-up" data-aos-delay="500">
+          <div class="stat-item"><span class="stat-num">10+</span><span class="stat-label">프로젝트</span></div>
+          <div class="stat-divider"></div>
+          <div class="stat-item"><span class="stat-num">3</span><span class="stat-label">수상 경력</span></div>
+          <div class="stat-divider"></div>
+          <div class="stat-item"><span class="stat-num">581</span><span class="stat-label">팀 중 8위</span></div>
+        </div>
+      </div>
+
+      <div class="scroll-hint">
+        <span>스크롤</span>
+        <div class="scroll-line"></div>
       </div>
     </section>
 
+    <!-- ABOUT -->
     <section id="about" class="section">
       <div class="container">
-        <h2 class="section-title" data-aos="fade-right">My Vision</h2>
-        <div class="about-grid">
-          <div class="about-text" data-aos="fade-up" data-aos-delay="100">
-            <h3>"아이디어를 현실로 만드는 혁신가"</h3>
-            <p>
-              안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고
-              만드는 <strong>이건영</strong>입니다. 저는 사업가가 아닌
-              <strong>기업가</strong>를 지향합니다. 단순히 이윤을 쫓기보다
-              기술을 통해 세상에 없던 가치를 창출하고 혁신을 일으키는 과정을
-              즐깁니다.
-            </p>
-            <p>
-              매일 떠오르는 아이디어를 구체화하여 기록하고 있으며, 이를 실현하기
-              위해
-              <strong>AI, 웹/앱 개발, 임베디드 하드웨어</strong> 등 분야를
-              가리지 않고 기술을 섭렵했습니다. 팀을 이끄는 리더십과 명확한 소통
-              능력을 바탕으로 상상을 현실로 구현해냅니다.
-            </p>
-            <div class="info-list">
-              <div class="info-item">
-                <i class="fas fa-rocket"></i>
-                <span>목표: 월 100만명이 이용하는 유저 서비스</span>
-              </div>
-              <div class="info-item">
-                <i class="fas fa-lightbulb"></i>
-                <span>혁신적인 아이디어 뱅크</span>
-              </div>
-              <div class="info-item">
-                <i class="fas fa-users"></i>
-                <span>풍부한 팀장 경험</span>
-              </div>
-            </div>
-
-            <div style="margin-top: 40px">
-              <h4
-                style="color: #94a3b8; margin-bottom: 15px; font-size: 0.9rem"
-              >
-                Constant Activity & Growth
-              </h4>
-              <a
-                href="https://github.com/pachir1su"
-                target="_blank"
-                style="
-                  display: inline-block;
-                  padding: 10px 20px;
-                  background-color: #1e293b;
-                  color: #fff;
-                  border-radius: 8px;
-                  font-size: 0.9rem;
-                  border: 1px solid #334155;
-                  text-decoration: none;
-                "
-              >
-                <i class="fab fa-github"></i> GitHub 활동 보러가기
-              </a>
-            </div>
+        <div class="section-header" data-aos="fade-right">
+          <span class="section-tag">// 01</span>
+          <h2 class="section-title">My Vision</h2>
+        </div>
+        <div class="about-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="about-quote">"아이디어를 현실로 만드는 혁신가"</div>
+          <div class="about-body">
+            <p>안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고 만드는 <strong>이건영</strong>입니다. 저는 사업가가 아닌 <strong>기업가</strong>를 지향합니다. 단순히 이윤을 쫓기보다 기술을 통해 세상에 없던 가치를 창출하고 혁신을 일으키는 과정을 즐깁니다.</p>
+            <p>매일 떠오르는 아이디어를 구체화하여 기록하고 있으며, 이를 실현하기 위해 <strong>AI, 웹/앱 개발, 임베디드 하드웨어</strong> 등 분야를 가리지 않고 기술을 섭렵했습니다. 팀을 이끄는 리더십과 명확한 소통 능력을 바탕으로 상상을 현실로 구현해냅니다.</p>
+          </div>
+          <div class="about-chips">
+            <div class="chip"><i class="fas fa-rocket"></i> 목표: 월 100만명 유저 서비스</div>
+            <div class="chip"><i class="fas fa-lightbulb"></i> 혁신적인 아이디어 뱅크</div>
+            <div class="chip"><i class="fas fa-users"></i> 풍부한 팀장 경험</div>
+          </div>
+          <div class="about-github-link">
+            <a href="https://github.com/pachir1su" target="_blank" class="github-activity-btn">
+              <i class="fab fa-github"></i> GitHub 활동 보러가기
+            </a>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="skills" class="section bg-dark">
+    <!-- SKILLS -->
+    <section id="skills" class="section section-alt">
       <div class="container">
-        <h2 class="section-title" data-aos="fade-right">Capabilities</h2>
-        <div class="skills-container">
-          <div
-            class="skill-card"
-            data-tilt
-            data-tilt-max="10"
-            data-tilt-speed="400"
-            data-aos="flip-left"
-            data-aos-delay="0"
-          >
-            <div class="icon-box"><i class="fas fa-code"></i></div>
+        <div class="section-header" data-aos="fade-right">
+          <span class="section-tag">// 02</span>
+          <h2 class="section-title">Capabilities</h2>
+        </div>
+        <div class="skills-grid">
+          <div class="skill-card" data-tilt data-aos="fade-up" data-aos-delay="0">
+            <div class="skill-icon"><i class="fas fa-code"></i></div>
             <h3>핵심 언어</h3>
-            <p><i class="devicon-python-plain colored"></i> Python</p>
-            <p><i class="devicon-c-plain colored"></i> C / C++</p>
-            <p><i class="devicon-java-plain colored"></i> Java</p>
-            <p><i class="devicon-javascript-plain colored"></i> JavaScript</p>
-            <p><i class="devicon-processing-plain colored"></i> Processing</p>
+            <ul class="skill-list">
+              <li><i class="devicon-python-plain colored"></i> Python</li>
+              <li><i class="devicon-c-plain colored"></i> C / C++</li>
+              <li><i class="devicon-java-plain colored"></i> Java</li>
+              <li><i class="devicon-javascript-plain colored"></i> JavaScript</li>
+              <li><i class="devicon-processing-plain colored"></i> Processing</li>
+            </ul>
           </div>
-
-          <div
-            class="skill-card"
-            data-tilt
-            data-tilt-max="10"
-            data-tilt-speed="400"
-            data-aos="flip-left"
-            data-aos-delay="100"
-          >
-            <div class="icon-box"><i class="fas fa-brain"></i></div>
-            <h3>AI & 데이터 사이언스</h3>
-            <p><i class="fas fa-robot colored"></i> LLM 활용 능력</p>
-            <p>
-              <i class="devicon-scikitlearn-plain colored"></i> Scikit-learn /
-              Keras
-            </p>
-            <p><i class="fas fa-chart-pie"></i> Orange3</p>
-            <p><i class="fas fa-project-diagram"></i> 머신러닝 & 딥러닝</p>
-            <p><i class="fas fa-language"></i> NLP (자연어 처리)</p>
-            <p><i class="fas fa-chart-bar"></i> 데이터 시각화 & 전처리</p>
+          <div class="skill-card" data-tilt data-aos="fade-up" data-aos-delay="50">
+            <div class="skill-icon"><i class="fas fa-brain"></i></div>
+            <h3>AI & 데이터</h3>
+            <ul class="skill-list">
+              <li><i class="fas fa-robot"></i> LLM 활용 능력</li>
+              <li><i class="devicon-scikitlearn-plain colored"></i> Scikit-learn / Keras</li>
+              <li><i class="fas fa-chart-pie"></i> Orange3</li>
+              <li><i class="fas fa-project-diagram"></i> 머신러닝 & 딥러닝</li>
+              <li><i class="fas fa-language"></i> NLP (자연어 처리)</li>
+            </ul>
           </div>
-
-          <div
-            class="skill-card"
-            data-tilt
-            data-tilt-max="10"
-            data-tilt-speed="400"
-            data-aos="flip-left"
-            data-aos-delay="600"
-          >
-            <div class="icon-box"><i class="fas fa-photo-video"></i></div>
-            <h3>미디어 & 프레젠테이션</h3>
-            <p><i class="fas fa-film"></i> 영상 편집 기술</p>
-            <p><i class="fas fa-vr-cardboard"></i> 버츄얼(VTuber) 기술 보유</p>
-          </div>
-
-          <div
-            class="skill-card"
-            data-tilt
-            data-tilt-max="10"
-            data-tilt-speed="400"
-            data-aos="flip-left"
-            data-aos-delay="200"
-          >
-            <div class="icon-box"><i class="fas fa-laptop-code"></i></div>
+          <div class="skill-card" data-tilt data-aos="fade-up" data-aos-delay="100">
+            <div class="skill-icon"><i class="fas fa-laptop-code"></i></div>
             <h3>웹 & 앱 개발</h3>
-            <p>
-              <i class="devicon-react-original colored"></i> React / HTML / CSS
-            </p>
-            <p><i class="devicon-flask-original colored"></i> Flask</p>
-            <p><i class="devicon-flutter-plain colored"></i> Flutter</p>
-            <p><i class="devicon-figma-plain colored"></i> Figma</p>
-            <p><i class="fas fa-plug"></i> API 연동 & Tkinter</p>
-            <p><i class="fab fa-discord"></i> Discord 봇 개발</p>
+            <ul class="skill-list">
+              <li><i class="devicon-react-original colored"></i> React / HTML / CSS</li>
+              <li><i class="devicon-flask-original colored"></i> Flask</li>
+              <li><i class="devicon-flutter-plain colored"></i> Flutter</li>
+              <li><i class="devicon-figma-plain colored"></i> Figma</li>
+              <li><i class="fab fa-discord"></i> Discord 봇 개발</li>
+            </ul>
           </div>
-
-          <div
-            class="skill-card"
-            data-tilt
-            data-tilt-max="10"
-            data-tilt-speed="400"
-            data-aos="flip-left"
-            data-aos-delay="300"
-          >
-            <div class="icon-box"><i class="fas fa-microchip"></i></div>
+          <div class="skill-card" data-tilt data-aos="fade-up" data-aos-delay="150">
+            <div class="skill-icon"><i class="fas fa-microchip"></i></div>
             <h3>하드웨어 & 메이커</h3>
-            <p>
-              <i class="devicon-arduino-plain colored"></i> 아두이노 /
-              라즈베리파이
-            </p>
-            <p><i class="fas fa-cube"></i> 3D 프린팅 / 모델링</p>
-            <p><i class="fas fa-burn"></i> 레이저 커팅</p>
-            <p><i class="fas fa-network-wired"></i> IoT 시스템 구축</p>
-            <p><i class="fas fa-tools"></i> 용접 & 납땜</p>
+            <ul class="skill-list">
+              <li><i class="devicon-arduino-plain colored"></i> 아두이노 / 라즈베리파이</li>
+              <li><i class="fas fa-cube"></i> 3D 프린팅 / 모델링</li>
+              <li><i class="fas fa-burn"></i> 레이저 커팅</li>
+              <li><i class="fas fa-network-wired"></i> IoT 시스템 구축</li>
+              <li><i class="fas fa-tools"></i> 용접 & 납땜</li>
+            </ul>
           </div>
-
-          <div
-            class="skill-card"
-            data-tilt
-            data-tilt-max="10"
-            data-tilt-speed="400"
-            data-aos="flip-left"
-            data-aos-delay="400"
-          >
-            <div class="icon-box"><i class="fas fa-file-alt"></i></div>
+          <div class="skill-card" data-tilt data-aos="fade-up" data-aos-delay="200">
+            <div class="skill-icon"><i class="fas fa-file-alt"></i></div>
             <h3>문서화 & 협업</h3>
-            <p>
-              <i class="devicon-notion-plain colored"></i> Notion
-              (포트폴리오/협업)
-            </p>
-            <p><i class="fas fa-file-contract"></i> 탁월한 보고서 작성</p>
-            <p><i class="fas fa-folder-open"></i> 체계적인 자료 정리</p>
-            <p><i class="fas fa-pen-nib"></i> 기술 문서 작성</p>
+            <ul class="skill-list">
+              <li><i class="devicon-notion-plain colored"></i> Notion</li>
+              <li><i class="fas fa-file-contract"></i> 탁월한 보고서 작성</li>
+              <li><i class="fas fa-folder-open"></i> 체계적인 자료 정리</li>
+              <li><i class="fas fa-pen-nib"></i> 기술 문서 작성</li>
+            </ul>
           </div>
-
-          <div
-            class="skill-card"
-            data-tilt
-            data-tilt-max="10"
-            data-tilt-speed="400"
-            data-aos="flip-left"
-            data-aos-delay="500"
-          >
-            <div class="icon-box"><i class="fas fa-crown"></i></div>
+          <div class="skill-card" data-tilt data-aos="fade-up" data-aos-delay="250">
+            <div class="skill-icon"><i class="fas fa-crown"></i></div>
             <h3>리더십 & 커뮤니케이션</h3>
-            <p><i class="fas fa-tasks"></i> 프로젝트 총괄 관리</p>
-            <p><i class="fas fa-user-friends"></i> 팀 리딩 경험 다수</p>
-            <p><i class="fas fa-microphone-alt"></i> 능숙한 발표 능력</p>
-            <p>
-              <i class="fas fa-chalkboard-teacher"></i> 효과적인 프레젠테이션
-            </p>
+            <ul class="skill-list">
+              <li><i class="fas fa-tasks"></i> 프로젝트 총괄 관리</li>
+              <li><i class="fas fa-user-friends"></i> 팀 리딩 경험 다수</li>
+              <li><i class="fas fa-microphone-alt"></i> 능숙한 발표 능력</li>
+              <li><i class="fas fa-chalkboard-teacher"></i> 효과적인 프레젠테이션</li>
+            </ul>
+          </div>
+          <div class="skill-card" data-tilt data-aos="fade-up" data-aos-delay="300">
+            <div class="skill-icon"><i class="fas fa-photo-video"></i></div>
+            <h3>미디어 & 프레젠테이션</h3>
+            <ul class="skill-list">
+              <li><i class="fas fa-film"></i> 영상 편집 기술</li>
+              <li><i class="fas fa-vr-cardboard"></i> 버츄얼(VTuber) 기술 보유</li>
+            </ul>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- AWARDS -->
     <section id="awards" class="section">
       <div class="container">
-        <h2 class="section-title" data-aos="fade-right">
-          Awards & Achievements
-        </h2>
-        <div class="skills-container">
-          <div
-            class="skill-card"
-            style="border-color: #ffd700"
-            data-tilt
-            data-tilt-max="15"
-            data-tilt-speed="400"
-            data-tilt-glare
-            data-tilt-max-glare="0.5"
-            data-aos="zoom-in"
-          >
-            <div class="icon-box">
-              <i class="fas fa-trophy" style="color: #ffd700"></i>
+        <div class="section-header" data-aos="fade-right">
+          <span class="section-tag">// 03</span>
+          <h2 class="section-title">Awards &amp; Achievements</h2>
+        </div>
+        <div class="awards-grid">
+          <div class="award-card award-gold" data-tilt data-aos="zoom-in">
+            <div class="award-rank">01</div>
+            <div class="award-icon"><i class="fas fa-trophy"></i></div>
+            <div class="award-info">
+              <h3>2024 SFPC</h3>
+              <p class="award-prize">전체 8위 (Top 1.3%)</p>
+              <p class="award-desc">총 581팀 / 1661명 참가 · 알고리즘 및 문제해결 능력 입증</p>
             </div>
-            <h3>2024 SFPC</h3>
-            <p class="highlight" style="color: #ffd700; font-weight: bold">
-              전체 8위 (Top 1.3%)
-            </p>
-            <p>총 581팀 / 1661명 참가</p>
-            <p>알고리즘 및 문제해결 능력 입증</p>
           </div>
-          <div
-            class="skill-card"
-            style="border-color: #00d4ff"
-            data-tilt
-            data-tilt-max="15"
-            data-tilt-speed="400"
-            data-tilt-glare
-            data-tilt-max-glare="0.5"
-            data-aos="zoom-in"
-            data-aos-delay="100"
-          >
-            <div class="icon-box">
-              <i class="fas fa-award" style="color: #00d4ff"></i>
+          <div class="award-card award-cyan" data-tilt data-aos="zoom-in" data-aos-delay="100">
+            <div class="award-rank">02</div>
+            <div class="award-icon"><i class="fas fa-award"></i></div>
+            <div class="award-info">
+              <h3>2024 디지털새싹 인공지능 메이커톤</h3>
+              <p class="award-prize">AI 어벤져스상 수상</p>
+              <p class="award-desc">산불 조기 감지 알림 시스템 개발 · Raspberry Pi & OpenCV 활용</p>
             </div>
-            <h3>2024 디지털새싹 인공지능 메이커톤</h3>
-            <p class="highlight" style="color: #00d4ff; font-weight: bold">
-              AI 어벤져스상 수상
-            </p>
-            <p>산불 조기 감지 알림 시스템 개발</p>
-            <p>Raspberry Pi & OpenCV 활용</p>
           </div>
-          <div
-            class="skill-card"
-            style="border-color: #cd7f32"
-            data-tilt
-            data-tilt-max="15"
-            data-tilt-speed="400"
-            data-tilt-glare
-            data-tilt-max-glare="0.5"
-            data-aos="zoom-in"
-            data-aos-delay="200"
-          >
-            <div class="icon-box">
-              <i class="fas fa-medal" style="color: #cd7f32"></i>
+          <div class="award-card award-bronze" data-tilt data-aos="zoom-in" data-aos-delay="200">
+            <div class="award-rank">03</div>
+            <div class="award-icon"><i class="fas fa-medal"></i></div>
+            <div class="award-info">
+              <h3>천안학생로봇대회</h3>
+              <p class="award-prize">동상 수상</p>
+              <p class="award-desc">2024 제 5회 천안 학생 로봇 대회 해커톤</p>
             </div>
-            <h3>천안학생로봇대회</h3>
-            <p class="highlight" style="color: #cd7f32; font-weight: bold">
-              동상 수상
-            </p>
-            <p>2024 제 5회 천안 학생 로봇 대회 - 해커톤</p>
-            <p>학교와 일상생활에 도움을 주는 장치로 작품 제작</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="projects" class="section bg-dark">
+    <!-- PROJECTS -->
+    <section id="projects" class="section section-alt">
       <div class="container">
-        <h2 class="section-title" data-aos="fade-right">Featured Projects</h2>
+        <div class="section-header" data-aos="fade-right">
+          <span class="section-tag">// 04</span>
+          <h2 class="section-title">Featured Projects</h2>
+        </div>
         <div class="projects-grid">
-          <div
-            class="project-card"
-            data-tilt
-            data-tilt-max="5"
-            data-tilt-speed="400"
-            data-aos="fade-up"
-          >
-            <div class="card-header">
-              <i class="fas fa-hammer"></i>
-              <div class="links">
-                <a
-                  href="https://github.com/pachir1su/Master_Creator_Challenge"
-                  target="_blank"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
+
+          <div class="project-card" data-tilt data-aos="fade-up">
+            <div class="project-top">
+              <i class="fas fa-hammer project-icon"></i>
+              <div class="project-links">
+                <a href="projects/password-doorlock.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://github.com/pachir1su/Master_Creator_Challenge" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
               </div>
             </div>
-            <div class="card-body">
-              <h3>비밀번호 도어락</h3>
-              <p>
-                마스터 크리에이터 챌린지 참가 프로젝트입니다. 창의적인
-                아이디어를 구체화하여 작품을 제작하고 메이커 활동을
-                수행했습니다.
-              </p>
-              <div class="tech-stack">
-                <span>Maker</span>
-                <span>Creative</span>
-                <span>Challenge</span>
-              </div>
-            </div>
+            <h3>비밀번호 도어락</h3>
+            <p>마스터 크리에이터 챌린지 참가 프로젝트. 창의적인 아이디어를 구체화하여 작품을 제작하고 메이커 활동을 수행했습니다.</p>
+            <div class="tech-stack"><span>Maker</span><span>Creative</span><span>Challenge</span></div>
           </div>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-tilt-max="5"
-            data-tilt-speed="400"
-            data-aos="fade-up"
-            data-aos-delay="100"
-          >
-            <div class="card-header">
-              <i class="fas fa-water"></i>
-              <div class="links">
-                <a href="https://github.com/pachir1su/Wall_Sina" target="_blank"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
+          <div class="project-card" data-tilt data-aos="fade-up" data-aos-delay="50">
+            <div class="project-top">
+              <i class="fas fa-water project-icon"></i>
+              <div class="project-links">
+                <a href="projects/coastal-barrier.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://github.com/pachir1su/Wall_Sina" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
               </div>
             </div>
-            <div class="card-body">
-              <h3>해안 장벽 프로젝트</h3>
-              <p>
-                2024 지속 가능한 발전 프로젝트로 해수면 상승에 대비한 해안 장벽
-                프로젝트입니다. 기후 위기 시대에 공학적인 설계로 환경 문제를
-                해결하고 안전을 지키기 위한 프로토타입입니다.
-              </p>
-              <div class="tech-stack">
-                <span>Engineering</span>
-                <span>Environment</span>
-                <span>Modeling</span>
-              </div>
-            </div>
+            <h3>해안 장벽 프로젝트</h3>
+            <p>2024 지속 가능한 발전 프로젝트. 해수면 상승에 대비한 공학적 해안 장벽 프로토타입입니다.</p>
+            <div class="tech-stack"><span>Engineering</span><span>Environment</span><span>Modeling</span></div>
           </div>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-tilt-max="5"
-            data-tilt-speed="400"
-            data-aos="fade-up"
-            data-aos-delay="200"
-          >
-            <div class="card-header">
-              <i class="fas fa-fire-extinguisher"></i>
-              <div class="links">
-                <a
-                  href="https://github.com/chae03yb/hstree-makerthon"
-                  target="_blank"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
+          <div class="project-card" data-tilt data-aos="fade-up" data-aos-delay="100">
+            <div class="project-top">
+              <i class="fas fa-fire-extinguisher project-icon"></i>
+              <div class="project-links">
+                <a href="projects/wildfire-detection.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://github.com/chae03yb/hstree-makerthon" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
               </div>
             </div>
-            <div class="card-body">
-              <h3>산불 조기 감지 알림 시스템</h3>
-              <p>
-                2024 디지털새싹 인공지능 메이커톤 'AI 어벤져스상' 수상작.
-                라즈베리파이와 OpenCV를 활용하여 산불을 실시간으로 감지하고
-                알림을 보내는 시스템입니다.
-              </p>
-              <div class="tech-stack">
-                <span>Raspberry Pi</span>
-                <span>OpenCV</span>
-                <span>AI</span>
-              </div>
-            </div>
+            <h3>산불 조기 감지 알림 시스템</h3>
+            <p>2024 디지털새싹 'AI 어벤져스상' 수상작. 라즈베리파이와 OpenCV로 산불을 실시간 감지합니다.</p>
+            <div class="tech-stack"><span>Raspberry Pi</span><span>OpenCV</span><span>AI</span></div>
           </div>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-tilt-max="5"
-            data-tilt-speed="400"
-            data-aos="fade-up"
-            data-aos-delay="300"
-          >
-            <div class="card-header">
-              <i class="fas fa-laptop-code"></i>
-              <div class="links">
-                <a href="https://github.com/pachir1su/2024_SFPC" target="_blank"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
+          <div class="project-card" data-tilt data-aos="fade-up" data-aos-delay="150">
+            <div class="project-top">
+              <i class="fas fa-laptop-code project-icon"></i>
+              <div class="project-links">
+                <a href="projects/sfpc.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://github.com/pachir1su/2024_SFPC" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
               </div>
             </div>
-            <div class="card-body">
-              <h3>2024 SFPC</h3>
-              <p>
-                총 581팀 중 8위를 기록한 알고리즘 대회 코드 아카이브입니다. 팀
-                협업을 통해 복잡한 문제를 효율적으로 해결했습니다.
-              </p>
-              <div class="tech-stack">
-                <span>Algorithm</span>
-                <span>Problem Solving</span>
-                <span>C++ / Python</span>
-              </div>
-            </div>
+            <h3>2024 SFPC</h3>
+            <p>총 581팀 중 8위를 기록한 알고리즘 대회 코드 아카이브. 팀 협업으로 복잡한 문제를 효율적으로 해결했습니다.</p>
+            <div class="tech-stack"><span>Algorithm</span><span>Problem Solving</span><span>C++ / Python</span></div>
           </div>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-tilt-max="5"
-            data-tilt-speed="400"
-            data-aos="fade-up"
-          >
-            <div class="card-header">
-              <i class="fas fa-robot"></i>
-              <div class="links">
-                <a
-                  href="https://github.com/pachir1su/2024_5th_CSRC"
-                  target="_blank"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
+          <div class="project-card" data-tilt data-aos="fade-up" data-aos-delay="200">
+            <div class="project-top">
+              <i class="fas fa-robot project-icon"></i>
+              <div class="project-links">
+                <a href="projects/drowsiness.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://github.com/pachir1su/2024_5th_CSRC" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
               </div>
             </div>
-            <div class="card-body">
-              <h3>허스키렌즈를 이용한 졸음 방지 시스템</h3>
-              <p>
-                2024 제 5회 천안학생로봇대회 동상 수상 프로젝트. 아두이노 허스키
-                렌즈를 이용한 졸음 방지 시스템을 개발했습니다.
-              </p>
-              <div class="tech-stack">
-                <span>Robot</span>
-                <span>Embedded</span>
-                <span>Control</span>
-              </div>
-            </div>
+            <h3>졸음 방지 시스템</h3>
+            <p>2024 제 5회 천안학생로봇대회 동상 수상 프로젝트. 허스키렌즈를 이용한 실시간 졸음 감지 시스템입니다.</p>
+            <div class="tech-stack"><span>Robot</span><span>Embedded</span><span>HuskyLens</span></div>
           </div>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-tilt-max="5"
-            data-tilt-speed="400"
-            data-aos="fade-up"
-            data-aos-delay="100"
-          >
-            <div class="card-header">
-              <i class="fab fa-discord"></i>
-              <div class="links">
-                <a href="https://github.com/pachir1su/MZ_bot" target="_blank"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
+          <div class="project-card" data-tilt data-aos="fade-up" data-aos-delay="250">
+            <div class="project-top">
+              <i class="fab fa-discord project-icon"></i>
+              <div class="project-links">
+                <a href="projects/mzbot.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://github.com/pachir1su/MZ_bot" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
               </div>
             </div>
-            <div class="card-body">
-              <h3>MZ_bot</h3>
-              <p>
-                디스코드 사용자를 위한 경제 게임 봇입니다. 사용자들이 서버
-                내에서 상호작용하며 즐길 수 있는 다양한 경제 기능을
-                구현했습니다.
-              </p>
-              <div class="tech-stack">
-                <span>Python</span>
-                <span>Discord.py</span>
-              </div>
-            </div>
+            <h3>MZ_bot</h3>
+            <p>디스코드 사용자를 위한 경제 게임 봇. 서버 내 다양한 경제 기능을 구현했습니다.</p>
+            <div class="tech-stack"><span>Python</span><span>Discord.py</span></div>
           </div>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-tilt-max="5"
-            data-tilt-speed="400"
-            data-aos="fade-up"
-            data-aos-delay="200"
-          >
-            <div class="card-header">
-              <i class="fas fa-robot"></i>
-              <div class="links">
-                <a
-                  href="https://github.com/pachir1su/Legend_SakSak_GongGam_AI"
-                  target="_blank"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
+          <div class="project-card" data-tilt data-aos="fade-up" data-aos-delay="300">
+            <div class="project-top">
+              <i class="fas fa-robot project-icon"></i>
+              <div class="project-links">
+                <a href="projects/empathy-ai.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://github.com/pachir1su/Legend_SakSak_GongGam_AI" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
               </div>
             </div>
-            <div class="card-body">
-              <h3>공감 봇 & 레시피 AI</h3>
-              <p>
-                사용자의 감정에 공감하는 챗봇 기능과, 보유한 식재료를 기반으로
-                요리 레시피를 추천해주는 인공지능 서비스입니다.
-              </p>
-              <div class="tech-stack">
-                <span>AI</span>
-                <span>NLP</span>
-                <span>Recommendation</span>
-              </div>
-            </div>
+            <h3>공감 봇 & 레시피 AI</h3>
+            <p>감정 공감 챗봇과 보유 식재료 기반 요리 레시피 추천 AI 서비스입니다.</p>
+            <div class="tech-stack"><span>AI</span><span>NLP</span><span>Recommendation</span></div>
           </div>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-tilt-max="5"
-            data-tilt-speed="400"
-            data-aos="fade-up"
-          >
-            <div class="card-header">
-              <i class="fas fa-id-card"></i>
-              <div class="links">
-                <a href="https://github.com/pachir1su/BerryIno" target="_blank"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
+          <div class="project-card" data-tilt data-aos="fade-up" data-aos-delay="350">
+            <div class="project-top">
+              <i class="fas fa-id-card project-icon"></i>
+              <div class="project-links">
+                <a href="projects/nfc-attendance.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://github.com/pachir1su/BerryIno" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
               </div>
             </div>
-            <div class="card-body">
-              <h3>NFC 출석 체크 시스템</h3>
-              <p>
-                NFC 태그를 활용한 효율적인 출석 체크 시스템입니다. 아두이노와
-                라즈베리파이 연동을 통해 데이터를 처리합니다.
-              </p>
-              <div class="tech-stack">
-                <span>Arduino</span>
-                <span>Raspberry Pi</span>
-                <span>IoT</span>
-              </div>
-            </div>
+            <h3>NFC 출석 체크 시스템</h3>
+            <p>NFC 태그를 활용한 효율적인 출석 체크 시스템. 아두이노와 라즈베리파이 연동으로 데이터를 처리합니다.</p>
+            <div class="tech-stack"><span>Arduino</span><span>Raspberry Pi</span><span>IoT</span></div>
           </div>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-tilt-max="5"
-            data-tilt-speed="400"
-            data-aos="fade-up"
-            data-aos-delay="100"
-          >
-            <div class="card-header">
-              <i class="fas fa-leaf"></i>
-              <div class="links">
-                <a
-                  href="https://github.com/pachir1su/PlantClock"
-                  target="_blank"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
+          <div class="project-card" data-tilt data-aos="fade-up" data-aos-delay="400">
+            <div class="project-top">
+              <i class="fas fa-leaf project-icon"></i>
+              <div class="project-links">
+                <a href="projects/plant-timer.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://github.com/pachir1su/PlantClock" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
               </div>
             </div>
-            <div class="card-body">
-              <h3>식물 타이머</h3>
-              <p>
-                해커톤 참가작으로, 식물 관리를 돕는 스마트 타이머 시스템입니다.
-                적절한 물 주기 및 환경 관리를 보조합니다.
-              </p>
-              <div class="tech-stack">
-                <span>IoT</span>
-                <span>Hackathon</span>
-              </div>
-            </div>
+            <h3>식물 타이머</h3>
+            <p>해커톤 참가작. 식물 관리를 돕는 스마트 타이머 시스템으로 물 주기 및 환경 관리를 보조합니다.</p>
+            <div class="tech-stack"><span>IoT</span><span>Hackathon</span></div>
           </div>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-tilt-max="5"
-            data-tilt-speed="400"
-            data-aos="fade-up"
-            data-aos-delay="200"
-          >
-            <div class="card-header">
-              <i class="fas fa-heartbeat"></i>
-              <div class="links">
-                <a
-                  href="https://github.com/pachir1su/HEALTH_CHECK_PROJECT"
-                  target="_blank"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
+          <div class="project-card" data-tilt data-aos="fade-up" data-aos-delay="450">
+            <div class="project-top">
+              <i class="fas fa-heartbeat project-icon"></i>
+              <div class="project-links">
+                <a href="projects/healthcare.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://github.com/pachir1su/HEALTH_CHECK_PROJECT" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
               </div>
             </div>
-            <div class="card-body">
-              <h3>헬스 케어 시스템</h3>
-              <p>
-                사용자 맞춤형 헬스케어 시스템 프로젝트입니다. 건강 데이터를
-                기록하고 모니터링하는 기능을 구현했습니다.
-              </p>
-              <div class="tech-stack">
-                <span>Healthcare</span>
-                <span>Data</span>
-              </div>
-            </div>
+            <h3>헬스 케어 시스템</h3>
+            <p>사용자 맞춤형 헬스케어 시스템. 건강 데이터를 기록하고 모니터링하는 기능을 구현했습니다.</p>
+            <div class="tech-stack"><span>Healthcare</span><span>Data</span></div>
           </div>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-tilt-max="5"
-            data-tilt-speed="400"
-            data-aos="fade-up"
-          >
-            <div class="card-header">
-              <i class="fas fa-book-open"></i>
-              <div class="links">
-                <a
-                  href="https://capybaracute.notion.site/26-2fca8de5ee5f806db9e9e64464a9ac78"
-                  target="_blank"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
+          <div class="project-card" data-tilt data-aos="fade-up" data-aos-delay="500">
+            <div class="project-top">
+              <i class="fas fa-book-open project-icon"></i>
+              <div class="project-links">
+                <a href="projects/freshman-guide.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://capybaracute.notion.site/26-2fca8de5ee5f806db9e9e64464a9ac78" target="_blank" class="plink plink-github" title="Notion"><i class="fas fa-external-link-alt"></i></a>
               </div>
             </div>
-            <div class="card-body">
-              <h3>신입생 가이드 (Notion)</h3>
-              <p>
-                한기대 26학번 신입생들을 위해 제작한 온라인 중점강좌 안내
-                사이트입니다. 노션을 활용해 직관적인 정보를 제공합니다.
-              </p>
-              <div class="tech-stack">
-                <span>Notion</span>
-                <span>Documentation</span>
-              </div>
-            </div>
+            <h3>신입생 가이드</h3>
+            <p>한기대 26학번 신입생을 위한 온라인 중점강좌 안내 노션 사이트입니다.</p>
+            <div class="tech-stack"><span>Notion</span><span>Documentation</span></div>
           </div>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-tilt-max="5"
-            data-tilt-speed="400"
-            data-aos="fade-up"
-            data-aos-delay="100"
-          >
-            <div class="card-header">
-              <i class="fas fa-file-code"></i>
-              <div class="links">
-                <a
-                  href="https://github.com/pachir1su/file_swordmaster"
-                  target="_blank"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
+          <div class="project-card" data-tilt data-aos="fade-up" data-aos-delay="550">
+            <div class="project-top">
+              <i class="fas fa-file-code project-icon"></i>
+              <div class="project-links">
+                <a href="projects/file-swordmaster.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://github.com/pachir1su/file_swordmaster" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
               </div>
             </div>
-            <div class="card-body">
-              <h3>File Swordmaster</h3>
-              <p>
-                PDF(분할, 병합, 워터마크, 텍스트 변환 등)와 오디오(구간 분할,
-                N등분) 파일을 편집하는 다기능 스크립트입니다. 로컬 환경 및
-                Google Colab, Hugging Face 웹 환경을 지원합니다.
-              </p>
-              <div class="tech-stack">
-                <span>Python</span>
-                <span>Gradio</span>
-                <span>PyPDF</span>
-              </div>
-            </div>
+            <h3>File Swordmaster</h3>
+            <p>PDF(분할, 병합, 워터마크 등)와 오디오 파일을 편집하는 다기능 스크립트. HuggingFace Spaces 지원.</p>
+            <div class="tech-stack"><span>Python</span><span>Gradio</span><span>PyPDF</span></div>
           </div>
+
         </div>
       </div>
     </section>
 
     <footer>
-      <div class="container footer-content">
-        <p>&copy; 2026 Lee Geon Yeong. All rights reserved.</p>
+      <div class="container footer-inner">
+        <div class="footer-logo"><span class="logo-bracket">{</span> GY <span class="logo-bracket">}</span></div>
+        <p class="footer-copy">&copy; 2026 Lee Geon Yeong. All rights reserved.</p>
         <div class="social-links">
-          <a href="https://github.com/pachir1su" target="_blank"
-            ><i class="fab fa-github"></i
-          ></a>
-          <a href="mailto:" title="capybara@koreatech.ac.kr"
-            ><i class="fas fa-envelope"></i
-          ></a>
+          <a href="https://github.com/pachir1su" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          <a href="mailto:capybara@koreatech.ac.kr" title="Email"><i class="fas fa-envelope"></i></a>
         </div>
       </div>
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
-
     <script src="script.js"></script>
   </body>
 </html>
