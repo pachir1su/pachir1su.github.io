@@ -3,3 +3,7 @@
 <br>
 
 👉 **[실행](https://pachir1su.github.io)**
+
+
+## 추가 예정
+- 각 프로젝트 별 사진 추가
