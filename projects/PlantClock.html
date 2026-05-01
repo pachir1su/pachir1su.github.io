@@ -27,32 +27,38 @@
     <button type="button" id="btn-back-to-top">
       <i class="fas fa-arrow-up"></i>
     </button>
-    <div class="cursor-dot"></div>
-    <div class="cursor-outline"></div>
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true">
+      <button class="mobile-menu-close" id="mobileMenuClose" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html" onclick="closeMobile()">홈</a>
+      <a href="../index.html#projects" onclick="closeMobile()">← 프로젝트 목록</a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener" onclick="closeMobile()">GitHub</a>
+      <a href="mailto:capybara@koreatech.ac.kr" onclick="closeMobile()">연락하기</a>
+    </div>
 
-    <nav class="navbar">
+    <header class="navbar" id="navbar">
       <div class="container nav-content">
-        <a href="../index.html" class="logo"
-          ><span class="logo-bracket">{</span> GY
-          <span class="logo-bracket">}</span></a
-        >
-        <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
-          <li>
-            <a
-              href="https://github.com/pachir1su"
-              target="_blank"
-              class="nav-github"
-              ><i class="fab fa-github"></i
-            ></a>
-          </li>
-        </ul>
+        <a href="../index.html" class="logo" aria-label="홈으로">이건영.</a>
+        <nav aria-label="프로젝트 네비게이션">
+          <ul class="nav-links">
+            <li><a href="../index.html#projects" class="nav-link">← 프로젝트 목록</a></li>
+            <li>
+              <a href="https://github.com/pachir1su" target="_blank" rel="noopener" class="nav-link nav-github" aria-label="GitHub">
+                <i class="fab fa-github"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <a href="mailto:capybara@koreatech.ac.kr" class="btn btn-nav nav-contact-btn">연락하기</a>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
-    </nav>
+    </header>
 
     <section class="detail-hero">
-      <div class="hero-grid-bg"></div>
-      <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
           <a href="../index.html">홈</a> /
@@ -150,29 +156,22 @@
         </div>
       </div>
     </section>
-
-    <footer>
-      <div class="container footer-inner">
-        <div class="footer-logo">
-          <span class="logo-bracket">{</span> GY
-          <span class="logo-bracket">}</span>
-        </div>
-        <p class="footer-copy">
-          &copy; 2026 Lee Geon Yeong. All rights reserved.
-        </p>
+    <footer class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <span class="footer-logo-text">이건영.</span>
+        <p class="footer-copy">&copy; 2026 Lee Geon Yeong. All rights reserved.</p>
         <div class="social-links">
-          <a href="https://github.com/pachir1su" target="_blank"
-            ><i class="fab fa-github"></i
-          ></a>
-          <a href="mailto:capybara@koreatech.ac.kr"
-            ><i class="fas fa-envelope"></i
-          ></a>
+          <a href="https://github.com/pachir1su" target="_blank" rel="noopener" aria-label="GitHub">
+            <i class="fab fa-github" aria-hidden="true"></i>
+          </a>
+          <a href="mailto:capybara@koreatech.ac.kr" aria-label="이메일">
+            <i class="fas fa-envelope" aria-hidden="true"></i>
+          </a>
         </div>
       </div>
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
     <script src="../script.js"></script>
   </body>
 </html>
