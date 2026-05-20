@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CentrifugeAI | 이건영 포트폴리오</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <div class="progress-container">
+      <div class="progress-bar" id="myBar"></div>
+    </div>
+    <button type="button" id="btn-back-to-top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <nav class="navbar">
+      <div class="container nav-content">
+        <a href="../index.html" class="logo"
+          ><span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span></a
+        >
+        <ul class="nav-links">
+          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li>
+            <a
+              href="https://github.com/pachir1su"
+              target="_blank"
+              class="nav-github"
+              ><i class="fab fa-github"></i
+            ></a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <section class="detail-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="detail-hero-glow"></div>
+      <div class="container" style="position: relative; z-index: 1">
+        <div class="detail-breadcrumb">
+          <a href="../index.html">홈</a> /
+          <a href="../index.html#projects">프로젝트</a> / CentrifugeAI
+        </div>
+        <div class="detail-hero-icon">
+          <i class="fas fa-flask"></i>
+        </div>
+        <h1 class="detail-title" data-aos="fade-up">CentrifugeAI</h1>
+        <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
+          <span class="detail-badge">Python</span>
+          <span class="detail-badge">Flask</span>
+          <span class="detail-badge">Gemini API</span>
+          <span class="detail-badge">Discord Bot</span>
+          <span
+            class="detail-badge"
+            style="
+              border-color: rgba(184, 138, 26, 0.4);
+              color: var(--gold);
+              background: rgba(184, 138, 26, 0.1);
+            "
+            >개발 중</span
+          >
+        </div>
+        <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
+          <a
+            href="https://github.com/pachir1su/CentrifugeAI"
+            target="_blank"
+            class="btn btn-primary"
+            ><i class="fab fa-github"></i> GitHub</a
+          >
+          <a href="../index.html#projects" class="btn btn-ghost"
+            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-body">
+      <div class="container">
+        <div class="detail-grid">
+          <div class="detail-main">
+            <div class="detail-section" data-aos="fade-up">
+              <h2>프로젝트 개요</h2>
+              <p>
+                "콧물을 원심분리기에 돌리면 어떻게 될까?"라는 호기심에서
+                출발한 가상 실험 시뮬레이터입니다. 사용자가 임의의 재료를
+                고르고 가상 실험 장치에 투입하면, Gemini AI가 결과를 예측해
+                구조화된 데이터로 반환합니다.
+              </p>
+              <p>
+                결과는 단순 텍스트가 아니라 층 분리 이미지·SVG 그래프·결과
+                카드 형태로 출력되어 실제 실험 느낌을 제공합니다. 모든 실험
+                기록은 SQLite에 영속화되어 히스토리 조회와 재생(Replay)이
+                가능합니다.
+              </p>
+              <p>
+                Flask 기반의 웹 인터페이스와 함께 Discord Slash Command 기반
+                봇도 동시에 지원해, 어디서나 쉽게 실험을 돌릴 수 있도록
+                설계했습니다.
+              </p>
+            </div>
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
+              <h2>주요 기능</h2>
+              <h3>🧪 다양한 가상 실험 장치</h3>
+              <ul>
+                <li>원심분리기 — 층 분리 시뮬레이션</li>
+                <li>화학 반응기 — 반응 예측 및 부산물 생성</li>
+                <li>현미경 — 미시적 구조 시각화</li>
+                <li>가열/냉각기 — 상태 변화 추적</li>
+                <li>믹서기 / 압력솥 / 전자레인지</li>
+                <li>입자 가속기 — 극한 조건 실험</li>
+              </ul>
+              <h3>🤖 Gemini AI 기반 결과 생성</h3>
+              <ul>
+                <li>물질의 반응 예측</li>
+                <li>분리 결과 및 상태 변화 설명</li>
+                <li>실험 결과 JSON 구조화</li>
+              </ul>
+              <h3>📊 실험 결과 시각화</h3>
+              <ul>
+                <li>층 분리 이미지 자동 렌더링</li>
+                <li>SVG 기반 결과 그래프</li>
+                <li>시각적 결과 카드 출력</li>
+              </ul>
+              <h3>💾 실험 기록 저장</h3>
+              <ul>
+                <li>SQLite 기반 히스토리 영속화</li>
+                <li>이전 실험 조회 및 재생(Replay)</li>
+              </ul>
+              <h3>🌐 웹 + 디스코드 동시 지원</h3>
+              <ul>
+                <li>Flask 기반 웹 UI — 실험 선택 / 결과 확인 / 히스토리</li>
+                <li>Discord Slash Command 기반 실험 봇</li>
+              </ul>
+            </div>
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
+              <h2>추가 예정 기능</h2>
+              <ul>
+                <li>실험 히스토리 UI 개선</li>
+                <li>실험 결과 공유 기능</li>
+                <li>사용자 커스텀 실험 제작</li>
+                <li>실시간 애니메이션</li>
+                <li>3D 시각화</li>
+                <li>모바일 최적화</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="detail-sidebar">
+            <div class="sidebar-card" data-aos="fade-left">
+              <h4>Tech Stack</h4>
+              <div class="sidebar-stack">
+                <span>Python</span>
+                <span>Flask</span>
+                <span>SQLite</span>
+                <span>Gemini API</span>
+                <span>Discord.py</span>
+                <span>Matplotlib</span>
+                <span>SVG</span>
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
+              <h4>Links</h4>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <a
+                  href="https://github.com/pachir1su/CentrifugeAI"
+                  target="_blank"
+                  class="github-activity-btn"
+                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                >
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
+              <h4>프로젝트 유형</h4>
+              <p
+                style="
+                  color: var(--text-muted);
+                  font-size: 0.88rem;
+                  line-height: 1.6;
+                "
+              >
+                개인 연구·실험 프로젝트<br />호기심 기반 시뮬레이터
+              </p>
+            </div>
+            <div
+              class="sidebar-card"
+              data-aos="fade-left"
+              data-aos-delay="200"
+              style="border-color: rgba(184, 138, 26, 0.3)"
+            >
+              <h4 style="color: var(--gold)">진행 상태</h4>
+              <p
+                style="
+                  color: var(--text-muted);
+                  font-size: 0.88rem;
+                  line-height: 1.6;
+                "
+              >
+                🔧 핵심 기능 구현 단계
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">
+          <span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span>
+        </div>
+        <p class="footer-copy">
+          &copy; 2026 Lee Geon Yeong. All rights reserved.
+        </p>
+        <div class="social-links">
+          <a href="https://github.com/pachir1su" target="_blank"
+            ><i class="fab fa-github"></i
+          ></a>
+          <a href="mailto:capybara@koreatech.ac.kr"
+            ><i class="fas fa-envelope"></i
+          ></a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="../script.js"></script>
+  </body>
+</html>

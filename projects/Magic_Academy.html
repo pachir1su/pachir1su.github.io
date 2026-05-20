@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>마법 아카데미 | 이건영 포트폴리오</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <div class="progress-container">
+      <div class="progress-bar" id="myBar"></div>
+    </div>
+    <button type="button" id="btn-back-to-top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <nav class="navbar">
+      <div class="container nav-content">
+        <a href="../index.html" class="logo"
+          ><span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span></a
+        >
+        <ul class="nav-links">
+          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li>
+            <a
+              href="https://github.com/pachir1su"
+              target="_blank"
+              class="nav-github"
+              ><i class="fab fa-github"></i
+            ></a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <section class="detail-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="detail-hero-glow"></div>
+      <div class="container" style="position: relative; z-index: 1">
+        <div class="detail-breadcrumb">
+          <a href="../index.html">홈</a> /
+          <a href="../index.html#projects">프로젝트</a> / 마법 아카데미
+        </div>
+        <div class="detail-hero-icon">
+          <i class="fas fa-hat-wizard"></i>
+        </div>
+        <h1 class="detail-title" data-aos="fade-up">마법 아카데미</h1>
+        <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
+          <span class="detail-badge">Simulation</span>
+          <span class="detail-badge">Interactive</span>
+          <span class="detail-badge">Visualization</span>
+          <span
+            class="detail-badge"
+            style="
+              border-color: rgba(43, 138, 147, 0.4);
+              color: var(--cyan);
+              background: rgba(43, 138, 147, 0.1);
+            "
+            >진행 예정</span
+          >
+        </div>
+        <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
+          <a href="../index.html#projects" class="btn btn-ghost"
+            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-body">
+      <div class="container">
+        <div class="detail-grid">
+          <div class="detail-main">
+            <div class="detail-section" data-aos="fade-up">
+              <h2>프로젝트 개요</h2>
+              <p>
+                원소를 조합해 마법을 만들고 결과를 시각화하는 인터랙티브
+                시뮬레이션입니다. 단순한 원소(불·물·바람·흙 등)에서 시작해,
+                조합 규칙에 따라 점차 복잡한 마법으로 확장되는 학습형
+                샌드박스를 목표로 합니다.
+              </p>
+              <p>
+                "어떤 조합이 어떤 마법을 만들까?"라는 호기심을 자극하는
+                플레이 흐름과, 즉각적으로 보이는 시각 효과를 통해 자연스럽게
+                규칙을 익히도록 설계할 예정입니다.
+              </p>
+            </div>
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
+              <h2>주요 기능 (예정)</h2>
+              <ul>
+                <li>원소 조합 시스템 — 예: 불 + 물 → 증기</li>
+                <li>마법 효과 실시간 시각화 (파티클, 컬러 변화)</li>
+                <li>단계적 난이도 — 기본 원소에서 복합 마법으로 확장</li>
+                <li>발견한 마법 컬렉션 / 도감</li>
+                <li>자유 모드 + 챌린지 모드</li>
+              </ul>
+            </div>
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
+              <h2>설계 메모</h2>
+              <p>
+                원소 간 조합 규칙은 데이터 테이블로 분리해 쉽게 확장
+                가능하도록 만들 예정입니다. 시각화 레이어는 p5.js 혹은
+                Canvas 기반으로 가볍게 구성하고, 가능하다면 모바일 터치
+                인터랙션까지 고려합니다.
+              </p>
+            </div>
+          </div>
+
+          <div class="detail-sidebar">
+            <div class="sidebar-card" data-aos="fade-left">
+              <h4>Tech Stack (예정)</h4>
+              <div class="sidebar-stack">
+                <span>Python (예정)</span>
+                <span>p5.js (예정)</span>
+                <span>Canvas / SVG</span>
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
+              <h4>Links</h4>
+              <p
+                style="
+                  color: var(--text-muted);
+                  font-size: 0.88rem;
+                  line-height: 1.6;
+                "
+              >
+                저장소 준비 중
+              </p>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
+              <h4>프로젝트 유형</h4>
+              <p
+                style="
+                  color: var(--text-muted);
+                  font-size: 0.88rem;
+                  line-height: 1.6;
+                "
+              >
+                개인 기획 프로젝트<br />학습형 시뮬레이션
+              </p>
+            </div>
+            <div
+              class="sidebar-card"
+              data-aos="fade-left"
+              data-aos-delay="200"
+              style="border-color: rgba(43, 138, 147, 0.3)"
+            >
+              <h4 style="color: var(--cyan)">진행 상태</h4>
+              <p
+                style="
+                  color: var(--text-muted);
+                  font-size: 0.88rem;
+                  line-height: 1.6;
+                "
+              >
+                📝 기획 단계
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">
+          <span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span>
+        </div>
+        <p class="footer-copy">
+          &copy; 2026 Lee Geon Yeong. All rights reserved.
+        </p>
+        <div class="social-links">
+          <a href="https://github.com/pachir1su" target="_blank"
+            ><i class="fab fa-github"></i
+          ></a>
+          <a href="mailto:capybara@koreatech.ac.kr"
+            ><i class="fas fa-envelope"></i
+          ></a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="../script.js"></script>
+  </body>
+</html>
