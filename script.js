@@ -1,11 +1,6 @@
 // AOS
 AOS.init({ once: true, duration: 700, easing: 'ease-out-cubic' });
 
-// VanillaTilt
-VanillaTilt.init(document.querySelectorAll(".skill-card, .project-card, .award-card"), {
-  max: 8, speed: 400, glare: true, "max-glare": 0.15,
-});
-
 // Custom Cursor
 const dot = document.querySelector('.cursor-dot');
 const outline = document.querySelector('.cursor-outline');
@@ -19,11 +14,11 @@ if (dot && outline) {
   document.querySelectorAll('a, button').forEach(el => {
     el.addEventListener('mouseenter', () => {
       outline.style.transform = 'translate(-50%,-50%) scale(1.5)';
-      outline.style.borderColor = 'rgba(79,142,247,0.8)';
+      outline.style.borderColor = 'rgba(198,59,59,0.8)';
     });
     el.addEventListener('mouseleave', () => {
       outline.style.transform = 'translate(-50%,-50%) scale(1)';
-      outline.style.borderColor = 'rgba(79,142,247,0.5)';
+      outline.style.borderColor = 'rgba(198,59,59,0.5)';
     });
   });
 }
