@@ -464,16 +464,22 @@ p {
 }
 .fi {
   position: absolute;
-  width: 84px;
-  height: 84px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
-  font-size: 0;
-  color: transparent;
-  background: var(--paper);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  line-height: 1;
+  background: var(--card);
   border: 2px solid currentColor;
-  box-shadow: inset 0 0 0 5px var(--paper), inset 0 0 0 6px currentColor;
-  opacity: 0.55;
+  outline: 1.5px dashed currentColor;
+  outline-offset: -8px;
+  box-shadow: 0 6px 14px rgba(31, 28, 20, 0.1);
+  opacity: 0.85;
   animation: floatUp 8s ease-in-out infinite;
+  /* devicon ::before 글리프가 가운데 들어와 보이게 — color는 nth별로 cycle */
 }
 .fi-1 {
   top: 15%;
@@ -1171,8 +1177,12 @@ p {
     top: -4px;
   }
   .fi {
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
+    font-size: 2rem;
+  }
+  .fi::before {
+    inset: 6px;
   }
   .hero-stats {
     gap: 14px;
