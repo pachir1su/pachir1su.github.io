@@ -36,13 +36,23 @@
   --border: var(--line);
 }
 
-/* 2. Reset */
+/* 2. Reset + 좌클릭 드래그/선택 전역 차단 */
 *,
 *::before,
 *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+img {
+  -webkit-user-drag: none;
+  pointer-events: none;
 }
 html {
   scroll-behavior: smooth;
@@ -1425,28 +1435,7 @@ p {
    19. 인터랙션 팩 — 잉크 트레일 / 도장 / 드래그 / 단축키 힌트
    ========================================================================== */
 
-/* 잉크 레이어 + 점 */
-.ink-layer {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9990;
-  overflow: hidden;
-}
-.ink-dot {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(198, 59, 59, 0.95) 0%, rgba(198, 59, 59, 0.7) 50%, rgba(198, 59, 59, 0.1) 90%, transparent 100%);
-  pointer-events: none;
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 0.85;
-  transition: opacity 1.1s ease-out, transform 1.1s ease-out;
-  box-shadow: 0 0 4px rgba(198, 59, 59, 0.25);
-}
-.ink-dot.fade {
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.4);
-}
+/* 잉크 트레일 제거 (거슬림 — 제거됨) */
 
 /* 커서 강조 (링크/버튼 호버) */
 .cursor-outline.cursor-link {
@@ -2002,9 +1991,6 @@ html {
   body::before {
     opacity: 0.2;
   }
-  .ink-layer {
-    display: none;
-  }
   .stamp-pop {
     font-size: 0.85rem;
     padding: 5px 12px;
@@ -2028,8 +2014,6 @@ html {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .ink-layer,
-  .ink-dot,
   .stamp-pop {
     display: none !important;
   }

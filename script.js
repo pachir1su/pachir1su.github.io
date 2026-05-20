@@ -18,48 +18,21 @@ if (typeof AOS !== 'undefined') {
 }
 
 /* ------------------------------------------------------------- */
-/* 2. 커스텀 커서 (기존) + 잉크 트레일 (신규)                       */
+/* 2. 커스텀 커서 (잉크 트레일 제거됨)                              */
 /* ------------------------------------------------------------- */
-(function initCursorAndInk() {
+(function initCursor() {
   const dot = document.querySelector('.cursor-dot');
   const outline = document.querySelector('.cursor-outline');
   if (!dot || !outline) return;
-
-  let lastInk = 0;
-  const inkInterval = 28; // 28ms마다 잉크 점 하나
-  const inkLayer = document.createElement('div');
-  inkLayer.className = 'ink-layer';
-  document.body.appendChild(inkLayer);
 
   document.addEventListener('mousemove', (e) => {
     dot.style.left = e.clientX + 'px';
     dot.style.top = e.clientY + 'px';
     outline.style.left = e.clientX + 'px';
     outline.style.top = e.clientY + 'px';
-
-    if (isMobile() || prefersReducedMotion) return;
-    const now = performance.now();
-    if (now - lastInk < inkInterval) return;
-    lastInk = now;
-    spawnInk(e.clientX, e.clientY);
   });
 
-  function spawnInk(x, y) {
-    const inkDot = document.createElement('span');
-    inkDot.className = 'ink-dot';
-    const jitter = () => (Math.random() - 0.5) * 8;
-    inkDot.style.left = (x + jitter()) + 'px';
-    inkDot.style.top = (y + jitter()) + 'px';
-    const size = 7 + Math.random() * 6;
-    inkDot.style.width = size + 'px';
-    inkDot.style.height = size + 'px';
-    inkLayer.appendChild(inkDot);
-    // 잠시 보였다가 천천히 fade
-    setTimeout(() => inkDot.classList.add('fade'), 80);
-    setTimeout(() => inkDot.remove(), 1400);
-  }
-
-  // 링크/버튼 호버 시 outline 강조 (기존 거 유지)
+  // 링크/버튼 호버 시 outline 강조
   document.querySelectorAll('a, button').forEach((el) => {
     el.addEventListener('mouseenter', () => {
       outline.style.transform = 'translate(-50%,-50%) scale(1.6)';
@@ -127,13 +100,17 @@ function closeMobile() {
 }
 
 /* ------------------------------------------------------------- */
-/* 6. 우클릭/드래그/선택 차단 (기존)                              */
-/*    단, .fi 스티커는 드래그 가능하도록 예외                     */
+/* 6. 우클릭/드래그/선택 차단 (강화)                              */
+/*    좌클릭 드래그 자체를 mousedown 단계에서 차단                  */
+/*    interactive 요소(.fi 포함)는 예외로 둬서 클릭/드래그 살림      */
 /* ------------------------------------------------------------- */
+const INTERACTIVE = 'a, button, input, textarea, select, label, .fi';
 document.addEventListener('contextmenu', (e) => e.preventDefault());
 document.addEventListener('dragstart', (e) => e.preventDefault());
-document.addEventListener('selectstart', (e) => {
-  if (e.target.closest('.fi')) return;
+document.addEventListener('selectstart', (e) => e.preventDefault());
+document.addEventListener('mousedown', (e) => {
+  if (e.button !== 0) return; // 좌클릭만
+  if (e.target.closest(INTERACTIVE)) return;
   e.preventDefault();
 });
 
