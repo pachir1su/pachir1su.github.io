@@ -2054,9 +2054,15 @@ html {
    PREVIEW 전용 — 5종 3D 효과 + BONUS
    ========================================================================== */
 
-/* body perspective (도장 3D 낙하 등에 사용) */
-body {
-  perspective: 1200px;
+/* body 전역 perspective는 fixed 자식(.cursor-dot/.cursor-outline) 가시성에
+   영향을 줄 수 있어 사용하지 않음. 각 효과는 자체 wrapper에 perspective 부여. */
+
+/* 커서 z-index를 최대치로 올려 perspective 컨테이너 안에서도 항상 위 */
+.cursor-dot {
+  z-index: 2147483647 !important;
+}
+.cursor-outline {
+  z-index: 2147483646 !important;
 }
 
 /* 효과 1 — hero perspective parallax */
@@ -2196,26 +2202,34 @@ body.intro-fold .footer { animation-delay: 0.15s; }
   }
 }
 
-/* 효과 4 — 도장 3D 낙하 (기존 stamp-pop 키프레임 교체) */
+/* 효과 4 — 도장 3D 낙하 (전용 perspective wrapper) */
+.stamp-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  z-index: 9995;
+}
 .stamp-pop {
   transform-style: preserve-3d;
   animation: stamp-3d-drop 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
 }
 @keyframes stamp-3d-drop {
   0% {
-    transform: translate(-50%, -50%) rotate(var(--stamp-rot, -12deg)) translateZ(-260px) scale(1.5) rotateX(-65deg);
+    transform: translate(-50%, -50%) translateY(-120px) rotate(var(--stamp-rot, -12deg)) scale(1.5) rotateX(-65deg);
     opacity: 0;
   }
   28% {
-    transform: translate(-50%, -50%) rotate(var(--stamp-rot, -12deg)) translateZ(0) scale(1.18) rotateX(0);
+    transform: translate(-50%, -50%) translateY(0) rotate(var(--stamp-rot, -12deg)) scale(1.18) rotateX(0);
     opacity: 1;
   }
   60% {
-    transform: translate(-50%, -50%) rotate(var(--stamp-rot, -12deg)) translateZ(0) scale(0.96) rotateX(0);
+    transform: translate(-50%, -50%) translateY(0) rotate(var(--stamp-rot, -12deg)) scale(0.96) rotateX(0);
     opacity: 1;
   }
   100% {
-    transform: translate(-50%, -50%) rotate(var(--stamp-rot, -12deg)) translateZ(30px) translateY(-14px) scale(0.85) rotateX(0);
+    transform: translate(-50%, -50%) translateY(-20px) rotate(var(--stamp-rot, -12deg)) scale(0.85) rotateX(0);
     opacity: 0;
   }
 }
@@ -3820,6 +3834,22 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
     '</svg>',
   ].join('\n');
   hero.appendChild(layer);
+})();
+
+/* 효과 4 보조 — 도장이 떨어질 perspective wrapper 준비.
+   기존 script.js의 initStampClick은 body에 직접 append하므로,
+   document.body.appendChild를 가로채 stamp-layer로 리다이렉트. */
+(function initStampLayer() {
+  const layer = document.createElement('div');
+  layer.className = 'stamp-layer';
+  document.body.appendChild(layer);
+  const origAppend = document.body.appendChild.bind(document.body);
+  document.body.appendChild = function (node) {
+    if (node && node.classList && node.classList.contains('stamp-pop')) {
+      return layer.appendChild(node);
+    }
+    return origAppend(node);
+  };
 })();
 
 /* 효과 3 — 노트 펼침 인트로 (1회) */
