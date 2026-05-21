@@ -1,3979 +1,638 @@
 <!doctype html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>이건영 — Preview (노트 테마 + 3D)</title>
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
-    />
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <style>
-/* ==========================================================================
-   노트 / 인덱스 카드 — Notebook & Index Card Aesthetic
-   Tokens: 종이 크림, 빨간 마진, 줄 노트, 펀치 홀, 마스킹 테이프, 스티커
-   ========================================================================== */
-
-/* 1. Tokens */
-:root {
-  --paper: #faf7ee;
-  --paper-2: #f4efe1;
-  --card: #fffdf6;
-  --ink: #1f1c14;
-  --text-muted: #6b6453;
-  --red: #c63b3b;
-  --red-soft: rgba(198, 59, 59, 0.16);
-  --red-margin: rgba(198, 59, 59, 0.32);
-  --cyan: #2b8a93;
-  --gold: #b88a1a;
-  --bronze: #b3712a;
-  --tape: rgba(230, 200, 120, 0.55);
-  --tape-solid: #e6c878;
-  --line: rgba(31, 28, 20, 0.18);
-  --rule: rgba(31, 28, 20, 0.08);
-  --postit: #fff7a8;
-  --shadow-soft: 0 6px 18px rgba(31, 28, 20, 0.08);
-  --shadow-lift: 0 12px 28px rgba(31, 28, 20, 0.14);
-  --radius: 4px;
-  --font-main: "Noto Sans KR", sans-serif;
-  --font-mono: "Space Mono", monospace;
-  --font-hand: "Caveat", cursive;
-  /* Back-compat aliases for sub-page inline styles */
-  --text: var(--ink);
-  --accent: var(--red);
-  --accent2: var(--bronze);
-  --bg: var(--paper);
-  --bg-card: var(--card);
-  --border: var(--line);
-}
-
-/* 2. Reset + 좌클릭 드래그/선택 전역 차단 */
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -webkit-user-drag: none;
-  -webkit-touch-callout: none;
-}
-img {
-  -webkit-user-drag: none;
-  pointer-events: none;
-}
-html {
-  scroll-behavior: smooth;
-}
-body {
-  font-family: var(--font-main);
-  background: var(--paper);
-  color: var(--ink);
-  line-height: 1.7;
-  overflow-x: hidden;
-  cursor: none;
-  background-image:
-    radial-gradient(circle at 18% 22%, rgba(184, 138, 26, 0.04), transparent 40%),
-    radial-gradient(circle at 82% 78%, rgba(198, 59, 59, 0.03), transparent 45%);
-}
-a {
-  color: inherit;
-  text-decoration: none;
-  cursor: none;
-}
-ul {
-  list-style: none;
-}
-button {
-  font-family: inherit;
-  background: none;
-  border: none;
-  cursor: none;
-  color: inherit;
-}
-img,
-svg {
-  max-width: 100%;
-  display: block;
-}
-
-/* 3. Typography */
-h1,
-h2,
-h3,
-h4 {
-  font-weight: 800;
-  color: var(--ink);
-  letter-spacing: -0.01em;
-}
-p {
-  color: var(--ink);
-}
-.container {
-  width: 100%;
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-/* 4. Progress bar */
-.progress-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  z-index: 2000;
-  background: transparent;
-}
-.progress-bar {
-  height: 3px;
-  background: var(--red);
-  width: 0%;
-  transition: width 0.1s ease;
-}
-
-/* 5. Back to top */
-#btn-back-to-top {
-  position: fixed;
-  bottom: 28px;
-  right: 28px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--card);
-  color: var(--red);
-  font-size: 1rem;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1500;
-  box-shadow: var(--shadow-soft);
-  border: 1.5px dashed var(--red-margin);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-#btn-back-to-top:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lift);
-}
-
-/* 6. Custom cursor */
-.cursor-dot {
-  position: fixed;
-  width: 8px;
-  height: 8px;
-  background: var(--red);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: transform 0.05s;
-}
-.cursor-outline {
-  position: fixed;
-  width: 36px;
-  height: 36px;
-  border: 1.5px solid rgba(198, 59, 59, 0.5);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  transition: transform 0.15s ease, border-color 0.15s ease;
-}
-
-/* 7. Navbar */
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: var(--paper);
-  border-bottom: 1px solid var(--line);
-  z-index: 1000;
-  padding: 14px 0;
-}
-.nav-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.logo {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--red);
-  letter-spacing: 0.04em;
-}
-.logo-bracket {
-  color: var(--cyan);
-}
-.nav-links {
-  display: flex;
-  gap: 28px;
-  align-items: center;
-}
-.nav-links a {
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  transition: color 0.2s;
-  position: relative;
-}
-.nav-links a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -4px;
-  height: 6px;
-  background: var(--red-soft);
-  opacity: 0;
-  transition: opacity 0.2s;
-  z-index: -1;
-}
-.nav-links a:hover {
-  color: var(--ink);
-}
-.nav-links a:hover::after {
-  opacity: 1;
-}
-.nav-github {
-  font-size: 1.15rem;
-  color: var(--ink);
-}
-.hamburger {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  padding: 6px;
-}
-.hamburger span {
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: var(--ink);
-  border-radius: 2px;
-  transition: background 0.2s;
-}
-.hamburger:hover span {
-  background: var(--red);
-}
-.mobile-menu {
-  position: fixed;
-  top: 60px;
-  left: 0;
-  width: 100%;
-  background: var(--paper);
-  border-bottom: 1px solid var(--line);
-  padding: 18px 24px;
-  display: none;
-  flex-direction: column;
-  gap: 14px;
-  z-index: 999;
-}
-.mobile-menu.open {
-  display: flex;
-}
-.mobile-menu a {
-  font-family: var(--font-mono);
-  color: var(--ink);
-  font-size: 0.95rem;
-  padding: 6px 0;
-}
-
-/* 8. Section base */
-.section {
-  padding: 88px 0;
-  position: relative;
-}
-.section-alt {
-  background: var(--paper-2);
-}
-.section-header {
-  margin-bottom: 56px;
-  position: relative;
-}
-.section-tag {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  letter-spacing: 0.12em;
-  margin-bottom: 12px;
-}
-.section-title {
-  font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-  font-weight: 800;
-  position: relative;
-  display: inline-block;
-  z-index: 1;
-}
-.section-title::before {
-  content: "";
-  position: absolute;
-  left: -6px;
-  right: -6px;
-  bottom: 4px;
-  height: 14px;
-  background: var(--red-soft);
-  z-index: -1;
-  transform: skewX(-2deg);
-}
-/* 섹션 헤더 우측 빈 원형 스티커 */
-.section-header::after {
-  content: "";
-  position: absolute;
-  top: -8px;
-  right: 0;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  color: var(--red);
-  box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 5px currentColor;
-  opacity: 0.7;
-  transform: rotate(-4deg);
-  pointer-events: none;
-}
-#about .section-header::after {
-  color: var(--cyan);
-  transform: rotate(3deg);
-}
-#skills .section-header::after {
-  color: var(--gold);
-  transform: rotate(-5deg);
-}
-#awards .section-header::after {
-  color: var(--bronze);
-  transform: rotate(2deg);
-}
-#projects .section-header::after {
-  color: var(--red);
-  transform: rotate(-3deg);
-}
-
-/* 9. Notebook card primitive
-   적용: .about-card, .skill-card, .award-card, .project-card
-*/
-.about-card,
-.skill-card,
-.award-card,
-.project-card {
-  position: relative;
-  background-color: var(--card);
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='28' viewBox='0 0 90 28'><g transform='rotate(-4 45 14)'><rect x='0' y='0' width='90' height='28' fill='%23e6c878' fill-opacity='0.55'/><rect x='0' y='0' width='90' height='2' fill='%23b88a1a' fill-opacity='0.15'/></g></svg>"),
-    linear-gradient(var(--red-margin), var(--red-margin)),
-    radial-gradient(circle 5px at 22px 44px, var(--paper-2) 99%, transparent 100%),
-    radial-gradient(circle 5px at 22px 50%, var(--paper-2) 99%, transparent 100%),
-    radial-gradient(circle 5px at 22px calc(100% - 44px), var(--paper-2) 99%, transparent 100%),
-    repeating-linear-gradient(transparent 0 31px, var(--rule) 31px 32px);
-  background-position:
-    18px -6px,
-    56px 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0;
-  background-size:
-    90px 28px,
-    1px 100%,
-    auto, auto, auto,
-    100% auto;
-  background-repeat:
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    repeat-y;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 38px 28px 28px 64px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  box-shadow: var(--shadow-soft);
-}
-.about-card:hover,
-.skill-card:hover,
-.award-card:hover,
-.project-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lift);
-}
-
-/* 카드 우측 상단 스티커 */
-.skill-card::after,
-.award-card::after {
-  content: "";
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--card);
-  border: 2px solid currentColor;
-  box-shadow: inset 0 0 0 2px var(--card), inset 0 0 0 3px currentColor;
-  color: var(--red);
-  opacity: 0.85;
-  pointer-events: none;
-}
-.skill-card:nth-child(5n + 1)::after,
-.award-card:nth-child(5n + 1)::after {
-  color: var(--red);
-  transform: rotate(-4deg);
-}
-.skill-card:nth-child(5n + 2)::after,
-.award-card:nth-child(5n + 2)::after {
-  color: var(--cyan);
-  transform: rotate(3deg);
-}
-.skill-card:nth-child(5n + 3)::after,
-.award-card:nth-child(5n + 3)::after {
-  color: var(--gold);
-  transform: rotate(-2deg);
-}
-.skill-card:nth-child(5n + 4)::after,
-.award-card:nth-child(5n + 4)::after {
-  color: var(--bronze);
-  transform: rotate(4deg);
-}
-.skill-card:nth-child(5n + 5)::after,
-.award-card:nth-child(5n + 5)::after {
-  color: var(--ink);
-  transform: rotate(-3deg);
-}
-
-/* 10. Hero */
-.hero {
-  min-height: 100vh;
-  padding: 96px 0 60px;
-  display: flex;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-  background: var(--paper);
-}
-.hero-grid-bg {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--red-margin), var(--red-margin)),
-    repeating-linear-gradient(transparent 0 31px, var(--rule) 31px 32px);
-  background-position: 84px 0, 0 0;
-  background-size: 1px 100%, 100% auto;
-  background-repeat: no-repeat, repeat-y;
-  opacity: 0.7;
-  pointer-events: none;
-}
-.hero-glow {
-  position: absolute;
-  width: 480px;
-  height: 480px;
-  top: 18%;
-  right: -120px;
-  background: radial-gradient(circle, rgba(198, 59, 59, 0.06), transparent 65%);
-  pointer-events: none;
-}
-.floating-icons {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.fi {
-  position: absolute;
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  line-height: 1;
-  background: var(--card);
-  border: 2px solid currentColor;
-  outline: 1.5px dashed currentColor;
-  outline-offset: -8px;
-  box-shadow: 0 6px 14px rgba(31, 28, 20, 0.1);
-  opacity: 0.85;
-  animation: floatUp 8s ease-in-out infinite;
-  /* devicon ::before 글리프가 가운데 들어와 보이게 — color는 nth별로 cycle */
-}
-.fi-1 {
-  top: 15%;
-  left: 8%;
-  color: var(--red);
-  animation-delay: 0s;
-}
-.fi-2 {
-  top: 22%;
-  right: 12%;
-  color: var(--cyan);
-  animation-delay: 1.5s;
-}
-.fi-3 {
-  bottom: 26%;
-  left: 14%;
-  color: var(--gold);
-  animation-delay: 3s;
-}
-.fi-4 {
-  bottom: 16%;
-  right: 9%;
-  color: var(--bronze);
-  animation-delay: 4.5s;
-}
-.fi-5 {
-  top: 48%;
-  left: 4%;
-  color: var(--ink);
-  animation-delay: 6s;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-  max-width: 820px;
-}
-.hero-tag {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  color: var(--red);
-  letter-spacing: 0.1em;
-  padding: 5px 14px;
-  border: 1.5px dashed var(--red-margin);
-  border-radius: 999px;
-  background: var(--card);
-  margin-bottom: 22px;
-}
-.hero-name {
-  font-size: clamp(2.6rem, 6vw, 4.4rem);
-  font-weight: 900;
-  line-height: 1.05;
-  margin-bottom: 14px;
-}
-.name-kr {
-  display: inline-block;
-  position: relative;
-  z-index: 1;
-  color: var(--ink);
-}
-.name-kr::before {
-  content: "";
-  position: absolute;
-  left: -6px;
-  right: -6px;
-  bottom: 6px;
-  height: 18px;
-  background: var(--red-soft);
-  z-index: -1;
-  transform: skewX(-3deg);
-}
-.name-en {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: clamp(1rem, 1.6vw, 1.2rem);
-  color: var(--text-muted);
-  font-weight: 400;
-  letter-spacing: 0.08em;
-  margin-top: 6px;
-}
-.hero-role {
-  font-size: clamp(1.1rem, 2vw, 1.4rem);
-  color: var(--ink);
-  margin-bottom: 18px;
-  font-weight: 500;
-}
-.typing-wrap {
-  color: var(--red);
-  font-weight: 700;
-}
-.typing-cursor {
-  display: inline-block;
-  width: 2px;
-  height: 1.1em;
-  background: var(--red);
-  margin-left: 2px;
-  vertical-align: middle;
-  animation: blink 1s infinite;
-}
-.hero-desc {
-  font-size: 1rem;
-  color: var(--text-muted);
-  line-height: 1.85;
-  max-width: 580px;
-  margin-bottom: 30px;
-}
-.hero-btns {
-  display: flex;
-  gap: 14px;
-  margin-bottom: 44px;
-  flex-wrap: wrap;
-}
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  font-weight: 700;
-  border-radius: var(--radius);
-  transition: transform 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
-  letter-spacing: 0.02em;
-}
-.btn-primary {
-  background: var(--red);
-  color: var(--card);
-  box-shadow: 0 4px 0 #7a1f1f;
-}
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 #7a1f1f;
-}
-.btn-ghost {
-  background: var(--card);
-  color: var(--red);
-  border: 1.5px dashed var(--red-margin);
-}
-.btn-ghost:hover {
-  background: var(--paper-2);
-  transform: translateY(-2px);
-}
-
-.hero-stats {
-  display: flex;
-  align-items: flex-start;
-  gap: 22px;
-  flex-wrap: wrap;
-}
-/* 포스트잇 stat */
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  background: var(--postit);
-  padding: 14px 20px;
-  min-width: 110px;
-  box-shadow: 2px 4px 8px rgba(31, 28, 20, 0.12);
-  transform: rotate(-2deg);
-  transition: transform 0.2s;
-}
-.stat-item:nth-child(3) {
-  transform: rotate(2deg);
-  background: #ffe5a8;
-}
-.stat-item:nth-child(5) {
-  transform: rotate(-1deg);
-  background: #c5e4e7;
-}
-.stat-item:hover {
-  transform: rotate(0) translateY(-3px);
-}
-.stat-num {
-  font-family: var(--font-hand);
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--red);
-  line-height: 1;
-}
-.stat-label {
-  font-size: 0.78rem;
-  color: var(--ink);
-  margin-top: 4px;
-  font-weight: 500;
-}
-.stat-divider {
-  display: none;
-}
-
-.scroll-hint {
-  position: absolute;
-  bottom: 32px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
-  pointer-events: none;
-}
-.scroll-line {
-  width: 1px;
-  height: 36px;
-  background: var(--red);
-  animation: scrollPulse 1.6s ease-in-out infinite;
-  transform-origin: top;
-}
-
-/* 11. About */
-.about-card {
-  margin-top: 8px;
-}
-.about-quote {
-  font-family: var(--font-hand);
-  font-size: clamp(1.5rem, 2.6vw, 1.95rem);
-  color: var(--red);
-  line-height: 1.4;
-  margin-bottom: 22px;
-  transform: rotate(-0.5deg);
-  font-weight: 600;
-}
-.about-body p {
-  font-size: 0.98rem;
-  color: var(--ink);
-  line-height: 2;
-  margin-bottom: 14px;
-}
-.about-body strong {
-  position: relative;
-  z-index: 1;
-  font-weight: 700;
-}
-.about-body strong::before {
-  content: "";
-  position: absolute;
-  left: -2px;
-  right: -2px;
-  bottom: 2px;
-  height: 10px;
-  background: var(--red-soft);
-  z-index: -1;
-}
-.about-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 22px;
-  margin-bottom: 22px;
-}
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  padding: 5px 12px;
-  background: var(--postit);
-  color: var(--ink);
-  border-radius: 2px;
-  box-shadow: 1px 2px 4px rgba(31, 28, 20, 0.08);
-  transform: rotate(-2deg);
-}
-.chip:nth-child(2n) {
-  background: #c5e4e7;
-  transform: rotate(2deg);
-}
-.chip:nth-child(3n) {
-  background: #ffe5a8;
-  transform: rotate(-1deg);
-}
-.about-github-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  color: var(--red);
-  border-bottom: 1.5px dashed var(--red-margin);
-  padding-bottom: 2px;
-  transition: color 0.2s;
-}
-.about-github-link:hover {
-  color: var(--ink);
-}
-
-/* 12. Skills */
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 24px;
-}
-.skill-icon {
-  font-size: 1.9rem;
-  color: var(--red);
-  margin-bottom: 12px;
-  line-height: 1;
-}
-.skill-card h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-bottom: 12px;
-  position: relative;
-  display: inline-block;
-  z-index: 1;
-}
-.skill-card h3::before {
-  content: "";
-  position: absolute;
-  left: -3px;
-  right: -3px;
-  bottom: 2px;
-  height: 9px;
-  background: var(--red-soft);
-  z-index: -1;
-}
-.skill-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-.skill-list li {
-  font-size: 0.88rem;
-  color: var(--ink);
-  line-height: 32px;
-  position: relative;
-  padding-left: 16px;
-}
-.skill-list li::before {
-  content: "·";
-  position: absolute;
-  left: 4px;
-  color: var(--red);
-  font-weight: 700;
-}
-
-/* 13. Awards */
-.awards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-}
-.award-card {
-  position: relative;
-}
-.award-rank {
-  position: absolute;
-  top: 14px;
-  right: 58px;
-  font-family: var(--font-hand);
-  font-size: 3.6rem;
-  font-weight: 700;
-  color: var(--red);
-  opacity: 0.16;
-  transform: rotate(-6deg);
-  line-height: 1;
-  pointer-events: none;
-}
-.award-icon {
-  font-size: 2.1rem;
-  margin-bottom: 12px;
-  line-height: 1;
-}
-.award-gold .award-icon {
-  color: var(--gold);
-}
-.award-cyan .award-icon {
-  color: var(--cyan);
-}
-.award-bronze .award-icon {
-  color: var(--bronze);
-}
-.award-info h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-.award-prize {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: var(--gold);
-  padding: 3px 10px;
-  background: rgba(184, 138, 26, 0.12);
-  border-radius: 2px;
-  margin-bottom: 10px;
-}
-.award-cyan .award-prize {
-  color: var(--cyan);
-  background: rgba(43, 138, 147, 0.12);
-}
-.award-bronze .award-prize {
-  color: var(--bronze);
-  background: rgba(179, 113, 42, 0.12);
-}
-.award-desc {
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  line-height: 1.7;
-}
-
-/* 14. Projects */
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
-}
-.project-card {
-  padding-top: 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-/* 빨간 압정 (우상단) */
-.project-card::before {
-  content: "";
-  position: absolute;
-  top: -7px;
-  right: 22px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 32%, #ff8a8a 0%, var(--red) 55%, #6e1a1a 100%);
-  box-shadow: 0 3px 5px rgba(31, 28, 20, 0.28);
-  z-index: 2;
-}
-.project-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-.project-icon {
-  font-size: 1.8rem;
-  color: var(--red);
-  line-height: 1;
-}
-.project-links {
-  display: flex;
-  gap: 6px;
-}
-.plink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  font-size: 0.82rem;
-  transition: transform 0.2s, background 0.2s, color 0.2s;
-  background: var(--card);
-  border: 1.5px solid var(--line);
-  color: var(--ink);
-}
-.plink-detail {
-  border-color: var(--red-margin);
-  color: var(--red);
-}
-.plink-detail:hover {
-  background: var(--red);
-  color: var(--card);
-  transform: translateY(-2px);
-}
-.plink-github {
-  color: var(--text-muted);
-}
-.plink-github:hover {
-  background: var(--ink);
-  color: var(--card);
-  transform: translateY(-2px);
-}
-.project-card h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--ink);
-  position: relative;
-  display: inline-block;
-  z-index: 1;
-}
-.project-card h3::before {
-  content: "";
-  position: absolute;
-  left: -3px;
-  right: -3px;
-  bottom: 2px;
-  height: 9px;
-  background: var(--red-soft);
-  z-index: -1;
-}
-.project-card p {
-  font-size: 0.88rem;
-  color: var(--ink);
-  line-height: 1.75;
-  flex: 1;
-}
-.tech-stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding-top: 10px;
-  border-top: 1px dashed var(--line);
-  margin-top: 6px;
-}
-.tech-stack span {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--ink);
-  background: var(--paper-2);
-  padding: 3px 10px;
-  border-radius: 2px;
-  border: 1px dashed var(--line);
-}
-
-/* WIP 카드 — 사선 줄무늬 + 금색 테이프 배지 */
-.project-wip {
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='28' viewBox='0 0 90 28'><g transform='rotate(-4 45 14)'><rect x='0' y='0' width='90' height='28' fill='%23e6c878' fill-opacity='0.55'/><rect x='0' y='0' width='90' height='2' fill='%23b88a1a' fill-opacity='0.15'/></g></svg>"),
-    linear-gradient(var(--red-margin), var(--red-margin)),
-    radial-gradient(circle 5px at 22px 44px, var(--paper-2) 99%, transparent 100%),
-    radial-gradient(circle 5px at 22px 50%, var(--paper-2) 99%, transparent 100%),
-    radial-gradient(circle 5px at 22px calc(100% - 44px), var(--paper-2) 99%, transparent 100%),
-    repeating-linear-gradient(45deg, transparent 0 12px, rgba(184, 138, 26, 0.07) 12px 24px),
-    repeating-linear-gradient(transparent 0 31px, var(--rule) 31px 32px);
-  background-position:
-    18px -6px,
-    56px 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0;
-  background-size:
-    90px 28px,
-    1px 100%,
-    auto, auto, auto,
-    auto, 100% auto;
-  background-repeat:
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    repeat,
-    repeat-y;
-}
-.wip-badge {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  padding: 4px 12px;
-  background: var(--tape-solid);
-  color: var(--ink);
-  letter-spacing: 0.04em;
-  transform: rotate(-2deg);
-  box-shadow: 1px 2px 4px rgba(31, 28, 20, 0.12);
-  align-self: flex-start;
-  border-radius: 1px;
-}
-
-/* 15. Footer */
-.footer {
-  padding: 36px 0;
-  border-top: 1px dashed var(--red-margin);
-  background: var(--paper);
-}
-.footer-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  flex-wrap: wrap;
-}
-.footer-logo {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: var(--red);
-}
-.footer-copy {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-.social-links {
-  display: flex;
-  gap: 14px;
-}
-.social-links a {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ink);
-  background: var(--card);
-  border: 1px dashed var(--line);
-  transition: color 0.2s, background 0.2s, transform 0.2s;
-}
-.social-links a:hover {
-  color: var(--red);
-  transform: translateY(-2px);
-}
-
-/* 16. Animations */
-@keyframes floatUp {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-22px) rotate(6deg);
-  }
-}
-@keyframes blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-@keyframes scrollPulse {
-  0%,
-  100% {
-    opacity: 0.4;
-    transform: scaleY(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scaleY(1.2);
-  }
-}
-
-/* 17. Media queries */
-@media (max-width: 768px) {
-  body {
-    cursor: auto;
-  }
-  a,
-  button {
-    cursor: auto;
-  }
-  .cursor-dot,
-  .cursor-outline {
-    display: none;
-  }
-  .nav-links {
-    display: none;
-  }
-  .hamburger {
-    display: flex;
-  }
-  .scroll-hint {
-    display: none;
-  }
-  .section {
-    padding: 64px 0;
-  }
-  .about-card,
-  .skill-card,
-  .award-card,
-  .project-card {
-    padding: 32px 22px 22px 52px;
-    background-position:
-      14px -6px,
-      44px 0,
-      0 0,
-      0 0,
-      0 0,
-      0 0;
-  }
-  .project-wip {
-    background-position:
-      14px -6px,
-      44px 0,
-      0 0,
-      0 0,
-      0 0,
-      0 0,
-      0 0;
-  }
-  .hero {
-    padding: 88px 0 48px;
-    min-height: auto;
-  }
-  .hero-name {
-    font-size: clamp(2rem, 8vw, 3rem);
-  }
-  .section-header::after {
-    width: 56px;
-    height: 56px;
-    top: -4px;
-  }
-  .fi {
-    width: 64px;
-    height: 64px;
-    font-size: 2rem;
-  }
-  .fi::before {
-    inset: 6px;
-  }
-  .hero-stats {
-    gap: 14px;
-  }
-  .stat-item {
-    min-width: 90px;
-    padding: 10px 14px;
-  }
-  .award-rank {
-    right: 40px;
-    font-size: 2.6rem;
-  }
-}
-
-/* ==========================================================================
-   18. 서브페이지 호환 shim — 기존 15개 /projects/*.html 가독성·동작 보존
-   ========================================================================== */
-
-.detail-hero {
-  position: relative;
-  padding: 120px 0 60px;
-  background: var(--paper);
-  overflow: hidden;
-  border-bottom: 1px solid var(--line);
-}
-.detail-hero-glow {
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  top: 10%;
-  right: -100px;
-  background: radial-gradient(circle, rgba(198, 59, 59, 0.06), transparent 65%);
-  pointer-events: none;
-}
-.detail-breadcrumb {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  margin-bottom: 18px;
-}
-.detail-breadcrumb a {
-  color: var(--red);
-  transition: color 0.2s;
-}
-.detail-breadcrumb a:hover {
-  color: var(--ink);
-}
-.detail-hero-icon {
-  font-size: 2.4rem;
-  color: var(--red);
-  margin-bottom: 14px;
-  line-height: 1;
-}
-.detail-title {
-  font-size: clamp(2rem, 5vw, 3.4rem);
-  font-weight: 900;
-  color: var(--ink);
-  background: none;
-  -webkit-text-fill-color: initial;
-  -webkit-background-clip: initial;
-  background-clip: initial;
-  line-height: 1.1;
-  margin-bottom: 18px;
-  position: relative;
-  display: inline-block;
-  z-index: 1;
-}
-.detail-title::before {
-  content: "";
-  position: absolute;
-  left: -6px;
-  right: -6px;
-  bottom: 6px;
-  height: 16px;
-  background: var(--red-soft);
-  z-index: -1;
-  transform: skewX(-2deg);
-}
-.detail-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 22px;
-}
-.detail-badge {
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  padding: 4px 12px;
-  background: var(--card);
-  color: var(--red);
-  border: 1px dashed var(--red-margin);
-  border-radius: 999px;
-  letter-spacing: 0.04em;
-}
-.detail-actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.github-activity-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  background: var(--card);
-  color: var(--ink);
-  font-family: var(--font-mono);
-  font-size: 0.84rem;
-  border: 1px dashed var(--line);
-  border-radius: var(--radius);
-  transition: transform 0.2s;
-}
-.github-activity-btn:hover {
-  transform: translateY(-2px);
-}
-
-.detail-body {
-  padding: 60px 0 80px;
-  background: var(--paper);
-}
-.detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 36px;
-}
-.detail-main {
-  min-width: 0;
-}
-.detail-section {
-  margin-bottom: 36px;
-  background-color: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 28px 32px;
-  box-shadow: var(--shadow-soft);
-  background-image: repeating-linear-gradient(transparent 0 31px, var(--rule) 31px 32px);
-}
-.detail-section h2 {
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: var(--ink);
-  margin-bottom: 14px;
-  position: relative;
-  display: inline-block;
-  z-index: 1;
-}
-.detail-section h2::before {
-  content: "";
-  position: absolute;
-  left: -3px;
-  right: -3px;
-  bottom: 2px;
-  height: 12px;
-  background: var(--red-soft);
-  z-index: -1;
-}
-.detail-section h3 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--ink);
-  margin: 18px 0 10px;
-}
-.detail-section p {
-  color: var(--ink);
-  line-height: 2;
-  margin-bottom: 12px;
-}
-.detail-section ul {
-  margin: 10px 0 14px;
-}
-.detail-section ul li {
-  position: relative;
-  padding-left: 22px;
-  line-height: 2;
-  color: var(--ink);
-}
-.detail-section ul li::before {
-  content: "·";
-  position: absolute;
-  left: 8px;
-  color: var(--red);
-  font-weight: 700;
-}
-.detail-section strong {
-  color: var(--ink);
-  font-weight: 700;
-}
-.detail-section a {
-  color: var(--red);
-  border-bottom: 1px dashed var(--red-margin);
-}
-
-.detail-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.sidebar-card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 22px;
-  box-shadow: var(--shadow-soft);
-}
-.sidebar-card h4 {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  color: var(--red);
-  margin-bottom: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.sidebar-card p {
-  color: var(--ink);
-  font-size: 0.9rem;
-  line-height: 1.7;
-}
-.sidebar-stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.sidebar-stack span {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  padding: 3px 10px;
-  background: var(--paper-2);
-  color: var(--ink);
-  border: 1px dashed var(--line);
-  border-radius: 2px;
-}
-
-@media (max-width: 900px) {
-  .detail-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ==========================================================================
-   19. 인터랙션 팩 — 잉크 트레일 / 도장 / 드래그 / 단축키 힌트
-   ========================================================================== */
-
-/* 잉크 트레일 제거 (거슬림 — 제거됨) */
-
-/* 커서 강조 (링크/버튼 호버) */
-.cursor-outline.cursor-link {
-  background: rgba(198, 59, 59, 0.08);
-}
-
-/* 도장 클릭 효과 */
-.stamp-pop {
-  position: fixed;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--red);
-  border: 2.5px solid var(--red);
-  padding: 6px 14px;
-  background: rgba(255, 253, 246, 0.85);
-  letter-spacing: 0.1em;
-  pointer-events: none;
-  z-index: 9995;
-  --stamp-rot: -12deg;
-  transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(0);
-  opacity: 0;
-  animation: stamp-pop 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  text-shadow: 0 0 1px var(--red);
-}
-.stamp-pop::before,
-.stamp-pop::after {
-  content: "";
-  position: absolute;
-  inset: -3px;
-  border: 1.5px dashed rgba(198, 59, 59, 0.4);
-  pointer-events: none;
-}
-.stamp-pop::after {
-  inset: 3px;
-  border: none;
-  background:
-    radial-gradient(circle at 30% 40%, rgba(198, 59, 59, 0.06) 0 30%, transparent 31%),
-    radial-gradient(circle at 70% 70%, rgba(198, 59, 59, 0.04) 0 30%, transparent 31%);
-}
-@keyframes stamp-pop {
-  0% {
-    transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(0.4);
-    opacity: 0;
-  }
-  25% {
-    transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(1.25);
-    opacity: 1;
-  }
-  45% {
-    transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(0.95);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(0.85) translateY(-18px);
-    opacity: 0;
-  }
-}
-
-/* 단축키 힌트 토스트 */
-.key-hint {
-  position: fixed;
-  bottom: 90px;
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  color: var(--card);
-  background: var(--ink);
-  padding: 8px 18px;
-  border-radius: 2px;
-  opacity: 0;
-  transition: transform 0.25s ease, opacity 0.25s ease;
-  z-index: 9994;
-  pointer-events: none;
-  box-shadow: 0 6px 14px rgba(31, 28, 20, 0.25);
-}
-.key-hint.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* ==========================================================================
-   20. 스티커 (.fi) — 5색 floatUp 변형 + 드래그 상태
-   ========================================================================== */
-
-.fi {
-  transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px)));
-  transition: box-shadow 0.2s ease;
-  z-index: 1;
-  user-select: none;
-  -webkit-user-select: none;
-}
-.fi:hover {
-  box-shadow: 0 10px 22px rgba(31, 28, 20, 0.16);
-}
-.fi.grabbing {
-  cursor: grabbing !important;
-  z-index: 50;
-  box-shadow: 0 18px 36px rgba(31, 28, 20, 0.28);
-}
-.fi.settled {
-  animation: none !important;
-}
-
-/* nth-child별 다른 floatUp 패턴 */
-.fi-1 { animation-name: floatA; }
-.fi-2 { animation-name: floatB; animation-duration: 9s; }
-.fi-3 { animation-name: floatC; animation-duration: 10s; }
-.fi-4 { animation-name: floatD; animation-duration: 8.5s; }
-.fi-5 { animation-name: floatE; animation-duration: 11s; }
-
-@keyframes floatA {
-  0%, 100% {
-    transform: translate(calc(var(--drag-x, 0px)), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(-6deg);
-  }
-  50% {
-    transform: translate(calc(var(--drag-x, 0px) + 12px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 22px)) rotate(2deg);
-  }
-}
-@keyframes floatB {
-  0%, 100% {
-    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(4deg);
-  }
-  50% {
-    transform: translate(calc(var(--drag-x, 0px) - 18px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 16px)) rotate(-3deg);
-  }
-}
-@keyframes floatC {
-  0%, 100% {
-    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(-3deg);
-  }
-  50% {
-    transform: translate(calc(var(--drag-x, 0px) + 8px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 26px)) rotate(5deg);
-  }
-}
-@keyframes floatD {
-  0%, 100% {
-    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(5deg);
-  }
-  50% {
-    transform: translate(calc(var(--drag-x, 0px) - 10px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 20px)) rotate(-4deg);
-  }
-}
-@keyframes floatE {
-  0%, 100% {
-    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(-4deg);
-  }
-  50% {
-    transform: translate(calc(var(--drag-x, 0px) + 14px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 18px)) rotate(3deg);
-  }
-}
-
-/* ==========================================================================
-   21. 형광펜 sweep — 호버 시 좌→우로 그어지는 효과
-   ========================================================================== */
-
-.nav-links a::after {
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.25s;
-  opacity: 1;
-}
-.nav-links a:hover::after {
-  opacity: 1;
-  transform: scaleX(1);
-}
-
-.detail-breadcrumb a {
-  position: relative;
-  display: inline-block;
-}
-.detail-breadcrumb a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 7px;
-  background: var(--red-soft);
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 0.3s cubic-bezier(0.65, 0, 0.35, 1);
-  z-index: -1;
-}
-.detail-breadcrumb a:hover::after {
-  transform: scaleX(1);
-}
-
-.about-github-link {
-  position: relative;
-  overflow: hidden;
-}
-.about-github-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 10px;
-  background: var(--red-soft);
-  transform: translateY(-50%) scaleX(0);
-  transform-origin: left center;
-  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
-  z-index: -1;
-}
-.about-github-link:hover::after {
-  transform: translateY(-50%) scaleX(1);
-}
-
-.social-links a {
-  position: relative;
-  overflow: hidden;
-}
-.social-links a::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--red-soft);
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 0.3s ease;
-  z-index: -1;
-  border-radius: 50%;
-}
-.social-links a:hover::before {
-  transform: scaleY(1);
-}
-
-/* ==========================================================================
-   22. 카드 그림자 follow — 마우스 위치에 따라 그림자 방향 (회전 없음)
-   ========================================================================== */
-
-.about-card,
-.skill-card,
-.award-card,
-.project-card {
-  --shadow-x: 0px;
-  --shadow-y: 6px;
-  box-shadow:
-    var(--shadow-x) var(--shadow-y) 18px rgba(31, 28, 20, 0.1),
-    0 1px 0 rgba(31, 28, 20, 0.04);
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
-}
-.about-card:hover,
-.skill-card:hover,
-.award-card:hover,
-.project-card:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    var(--shadow-x) calc(var(--shadow-y) + 12px) 28px rgba(31, 28, 20, 0.16),
-    0 1px 0 rgba(31, 28, 20, 0.04);
-}
-
-/* ==========================================================================
-   23. 카드 진입 — 마스킹 테이프 sweep (.taped 클래스 추가 시)
-   ========================================================================== */
-
-.project-card .project-icon,
-.skill-card .skill-icon,
-.award-card .award-icon {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.project-card.taped .project-icon,
-.skill-card.taped .skill-icon,
-.award-card.taped .award-icon {
-  animation: icon-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-@keyframes icon-pop {
-  0% { transform: scale(0.6) rotate(-12deg); opacity: 0; }
-  60% { transform: scale(1.18) rotate(6deg); opacity: 1; }
-  100% { transform: scale(1) rotate(0); opacity: 1; }
-}
-
-/* 카드 호버 시 푸시핀 살짝 흔들 */
-.project-card:hover::before {
-  animation: pin-wobble 0.5s ease-in-out;
-}
-@keyframes pin-wobble {
-  0%, 100% { transform: rotate(0); }
-  25% { transform: rotate(-8deg) translateY(-1px); }
-  75% { transform: rotate(8deg) translateY(-1px); }
-}
-
-/* WIP 배지 호버 시 살짝 떨림 */
-.wip-badge {
-  transition: transform 0.2s ease;
-}
-.project-card:hover .wip-badge {
-  animation: badge-wiggle 0.45s ease-in-out;
-}
-@keyframes badge-wiggle {
-  0%, 100% { transform: rotate(-2deg); }
-  25% { transform: rotate(-6deg) translateX(-1px); }
-  50% { transform: rotate(0deg); }
-  75% { transform: rotate(-4deg) translateX(1px); }
-}
-
-/* ==========================================================================
-   24. 로고 wobble (클릭 시)
-   ========================================================================== */
-
-.logo,
-.footer-logo {
-  display: inline-block;
-}
-.logo.wobble,
-.footer-logo.wobble {
-  animation: logo-wobble 0.55s ease-in-out;
-}
-@keyframes logo-wobble {
-  0%, 100% { transform: rotate(0); }
-  15% { transform: rotate(-6deg) scale(1.05); }
-  30% { transform: rotate(5deg); }
-  45% { transform: rotate(-3deg); }
-  60% { transform: rotate(2deg); }
-  80% { transform: rotate(-1deg); }
-}
-
-/* ==========================================================================
-   25. 페이지 진입 (한 번만)
-   ========================================================================== */
-
-body.page-entry {
-  animation: page-land 0.85s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes page-land {
-  0% { opacity: 0.2; transform: translateY(-12px) rotate(-0.4deg); }
-  60% { opacity: 1; transform: translateY(2px) rotate(0.15deg); }
-  100% { opacity: 1; transform: translateY(0) rotate(0); }
-}
-
-/* ==========================================================================
-   26. Back-to-top 가시성 토글 (.visible 클래스 기반)
-   ========================================================================== */
-
-#btn-back-to-top {
-  display: flex;
-  opacity: 0;
-  transform: translateY(14px) scale(0.85);
-  pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-#btn-back-to-top.visible {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
-}
-
-/* ==========================================================================
-   27. 햄버거 변형 (open 상태)
-   ========================================================================== */
-
-.hamburger span {
-  transition: transform 0.25s ease, opacity 0.2s ease, background 0.2s ease;
-}
-.hamburger.open span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
-}
-.hamburger.open span:nth-child(2) {
-  opacity: 0;
-}
-.hamburger.open span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
-}
-
-/* ==========================================================================
-   28. 노트 질감 강화 — 종이 노이즈, 잉크 번짐, 손글씨 잔흔
-   ========================================================================== */
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.32;
-  mix-blend-mode: multiply;
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0.4   0 0 0 0 0.35   0 0 0 0 0.25   0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  background-size: 220px 220px;
-}
-
-/* 잉크 얼룩 (히어로 우상단) */
-.hero::before {
-  content: "";
-  position: absolute;
-  top: 12%;
-  right: 14%;
-  width: 80px;
-  height: 80px;
-  background: radial-gradient(circle at 40% 40%,
-    rgba(198, 59, 59, 0.08) 0%,
-    rgba(198, 59, 59, 0.03) 40%,
-    transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-  filter: blur(2px);
-  animation: ink-drift 14s ease-in-out infinite;
-}
-@keyframes ink-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-12px, 8px) scale(1.1); }
-}
-
-/* 손글씨 잔흔 (about-quote 옆) */
-.about-quote::before {
-  content: "“";
-  position: absolute;
-  left: -34px;
-  top: -14px;
-  font-family: var(--font-hand);
-  font-size: 4rem;
-  color: var(--red);
-  opacity: 0.25;
-  line-height: 1;
-  pointer-events: none;
-}
-.about-quote {
-  position: relative;
-  padding-left: 16px;
-}
-
-/* ==========================================================================
-   29. 카드 마스킹 테이프 호버 시 살짝 떨어짐
-   ========================================================================== */
-
-.about-card,
-.skill-card,
-.award-card,
-.project-card {
-  background-attachment: scroll;
-}
-
-/* 카드 호버 시 테이프 살짝 떨어짐 */
-.skill-card:hover,
-.award-card:hover,
-.project-card:hover {
-  background-position:
-    24px -3px,
-    56px 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0;
-}
-.project-card.project-wip:hover {
-  background-position:
-    24px -3px,
-    56px 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0;
-}
-
-/* ==========================================================================
-   30. 텍스트 강조 보강
-   ========================================================================== */
-
-/* 히어로 desc 안의 strong (월 100만 명 등) */
-.hero-desc strong {
-  position: relative;
-  z-index: 1;
-  font-weight: 700;
-  color: var(--ink);
-}
-.hero-desc strong::before {
-  content: "";
-  position: absolute;
-  left: -2px;
-  right: -2px;
-  bottom: 1px;
-  height: 11px;
-  background: var(--red-soft);
-  z-index: -1;
-  transform: skewX(-3deg);
-}
-
-/* 섹션 헤더의 section-tag — 약간 손글씨 느낌 */
-.section-tag::before {
-  content: "✎ ";
-  color: var(--red);
-  font-size: 0.85em;
-  margin-right: 4px;
-}
-
-/* ==========================================================================
-   31. 스크롤바 빨간 잉크
-   ========================================================================== */
-
-html {
-  scrollbar-width: thin;
-  scrollbar-color: var(--red) var(--paper-2);
-}
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: var(--paper-2);
-  border-left: 1px dashed var(--line);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--red);
-  border-radius: 0;
-  border: 2px solid var(--paper-2);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #a82e2e;
-}
-
-/* ==========================================================================
-   32. 카드 진입 시 stagger 추가 — AOS 보조
-   ========================================================================== */
-
-.project-card:not(.taped),
-.skill-card:not(.taped),
-.award-card:not(.taped) {
-  /* AOS가 동작하지 않을 때를 대비한 fallback (이미 보이는 상태로) */
-  opacity: 1;
-}
-
-/* ==========================================================================
-   33. nav-links 활성 표시
-   ========================================================================== */
-
-.nav-links a.is-active::after {
-  opacity: 1;
-  transform: scaleX(1);
-}
-
-/* ==========================================================================
-   34. 호버 시 .stat-item 더 강조 (포스트잇 떠오름)
-   ========================================================================== */
-
-.stat-item {
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-}
-.stat-item:hover {
-  box-shadow: 3px 8px 16px rgba(31, 28, 20, 0.18);
-  transform: rotate(0) translateY(-5px);
-  z-index: 2;
-}
-
-/* ==========================================================================
-   35. 모바일 보강
-   ========================================================================== */
-
-@media (max-width: 768px) {
-  body::before {
-    opacity: 0.2;
-  }
-  .stamp-pop {
-    font-size: 0.85rem;
-    padding: 5px 12px;
-  }
-  .key-hint {
-    bottom: 70px;
-    font-size: 0.72rem;
-  }
-}
-
-/* ==========================================================================
-   36. reduce-motion 사용자 배려
-   ========================================================================== */
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-  .stamp-pop {
-    display: none !important;
-  }
-  .fi {
-    animation: none !important;
-  }
-}
-
-
-/* ==========================================================================
-   PREVIEW 전용 — 5종 3D 효과 + BONUS
-   ========================================================================== */
-
-/* body 전역 perspective는 fixed 자식(.cursor-dot/.cursor-outline) 가시성에
-   영향을 줄 수 있어 사용하지 않음. 각 효과는 자체 wrapper에 perspective 부여. */
-
-/* 커서 z-index를 최대치로 올려 perspective 컨테이너 안에서도 항상 위 */
-.cursor-dot {
-  z-index: 2147483647 !important;
-}
-.cursor-outline {
-  z-index: 2147483646 !important;
-}
-
-/* 효과 1 — hero perspective parallax */
-.hero {
-  perspective: 1200px;
-  transform-style: preserve-3d;
-}
-.hero-content {
-  transform-style: preserve-3d;
-}
-.hero-tag,
-.name-kr,
-.name-en,
-.hero-role,
-.hero-desc,
-.hero-btns,
-.hero-stats,
-.fi {
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-
-/* 효과 2 — 3D 부유물 (종이 비행기·클립·연필) */
-.flying-3d-layer {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  perspective: 1000px;
-  transform-style: preserve-3d;
-  z-index: 1;
-  overflow: hidden;
-}
-.flying-3d-layer .fly-item {
-  position: absolute;
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-.flying-3d-layer svg {
-  pointer-events: none;
-  width: 100%;
-  height: auto;
-  display: block;
-}
-.flying-3d-layer .fly-plane {
-  top: 18%;
-  left: -120px;
-  width: 64px;
-  animation: plane-fly 16s linear infinite;
-  filter: drop-shadow(2px 4px 4px rgba(31, 28, 20, 0.16));
-}
-.flying-3d-layer .fly-clip {
-  top: -80px;
-  right: 12%;
-  width: 30px;
-  animation: clip-fall 11s ease-in infinite;
-  filter: drop-shadow(2px 4px 3px rgba(31, 28, 20, 0.14));
-}
-.flying-3d-layer .fly-pencil {
-  bottom: 22%;
-  left: 5%;
-  width: 110px;
-  animation: pencil-wiggle 3.2s ease-in-out infinite;
-  transform-origin: bottom right;
-  filter: drop-shadow(2px 4px 3px rgba(31, 28, 20, 0.12));
-}
-
-@keyframes plane-fly {
-  0% {
-    transform: translate3d(0, 0, 0) rotateY(20deg) rotateZ(-6deg);
-    opacity: 0;
-  }
-  8% { opacity: 0.9; }
-  50% {
-    transform: translate3d(60vw, -80px, 80px) rotateY(8deg) rotateZ(8deg);
-    opacity: 0.95;
-  }
-  92% { opacity: 0.75; }
-  100% {
-    transform: translate3d(120vw, -180px, 140px) rotateY(-18deg) rotateZ(-4deg);
-    opacity: 0;
-  }
-}
-@keyframes clip-fall {
-  0% {
-    transform: translate3d(0, 0, 0) rotateX(0deg) rotateZ(0deg);
-    opacity: 0;
-  }
-  15% { opacity: 1; }
-  100% {
-    transform: translate3d(28px, 120vh, -120px) rotateX(720deg) rotateZ(360deg);
-    opacity: 0.4;
-  }
-}
-@keyframes pencil-wiggle {
-  0%, 100% {
-    transform: rotate(-22deg) translateZ(0);
-  }
-  25% {
-    transform: rotate(-26deg) translateZ(12px);
-  }
-  50% {
-    transform: rotate(-19deg) translateZ(0);
-  }
-  75% {
-    transform: rotate(-24deg) translateZ(10px);
-  }
-}
-
-/* 효과 3 — 노트 펼침 인트로 */
-body.intro-fold {
-  overflow: hidden !important;
-}
-body.intro-fold .navbar,
-body.intro-fold .hero,
-body.intro-fold section,
-body.intro-fold .footer {
-  animation: notebook-fold 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;
-  transform-origin: left center;
-  backface-visibility: hidden;
-}
-body.intro-fold .navbar { animation-delay: 0s; }
-body.intro-fold .hero { animation-delay: 0.05s; }
-body.intro-fold section { animation-delay: 0.1s; }
-body.intro-fold .footer { animation-delay: 0.15s; }
-@keyframes notebook-fold {
-  0% {
-    transform: perspective(1500px) rotateY(-65deg) scale(0.92);
-    opacity: 0;
-  }
-  55% {
-    transform: perspective(1500px) rotateY(8deg) scale(0.99);
-    opacity: 1;
-  }
-  100% {
-    transform: perspective(1500px) rotateY(0deg) scale(1);
-    opacity: 1;
-  }
-}
-
-/* 효과 4 — 도장 3D 낙하 (전용 perspective wrapper) */
-.stamp-layer {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  perspective: 1000px;
-  transform-style: preserve-3d;
-  z-index: 9995;
-}
-.stamp-pop {
-  transform-style: preserve-3d;
-  animation: stamp-3d-drop 0.95s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
-}
-@keyframes stamp-3d-drop {
-  0% {
-    transform: translate(-50%, -50%) translateY(-120px) rotate(var(--stamp-rot, -12deg)) scale(1.5) rotateX(-65deg);
-    opacity: 0;
-  }
-  28% {
-    transform: translate(-50%, -50%) translateY(0) rotate(var(--stamp-rot, -12deg)) scale(1.18) rotateX(0);
-    opacity: 1;
-  }
-  60% {
-    transform: translate(-50%, -50%) translateY(0) rotate(var(--stamp-rot, -12deg)) scale(0.96) rotateX(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -50%) translateY(-20px) rotate(var(--stamp-rot, -12deg)) scale(0.85) rotateX(0);
-    opacity: 0;
-  }
-}
-
-/* 효과 5 — 카드 perspective 호버 (회전 없음) */
-.projects-grid,
-.skills-grid,
-.awards-grid {
-  perspective: 1000px;
-  transform-style: preserve-3d;
-}
-.about-card,
-.skill-card,
-.award-card,
-.project-card {
-  transform-style: preserve-3d;
-  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.32s ease;
-}
-.about-card:hover,
-.skill-card:hover,
-.award-card:hover,
-.project-card:hover {
-  transform: translate3d(0, -8px, 32px) !important;
-  box-shadow:
-    var(--shadow-x, 0px) calc(var(--shadow-y, 6px) + 22px) 38px rgba(31, 28, 20, 0.22),
-    0 1px 0 rgba(31, 28, 20, 0.04) !important;
-}
-
-/* BONUS — 종이 책갈피 (우측 상단) */
-.bookmark-3d {
-  position: fixed;
-  top: 78px;
-  right: 0;
-  width: 40px;
-  height: 116px;
-  z-index: 1100;
-  transform-style: preserve-3d;
-  transform: rotateY(-14deg);
-  transform-origin: right center;
-  transition: transform 0.3s ease;
-  cursor: none;
-  pointer-events: auto;
-}
-.bookmark-3d:hover {
-  transform: rotateY(-26deg) translateX(-5px);
-}
-.bookmark-3d svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(-2px 4px 6px rgba(31, 28, 20, 0.24));
-  pointer-events: none;
-}
-
-/* BONUS — 잉크 splash (카드 클릭 시) */
-.ink-splash {
-  position: fixed;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--red) 0%, rgba(198,59,59,0.5) 70%, transparent 100%);
-  pointer-events: none;
-  z-index: 9990;
-  opacity: 0.85;
-  transform: translate(-50%, -50%);
-  animation: ink-splash 0.7s ease-out forwards;
-  box-shadow: 0 0 4px rgba(198, 59, 59, 0.25);
-}
-@keyframes ink-splash {
-  0% {
-    transform: translate(-50%, -50%) scale(0);
-    opacity: 1;
-  }
-  60% {
-    transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(0.25);
-    opacity: 0;
-  }
-}
-
-/* BONUS — preview 배지 (좌측) */
-.preview-badge {
-  position: fixed;
-  top: 80px;
-  left: 18px;
-  z-index: 1100;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  background: var(--ink);
-  color: var(--card);
-  padding: 5px 12px;
-  transform: rotate(-3deg);
-  box-shadow: 2px 4px 8px rgba(31, 28, 20, 0.2);
-  pointer-events: none;
-}
-
-/* BONUS — 스크롤 깊이에 따른 종이 색 미세 grading */
-body {
-  background: hsl(46, 38%, calc(96% - (var(--scroll-progress, 0)) * 6%));
-  transition: background 0.4s ease;
-}
-
-@media (max-width: 768px) {
-  .flying-3d-layer .fly-plane { width: 44px; }
-  .flying-3d-layer .fly-pencil { width: 80px; }
-  .bookmark-3d { width: 30px; height: 90px; top: 70px; }
-  body.intro-fold section,
-  body.intro-fold .hero,
-  body.intro-fold .navbar,
-  body.intro-fold .footer {
-    animation-duration: 0.9s;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .flying-3d-layer,
-  .bookmark-3d,
-  .ink-splash {
-    display: none !important;
-  }
-  body.intro-fold {
-    overflow: visible !important;
-  }
-}
-
-    </style>
-  </head>
-  <body>
-
-    <div class="progress-container">
-      <div class="progress-bar" id="myBar"></div>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>이건영 — Index Card (Preview)</title>
+<link
+  rel="icon"
+  href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
+/>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Pretendard:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+/>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#faf7ee;
+    --paper-2:#f4efe1;
+    --ink:#1f1c14;
+    --g:#6b6453;
+    --g2:#a39c8a;
+    --red:#c63b3b;
+    --red-l:rgba(198,59,59,0.3);
+    --line:rgba(31,28,20,0.16);
+    --rule:rgba(31,28,20,0.1);
+    --green:#3a6b3a;
+    --row-h:32px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:'Pretendard','Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  ul{list-style:none}
+  .hand{font-family:'Caveat',cursive}
+
+  /* progress bar (preserved) */
+  .progress-container{position:fixed;top:0;left:0;right:0;height:3px;background:transparent;z-index:100;pointer-events:none}
+  .progress-bar{height:100%;width:0;background:var(--red);transition:width .08s linear}
+
+  /* back-to-top (preserved) */
+  #btn-back-to-top{position:fixed;bottom:24px;right:24px;width:44px;height:44px;border:1.5px solid var(--ink);background:var(--paper);color:var(--ink);font-family:'JetBrains Mono';font-size:14px;font-weight:700;cursor:pointer;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s, background .15s, color .15s;display:flex;align-items:center;justify-content:center}
+  #btn-back-to-top.show{opacity:1;pointer-events:auto}
+  #btn-back-to-top:hover{background:var(--ink);color:var(--paper)}
+
+  /* nav */
+  nav{position:sticky;top:0;background:var(--paper);border-bottom:1px solid var(--line);padding:12px 28px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.05em;z-index:50}
+  nav .lhs{display:flex;align-items:center;gap:14px;color:var(--g)}
+  nav .lhs .stamp{font-family:'JetBrains Mono';font-size:10px;border:1.5px solid var(--red);color:var(--red);padding:2px 6px;letter-spacing:0.08em;font-weight:700}
+  nav .lhs b{color:var(--ink);font-weight:700}
+  nav .links{display:flex;gap:22px}
+  nav .links a{color:var(--g);transition:color .15s}
+  nav .links a:hover{color:var(--ink)}
+
+  main{max-width:1100px;margin:0 auto;padding:48px 28px 80px}
+
+  /* INDEX CARD base */
+  .card{background:#fff;border:1px solid var(--line);box-shadow:0 1px 0 var(--line),0 8px 24px -12px rgba(0,0,0,0.1);position:relative;margin-bottom:32px;overflow:hidden}
+  .card::before{content:'';position:absolute;left:64px;top:0;bottom:0;width:1px;background:var(--red-l)}
+  .card .lines{position:absolute;left:0;right:0;top:60px;bottom:0;background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--row-h) - 1px),var(--rule) calc(var(--row-h) - 1px),var(--rule) var(--row-h));pointer-events:none}
+  .card .holes{position:absolute;left:22px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-around;padding:30px 0;align-items:center;gap:0}
+  .card .holes span{display:block;width:12px;height:12px;border-radius:50%;background:var(--paper-2);border:1px solid var(--line)}
+  .card .head{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 12px 84px;border-bottom:1px solid var(--line);font-family:'JetBrains Mono';font-size:11px;color:var(--g);letter-spacing:0.05em;position:relative;z-index:1;flex-wrap:wrap;gap:8px}
+  .card .head b{color:var(--ink);font-weight:700}
+  .card .head .red{color:var(--red);font-weight:700}
+  .card .body{padding:20px 28px 30px 84px;position:relative;z-index:1}
+  .card .stamp{position:absolute;top:16px;right:24px;font-family:'JetBrains Mono';font-size:11px;color:var(--red);border:2px solid var(--red);padding:6px 12px;letter-spacing:0.12em;font-weight:700;transform:rotate(7deg);background:rgba(255,255,255,0.5);z-index:2}
+  .card .stamp small{display:block;font-size:8px;font-weight:500;margin-top:2px;letter-spacing:0.06em}
+
+  /* line-content helper */
+  .line{display:flex;align-items:center;height:var(--row-h);font-size:15px;color:var(--ink);gap:8px}
+  .line b{font-weight:700}
+  .line.muted{color:var(--g);font-size:13px}
+
+  /* HERO card */
+  .hero-card{min-height:540px}
+  .hero-card .body{display:flex;flex-direction:column;justify-content:flex-start;gap:6px}
+  .meta-row{font-family:'JetBrains Mono';font-size:10px;color:var(--g);letter-spacing:0.06em;height:var(--row-h);display:flex;align-items:center}
+  .meta-row b{color:var(--ink);font-weight:600}
+  .name{font-family:'Space Grotesk';font-weight:700;font-size:78px;line-height:64px;letter-spacing:-0.04em;margin:8px 0 0;height:128px;display:flex;flex-direction:column}
+  .name span{display:block;height:64px;line-height:64px}
+  .name em{font-style:normal;color:var(--red);position:relative}
+  .name em::after{content:'';position:absolute;left:0;right:6px;bottom:6px;height:2px;background:var(--red);opacity:0.4}
+  .scribble{position:absolute;font-family:'Caveat';font-size:22px;color:var(--red);transform:rotate(-4deg);line-height:1}
+  .scribble.s1{top:236px;right:96px}
+  .scribble.s2{top:80px;right:152px;font-size:18px;transform:rotate(-12deg)}
+
+  .quote-row{min-height:var(--row-h);font-family:'Space Grotesk';font-weight:600;font-size:16px;color:var(--ink);display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .quote-row em{font-style:normal;background:rgba(198,59,59,0.12);color:var(--red);padding:0 4px;font-weight:700}
+  .caret{display:inline-block;width:2px;height:0.9em;background:var(--ink);margin-left:2px;vertical-align:-2px;animation:bl 1s steps(2) infinite}
+  @keyframes bl{50%{opacity:0}}
+
+  /* stat grid */
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+  .stat{padding:12px 14px;border:1px solid var(--line);background:rgba(255,255,255,0.5)}
+  .stat .l{font-family:'JetBrains Mono';font-size:9px;color:var(--g);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px}
+  .stat .v{font-family:'Space Grotesk';font-weight:700;font-size:28px;line-height:1;letter-spacing:-0.03em;color:var(--ink)}
+  .stat .v small{font-size:13px;color:var(--g);font-weight:500;margin-left:2px}
+  .stat .s{font-size:11px;color:var(--g);margin-top:4px}
+
+  .cta-row{display:flex;gap:6px;margin-top:18px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font-family:'JetBrains Mono';font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:1.5px solid var(--ink);background:transparent;color:var(--ink);transition:.15s;border-radius:0;cursor:pointer}
+  .btn:hover{background:var(--ink);color:var(--paper)}
+  .btn.red{background:var(--red);border-color:var(--red);color:#fff}
+  .btn.red:hover{background:var(--ink);border-color:var(--ink)}
+
+  /* generic card content rows */
+  .rows{padding-top:8px}
+  .rows .li{display:flex;align-items:center;min-height:var(--row-h);padding:2px 0;font-size:14px;color:var(--ink);gap:10px}
+  .rows .li > .desc{flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.4}
+  .rows .li b{font-weight:700}
+  .rows .li .bullet{color:var(--red);font-weight:700;font-size:16px;line-height:1;flex:0 0 auto}
+  .rows .li .tag{color:var(--g);font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.04em;flex:0 0 auto}
+  .rows .li .y{color:var(--g);font-family:'JetBrains Mono';font-size:11px;flex:0 0 auto}
+  .rows .li .red{color:var(--red);font-weight:700;font-family:'JetBrains Mono';font-size:11px;flex:0 0 auto}
+  .rows .li mark{background:rgba(198,59,59,0.12);color:var(--ink);padding:0 4px}
+  .rows .li .links{display:inline-flex;gap:4px;align-items:center;flex:0 0 auto}
+  .rows .li .links a{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border:1px solid var(--line);color:var(--g);transition:.15s;background:rgba(255,255,255,0.4)}
+  .rows .li .links a:hover{border-color:var(--ink);color:var(--ink);background:#fff}
+  .rows .li .links a i{font-size:10px}
+  .rows .li .skicon{color:var(--red);font-size:12px;width:18px;text-align:center;flex:0 0 auto}
+
+  /* about narrative */
+  .narrative{font-size:15px;line-height:1.85;color:var(--ink)}
+  .narrative + .narrative{margin-top:10px}
+  .narrative b{font-weight:700}
+  .narrative em{font-style:normal;background:rgba(198,59,59,0.14);color:var(--red);padding:0 3px}
+  .quote-mark{font-family:'Space Grotesk';font-style:italic;font-size:18px;color:var(--ink);padding:6px 0 14px;border-bottom:1px dashed var(--line);margin-bottom:16px}
+  .quote-mark::before{content:'"';color:var(--red);margin-right:4px;font-size:24px;vertical-align:-4px}
+  .quote-mark::after{content:'"';color:var(--red);margin-left:4px;font-size:24px;vertical-align:-4px}
+
+  /* chip row */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+  .chip{font-family:'JetBrains Mono';font-size:11px;padding:4px 9px;border:1px solid var(--line);color:var(--g);display:inline-flex;align-items:center;gap:6px}
+  .chip i{color:var(--red);font-size:10px}
+  .chip b{color:var(--ink);font-weight:600}
+
+  /* about github cta */
+  .gh-cta{margin-top:18px;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:1.5px solid var(--ink);font-family:'JetBrains Mono';font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--ink);transition:.15s;text-transform:uppercase}
+  .gh-cta:hover{background:var(--ink);color:var(--paper)}
+
+  /* footer card */
+  .foot{background:var(--ink);color:var(--paper);padding:36px 28px 28px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px;align-items:start;margin-top:16px}
+  .foot h4{font-family:'JetBrains Mono';font-size:10px;color:var(--g2);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px}
+  .foot .mk{font-family:'Space Grotesk';font-weight:700;font-size:40px;line-height:0.9;letter-spacing:-0.04em}
+  .foot .mk .r{color:var(--red)}
+  .foot .mk small{display:block;font-family:'JetBrains Mono';font-size:11px;color:var(--g2);margin-top:10px;font-weight:500;letter-spacing:0.05em}
+  .foot ul li{font-size:13px;line-height:1.85;color:var(--g2)}
+  .foot ul li a{transition:color .15s}
+  .foot ul li a:hover{color:#fff}
+  .foot-bot{grid-column:1/-1;padding-top:18px;margin-top:18px;border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;font-family:'JetBrains Mono';font-size:10px;color:var(--g2);letter-spacing:0.05em;flex-wrap:wrap;gap:8px}
+
+  @media (max-width:880px){
+    main{padding:24px 16px 60px}
+    nav{padding:10px 16px}
+    nav .links{display:none}
+    .card .head{padding-left:64px;padding-right:14px;font-size:10px}
+    .card .body{padding:16px 18px 24px 64px}
+    .card::before{left:48px}
+    .card .holes{left:14px}
+    .name{font-size:54px;line-height:48px;height:auto}
+    .name span{height:48px;line-height:48px}
+    .stat-grid{grid-template-columns:1fr 1fr;gap:8px}
+    .card .stamp{top:12px;right:16px;transform:rotate(7deg) scale(.85)}
+    .scribble.s1{top:auto;bottom:-10px;right:24px}
+    .scribble.s2{top:62px;right:18px}
+    .foot{grid-template-columns:1fr}
+    #btn-back-to-top{bottom:16px;right:16px;width:38px;height:38px}
+    .rows .li{font-size:13px}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-container"><div class="progress-bar" id="myBar"></div></div>
+<button type="button" id="btn-back-to-top" title="맨 위로"><i class="fas fa-arrow-up"></i></button>
+
+<nav>
+  <div class="lhs">
+    <span class="stamp">REC. A.2</span>
+    <b>LGY</b><span>· Index Card · v5</span>
+  </div>
+  <div class="links">
+    <a href="#hero">profile</a>
+    <a href="#about">about</a>
+    <a href="#skills">skills</a>
+    <a href="#awards">awards</a>
+    <a href="#works">works</a>
+    <a href="https://github.com/pachir1su" target="_blank">github ↗</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ============ HERO CARD ============ -->
+  <article class="card hero-card" id="hero" data-aos="fade-up">
+    <div class="lines"></div>
+    <div class="holes"><span></span><span></span><span></span><span></span><span></span></div>
+    <span class="stamp">FILED<small>2026.05.21</small></span>
+    <span class="scribble s2">← me</span>
+
+    <div class="head">
+      <span>CARD · <b>№ 0001</b></span>
+      <span>SUBJECT · <b>profile</b></span>
+      <span class="red">REV. A.2</span>
     </div>
-    <button type="button" id="btn-back-to-top" title="맨 위로">
-      <i class="fas fa-arrow-up"></i>
-    </button>
-
-    <!-- Cursor -->
-    <div class="cursor-dot"></div>
-    <div class="cursor-outline"></div>
-
-    <nav class="navbar">
-      <div class="container nav-content">
-        <a href="#" class="logo"
-          ><span class="logo-bracket">{</span> GY
-          <span class="logo-bracket">}</span></a
-        >
-        <ul class="nav-links">
-          <li><a href="#home">홈</a></li>
-          <li><a href="#about">비전</a></li>
-          <li><a href="#skills">역량</a></li>
-          <li><a href="#awards">수상</a></li>
-          <li><a href="#projects">프로젝트</a></li>
-          <li>
-            <a
-              href="https://github.com/pachir1su"
-              target="_blank"
-              class="nav-github"
-              ><i class="fab fa-github"></i
-            ></a>
-          </li>
-        </ul>
-        <button class="hamburger" id="hamburger">
-          <span></span><span></span><span></span>
-        </button>
+    <div class="body">
+      <div class="meta-row"><span><b>2026.05.21</b> · Thursday · Daejeon, KR</span></div>
+      <h1 class="name"><span>Lee</span><span>Geon</span><span><em>Yeong</em>.</span></h1>
+      <span class="scribble s1">★ 26 maker</span>
+      <div class="rows">
+        <div class="li"><span class="bullet">·</span><span class="desc"><b>한국기술교육대학교</b> · 26학번 · maker · 기획자</span></div>
+        <div class="li"><span class="bullet">·</span><span class="desc">이윤을 넘어 <b>혁신</b>을 추구하는 기업가를 꿈꿉니다.</span></div>
+        <div class="li"><span class="bullet">·</span><span class="desc">목표 — <mark>월 100만 명</mark>이 사용하는 서비스</span></div>
+        <div class="li"><span class="bullet">·</span><span class="desc">github · <b>@pachir1su</b> · email · capybara@koreatech.ac.kr</span></div>
       </div>
-    </nav>
+      <div class="quote-row">혁신의 <em>기업가</em> &amp; <span id="typed"></span><span class="caret"></span></div>
 
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="#home" onclick="closeMobile()">홈</a>
-      <a href="#about" onclick="closeMobile()">비전</a>
-      <a href="#skills" onclick="closeMobile()">역량</a>
-      <a href="#awards" onclick="closeMobile()">수상</a>
-      <a href="#projects" onclick="closeMobile()">프로젝트</a>
-      <a href="https://github.com/pachir1su" target="_blank">GitHub</a>
+      <div class="stat-grid">
+        <div class="stat"><div class="l">// works</div><div class="v">18</div><div class="s">12 shipped · 6 wip</div></div>
+        <div class="stat"><div class="l">// awards</div><div class="v">03</div><div class="s">2024 cohort</div></div>
+        <div class="stat"><div class="l">// sfpc</div><div class="v">1.3<small>%</small></div><div class="s">581팀 · 8위</div></div>
+        <div class="stat"><div class="l">// goal</div><div class="v">1<small>M</small></div><div class="s">월간 사용자</div></div>
+      </div>
+
+      <div class="cta-row">
+        <a href="#works" class="btn red"><i class="fas fa-folder-open"></i> 프로젝트 보기 →</a>
+        <a href="mailto:capybara@koreatech.ac.kr" class="btn"><i class="fas fa-envelope"></i> email</a>
+        <a href="https://github.com/pachir1su" target="_blank" class="btn"><i class="fab fa-github"></i> github ↗</a>
+      </div>
     </div>
+  </article>
 
-    <!-- HERO -->
-    <section id="home" class="hero">
-      <div class="hero-grid-bg"></div>
-      <div class="hero-glow"></div>
+  <!-- ============ ABOUT CARD ============ -->
+  <article class="card" id="about" data-aos="fade-up">
+    <div class="lines"></div>
+    <div class="holes"><span></span><span></span><span></span><span></span><span></span></div>
 
-      <div class="floating-icons">
-        <i class="devicon-python-plain fi fi-1"></i>
-        <i class="devicon-react-original fi fi-2"></i>
-        <i class="devicon-java-plain fi fi-3"></i>
-        <i class="devicon-cplusplus-plain fi fi-4"></i>
-        <i class="devicon-arduino-plain fi fi-5"></i>
+    <div class="head">
+      <span>CARD · <b>№ 0002</b></span>
+      <span>SUBJECT · <b>about / vision</b></span>
+      <span class="red">— manifesto</span>
+    </div>
+    <div class="body">
+      <div class="meta-row"><span><b>// 01 · 비전</b> — 아이디어를 현실로</span></div>
+      <div class="quote-mark">아이디어를 현실로 만드는 혁신가</div>
+      <p class="narrative">안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고 만드는 <b>이건영</b>입니다. 저는 사업가가 아닌 <em>기업가</em>를 지향합니다. 단순히 이윤을 쫓기보다 기술을 통해 세상에 없던 가치를 창출하고 혁신을 일으키고 싶습니다.</p>
+      <p class="narrative">떠오르는 아이디어가 있을 때마다 구체화하여 기록하고 있으며 이를 실현하기 위해 <b>AI, 웹/앱 개발, 임베디드 하드웨어</b> 등 분야를 가리지 않고 기술을 익히고 있습니다.</p>
+      <div class="chips">
+        <span class="chip"><i class="fas fa-rocket"></i> <b>목표</b> 월 100만명 유저 서비스</span>
+        <span class="chip"><i class="fas fa-lightbulb"></i> 아이디어 뱅크</span>
+        <span class="chip"><i class="fas fa-users"></i> 팀장 경험 多</span>
       </div>
+      <a href="https://github.com/pachir1su" target="_blank" class="gh-cta"><i class="fab fa-github"></i> GitHub 활동 보러가기 ↗</a>
+    </div>
+  </article>
 
-      <div class="container hero-content">
-        <div class="hero-tag" data-aos="fade-down">안녕하세요</div>
-        <h1 class="hero-name" data-aos="fade-up" data-aos-delay="100">
-          <span class="name-kr">이건영</span>
-          <span class="name-en">Lee Geon Yeong</span>
-        </h1>
-        <div class="hero-role" data-aos="fade-up" data-aos-delay="200">
-          혁신의 기업가 &amp;
-          <span class="typing-wrap"
-            ><span id="typing-text"></span><span class="typing-cursor"></span
-          ></span>
-        </div>
-        <p class="hero-desc" data-aos="fade-up" data-aos-delay="300">
-          이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br />
-          <strong>월 100만 명</strong>이 사용하는 서비스를 만드는 것이
-          목표입니다.
-        </p>
-        <div class="hero-btns" data-aos="fade-up" data-aos-delay="400">
-          <a href="#projects" class="btn btn-primary"
-            ><i class="fas fa-folder-open"></i> 프로젝트 보기</a
-          >
-          <a
-            href="https://github.com/pachir1su"
-            target="_blank"
-            class="btn btn-ghost"
-            ><i class="fab fa-github"></i> GitHub</a
-          >
-        </div>
+  <!-- ============ SKILLS CARD ============ -->
+  <article class="card" id="skills" data-aos="fade-up">
+    <div class="lines"></div>
+    <div class="holes"><span></span><span></span><span></span><span></span><span></span></div>
 
-        <div class="hero-stats" data-aos="fade-up" data-aos-delay="500">
-          <div class="stat-item">
-            <span class="stat-num">10+</span
-            ><span class="stat-label">프로젝트</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <span class="stat-num">3</span
-            ><span class="stat-label">수상 경력</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <span class="stat-num">8위</span
-            ><span class="stat-label">581 팀 중</span>
-          </div>
+    <div class="head">
+      <span>CARD · <b>№ 0003</b></span>
+      <span>SUBJECT · <b>skills</b></span>
+      <span class="red">— 07 rows</span>
+    </div>
+    <div class="body">
+      <div class="meta-row"><span><b>// 02 · 역량</b> — seven sharp edges</span></div>
+      <div class="rows">
+        <div class="li">
+          <span class="tag">A.01</span>
+          <i class="fas fa-code skicon"></i>
+          <span class="desc"><b>핵심 언어</b> — Python · C/C++ · Java · JavaScript · Processing</span>
         </div>
-      </div>
-
-      <div class="scroll-hint">
-        <span>스크롤</span>
-        <div class="scroll-line"></div>
-      </div>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="about" class="section">
-      <div class="container">
-        <div class="section-header" data-aos="fade-right">
-          <span class="section-tag">// 01</span>
-          <h2 class="section-title">비전</h2>
+        <div class="li">
+          <span class="tag">A.02</span>
+          <i class="fas fa-brain skicon"></i>
+          <span class="desc"><b>AI &amp; 데이터</b> — LLM 활용 · Scikit-learn · Keras · Orange3 · 머신러닝 · 딥러닝 · NLP</span>
         </div>
-        <div class="about-card" data-aos="fade-up" data-aos-delay="100">
-          <div class="about-quote">"아이디어를 현실로 만드는 혁신가"</div>
-          <div class="about-body">
-            <p>
-              안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고
-              만드는 <strong>이건영</strong>입니다. 저는 사업가가 아닌
-              <strong>기업가</strong>를 지향합니다. 단순히 이윤을 쫓기보다
-              기술을 통해 세상에 없던 가치를 창출하고 혁신을 일으키고 싶습니다.
-            </p>
-            <p>
-              떠오르는 아이디어가 있을 때마다 구체화하여 기록하고 있으며 이를
-              실현하기 위해
-              <strong>AI, 웹/앱 개발, 임베디드 하드웨어</strong> 등 분야를
-              가리지 않고 기술을 익히고 있습니다.
-            </p>
-          </div>
-          <div class="about-chips">
-            <div class="chip">
-              <i class="fas fa-rocket"></i> 목표 : 월 100만명 유저 서비스
-            </div>
-            <div class="chip">
-              <i class="fas fa-lightbulb"></i> 아이디어 뱅크
-            </div>
-            <div class="chip"><i class="fas fa-users"></i> 팀장 경험 多</div>
-          </div>
-          <div class="about-github-link">
-            <a
-              href="https://github.com/pachir1su"
-              target="_blank"
-              class="github-activity-btn"
-            >
-              <i class="fab fa-github"></i> GitHub 활동 보러가기
-            </a>
-          </div>
+        <div class="li">
+          <span class="tag">A.03</span>
+          <i class="fas fa-laptop-code skicon"></i>
+          <span class="desc"><b>웹 &amp; 앱 개발</b> — React · HTML/CSS · Flask · Flutter · Figma · Discord 봇</span>
+        </div>
+        <div class="li">
+          <span class="tag">A.04</span>
+          <i class="fas fa-microchip skicon"></i>
+          <span class="desc"><b>하드웨어 &amp; 메이커</b> — 아두이노 · 라즈베리파이 · 3D 프린팅/모델링 · 레이저 커팅 · IoT · 용접 &amp; 납땜</span>
+        </div>
+        <div class="li">
+          <span class="tag">A.05</span>
+          <i class="fas fa-file-alt skicon"></i>
+          <span class="desc"><b>문서화 &amp; 협업</b> — Notion · 탁월한 보고서 작성 · 체계적인 자료 정리 · 기술 문서 작성</span>
+        </div>
+        <div class="li">
+          <span class="tag">A.06</span>
+          <i class="fas fa-crown skicon"></i>
+          <span class="desc"><b>리더십 &amp; 커뮤니케이션</b> — 프로젝트 총괄 관리 · 팀 리딩 경험 다수 · 능숙한 발표 · 효과적인 프레젠테이션</span>
+        </div>
+        <div class="li">
+          <span class="tag">A.07</span>
+          <i class="fas fa-photo-video skicon"></i>
+          <span class="desc"><b>미디어 &amp; 프레젠테이션</b> — 영상 편집 기술 · 버츄얼(VTuber) 기술 보유</span>
         </div>
       </div>
-    </section>
+    </div>
+  </article>
 
-    <!-- SKILLS -->
-    <section id="skills" class="section section-alt">
-      <div class="container">
-        <div class="section-header" data-aos="fade-right">
-          <span class="section-tag">// 02</span>
-          <h2 class="section-title">역량</h2>
+  <!-- ============ AWARDS CARD ============ -->
+  <article class="card" id="awards" data-aos="fade-up">
+    <div class="lines"></div>
+    <div class="holes"><span></span><span></span><span></span><span></span><span></span></div>
+
+    <div class="head">
+      <span>CARD · <b>№ 0004</b></span>
+      <span>SUBJECT · <b>honors</b></span>
+      <span class="red">— 2024 · 3 awards</span>
+    </div>
+    <div class="body">
+      <div class="meta-row"><span><b>// 03 · 수상</b> — three times won</span></div>
+      <div class="rows">
+        <div class="li">
+          <span class="tag">01</span>
+          <i class="fas fa-trophy skicon"></i>
+          <span class="desc"><b>2024 SFPC</b> — 전체 8위 · 총 581팀 / 1,661명 참가 · 알고리즘 및 문제해결 능력 입증</span>
+          <span class="red">TOP 1.3%</span>
         </div>
-        <div class="skills-grid">
-          <div
-            class="skill-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="0"
-          >
-            <div class="skill-icon"><i class="fas fa-code"></i></div>
-            <h3>핵심 언어</h3>
-            <ul class="skill-list">
-              <li><i class="devicon-python-plain colored"></i> Python</li>
-              <li><i class="devicon-c-plain colored"></i> C / C++</li>
-              <li><i class="devicon-java-plain colored"></i> Java</li>
-              <li>
-                <i class="devicon-javascript-plain colored"></i> JavaScript
-              </li>
-              <li>
-                <i class="devicon-processing-plain colored"></i> Processing
-              </li>
-            </ul>
-          </div>
-          <div
-            class="skill-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="50"
-          >
-            <div class="skill-icon"><i class="fas fa-brain"></i></div>
-            <h3>AI & 데이터</h3>
-            <ul class="skill-list">
-              <li><i class="fas fa-robot"></i> LLM 활용 능력</li>
-              <li>
-                <i class="devicon-scikitlearn-plain colored"></i> Scikit-learn /
-                Keras
-              </li>
-              <li><i class="fas fa-chart-pie"></i> Orange3</li>
-              <li><i class="fas fa-project-diagram"></i> 머신러닝 & 딥러닝</li>
-              <li><i class="fas fa-language"></i> NLP (자연어 처리)</li>
-            </ul>
-          </div>
-          <div
-            class="skill-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="100"
-          >
-            <div class="skill-icon"><i class="fas fa-laptop-code"></i></div>
-            <h3>웹 & 앱 개발</h3>
-            <ul class="skill-list">
-              <li>
-                <i class="devicon-react-original colored"></i> React / HTML /
-                CSS
-              </li>
-              <li><i class="devicon-flask-original colored"></i> Flask</li>
-              <li><i class="devicon-flutter-plain colored"></i> Flutter</li>
-              <li><i class="devicon-figma-plain colored"></i> Figma</li>
-              <li><i class="fab fa-discord"></i> Discord 봇 개발</li>
-            </ul>
-          </div>
-          <div
-            class="skill-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="150"
-          >
-            <div class="skill-icon"><i class="fas fa-microchip"></i></div>
-            <h3>하드웨어 & 메이커</h3>
-            <ul class="skill-list">
-              <li>
-                <i class="devicon-arduino-plain colored"></i> 아두이노 /
-                라즈베리파이
-              </li>
-              <li><i class="fas fa-cube"></i> 3D 프린팅 / 모델링</li>
-              <li><i class="fas fa-burn"></i> 레이저 커팅</li>
-              <li><i class="fas fa-network-wired"></i> IoT 시스템 구축</li>
-              <li><i class="fas fa-tools"></i> 용접 & 납땜</li>
-            </ul>
-          </div>
-          <div
-            class="skill-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="200"
-          >
-            <div class="skill-icon"><i class="fas fa-file-alt"></i></div>
-            <h3>문서화 & 협업</h3>
-            <ul class="skill-list">
-              <li><i class="devicon-notion-plain colored"></i> Notion</li>
-              <li><i class="fas fa-file-contract"></i> 탁월한 보고서 작성</li>
-              <li><i class="fas fa-folder-open"></i> 체계적인 자료 정리</li>
-              <li><i class="fas fa-pen-nib"></i> 기술 문서 작성</li>
-            </ul>
-          </div>
-          <div
-            class="skill-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="250"
-          >
-            <div class="skill-icon"><i class="fas fa-crown"></i></div>
-            <h3>리더십 & 커뮤니케이션</h3>
-            <ul class="skill-list">
-              <li><i class="fas fa-tasks"></i> 프로젝트 총괄 관리</li>
-              <li><i class="fas fa-user-friends"></i> 팀 리딩 경험 다수</li>
-              <li><i class="fas fa-microphone-alt"></i> 능숙한 발표 능력</li>
-              <li>
-                <i class="fas fa-chalkboard-teacher"></i> 효과적인 프레젠테이션
-              </li>
-            </ul>
-          </div>
-          <div
-            class="skill-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="300"
-          >
-            <div class="skill-icon"><i class="fas fa-photo-video"></i></div>
-            <h3>미디어 & 프레젠테이션</h3>
-            <ul class="skill-list">
-              <li><i class="fas fa-film"></i> 영상 편집 기술</li>
-              <li>
-                <i class="fas fa-vr-cardboard"></i> 버츄얼(VTuber) 기술 보유
-              </li>
-            </ul>
-          </div>
+        <div class="li">
+          <span class="tag">02</span>
+          <i class="fas fa-award skicon"></i>
+          <span class="desc"><b>2024 디지털새싹 인공지능 메이커톤</b> — 산불 조기 감지 알림 시스템 · Raspberry Pi &amp; OpenCV 활용</span>
+          <span class="red">AI 어벤져스</span>
+        </div>
+        <div class="li">
+          <span class="tag">03</span>
+          <i class="fas fa-medal skicon"></i>
+          <span class="desc"><b>2024 제 5회 천안 학생 로봇 대회</b> — 해커톤 분야 · 총 97팀 참가</span>
+          <span class="red">동상</span>
         </div>
       </div>
-    </section>
+    </div>
+  </article>
 
-    <!-- AWARDS -->
-    <section id="awards" class="section">
-      <div class="container">
-        <div class="section-header" data-aos="fade-right">
-          <span class="section-tag">// 03</span>
-          <h2 class="section-title">수상</h2>
+  <!-- ============ WORKS CARD ============ -->
+  <article class="card" id="works" data-aos="fade-up">
+    <div class="lines"></div>
+    <div class="holes"><span></span><span></span><span></span><span></span><span></span></div>
+
+    <div class="head">
+      <span>CARD · <b>№ 0005</b></span>
+      <span>SUBJECT · <b>works · 18</b></span>
+      <span class="red">— 12 shipped · 6 wip</span>
+    </div>
+    <div class="body">
+      <div class="meta-row"><span><b>// 04 · 프로젝트</b> — eighteen small machines</span></div>
+      <div class="rows">
+
+        <div class="li">
+          <span class="tag">01</span>
+          <i class="fas fa-hammer skicon"></i>
+          <span class="desc"><b>비밀번호 도어락</b> — 2024 마스터 크리에이터 챌린지 · 4×4 매트릭스 키패드 도어락 시스템</span>
+          <span class="y">2024</span>
+          <span class="links">
+            <a href="projects/Master_Creator_Challenge.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/Master_Creator_Challenge" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
         </div>
-        <div class="awards-grid">
-          <div class="award-card award-gold" data-tilt data-aos="zoom-in">
-            <div class="award-rank">01</div>
-            <div class="award-icon"><i class="fas fa-trophy"></i></div>
-            <div class="award-info">
-              <h3>2024 SFPC</h3>
-              <p class="award-prize">전체 8위 (Top 1.3%)</p>
-              <p class="award-desc">
-                총 581팀 / 1661명 참가 · 알고리즘 및 문제해결 능력 입증
-              </p>
-            </div>
-          </div>
-          <div
-            class="award-card award-cyan"
-            data-tilt
-            data-aos="zoom-in"
-            data-aos-delay="100"
-          >
-            <div class="award-rank">02</div>
-            <div class="award-icon"><i class="fas fa-award"></i></div>
-            <div class="award-info">
-              <h3>2024 디지털새싹 인공지능 메이커톤</h3>
-              <p class="award-prize">AI 어벤져스상 수상</p>
-              <p class="award-desc">
-                산불 조기 감지 알림 시스템 개발 · Raspberry Pi & OpenCV 활용
-              </p>
-            </div>
-          </div>
-          <div
-            class="award-card award-bronze"
-            data-tilt
-            data-aos="zoom-in"
-            data-aos-delay="200"
-          >
-            <div class="award-rank">03</div>
-            <div class="award-icon"><i class="fas fa-medal"></i></div>
-            <div class="award-info">
-              <h3>2024 제 5회 천안 학생 로봇 대회</h3>
-              <p class="award-prize">동상 수상</p>
-              <p class="award-desc">해커톤 분야, 총 97팀 참가</p>
-            </div>
-          </div>
+
+        <div class="li">
+          <span class="tag">02</span>
+          <i class="fas fa-water skicon"></i>
+          <span class="desc"><b>해안 장벽 · Wall Sina</b> — 2024 지속 가능한 발전 · 해수면 상승 대비 해안 장벽 MVP</span>
+          <span class="y">2024</span>
+          <span class="links">
+            <a href="projects/Wall_Sina.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/Wall_Sina" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
         </div>
+
+        <div class="li">
+          <span class="tag">03</span>
+          <i class="fas fa-fire-extinguisher skicon"></i>
+          <span class="desc"><b>산불 조기 감지 알림 시스템</b> — 2024 디지털새싹 'AI 어벤져스상' · 라즈베리파이 &amp; OpenCV 실시간 화재 감지</span>
+          <span class="red">★ AWARD</span>
+          <span class="links">
+            <a href="projects/nonofire.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/chae03yb/hstree-makerthon" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">04</span>
+          <i class="fas fa-laptop-code skicon"></i>
+          <span class="desc"><b>2024 SFPC</b> — 총 581팀 중 8위 기록한 알고리즘 대회 코드 아카이브</span>
+          <span class="red">★ 1.3%</span>
+          <span class="links">
+            <a href="projects/2024_SFPC.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/2024_SFPC" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">05</span>
+          <i class="fas fa-robot skicon"></i>
+          <span class="desc"><b>졸음 방지 시스템</b> — 2024 제 5회 천안학생로봇대회 동상 · HuskyLens 실시간 졸음 감지</span>
+          <span class="red">★ 동상</span>
+          <span class="links">
+            <a href="projects/2024_5th_CSRC.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/2024_5th_CSRC" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">06</span>
+          <i class="fab fa-discord skicon"></i>
+          <span class="desc"><b>면진봇</b> — 디스코드 경제 게임 봇</span>
+          <span class="y">2024</span>
+          <span class="links">
+            <a href="projects/MZ_bot.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/MZ_bot" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">07</span>
+          <i class="fas fa-robot skicon"></i>
+          <span class="desc"><b>공감 봇 &amp; 레시피 AI</b> — 감정 공감 챗봇 + 보유 식재료 기반 요리 레시피 추천 AI</span>
+          <span class="y">2024</span>
+          <span class="links">
+            <a href="projects/Legend_SakSak_GongGam_AI.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/Legend_SakSak_GongGam_AI" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">08</span>
+          <i class="fas fa-id-card skicon"></i>
+          <span class="desc"><b>NFC 출석 · BerryIno</b> — NFC 태그 · 아두이노 + 라즈베리파이 출석 체크 시스템</span>
+          <span class="y">2025</span>
+          <span class="links">
+            <a href="projects/BerryIno.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/BerryIno" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">09</span>
+          <i class="fas fa-leaf skicon"></i>
+          <span class="desc"><b>식물 타이머 · PlantClock</b> — 2025 코딩 페스티벌 해커톤 · 식물 관리 스마트 타이머</span>
+          <span class="y">2025</span>
+          <span class="links">
+            <a href="projects/PlantClock.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/PlantClock" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">10</span>
+          <i class="fas fa-heartbeat skicon"></i>
+          <span class="desc"><b>헬스 케어 시스템</b> — 사용자 맞춤 건강 데이터 기록 및 모니터링</span>
+          <span class="y">2025</span>
+          <span class="links">
+            <a href="projects/HEALTH_CHECK_PROJECT.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/HEALTH_CHECK_PROJECT" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">11</span>
+          <i class="fas fa-book-open skicon"></i>
+          <span class="desc"><b>한기대 26학번 신입생 가이드</b> — 한기대 26학번을 위한 노션 사이트</span>
+          <span class="y">2026</span>
+          <span class="links">
+            <a href="projects/koreatech_noob_guide.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://capybaracute.notion.site/26-2fca8de5ee5f806db9e9e64464a9ac78" target="_blank" title="Notion"><i class="fas fa-external-link-alt"></i></a>
+            <a href="https://github.com/pachir1su/koreatech_noob_guide" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">12</span>
+          <i class="fas fa-file-code skicon"></i>
+          <span class="desc"><b>File Swordmaster</b> — PDF + 오디오 파일 편집 다기능 스크립트</span>
+          <span class="y">2025</span>
+          <span class="links">
+            <a href="projects/file_swordmaster.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://huggingface.co/spaces/capybaranice/file_swordmaster" target="_blank" title="HuggingFace"><i class="fas fa-external-link-alt"></i></a>
+            <a href="https://github.com/pachir1su/file_swordmaster" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">13</span>
+          <i class="fas fa-map-marked-alt skicon"></i>
+          <span class="desc"><b>한맵 · Koreatech Map</b> — 한기대 캠퍼스 인터랙티브 지도 · 건물 내부 / 호실 정보</span>
+          <span class="red">WIP</span>
+          <span class="links">
+            <a href="projects/Koreatech_map.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/Koreatech_Map" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">14</span>
+          <i class="fab fa-discord skicon"></i>
+          <span class="desc"><b>승기봇 · SG_bot</b> — 면진봇 개편 · 라이어게임 / 양세찬게임 / 마피아게임 미니게임 봇</span>
+          <span class="red">WIP</span>
+          <span class="links">
+            <a href="projects/SG_bot.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/SG_bot" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">15</span>
+          <i class="fas fa-wine-glass-alt skicon"></i>
+          <span class="desc"><b>온라인술담</b> — 온라인담타를 벤치마킹한 술담 사이트 · GitHub Pages 배포 예정</span>
+          <span class="red">WIP</span>
+          <span class="links">
+            <a href="projects/Sibal_Life_Smoking.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/Sibal_Life_Smoking" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">16</span>
+          <i class="fas fa-code skicon"></i>
+          <span class="desc"><b>HTML Viewer</b> — HTML 코드를 붙여넣으면 실시간으로 결과물을 보여주는 웹 뷰어</span>
+          <span class="red">WIP</span>
+          <span class="links">
+            <a href="projects/HTML_Viewer.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/HTML_Viewer" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">17</span>
+          <i class="fas fa-flask skicon"></i>
+          <span class="desc"><b>CentrifugeAI</b> — 가상 실험 장치(원심분리기·현미경·가속기) · Gemini AI 결과 예측·시각화</span>
+          <span class="red">WIP</span>
+          <span class="links">
+            <a href="projects/CentrifugeAI.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+            <a href="https://github.com/pachir1su/CentrifugeAI" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          </span>
+        </div>
+
+        <div class="li">
+          <span class="tag">18</span>
+          <i class="fas fa-hat-wizard skicon"></i>
+          <span class="desc"><b>마법 아카데미</b> — 원소를 조합해 마법을 만들고 시각화하는 인터랙티브 시뮬레이션</span>
+          <span class="red">WIP</span>
+          <span class="links">
+            <a href="projects/Magic_Academy.html" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+          </span>
+        </div>
+
       </div>
-    </section>
+    </div>
+  </article>
 
-    <!-- PROJECTS -->
-    <section id="projects" class="section section-alt">
-      <div class="container">
-        <div class="section-header" data-aos="fade-right">
-          <span class="section-tag">// 04</span>
-          <h2 class="section-title">프로젝트</h2>
-        </div>
-        <div class="projects-grid">
-          <div class="project-card" data-tilt data-aos="fade-up">
-            <div class="project-top">
-              <i class="fas fa-hammer project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/Master_Creator_Challenge.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/Master_Creator_Challenge"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <h3>비밀번호 도어락</h3>
-            <p>
-              2024 마스터 크리에이터 챌린지 참가 프로젝트
-              <br />
-              4x4 매트릭스 키패드를 활용한 도어락 시스템
-            </p>
-            <div class="tech-stack">
-              <span>Maker</span><span>Creative</span><span>Challenge</span>
-            </div>
-          </div>
+  <footer class="foot">
+    <div>
+      <div class="mk">L<span class="r">G</span>Y<br/><small>INDEX CARD · 2026 · preview</small></div>
+    </div>
+    <div>
+      <h4>// site</h4>
+      <ul>
+        <li><a href="#about">about</a></li>
+        <li><a href="#skills">skills</a></li>
+        <li><a href="#awards">awards</a></li>
+        <li><a href="#works">works</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>// contact</h4>
+      <ul>
+        <li><a href="mailto:capybara@koreatech.ac.kr">email ↗</a></li>
+        <li><a href="https://github.com/pachir1su" target="_blank">github ↗</a></li>
+        <li><a href="index.html">main site ↗</a></li>
+      </ul>
+    </div>
+    <div class="foot-bot">
+      <span>© 2026 Lee Geon Yeong · All rights reserved.</span>
+      <span>v5 · prototype</span>
+    </div>
+  </footer>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="50"
-          >
-            <div class="project-top">
-              <i class="fas fa-water project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/Wall_Sina.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/Wall_Sina"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <h3>해안 장벽 프로젝트</h3>
-            <p>
-              2024 지속 가능한 발전 프로젝트
-              <br />해수면 상승에 대비한 해안 장벽 MVP
-            </p>
-            <div class="tech-stack">
-              <span>Engineering</span><span>Environment</span
-              ><span>Modeling</span>
-            </div>
-          </div>
+</main>
 
-          <div
-            class="project-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="100"
-          >
-            <div class="project-top">
-              <i class="fas fa-fire-extinguisher project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/nonofire.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/chae03yb/hstree-makerthon"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <h3>산불 조기 감지 알림 시스템</h3>
-            <p>
-              2024 디지털새싹 'AI 어벤져스상' 수상작
-              <br />라즈베리파이와 OpenCV로 산불을 실시간 감지합니다.
-            </p>
-            <div class="tech-stack">
-              <span>Raspberry Pi</span><span>OpenCV</span><span>AI</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="150"
-          >
-            <div class="project-top">
-              <i class="fas fa-laptop-code project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/2024_SFPC.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/2024_SFPC"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <h3>2024 SFPC</h3>
-            <p>총 581팀 중 8위를 기록한 알고리즘 대회 코드 아카이브.</p>
-            <div class="tech-stack">
-              <span>Algorithm</span><span>Problem Solving</span
-              ><span>C++ / Python</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="200"
-          >
-            <div class="project-top">
-              <i class="fas fa-robot project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/2024_5th_CSRC.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/2024_5th_CSRC"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <h3>졸음 방지 시스템</h3>
-            <p>
-              2024 제 5회 천안학생로봇대회 동상 수상 프로젝트
-              <br />허스키렌즈를 이용한 실시간 졸음 감지 시스템
-            </p>
-            <div class="tech-stack">
-              <span>Robot</span><span>Embedded</span><span>HuskyLens</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="250"
-          >
-            <div class="project-top">
-              <i class="fab fa-discord project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/MZ_bot.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/MZ_bot"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <h3>면진봇</h3>
-            <p>디스코드 경제 게임 봇</p>
-            <div class="tech-stack">
-              <span>Python</span><span>Discord.py</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="300"
-          >
-            <div class="project-top">
-              <i class="fas fa-robot project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/Legend_SakSak_GongGam_AI.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/Legend_SakSak_GongGam_AI"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <h3>공감 봇 & 레시피 AI</h3>
-            <p>감정 공감 챗봇과 보유 식재료 기반 요리 레시피 추천 AI 서비스</p>
-            <div class="tech-stack">
-              <span>AI</span><span>Gemini API</span><span>Flask</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="350"
-          >
-            <div class="project-top">
-              <i class="fas fa-id-card project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/BerryIno.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/BerryIno"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <h3>NFC 출석 체크 시스템</h3>
-            <p>
-              NFC 태그를 활용한 효율적인 출석 체크 시스템
-              <br />아두이노와 라즈베리파이 연동으로 데이터 처리
-            </p>
-            <div class="tech-stack">
-              <span>Arduino</span><span>Raspberry Pi</span><span>IoT</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="400"
-          >
-            <div class="project-top">
-              <i class="fas fa-leaf project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/PlantClock.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/PlantClock"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <h3>식물 타이머</h3>
-            <p>
-              2025 선후배와 함께하는 코딩 페스티벌 해커톤 참가작
-              <br />식물 관리를 돕는 스마트 타이머 시스템
-            </p>
-            <div class="tech-stack"><span>IoT</span><span>Hackathon</span></div>
-          </div>
-
-          <div
-            class="project-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="450"
-          >
-            <div class="project-top">
-              <i class="fas fa-heartbeat project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/HEALTH_CHECK_PROJECT.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/HEALTH_CHECK_PROJECT"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <h3>헬스 케어 시스템</h3>
-            <p>
-              사용자 맞춤형 헬스케어 시스템
-              <br />건강 데이터를 기록하고 모니터링하는 기능 구현
-            </p>
-            <div class="tech-stack">
-              <span>Healthcare</span><span>Data</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="500"
-          >
-            <div class="project-top">
-              <i class="fas fa-book-open project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/koreatech_noob_guide.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://capybaracute.notion.site/26-2fca8de5ee5f806db9e9e64464a9ac78"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="Notion"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/koreatech_noob_guide"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <h3>한기대 26학번 신입생 가이드</h3>
-            <p>한기대 26학번 신입생을 위한 노션 사이트</p>
-            <div class="tech-stack">
-              <span>Notion</span><span>Documentation</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="550"
-          >
-            <div class="project-top">
-              <i class="fas fa-file-code project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/file_swordmaster.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://huggingface.co/spaces/capybaranice/file_swordmaster"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="바로가기"
-                  ><i class="fas fa-external-link-alt"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/file_swordmaster"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <h3>File Swordmaster</h3>
-            <p>PDF와 오디오 파일을 편집하는 다기능 스크립트</p>
-            <div class="tech-stack">
-              <span>Python</span><span>Gradio</span><span>PyPDF</span>
-            </div>
-          </div>
-
-          <!-- ===== 진행 예정 프로젝트 ===== -->
-          <div
-            class="project-card project-wip"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="600"
-          >
-            <div class="project-top">
-              <i class="fas fa-map-marked-alt project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/Koreatech_map.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/Koreatech_Map"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <div class="wip-badge">진행 예정</div>
-            <h3>한맵 (Koreatech Map)</h3>
-            <p>
-              한기대 캠퍼스 지도 서비스
-              <br />건물 내부 지도 및 호실 정보 등의 모든 정보를 담은 웹
-              인터랙티브 지도
-            </p>
-            <div class="tech-stack">
-              <span>Web</span><span>Interactive Map</span><span>Animation</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card project-wip"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="650"
-          >
-            <div class="project-top">
-              <i class="fab fa-discord project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/SG_bot.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/SG_bot"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <div class="wip-badge">개발 중</div>
-            <h3>승기봇</h3>
-            <p>
-              기존 면진봇의 개편 버전
-              <br />라이어게임, 양세찬게임, 마피아게임 등의 미니게임 봇
-            </p>
-            <div class="tech-stack">
-              <span>Python</span><span>Discord.py</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card project-wip"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="700"
-          >
-            <div class="project-top">
-              <i class="fas fa-wine-glass-alt project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/Sibal_Life_Smoking.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/Sibal_Life_Smoking"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <div class="wip-badge">진행 예정</div>
-            <h3>온라인술담</h3>
-            <p>
-              온라인담타를 벤치마킹한 술담 사이트
-              <br />GitHub Pages로 배포 예정
-            </p>
-            <div class="tech-stack">
-              <span>HTML/CSS/JS</span><span>GitHub Pages</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card project-wip"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="750"
-          >
-            <div class="project-top">
-              <i class="fas fa-code project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/HTML_Viewer.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/HTML_Viewer"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <div class="wip-badge">개발 중</div>
-            <h3>HTML Viewer</h3>
-            <p>
-              HTML 코드를 붙여넣으면
-              <br />실시간으로 결과물을 보여주는 웹 뷰어
-            </p>
-            <div class="tech-stack">
-              <span>HTML</span><span>CSS</span><span>JavaScript</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card project-wip"
-            data-tilt
-            data-aos="fade-up"
-            data-aos-delay="800"
-          >
-            <div class="project-top">
-              <i class="fas fa-flask project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/CentrifugeAI.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-                <a
-                  href="https://github.com/pachir1su/CentrifugeAI"
-                  target="_blank"
-                  class="plink plink-github"
-                  title="GitHub"
-                  ><i class="fab fa-github"></i
-                ></a>
-              </div>
-            </div>
-            <div class="wip-badge">개발 중</div>
-            <h3>CentrifugeAI</h3>
-            <p>
-              가상 실험 장치(원심분리기·현미경·가속기 등)에
-              <br />재료를 넣고 Gemini AI로 결과를 예측·시각화하는 실험 시뮬레이터
-            </p>
-            <div class="tech-stack">
-              <span>Python</span><span>Flask</span><span>SQLite</span><span>Gemini API</span><span>Discord.py</span><span>Matplotlib</span>
-            </div>
-          </div>
-
-          <div
-            class="project-card project-wip"
-            data-aos="fade-up"
-            data-aos-delay="850"
-          >
-            <div class="project-top">
-              <i class="fas fa-hat-wizard project-icon"></i>
-              <div class="project-links">
-                <a
-                  href="projects/Magic_Academy.html"
-                  class="plink plink-detail"
-                  title="자세히 보기"
-                  ><i class="fas fa-arrow-right"></i
-                ></a>
-              </div>
-            </div>
-            <div class="wip-badge">진행 예정</div>
-            <h3>마법 아카데미</h3>
-            <p>
-              원소를 조합해 마법을 만들고
-              <br />시각화하는 인터랙티브 시뮬레이션
-            </p>
-            <div class="tech-stack">
-              <span>Python (예정)</span><span>p5.js (예정)</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <footer>
-      <div class="container footer-inner">
-        <div class="footer-logo">
-          <span class="logo-bracket">{</span> GY
-          <span class="logo-bracket">}</span>
-        </div>
-        <p class="footer-copy">
-          &copy; 2026 Lee Geon Yeong. All rights reserved.
-        </p>
-        <div class="social-links">
-          <a href="https://github.com/pachir1su" target="_blank" title="GitHub"
-            ><i class="fab fa-github"></i
-          ></a>
-          <a href="mailto:capybara@koreatech.ac.kr" title="Email"
-            ><i class="fas fa-envelope"></i
-          ></a>
-        </div>
-      </div>
-    </footer>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-/* =============================================================
-   pachir1su.github.io — 노트 테마 인터랙션 스크립트
-   기존 기능: AOS / 커스텀 커서 / 프로그레스 / 타이핑 / 햄버거 /
-             back-to-top / 우클릭·드래그·선택 차단
-   추가 기능: 잉크 트레일 / 형광펜 sweep / 도장 클릭 / 스티커 드래그 /
-             스탯 카운트업 / floatUp 패럴랙스 / 키보드 단축키 /
-             콘솔 이스터에그 / 카드 깊이 그림자 / 텍스트 선택 시 형광펜
-   ============================================================= */
-
-const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/* ------------------------------------------------------------- */
-/* 1. AOS (기존)                                                  */
-/* ------------------------------------------------------------- */
-if (typeof AOS !== 'undefined') {
-  AOS.init({ once: true, duration: 700, easing: 'ease-out-cubic' });
-}
-
-/* ------------------------------------------------------------- */
-/* 2. 커스텀 커서 (잉크 트레일 제거됨)                              */
-/* ------------------------------------------------------------- */
-(function initCursor() {
-  const dot = document.querySelector('.cursor-dot');
-  const outline = document.querySelector('.cursor-outline');
-  if (!dot || !outline) return;
-
-  document.addEventListener('mousemove', (e) => {
-    dot.style.left = e.clientX + 'px';
-    dot.style.top = e.clientY + 'px';
-    outline.style.left = e.clientX + 'px';
-    outline.style.top = e.clientY + 'px';
-  });
-
-  // 링크/버튼 호버 시 outline 강조
-  document.querySelectorAll('a, button').forEach((el) => {
-    el.addEventListener('mouseenter', () => {
-      outline.style.transform = 'translate(-50%,-50%) scale(1.6)';
-      outline.style.borderColor = 'rgba(198,59,59,0.85)';
-      outline.classList.add('cursor-link');
-    });
-    el.addEventListener('mouseleave', () => {
-      outline.style.transform = 'translate(-50%,-50%) scale(1)';
-      outline.style.borderColor = 'rgba(198,59,59,0.5)';
-      outline.classList.remove('cursor-link');
-    });
-  });
-})();
-
-/* ------------------------------------------------------------- */
-/* 3. 프로그레스 바 + Back-to-top (기존, scroll listener 통합)      */
-/* ------------------------------------------------------------- */
-const backBtn = document.getElementById('btn-back-to-top');
-const myBar = document.getElementById('myBar');
-
-if (backBtn) {
-  backBtn.style.alignItems = 'center';
-  backBtn.style.justifyContent = 'center';
-  backBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-}
-
-/* ------------------------------------------------------------- */
-/* 4. 타이핑 효과 (기존)                                          */
-/* ------------------------------------------------------------- */
-(function initTyping() {
-  const typingText = document.getElementById('typing-text');
-  if (!typingText) return;
-  const words = ['풀스택 개발자', '메이커', '아이디어 뱅크', '팀 리더', '엔지니어'];
-  let wordIndex = 0, charIndex = 0, isDeleting = false, typeSpeed = 100;
-  function type() {
-    const currentWord = words[wordIndex];
-    typingText.textContent = isDeleting
-      ? currentWord.substring(0, charIndex - 1)
-      : currentWord.substring(0, charIndex + 1);
-    isDeleting ? charIndex-- : charIndex++;
-    typeSpeed = isDeleting ? 50 : 100;
-    if (!isDeleting && charIndex === currentWord.length) { isDeleting = true; typeSpeed = 2000; }
-    else if (isDeleting && charIndex === 0) { isDeleting = false; wordIndex = (wordIndex + 1) % words.length; typeSpeed = 500; }
-    setTimeout(type, typeSpeed);
-  }
-  type();
-})();
-
-/* ------------------------------------------------------------- */
-/* 5. 모바일 메뉴 (기존)                                          */
-/* ------------------------------------------------------------- */
-const hamburger = document.getElementById('hamburger');
-const mobileMenu = document.getElementById('mobileMenu');
-if (hamburger && mobileMenu) {
-  hamburger.addEventListener('click', () => {
-    mobileMenu.classList.toggle('open');
-    hamburger.classList.toggle('open');
-  });
-}
-function closeMobile() {
-  if (mobileMenu) mobileMenu.classList.remove('open');
-  if (hamburger) hamburger.classList.remove('open');
-}
-
-/* ------------------------------------------------------------- */
-/* 6. 우클릭/드래그/선택 차단 (강화)                              */
-/*    좌클릭 드래그 자체를 mousedown 단계에서 차단                  */
-/*    interactive 요소(.fi 포함)는 예외로 둬서 클릭/드래그 살림      */
-/* ------------------------------------------------------------- */
-const INTERACTIVE = 'a, button, input, textarea, select, label, .fi';
-document.addEventListener('contextmenu', (e) => e.preventDefault());
-document.addEventListener('dragstart', (e) => e.preventDefault());
-document.addEventListener('selectstart', (e) => e.preventDefault());
-document.addEventListener('mousedown', (e) => {
-  if (e.button !== 0) return; // 좌클릭만
-  if (e.target.closest(INTERACTIVE)) return;
-  e.preventDefault();
-});
-
-/* ------------------------------------------------------------- */
-/* 7. 도장 클릭 효과 (신규) — .btn / .plink / .chip / .wip-badge   */
-/* ------------------------------------------------------------- */
-(function initStampClick() {
-  if (prefersReducedMotion) return;
-  const stampWords = ['확인', 'OK', '!!', '@@', 'GOOD', '체크'];
-  const targets = '.btn, .plink, .chip, .wip-badge, .stat-item, .nav-github, #btn-back-to-top';
-  document.querySelectorAll(targets).forEach((el) => {
-    el.addEventListener('click', (e) => {
-      const stamp = document.createElement('div');
-      stamp.className = 'stamp-pop';
-      stamp.textContent = stampWords[Math.floor(Math.random() * stampWords.length)];
-      const rot = -15 + Math.random() * 30;
-      stamp.style.setProperty('--stamp-rot', rot + 'deg');
-      stamp.style.left = e.clientX + 'px';
-      stamp.style.top = e.clientY + 'px';
-      document.body.appendChild(stamp);
-      setTimeout(() => stamp.remove(), 900);
-    });
-  });
-})();
-
-/* ------------------------------------------------------------- */
-/* 8. 떠다니는 스티커 — JS rAF 통합 (float + drag + scroll)       */
-/* ------------------------------------------------------------- */
-(function initStickerSystem() {
-  const stickers = Array.from(document.querySelectorAll('.fi'));
-  if (!stickers.length) return;
-
-  // 스티커별 메타데이터
-  const states = stickers.map((el, i) => {
-    el.style.pointerEvents = 'auto';
-    el.style.animation = 'none'; // CSS keyframe 사용 안 함
-    return {
-      el,
-      dx: 0,
-      dy: 0,
-      scrollY: 0,
-      phase: Math.random() * Math.PI * 2,
-      // 5개 패턴
-      ampX: [12, -18, 8, -10, 14][i] || 10,
-      ampY: [-22, -16, -26, -20, -18][i] || -20,
-      speed: [0.00075, 0.00067, 0.0006, 0.0008, 0.00055][i] || 0.0007,
-      rotBase: [-6, 4, -3, 5, -4][i] || 0,
-      rotAmp: [8, -7, 8, -9, 7][i] || 8,
-      parallax: [0.18, 0.12, -0.1, 0.22, -0.16][i] || 0.15,
-      dragging: false,
-      moved: false,
-      startX: 0, startY: 0, baseDX: 0, baseDY: 0,
-    };
-  });
-
-  // 드래그 핸들러 (모바일/reduce-motion 제외)
-  const allowDrag = !isMobile() && !prefersReducedMotion;
-  if (allowDrag) {
-    states.forEach((s) => {
-      s.el.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        s.dragging = true;
-        s.moved = false;
-        s.startX = e.clientX;
-        s.startY = e.clientY;
-        s.baseDX = s.dx;
-        s.baseDY = s.dy;
-        s.el.classList.add('grabbing');
-      });
-    });
-    document.addEventListener('mousemove', (e) => {
-      states.forEach((s) => {
-        if (!s.dragging) return;
-        s.dx = s.baseDX + (e.clientX - s.startX);
-        s.dy = s.baseDY + (e.clientY - s.startY);
-        if (Math.abs(e.clientX - s.startX) + Math.abs(e.clientY - s.startY) > 4) s.moved = true;
-      });
-    });
-    document.addEventListener('mouseup', () => {
-      states.forEach((s) => {
-        if (!s.dragging) return;
-        s.dragging = false;
-        s.el.classList.remove('grabbing');
-        if (s.moved) s.el.classList.add('settled');
-      });
-    });
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  // AOS init (preserved subtle scroll fade)
+  if (typeof AOS !== 'undefined') {
+    AOS.init({ once: true, duration: 600, easing: 'ease-out-cubic' });
   }
 
-  // 스크롤 패럴랙스
-  function updateScroll() {
-    const y = window.scrollY;
-    states.forEach((s) => { s.scrollY = y * s.parallax; });
-  }
-  window.addEventListener('scroll', updateScroll, { passive: true });
-  updateScroll();
-
-  // rAF 루프: 각 스티커의 transform 갱신
-  function loop(t) {
-    states.forEach((s) => {
-      // float 부분 (드래그 안 했을 때만 — 옮긴 자리 유지)
-      let fx = 0, fy = 0, fr = 0;
-      if (!s.el.classList.contains('settled') && !prefersReducedMotion) {
-        const a = Math.sin(t * s.speed + s.phase);
-        fx = s.ampX * (a * 0.5 + 0.5);
-        fy = s.ampY * (a * 0.5 + 0.5);
-        fr = s.rotAmp * a;
-      }
-      const tx = s.dx + fx;
-      const ty = s.dy + s.scrollY + fy;
-      const rot = s.rotBase + fr;
-      s.el.style.transform = `translate(${tx}px, ${ty}px) rotate(${rot}deg)`;
-    });
-    requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
-})();
-
-/* ------------------------------------------------------------- */
-/* 9. 스탯 카운트업 (신규) — hero-stats 진입 시                   */
-/* ------------------------------------------------------------- */
-(function initStatCounter() {
-  const stats = document.querySelectorAll('.stat-num');
-  if (!stats.length) return;
-  // 원본 텍스트 저장 (예: "10+", "3", "8위")
-  stats.forEach((el) => {
-    const txt = el.textContent.trim();
-    const m = txt.match(/^(\d+)(.*)$/);
-    if (!m) return;
-    el.dataset.target = m[1];
-    el.dataset.suffix = m[2];
-    el.textContent = '0' + m[2];
-  });
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      const el = entry.target;
-      const target = parseInt(el.dataset.target, 10);
-      const suffix = el.dataset.suffix || '';
-      if (isNaN(target)) return;
-      let curr = 0;
-      const duration = 900;
-      const start = performance.now();
-      function tick(t) {
-        const p = Math.min(1, (t - start) / duration);
-        const eased = 1 - Math.pow(1 - p, 3);
-        curr = Math.round(target * eased);
-        el.textContent = curr + suffix;
-        if (p < 1) requestAnimationFrame(tick);
-        else el.textContent = target + suffix;
-      }
-      requestAnimationFrame(tick);
-      obs.unobserve(el);
-    });
-  }, { threshold: 0.5 });
-  stats.forEach((el) => obs.observe(el));
-})();
-
-/* 10. 스크롤 패럴랙스는 7번(스티커 시스템) rAF 루프에 통합됨 */
-
-/* ------------------------------------------------------------- */
-/* 11. 통합 scroll 핸들러 (프로그레스 + back-to-top)              */
-/* ------------------------------------------------------------- */
-(function initScroll() {
-  let ticking = false;
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const ratio = height > 0 ? (winScroll / height) : 0;
-      if (myBar) myBar.style.width = (ratio * 100) + '%';
-      if (backBtn) {
-        if (winScroll > 300) backBtn.classList.add('visible');
-        else backBtn.classList.remove('visible');
-      }
-      // 종이 진행도 (custom property)
-      document.documentElement.style.setProperty('--scroll-progress', ratio.toFixed(3));
-      ticking = false;
-    });
-  }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-})();
-
-/* ------------------------------------------------------------- */
-/* 12. 카드 호버 시 마우스 위치 따라 그림자 살짝 기울임 (신규)    */
-/*     transform 회전은 안 함 (사용자가 tilt 싫어함)              */
-/*     단, 그림자 방향만 마우스 반대편으로 길어짐                 */
-/* ------------------------------------------------------------- */
-(function initShadowFollow() {
-  if (isMobile() || prefersReducedMotion) return;
-  const cards = document.querySelectorAll('.skill-card, .project-card, .award-card, .about-card');
-  cards.forEach((card) => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      // 마우스 반대편으로 그림자 (최대 ±10px)
-      const sx = -x * 14;
-      const sy = -y * 14 + 8;
-      card.style.setProperty('--shadow-x', sx + 'px');
-      card.style.setProperty('--shadow-y', sy + 'px');
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.setProperty('--shadow-x', '0px');
-      card.style.setProperty('--shadow-y', '6px');
-    });
-  });
-})();
-
-/* ------------------------------------------------------------- */
-/* 13. 키보드 단축키 (신규)                                       */
-/*    1~5: 섹션 점프, Esc: 모바일 메뉴 닫기, t: top, g: GitHub    */
-/* ------------------------------------------------------------- */
-(function initShortcuts() {
-  const sections = ['#home', '#about', '#skills', '#awards', '#projects'];
-  document.addEventListener('keydown', (e) => {
-    if (e.target.matches('input, textarea')) return;
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    const k = e.key.toLowerCase();
-    if (k >= '1' && k <= '5') {
-      const sel = sections[parseInt(k, 10) - 1];
-      const target = document.querySelector(sel);
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth' });
-        flashHint(sel.replace('#', '').toUpperCase());
-      }
-    } else if (k === 'escape') {
-      closeMobile();
-    } else if (k === 't') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      flashHint('TOP');
-    } else if (k === 'g') {
-      flashHint('OPEN GITHUB');
-      setTimeout(() => window.open('https://github.com/pachir1su', '_blank'), 200);
+  // typing effect (matches existing script.js word list)
+  (function(){
+    const typed = document.getElementById('typed');
+    if (!typed) return;
+    const words = ['풀스택 개발자','메이커','아이디어 뱅크','팀 리더','엔지니어'];
+    let wi = 0, ci = 0, del = false;
+    function step(){
+      const w = words[wi];
+      typed.textContent = del ? w.slice(0, ci - 1) : w.slice(0, ci + 1);
+      del ? ci-- : ci++;
+      let s = del ? 50 : 100;
+      if (!del && ci === w.length) { del = true; s = 1800; }
+      else if (del && ci === 0) { del = false; wi = (wi + 1) % words.length; s = 480; }
+      setTimeout(step, s);
     }
-  });
+    step();
+  })();
 
-  function flashHint(text) {
-    const hint = document.createElement('div');
-    hint.className = 'key-hint';
-    hint.textContent = text;
-    document.body.appendChild(hint);
-    requestAnimationFrame(() => hint.classList.add('show'));
-    setTimeout(() => hint.classList.remove('show'), 700);
-    setTimeout(() => hint.remove(), 1100);
-  }
-})();
-
-/* ------------------------------------------------------------- */
-/* 14. 카드 진입 시 마스킹 테이프 sweep (신규)                    */
-/* ------------------------------------------------------------- */
-(function initCardEntry() {
-  if (prefersReducedMotion) return;
-  const cards = document.querySelectorAll('.project-card, .skill-card, .award-card');
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('taped');
-      obs.unobserve(entry.target);
-    });
-  }, { threshold: 0.2 });
-  cards.forEach((c) => obs.observe(c));
-})();
-
-/* ------------------------------------------------------------- */
-/* 15. 로고 클릭 시 흔들리는 효과                                  */
-/* ------------------------------------------------------------- */
-document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
-  el.addEventListener('click', (e) => {
-    el.classList.remove('wobble');
-    void el.offsetWidth;
-    el.classList.add('wobble');
-  });
-});
-
-/* ------------------------------------------------------------- */
-/* 16. 진입 시 페이지 살짝 떨림 (한 번만)                          */
-/* ------------------------------------------------------------- */
-(function initPageEntry() {
-  if (prefersReducedMotion) return;
-  document.body.classList.add('page-entry');
-  setTimeout(() => document.body.classList.remove('page-entry'), 900);
-})();
-
-/* ------------------------------------------------------------- */
-/* 17. 콘솔 이스터에그                                            */
-/* ------------------------------------------------------------- */
-(function consoleEgg() {
-  const lines = [
-    '%c┌─────────────────────────────────────────────┐',
-    '│  안녕, 종이 너머에서 코드를 읽는 사람.     │',
-    '│  이 페이지는 노트입니다.                    │',
-    '│                                             │',
-    '│  단축키:                                    │',
-    '│    1~5 → 섹션 점프                          │',
-    '│    T   → 맨 위로                            │',
-    '│    G   → GitHub                             │',
-    '│    Esc → 모바일 메뉴 닫기                   │',
-    '│                                             │',
-    '│  스티커는 드래그할 수 있어요.               │',
-    '└─────────────────────────────────────────────┘',
-  ];
-  const style = 'color:#c63b3b; font-family: monospace; font-size: 12px; line-height: 1.4;';
-  console.log(lines.join('\n'), style);
-})();
-
-
-/* =============================================================
-   PREVIEW 전용 — 5종 3D 효과 + BONUS
-   ============================================================= */
-
-/* 효과 1 — hero perspective parallax */
-(function initHeroParallax3D() {
-  if (isMobile() || prefersReducedMotion) return;
-  const hero = document.querySelector('.hero');
-  if (!hero) return;
-  const defs = [
-    { sel: '.hero-tag', z: 60 },
-    { sel: '.name-kr', z: 30 },
-    { sel: '.name-en', z: 50 },
-    { sel: '.hero-role', z: 20 },
-    { sel: '.hero-desc', z: 10 },
-    { sel: '.hero-btns', z: 40 },
-    { sel: '.hero-stats', z: 0 },
-  ];
-  const layers = defs
-    .map(({ sel, z }) => ({ el: hero.querySelector(sel), z }))
-    .filter((l) => l.el);
-  let tx = 0, ty = 0, targetX = 0, targetY = 0;
-  hero.addEventListener('mousemove', (e) => {
-    const rect = hero.getBoundingClientRect();
-    targetX = (e.clientX - rect.left) / rect.width - 0.5;
-    targetY = (e.clientY - rect.top) / rect.height - 0.5;
-  });
-  hero.addEventListener('mouseleave', () => { targetX = 0; targetY = 0; });
-  function loop() {
-    tx += (targetX - tx) * 0.08;
-    ty += (targetY - ty) * 0.08;
-    layers.forEach(({ el, z }) => {
-      el.style.transform = `translate3d(${(tx * z * 0.4).toFixed(2)}px, ${(ty * z * 0.3).toFixed(2)}px, ${z}px)`;
-    });
-    requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
-})();
-
-/* 효과 2 — 3D 부유물 (종이 비행기·클립·연필) */
-(function init3DFlying() {
-  if (prefersReducedMotion) return;
-  const hero = document.querySelector('.hero');
-  if (!hero) return;
-  const layer = document.createElement('div');
-  layer.className = 'flying-3d-layer';
-  layer.innerHTML = [
-    '<svg class="fly-item fly-plane" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">',
-    '  <polygon points="2,32 60,4 50,32 60,60" fill="#fffdf6" stroke="#1f1c14" stroke-width="1.4" stroke-linejoin="round"/>',
-    '  <polygon points="50,32 60,60 32,38" fill="#f4efe1" stroke="#1f1c14" stroke-width="1.2" stroke-linejoin="round"/>',
-    '  <line x1="2" y1="32" x2="50" y2="32" stroke="#1f1c14" stroke-width="0.8"/>',
-    '</svg>',
-    '<svg class="fly-item fly-clip" viewBox="0 0 32 50" xmlns="http://www.w3.org/2000/svg">',
-    '  <path d="M6 6 v34 a8 8 0 0 0 16 0 v-26 a4 4 0 0 0 -8 0 v22 a2 2 0 0 0 4 0 v-18" fill="none" stroke="#c63b3b" stroke-width="2.4" stroke-linecap="round"/>',
-    '</svg>',
-    '<svg class="fly-item fly-pencil" viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg">',
-    '  <polygon points="0,20 12,8 12,32" fill="#1f1c14"/>',
-    '  <polygon points="12,8 12,32 28,28 28,12" fill="#fffdf6" stroke="#1f1c14" stroke-width="1"/>',
-    '  <rect x="28" y="11" width="140" height="18" fill="#b88a1a" stroke="#1f1c14" stroke-width="1"/>',
-    '  <rect x="168" y="11" width="20" height="18" fill="#c63b3b" stroke="#1f1c14" stroke-width="1"/>',
-    '  <rect x="188" y="9" width="8" height="22" fill="#f4efe1" stroke="#1f1c14" stroke-width="1"/>',
-    '</svg>',
-  ].join('\n');
-  hero.appendChild(layer);
-})();
-
-/* 효과 4 보조 — 도장이 떨어질 perspective wrapper 준비.
-   기존 script.js의 initStampClick은 body에 직접 append하므로,
-   document.body.appendChild를 가로채 stamp-layer로 리다이렉트. */
-(function initStampLayer() {
-  const layer = document.createElement('div');
-  layer.className = 'stamp-layer';
-  document.body.appendChild(layer);
-  const origAppend = document.body.appendChild.bind(document.body);
-  document.body.appendChild = function (node) {
-    if (node && node.classList && node.classList.contains('stamp-pop')) {
-      return layer.appendChild(node);
+  // progress bar + back-to-top (preserved)
+  (function(){
+    const bar = document.getElementById('myBar');
+    const btn = document.getElementById('btn-back-to-top');
+    function onScroll(){
+      const ht = document.documentElement;
+      const sc = ht.scrollTop || document.body.scrollTop;
+      const max = (ht.scrollHeight - ht.clientHeight) || 1;
+      if (bar) bar.style.width = (sc / max * 100) + '%';
+      if (btn) btn.classList.toggle('show', sc > 200);
     }
-    return origAppend(node);
-  };
-})();
-
-/* 효과 3 — 노트 펼침 인트로 (1회) */
-(function initNotebookFold() {
-  if (prefersReducedMotion) return;
-  document.body.classList.add('intro-fold');
-  // 기존 page-entry와 충돌 피하기
-  document.body.classList.remove('page-entry');
-  setTimeout(() => {
-    document.body.classList.remove('intro-fold');
-  }, 1450);
-})();
-
-/* BONUS — 종이 책갈피 */
-(function initBookmark() {
-  const bm = document.createElement('a');
-  bm.href = 'https://github.com/pachir1su';
-  bm.target = '_blank';
-  bm.rel = 'noopener';
-  bm.className = 'bookmark-3d';
-  bm.title = 'GitHub';
-  bm.innerHTML = [
-    '<svg viewBox="0 0 40 116" xmlns="http://www.w3.org/2000/svg">',
-    '  <polygon points="0,0 40,0 40,116 20,96 0,116" fill="#c63b3b" stroke="#1f1c14" stroke-width="1.2" stroke-linejoin="round"/>',
-    '  <rect x="0" y="0" width="40" height="10" fill="#7a1f1f"/>',
-    '  <text x="20" y="50" text-anchor="middle" font-family="Space Mono, monospace" font-size="11" font-weight="700" fill="#fffdf6" letter-spacing="2">GH</text>',
-    '  <line x1="6" y1="64" x2="34" y2="64" stroke="#fffdf6" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>',
-    '  <text x="20" y="78" text-anchor="middle" font-family="Caveat, cursive" font-size="14" fill="#fffdf6">click!</text>',
-    '</svg>',
-  ].join('\n');
-  document.body.appendChild(bm);
-})();
-
-/* BONUS — preview 배지 */
-(function initPreviewBadge() {
-  const b = document.createElement('div');
-  b.className = 'preview-badge';
-  b.textContent = '◉ PREVIEW';
-  document.body.appendChild(b);
-})();
-
-/* BONUS — 잉크 splash (카드 클릭 시) */
-(function initInkSplash() {
-  if (prefersReducedMotion) return;
-  document.querySelectorAll('.skill-card, .project-card, .award-card, .about-card').forEach((card) => {
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('a, button')) return;
-      const cx = e.clientX, cy = e.clientY;
-      const n = 6 + Math.floor(Math.random() * 3);
-      for (let i = 0; i < n; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'ink-splash';
-        dot.style.left = cx + 'px';
-        dot.style.top = cy + 'px';
-        const angle = (Math.PI * 2 * i) / n + (Math.random() - 0.5) * 0.5;
-        const dist = 28 + Math.random() * 44;
-        dot.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
-        dot.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
-        document.body.appendChild(dot);
-        setTimeout(() => dot.remove(), 760);
-      }
-    });
-  });
-})();
-
-/* BONUS — 단축키 확장 (n / p 다음·이전 섹션) */
-(function initSectionNav() {
-  const ids = ['home', 'about', 'skills', 'awards', 'projects'];
-  function currentIdx() {
-    const y = window.scrollY + 100;
-    let idx = 0;
-    ids.forEach((id, i) => {
-      const el = document.getElementById(id);
-      if (el && el.offsetTop <= y) idx = i;
-    });
-    return idx;
-  }
-  document.addEventListener('keydown', (e) => {
-    if (e.target.matches('input, textarea')) return;
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    const k = e.key.toLowerCase();
-    let target = null;
-    if (k === 'n') {
-      target = document.getElementById(ids[Math.min(ids.length - 1, currentIdx() + 1)]);
-    } else if (k === 'p') {
-      target = document.getElementById(ids[Math.max(0, currentIdx() - 1)]);
-    }
-    if (target) target.scrollIntoView({ behavior: 'smooth' });
-  });
-})();
-
-/* BONUS — 콘솔 ASCII 노트북 아트 */
-(function initConsoleArt() {
-  const art = [
-    '%c',
-    '   +-----------------------------------------+',
-    '   |   ___________________________________   |',
-    '   |  |  o o o                            |  |',
-    '   |  |   _____   _____   __    __        |  |',
-    '   |  |  |  __ \\ |  ___| \\ \\  / /         |  |',
-    '   |  |  | |__) || |__    \\ \\/ /          |  |',
-    '   |  |  |  ___/ |  __|    \\  /           |  |',
-    '   |  |  | |     | |___    /  \\           |  |',
-    '   |  |  |_|     |_____|  /_/\\_\\          |  |',
-    '   |  |                                    |  |',
-    '   |  |  PREVIEW - notebook + 3D sandbox   |  |',
-    '   |  |___________________________________|  |',
-    '   +-----------------------------------------+',
-    '',
-    '   Shortcuts:',
-    '     1~5  → jump to section (home/about/skills/awards/projects)',
-    '     N/P  → next/prev section',
-    '     T    → top',
-    '     G    → GitHub',
-    '     Esc  → close mobile menu',
-    '',
-    '   - Hover over hero: depth parallax',
-    '   - Hover over cards: lift forward (no rotation)',
-    '   - Drag the floating stickers',
-    '   - Click cards for ink splash',
-  ].join('\n');
-  console.log(art, 'color:#c63b3b; font-family: monospace; font-size: 12px; line-height: 1.35;');
-})();
-
-    </script>
-  </body>
+    window.addEventListener('scroll', onScroll, { passive: true });
+    if (btn) btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    onScroll();
+  })();
+</script>
+</body>
 </html>
