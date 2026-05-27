@@ -90,15 +90,14 @@
             <div class="detail-section" data-aos="fade-up">
               <h2>프로젝트 개요</h2>
               <p>
-                <strong>API 없이</strong> pyautogui로 브라우저를 직접 조작해
-                여러 LLM(Claude·ChatGPT·Gemini 등)에 동시에 프롬프트를 던지고,
+                <strong>API 없이</strong> pyautogui로 브라우저를 직접 조작해서
+                여러 LLM(Claude·ChatGPT·Gemini 등)에 동시에 프롬프트를 던지고
                 Head LLM이 Worker들의 답변을 종합해 최종 결과를 제공하는
                 GUI 기반 멀티 LLM 오케스트레이터입니다.
               </p>
               <p>
                 LLM마다 잘하는 영역이 달라서 좋은 답변을 위해 여러 사이트에
-                일일이 복붙하는 불편함에서 출발했습니다. 기존 AI 애그리게이터(Monica, Poe 등)의
-                유료 한계를 <strong>RPA 자동화</strong>로 돌파합니다.
+                일일이 복붙하는 게 불편해서 만들었습니다.
               </p>
             </div>
 
@@ -136,7 +135,7 @@
               <h3>Head / Worker 자유 설정</h3>
               <ul>
                 <li>GUI에서 Head LLM을 직접 선택 — 결과 합성 담당</li>
-                <li>Worker LLM 체크박스로 자유 구성 (Claude·ChatGPT·Gemini·DeepSeek·Grok 등)</li>
+                <li>Worker LLM 체크박스로 자유 구성 (Claude·ChatGPT·Gemini·Perplexity·Grok 등)</li>
                 <li>Head로 선택된 LLM은 Worker 목록에서 자동 제외</li>
                 <li>설정값 <code>json</code>으로 저장 → 재시작 시 자동 복원</li>
               </ul>
@@ -149,24 +148,24 @@
               <h3>한글 입력 우회</h3>
               <ul>
                 <li>pyautogui <code>typewrite()</code>는 한글 미지원</li>
-                <li><code>pyperclip.copy()</code> + <code>Ctrl+V</code> 방식으로 완전 해결</li>
+                <li><code>pyperclip.copy()</code> + <code>Ctrl+V</code> 방식으로 해결</li>
               </ul>
             </div>
 
             <div class="detail-section" data-aos="fade-up" data-aos-delay="150">
               <h2>기존 유사 프로젝트와의 차별점</h2>
               <ul>
-                <li><strong>AutoChatScript / AutoChatgpt</strong>: 단일 LLM, 결과 종합 없음</li>
-                <li><strong>TalkingHeads</strong>: 다중 LLM 지원하지만 결과 종합 기능 없음</li>
-                <li><strong>WebAI-to-API</strong>: 복잡한 설치 필요, 기술 난이도 높음</li>
-                <li><strong>MultiMind</strong>: API 비용 0원, LLM 구성 자유 설정, Head가 최종 합성 — 셋 다 해결</li>
+                <li><strong>AutoChatScript / AutoChatgpt</strong> : 단일 LLM, 결과 종합 없음</li>
+                <li><strong>TalkingHeads</strong> : 다중 LLM 지원하지만 결과 종합 기능 없음</li>
+                <li><strong>WebAI-to-API</strong> : 복잡한 설치 필요, 기술 난이도 높음</li>
+                <li><strong>MultiMind</strong>: API 비용 0원, LLM 구성 자유 설정, Head가 최종 합성 : 전부 해결</li>
               </ul>
             </div>
 
             <div class="detail-section" data-aos="fade-up" data-aos-delay="200">
               <h2>확장 계획</h2>
               <ul>
-                <li>지원 LLM 추가: DeepSeek, Grok, HuggingChat 등</li>
+                <li>지원 LLM 추가: Perplexity, Grok, HuggingChat 등</li>
                 <li>질문 유형 자동 감지 → 최적 LLM 조합 추천</li>
                 <li>Worker별 답변 개별 확인 탭</li>
                 <li>답변 히스토리 저장 및 검색</li>
@@ -209,7 +208,7 @@
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="200">
               <h4>핵심 특징</h4>
               <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7;">
-                API 키 불필요 — 무료 브라우저 계정만으로 멀티 LLM 활용.<br/>
+                API 키 불필요 : 무료 브라우저 계정만으로 멀티 LLM 활용.<br/>
                 Head LLM이 결과를 종합하여 단일 LLM 대비 답변 품질 향상.
               </p>
             </div>
