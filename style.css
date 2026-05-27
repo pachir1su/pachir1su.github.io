@@ -2021,3 +2021,201 @@ html {
     animation: none !important;
   }
 }
+
+/* ==========================================================================
+   37. 태블릿 최적화 (769px ~ 1024px) — Issue #16
+   ========================================================================== */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .skills-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .projects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .awards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .hero-name {
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+  }
+  .fi-1, .fi-5 {
+    left: 3%;
+  }
+  .fi-2, .fi-4 {
+    right: 6%;
+  }
+  .detail-grid {
+    grid-template-columns: 1fr 280px;
+    gap: 24px;
+  }
+}
+
+/* ==========================================================================
+   38. GPU 가속 힌트 — 주요 애니메이션 요소
+   ========================================================================== */
+
+.fi,
+.cursor-dot,
+.cursor-outline,
+.progress-bar,
+#btn-back-to-top {
+  will-change: transform;
+}
+.scroll-line {
+  will-change: transform, opacity;
+}
+
+/* ==========================================================================
+   39. 견출지 (Index Tab) 디자인 — Issue #17
+   세션 헤더 section-tag를 견출지 형태로 강화
+   ========================================================================== */
+
+.section-tag {
+  position: relative;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: 3px 3px 0 0;
+  padding: 4px 16px 6px 10px;
+  display: inline-block;
+  box-shadow: 1px -2px 4px rgba(31, 28, 20, 0.07);
+  margin-bottom: 8px;
+}
+/* 아래 경계선과 자연스럽게 연결 */
+.section-tag::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: -1px;
+  right: -1px;
+  height: 2px;
+  background: var(--paper);
+}
+
+/* 섹션마다 다른 견출지 색 */
+#home .section-tag { border-color: var(--red); color: var(--red); }
+#about .section-tag { border-color: var(--cyan); color: var(--cyan); }
+#skills .section-tag { border-color: var(--gold); color: var(--gold); }
+#awards .section-tag { border-color: var(--bronze); color: var(--bronze); }
+#projects .section-tag { border-color: var(--red); color: var(--red); }
+
+/* section-header 아래 가로 밑줄 (노트 페이지 구분선처럼) */
+.section-header {
+  border-bottom: 1.5px solid var(--line);
+  padding-bottom: 20px;
+}
+
+/* ==========================================================================
+   40. 포스트잇 스티커 fold 모서리 효과 — stat-item
+   ========================================================================== */
+
+.stat-item {
+  position: relative;
+  overflow: hidden;
+}
+.stat-item::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 12px 12px;
+  border-color: transparent transparent rgba(31,28,20,0.12) transparent;
+}
+
+/* ==========================================================================
+   41. 메모지 스타일 card 변형 — about-card 헤더 라인 강화
+   ========================================================================== */
+
+.about-card {
+  border-top: 3px solid var(--cyan);
+}
+.skill-card:nth-child(4n+1) { border-top: 3px solid var(--red); }
+.skill-card:nth-child(4n+2) { border-top: 3px solid var(--cyan); }
+.skill-card:nth-child(4n+3) { border-top: 3px solid var(--gold); }
+.skill-card:nth-child(4n+4) { border-top: 3px solid var(--bronze); }
+
+/* ==========================================================================
+   42. 견출지 — 프로젝트 카드 상단 컬러 탭 (카드별 5색 순환)
+   ========================================================================== */
+
+.project-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 64px;
+  right: 0;
+  height: 3px;
+  border-radius: 0 var(--radius) 0 0;
+}
+.project-card:nth-child(5n+1)::after { background: var(--red); }
+.project-card:nth-child(5n+2)::after { background: var(--cyan); }
+.project-card:nth-child(5n+3)::after { background: var(--gold); }
+.project-card:nth-child(5n+4)::after { background: var(--bronze); }
+.project-card:nth-child(5n+5)::after { background: var(--ink); opacity: 0.4; }
+
+/* ==========================================================================
+   43. 소형 모바일(~480px) 추가 보정 — Issue #16
+   ========================================================================== */
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+  .hero-btns {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .hero-stats {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .stat-item {
+    min-width: calc(50% - 5px);
+    flex: 1 1 calc(50% - 5px);
+  }
+  .section {
+    padding: 52px 0;
+  }
+  .about-card,
+  .skill-card,
+  .award-card,
+  .project-card {
+    padding: 28px 16px 18px 44px;
+    background-position:
+      10px -6px,
+      38px 0,
+      0 0, 0 0, 0 0, 0 0;
+  }
+  .project-wip {
+    background-position:
+      10px -6px,
+      38px 0,
+      0 0, 0 0, 0 0, 0 0, 0 0;
+  }
+  .project-card::after {
+    left: 44px;
+  }
+  .skills-grid,
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+  .awards-grid {
+    grid-template-columns: 1fr;
+  }
+  .section-header::after {
+    display: none;
+  }
+  .fi {
+    width: 52px;
+    height: 52px;
+    font-size: 1.6rem;
+  }
+}
