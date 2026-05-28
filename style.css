@@ -2157,7 +2157,50 @@ html {
 .project-card:nth-child(5n+5)::after { background: var(--ink); opacity: 0.4; }
 
 /* ==========================================================================
-   43. 소형 모바일(~480px) 추가 보정 — Issue #16
+   43. 프로젝트 카드 넘버링 — 메모지 우측 하단 (Issue #20)
+   ========================================================================== */
+
+/* 그리드 단위로 카운터 초기화 후 카드마다 1씩 증가 → 도큐먼트 순서대로 자동 번호 */
+.projects-grid { counter-reset: pcard; }
+.project-card { counter-increment: pcard; }
+.project-num {
+  position: absolute;
+  right: 16px;
+  bottom: 9px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--red);
+  opacity: 0.5;
+  z-index: 2;
+  pointer-events: none;
+}
+/* decimal-leading-zero → 01, 02 ... 형식의 두 자리 번호 */
+.project-num::before { content: counter(pcard, decimal-leading-zero); }
+
+/* ==========================================================================
+   44. 나의 역할 — 직책 배지 (Issue #22)
+   ========================================================================== */
+
+.role-position {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--red-soft);
+  border: 1px dashed var(--red-margin);
+  border-radius: 3px;
+  padding: 7px 14px;
+  margin: 4px 0 14px;
+}
+.role-position i { color: var(--red); }
+
+/* ==========================================================================
+   45. 소형 모바일(~480px) 추가 보정 — Issue #16
    ========================================================================== */
 
 @media (max-width: 480px) {
