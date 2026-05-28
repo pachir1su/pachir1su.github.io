@@ -364,7 +364,6 @@ document.addEventListener('mousedown', (e) => {
 /* ------------------------------------------------------------- */
 /* 14. 카드 진입 시 마스킹 테이프 sweep (신규)                    */
 /* ------------------------------------------------------------- */
-
 (function initCardEntry() {
   if (prefersReducedMotion) return;
   const cards = document.querySelectorAll('.project-card, .skill-card, .award-card');
@@ -418,34 +417,4 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
   ];
   const style = 'color:#c63b3b; font-family: monospace; font-size: 12px; line-height: 1.4;';
   console.log(lines.join('\n'), style);
-})();
-
-/* ------------------------------------------------------------- */
-/* 18. 프로젝트 카드 필터                                          */
-/* ------------------------------------------------------------- */
-(function initProjectFilter() {
-  const btns = document.querySelectorAll('.pfilter');
-  const cards = document.querySelectorAll('.project-card');
-  if (!btns.length) return;
-
-  btns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const filter = btn.dataset.filter;
-
-      /* active 표시 이동 */
-      btns.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      /* 카드 표시/숨김 */
-      cards.forEach((card) => {
-        const cats = (card.dataset.category || '').split(' ');
-        const isWip = card.classList.contains('project-wip');
-        const show =
-          filter === 'all' ||
-          (filter === 'wip' && isWip) ||
-          cats.includes(filter);
-        card.style.display = show ? '' : 'none';
-      });
-    });
-  });
 })();
