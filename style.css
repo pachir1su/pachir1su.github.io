@@ -2176,8 +2176,8 @@ html {
   z-index: 2;
   pointer-events: none;
 }
-/* decimal-leading-zero → 01, 02 ... 형식의 두 자리 번호 */
-.project-num::before { content: counter(pcard, decimal-leading-zero); }
+/* p.01, p.02 ... 형식 */
+.project-num::before { content: "p." counter(pcard, decimal-leading-zero); }
 
 /* ==========================================================================
    44. 나의 역할 — 직책 배지 (Issue #22)
