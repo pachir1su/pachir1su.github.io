@@ -418,3 +418,82 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
   const style = 'color:#c63b3b; font-family: monospace; font-size: 12px; line-height: 1.4;';
   console.log(lines.join('\n'), style);
 })();
+
+/* ------------------------------------------------------------- */
+/* 18. 프로젝트 카테고리 필터 (#28)                                */
+/*    연도 그룹 단위로 카드 표시/숨김, 빈 그룹은 헤더까지 숨김       */
+/* ------------------------------------------------------------- */
+(function initProjectFilter() {
+  const btns = document.querySelectorAll('.pfilter');
+  const groups = document.querySelectorAll('.year-group');
+  if (!btns.length || !groups.length) return;
+
+  btns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+
+      /* active 표시 이동 */
+      btns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      /* 그룹별로 카드 필터링 후 빈 그룹 숨김 */
+      groups.forEach((group) => {
+        let visibleCount = 0;
+        group.querySelectorAll('.project-card').forEach((card) => {
+          const cats = (card.dataset.category || '').split(' ');
+          const isWip = card.classList.contains('project-wip');
+          const show =
+            filter === 'all' ||
+            (filter === 'wip' && isWip) ||
+            cats.includes(filter);
+          card.style.display = show ? '' : 'none';
+          if (show) visibleCount++;
+        });
+        group.style.display = visibleCount ? '' : 'none';
+      });
+    });
+  });
+})();
+
+/* ------------------------------------------------------------- */
+/* 19. 이메일 클릭 복사 (#30)                                      */
+/*    전역 selectstart 차단 때문에 클릭-복사 방식으로 제공          */
+/* ------------------------------------------------------------- */
+(function initEmailCopy() {
+  const btn = document.getElementById('copyEmail');
+  if (!btn) return;
+  const addr = btn.querySelector('.email-addr');
+  const hint = btn.querySelector('.copy-hint');
+  const email = addr ? addr.textContent.trim() : 'capybara@koreatech.ac.kr';
+
+  btn.addEventListener('click', async () => {
+    /* 1순위: Clipboard API, 실패 시 textarea 폴백 */
+    try {
+      await navigator.clipboard.writeText(email);
+    } catch (err) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = email;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      } catch (err2) {
+        return; // 복사 불가 환경이면 조용히 종료
+      }
+    }
+    /* 복사 완료 피드백 (1.5초) */
+    if (hint) {
+      const prev = hint.textContent;
+      btn.classList.add('copied');
+      hint.textContent = '복사됨!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        hint.textContent = prev;
+      }, 1500);
+    }
+  });
+})();
