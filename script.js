@@ -523,3 +523,86 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
 
   badge.textContent = `${done}개 완료 · ${wip}개 예정`;
 })();
+
+/* ------------------------------------------------------------- */
+/* 21. 🐔 치킨 모드 이스터에그 (#38)                               */
+/*    hero-stats 15회 클릭 시 발동. 글리치 없음(닭 비 + 토스트).    */
+/*    활성화 시 '되돌리기' 버튼 제공 → 원상 복구 (이슈 #38 댓글)    */
+/* ------------------------------------------------------------- */
+(function initChickenEgg() {
+  const stats = document.querySelector('.hero-stats');
+  if (!stats) return;
+
+  const TRIGGER = 15;          // 발동 클릭 수
+  let clicks = 0;
+  let active = false;
+  let rainTimer = null;
+  let rollbackBtn = null;
+
+  /* hero-stats 클릭 카운트 (이미 활성화면 무시) */
+  stats.addEventListener('click', () => {
+    if (active) return;
+    clicks++;
+    if (clicks >= TRIGGER) activate();
+  });
+
+  /* 닭 한 마리 떨어뜨리기 */
+  function spawnChicken() {
+    const c = document.createElement('div');
+    c.className = 'chicken-drop';
+    c.textContent = '🐔';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.fontSize = (22 + Math.random() * 30) + 'px';
+    c.style.setProperty('--sway', (Math.random() * 80 - 40) + 'px');
+    const dur = 4 + Math.random() * 3;
+    c.style.animationDuration = dur + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), dur * 1000 + 300);
+  }
+
+  /* 이스터에그 활성화 */
+  function activate() {
+    active = true;
+    document.body.classList.add('chicken-mode');
+
+    /* 발견 토스트 */
+    const toast = document.createElement('div');
+    toast.className = 'egg-toast';
+    toast.textContent = '🐔 히든 모드 발견 — 꼬꼬댁!';
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 400);
+    }, 2600);
+
+    /* 첫 폭발 + 지속적인 닭 비 (reduce-motion이면 가볍게) */
+    const burst = prefersReducedMotion ? 6 : 18;
+    for (let i = 0; i < burst; i++) setTimeout(spawnChicken, i * 60);
+    if (!prefersReducedMotion) rainTimer = setInterval(spawnChicken, 260);
+
+    /* 되돌리기 버튼 */
+    rollbackBtn = document.createElement('button');
+    rollbackBtn.type = 'button';
+    rollbackBtn.className = 'egg-rollback';
+    rollbackBtn.innerHTML = '<i class="fas fa-rotate-left"></i> 되돌리기';
+    rollbackBtn.addEventListener('click', deactivate);
+    document.body.appendChild(rollbackBtn);
+    requestAnimationFrame(() => rollbackBtn.classList.add('show'));
+  }
+
+  /* 원상 복구 */
+  function deactivate() {
+    active = false;
+    clicks = 0;
+    document.body.classList.remove('chicken-mode');
+    if (rainTimer) { clearInterval(rainTimer); rainTimer = null; }
+    document.querySelectorAll('.chicken-drop').forEach((c) => c.remove());
+    if (rollbackBtn) {
+      const b = rollbackBtn;
+      rollbackBtn = null;
+      b.classList.remove('show');
+      setTimeout(() => b.remove(), 300);
+    }
+  }
+})();
