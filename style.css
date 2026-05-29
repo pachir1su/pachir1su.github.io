@@ -2492,3 +2492,150 @@ html {
   .year-heading { font-size: 1.02rem; }
   .project-count-badge { font-size: 0.66rem; padding: 2px 8px; }
 }
+
+/* ==========================================================================
+   26. GitHub 활동 카드 (#5) — 종이톤 Stats(랭크) + Profile Details
+   ========================================================================== */
+.github-activity {
+  margin-top: 40px;
+  text-align: center;
+}
+.github-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+}
+.gh-card {
+  max-width: 100%;
+  height: auto;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--card);
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.gh-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+.gh-card-stats { width: 460px; }
+.gh-card-summary { width: 100%; max-width: 840px; }
+
+/* ==========================================================================
+   27. 자격증 (#39) — 수상 섹션 하위 블록
+   ========================================================================== */
+.cert-block { margin-top: 44px; }
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+.cert-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cert-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+.cert-icon {
+  font-size: 26px;
+  color: var(--red);
+  flex-shrink: 0;
+}
+.cert-info h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+.cert-desc {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   28. 🐔 치킨 모드 이스터에그 (#38) — 글리치 없는 닭 비 + 되돌리기 버튼
+   ========================================================================== */
+.chicken-drop {
+  position: fixed;
+  top: -8vh;
+  z-index: 9998;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform, opacity;
+  animation-name: chicken-fall;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+@keyframes chicken-fall {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translate(var(--sway, 0), 116vh) rotate(360deg); opacity: 0.9; }
+}
+.egg-toast {
+  position: fixed;
+  top: 84px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-12px);
+  z-index: 9999;
+  background: var(--card);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-family: var(--font-main);
+  font-weight: 700;
+  box-shadow: 4px 4px 0 var(--red);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease,
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.egg-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.egg-rollback {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink);
+  color: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 11px 18px;
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--red);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.12s ease;
+}
+.egg-rollback.show { opacity: 1; transform: translateY(0); }
+.egg-rollback:hover {
+  transform: translateY(-1px);
+  box-shadow: 5px 5px 0 var(--red);
+}
+.egg-rollback:active {
+  transform: translateY(2px);
+  box-shadow: 1px 1px 0 var(--red);
+}
+@media (prefers-reduced-motion: reduce) {
+  .chicken-drop { animation-duration: 7s !important; }
+}
