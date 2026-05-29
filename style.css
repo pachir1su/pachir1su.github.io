@@ -2160,8 +2160,8 @@ html {
    43. 프로젝트 카드 넘버링 — 메모지 우측 하단 (Issue #20)
    ========================================================================== */
 
-/* 그리드 단위로 카운터 초기화 후 카드마다 1씩 증가 → 도큐먼트 순서대로 자동 번호 */
-.projects-grid { counter-reset: pcard; }
+/* #projects 섹션 기준으로 카운터 1회 초기화 → 연도 그룹 구분 없이 전체 통합 번호 (#20) */
+#projects { counter-reset: pcard; }
 .project-card { counter-increment: pcard; }
 .project-num {
   position: absolute;
@@ -2465,6 +2465,23 @@ html {
 .contact-email.copied i { color: var(--cyan); }
 .contact-email.copied .copy-hint { color: var(--cyan); }
 
+/* --- 총 프로젝트 수 배지 (#20) — subsection-label 안에 인라인으로 표시 --- */
+.project-count-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--red);
+  background: var(--red-soft);
+  border: 1px dashed var(--red-margin);
+  border-radius: 2px;
+  padding: 2px 10px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
 /* --- 반응형 보정 --- */
 @media (max-width: 600px) {
   .featured-grid { gap: 18px; }
@@ -2473,4 +2490,5 @@ html {
   .project-filters { gap: 6px; }
   .pfilter { font-size: 0.72rem; padding: 6px 10px; }
   .year-heading { font-size: 1.02rem; }
+  .project-count-badge { font-size: 0.66rem; padding: 2px 8px; }
 }
