@@ -1,0 +1,79 @@
+<!doctype html>
+<!-- =====================================================================
+     404 페이지 — GitHub Pages가 미존재 경로에 자동 서빙.
+     어떤 깊이의 경로에서도 깨지지 않도록 에셋은 인라인 + 절대경로(/)만 사용.
+     ===================================================================== -->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 — 페이지를 찾을 수 없어요 | 이건영</title>
+    <meta name="robots" content="noindex" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
+    />
+    <style>
+      /* 노트/종이 테마 — 메인 사이트와 톤 통일 (인라인이라 의존성 0) */
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      :root {
+        --paper: #f6f1e0;
+        --ink: #1f1c14;
+        --muted: #6b6453;
+        --red: #c63b3b;
+        --line: rgba(31, 28, 20, 0.12);
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--paper);
+        /* 노트 가로줄 + 빨간 마진선 */
+        background-image:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(198, 59, 59, 0.18) 2px, transparent 2px);
+        background-size: 100% 32px, 100% 100%;
+        background-position: 0 0, 56px 0;
+        color: var(--ink);
+        font-family: "Noto Sans KR", "Pretendard", system-ui, sans-serif;
+        text-align: center;
+        padding: 24px;
+      }
+      .wrap { max-width: 480px; }
+      .code {
+        font-family: "Space Mono", monospace;
+        font-size: clamp(72px, 18vw, 140px);
+        font-weight: 700;
+        line-height: 1;
+        color: var(--red);
+        letter-spacing: 2px;
+      }
+      h1 { font-size: clamp(20px, 5vw, 28px); margin: 16px 0 8px; }
+      p { color: var(--muted); font-size: 15px; line-height: 1.6; }
+      .home {
+        display: inline-block;
+        margin-top: 28px;
+        padding: 12px 22px;
+        border: 2px solid var(--ink);
+        border-radius: 6px;
+        background: #fffaea;
+        color: var(--ink);
+        text-decoration: none;
+        font-weight: 700;
+        box-shadow: 3px 3px 0 var(--ink);
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+      }
+      .home:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
+      .home:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <div class="code">404</div>
+      <h1>이 페이지는 노트에 없어요 🐔</h1>
+      <p>주소가 바뀌었거나 사라진 페이지일 수 있어요.<br />홈으로 돌아가 다시 둘러봐 주세요.</p>
+      <a class="home" href="/">← 홈으로 돌아가기</a>
+    </main>
+  </body>
+</html>
