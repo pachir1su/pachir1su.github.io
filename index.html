@@ -1,43 +1,68 @@
 <!doctype html>
+<!-- =====================================================================
+     이건영 포트폴리오 — 메인 페이지 (index.html)
+     노트/인덱스카드 테마의 개인 포트폴리오 페이지.
+     섹션 구성: 홈(히어로) → 비전(about) → 역량(skills) → 수상(awards) → 프로젝트(projects)
+     ===================================================================== -->
 <html lang="ko">
   <head>
+    <!-- 문자 인코딩 및 뷰포트 (모바일 반응형 필수) -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>이건영 | Developer & Innovator</title>
+
+    <!-- 파비콘 — 닭 이모지를 SVG 데이터 URI로 인라인 삽입 -->
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
     />
+
+    <!-- Google Fonts 프리커넥트 — 폰트 로딩 속도 향상 -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Caveat(손글씨), Noto Sans KR(본문), Space Mono(코드/모노) -->
     <link
       href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Font Awesome — 아이콘 라이브러리 (fas, fab 클래스) -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <!-- Devicon — 기술 스택 아이콘 라이브러리 (devicon-* 클래스) -->
     <link
       rel="stylesheet"
       type="text/css"
       href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
     />
+
+    <!-- AOS (Animate On Scroll) — 스크롤 진입 시 페이드/슬라이드 애니메이션 -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+    <!-- 메인 스타일시트 — 노트 테마, 카드 레이아웃, 반응형 포함 -->
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <!-- 상단 스크롤 진행도 바 — 스크롤 위치를 퍼센트로 표시 (script.js #11) -->
     <div class="progress-container">
       <div class="progress-bar" id="myBar"></div>
     </div>
+
+    <!-- 맨 위로 버튼 — 300px 이상 스크롤 시 .visible 클래스 추가로 표시 (script.js #3) -->
     <button type="button" id="btn-back-to-top" title="맨 위로">
       <i class="fas fa-arrow-up"></i>
     </button>
 
-    <!-- Cursor -->
+    <!-- 커스텀 커서 — cursor: none으로 기본 커서 숨기고 JS로 위치 추적 (script.js #2) -->
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
 
+    <!-- ============================================================
+         내비게이션 바 — 고정(fixed) 상단 메뉴
+         로고, 섹션 링크, GitHub 링크, 모바일 햄버거 버튼 포함
+         ============================================================ -->
     <nav class="navbar">
       <div class="container nav-content">
         <a href="#" class="logo"
@@ -65,6 +90,7 @@
       </div>
     </nav>
 
+    <!-- 모바일 드롭다운 메뉴 — .open 클래스 토글로 표시/숨김 (script.js #5) -->
     <div class="mobile-menu" id="mobileMenu">
       <a href="#home" onclick="closeMobile()">홈</a>
       <a href="#about" onclick="closeMobile()">비전</a>
@@ -74,6 +100,12 @@
       <a href="https://github.com/pachir1su" target="_blank">GitHub</a>
     </div>
 
+    <!-- ============================================================
+         히어로 섹션 (홈) — 포트폴리오의 첫 인상
+         배경: 노트 줄 + 빨간 마진선 / 부유 아이콘 5개 / 타이핑 효과
+         통계(stat-item): 스크롤 진입 시 카운트업 애니메이션 (script.js #9)
+         부유 아이콘(.fi): JS rAF로 float 및 드래그 가능 (script.js #8)
+         ============================================================ -->
     <!-- HERO -->
     <section id="home" class="hero">
       <div class="hero-grid-bg"></div>
@@ -140,6 +172,10 @@
       </div>
     </section>
 
+    <!-- ============================================================
+         비전 섹션 — 자기소개 및 목표 기술
+         about-card: 노트 카드 스타일 / 형광펜 마커 강조 / chip 배지
+         ============================================================ -->
     <!-- ABOUT -->
     <section id="about" class="section">
       <div class="container">
@@ -185,6 +221,11 @@
       </div>
     </section>
 
+    <!-- ============================================================
+         역량 섹션 — 기술 스택 카드 그리드 (7개 카테고리)
+         data-tilt: 마우스 그림자 추적 효과 (script.js #12)
+         .taped: 스크롤 진입 시 IntersectionObserver로 클래스 추가 (script.js #14)
+         ============================================================ -->
     <!-- SKILLS -->
     <section id="skills" class="section section-alt">
       <div class="container">
@@ -321,6 +362,10 @@
       </div>
     </section>
 
+    <!-- ============================================================
+         수상 섹션 — 수상 이력 3개 (금/청록/동 색상 구분)
+         award-gold: 1위급 금색 / award-cyan: 특별상 / award-bronze: 3위급
+         ============================================================ -->
     <!-- AWARDS -->
     <section id="awards" class="section">
       <div class="container">
@@ -374,6 +419,13 @@
       </div>
     </section>
 
+    <!-- ============================================================
+         프로젝트 섹션 — 전체 프로젝트 목록
+         구성: 대표 프로젝트(featured-card) → 카테고리 필터 → 연도별 그룹 → WIP
+         필터 동작: .pfilter 버튼 클릭 → data-category 속성으로 카드 표시/숨김 (script.js #18)
+         넘버링: CSS counter(pcard) — #projects 기준 전체 통합 번호 (style.css #43, #20)
+         총 프로젝트 수 배지: JS로 동적 계산 후 #projectTotalCount 채움 (script.js #20)
+         ============================================================ -->
     <!-- PROJECTS -->
     <section id="projects" class="section section-alt">
       <div class="container">
@@ -382,7 +434,7 @@
           <h2 class="section-title">프로젝트</h2>
         </div>
 
-        <!-- ===== 대표 프로젝트 (Featured · #29) ===== -->
+        <!-- ===== 대표 프로젝트 (Featured · #29) — 성과가 뚜렷한 3개 선정 ===== -->
         <div class="subsection-label" data-aos="fade-up">
           <i class="fas fa-star"></i> 대표 프로젝트
         </div>
@@ -460,9 +512,14 @@
         </div>
 
         <!-- ===== 전체 프로젝트 + 카테고리 필터 (#28) ===== -->
+
+        <!-- 전체 프로젝트 헤더 — JS로 총 개수 배지를 동적으로 채움 (#20) -->
         <div class="subsection-label" data-aos="fade-up">
           <i class="fas fa-folder-open"></i> 전체 프로젝트
+          <span id="projectTotalCount" class="project-count-badge"></span>
         </div>
+
+        <!-- 카테고리 필터 버튼 — data-filter 값으로 project-card[data-category] 필터링 (script.js #18) -->
         <div class="project-filters" data-aos="fade-up">
           <button type="button" class="pfilter active" data-filter="all">전체</button>
           <button type="button" class="pfilter" data-filter="ai">AI · ML</button>
@@ -473,10 +530,14 @@
           <button type="button" class="pfilter" data-filter="wip">WIP</button>
         </div>
 
-        <!-- ===== 연도별 그룹 (#32) ===== -->
+        <!-- ===== 연도별 그룹 (#32) — 프로젝트를 제작 연도 기준으로 분류 ===== -->
+
+        <!-- 2026년 프로젝트 (5개) -->
         <div class="year-group" data-year="2026">
           <h3 class="year-heading">2026</h3>
           <div class="projects-grid">
+
+            <!-- 한기대 26학번 신입생 가이드 -->
             <div class="project-card" data-category="web" data-tilt data-aos="fade-up">
               <span class="project-num"></span>
               <div class="project-top">
@@ -492,58 +553,9 @@
               <p>한기대 26학번 신입생을 위한 노션 사이트</p>
               <div class="tech-stack"><span>Notion</span><span>Documentation</span></div>
             </div>
-          </div>
-        </div>
 
-        <div class="year-group" data-year="2025">
-          <h3 class="year-heading">2025</h3>
-          <div class="projects-grid">
-            <div class="project-card" data-category="hardware" data-tilt data-aos="fade-up">
-              <span class="project-num"></span>
-              <div class="project-top">
-                <i class="fas fa-id-card project-icon"></i>
-                <div class="project-links">
-                  <a href="projects/BerryIno.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/BerryIno" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
-                </div>
-              </div>
-              <h3>NFC 출석 체크 시스템</h3>
-              <p class="project-subtitle">NFC 태그 기반 자동 출석 체크 IoT</p>
-              <p>NFC 태그를 활용한 효율적인 출석 체크 시스템<br />아두이노와 라즈베리파이 연동으로 데이터 처리</p>
-              <div class="tech-stack"><span>Arduino</span><span>Raspberry Pi</span><span>IoT</span></div>
-            </div>
-
-            <div class="project-card" data-category="hardware contest" data-tilt data-aos="fade-up" data-aos-delay="50">
-              <span class="project-num"></span>
-              <div class="project-top">
-                <i class="fas fa-leaf project-icon"></i>
-                <div class="project-links">
-                  <a href="projects/PlantClock.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/PlantClock" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
-                </div>
-              </div>
-              <h3>식물 타이머</h3>
-              <p class="project-subtitle">식물 관리 스마트 타이머 (해커톤 참가작)</p>
-              <p>2025 선후배와 함께하는 코딩 페스티벌 해커톤 참가작<br />식물 관리를 돕는 스마트 타이머 시스템</p>
-              <div class="tech-stack"><span>IoT</span><span>Hackathon</span></div>
-            </div>
-
-            <div class="project-card" data-category="web" data-tilt data-aos="fade-up" data-aos-delay="100">
-              <span class="project-num"></span>
-              <div class="project-top">
-                <i class="fas fa-heartbeat project-icon"></i>
-                <div class="project-links">
-                  <a href="projects/HEALTH_CHECK_PROJECT.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/HEALTH_CHECK_PROJECT" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
-                </div>
-              </div>
-              <h3>헬스 케어 시스템</h3>
-              <p class="project-subtitle">건강 데이터 기록·모니터링 시스템</p>
-              <p>사용자 맞춤형 헬스케어 시스템<br />건강 데이터를 기록하고 모니터링하는 기능 구현</p>
-              <div class="tech-stack"><span>Healthcare</span><span>Data</span></div>
-            </div>
-
-            <div class="project-card" data-category="web" data-tilt data-aos="fade-up" data-aos-delay="150">
+            <!-- File Swordmaster -->
+            <div class="project-card" data-category="web" data-tilt data-aos="fade-up" data-aos-delay="50">
               <span class="project-num"></span>
               <div class="project-top">
                 <i class="fas fa-file-code project-icon"></i>
@@ -559,7 +571,8 @@
               <div class="tech-stack"><span>Python</span><span>Gradio</span><span>PyPDF</span></div>
             </div>
 
-            <div class="project-card" data-category="ai discord" data-tilt data-aos="fade-up" data-aos-delay="200">
+            <!-- 데일리 리포트 AI -->
+            <div class="project-card" data-category="ai discord" data-tilt data-aos="fade-up" data-aos-delay="100">
               <span class="project-num"></span>
               <div class="project-top">
                 <i class="fab fa-discord project-icon"></i>
@@ -574,7 +587,8 @@
               <div class="tech-stack"><span>Gemini API</span><span>discord.py</span><span>자동화</span></div>
             </div>
 
-            <div class="project-card" data-category="ai" data-tilt data-aos="fade-up" data-aos-delay="250">
+            <!-- MultiMind -->
+            <div class="project-card" data-category="ai" data-tilt data-aos="fade-up" data-aos-delay="150">
               <span class="project-num"></span>
               <div class="project-top">
                 <i class="fas fa-brain project-icon"></i>
@@ -589,7 +603,8 @@
               <div class="tech-stack"><span>Python</span><span>pyautogui</span><span>tkinter</span><span>Multi-Agent</span></div>
             </div>
 
-            <div class="project-card" data-category="ai" data-tilt data-aos="fade-up" data-aos-delay="300">
+            <!-- 기술과사회 -->
+            <div class="project-card" data-category="ai" data-tilt data-aos="fade-up" data-aos-delay="200">
               <span class="project-num"></span>
               <div class="project-top">
                 <i class="fas fa-chart-line project-icon"></i>
@@ -602,12 +617,104 @@
               <p>델파이 기법을 이용한 일·직업과 삶의 미래 예측<br />AI 시뮬레이션 델파이 조사 · 발표 프로젝트</p>
               <div class="tech-stack"><span>Delphi Method</span><span>Claude</span><span>Gemini</span><span>Chart.js</span></div>
             </div>
+
           </div>
         </div>
 
+        <!-- 2025년 프로젝트 (5개) -->
+        <div class="year-group" data-year="2025">
+          <h3 class="year-heading">2025</h3>
+          <div class="projects-grid">
+
+            <!-- NFC 출석 체크 시스템 -->
+            <div class="project-card" data-category="hardware" data-tilt data-aos="fade-up">
+              <span class="project-num"></span>
+              <div class="project-top">
+                <i class="fas fa-id-card project-icon"></i>
+                <div class="project-links">
+                  <a href="projects/BerryIno.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                  <a href="https://github.com/pachir1su/BerryIno" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+              </div>
+              <h3>NFC 출석 체크 시스템</h3>
+              <p class="project-subtitle">NFC 태그 기반 자동 출석 체크 IoT</p>
+              <p>NFC 태그를 활용한 효율적인 출석 체크 시스템<br />아두이노와 라즈베리파이 연동으로 데이터 처리</p>
+              <div class="tech-stack"><span>Arduino</span><span>Raspberry Pi</span><span>IoT</span></div>
+            </div>
+
+            <!-- 식물 타이머 -->
+            <div class="project-card" data-category="hardware contest" data-tilt data-aos="fade-up" data-aos-delay="50">
+              <span class="project-num"></span>
+              <div class="project-top">
+                <i class="fas fa-leaf project-icon"></i>
+                <div class="project-links">
+                  <a href="projects/PlantClock.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                  <a href="https://github.com/pachir1su/PlantClock" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+              </div>
+              <h3>식물 타이머</h3>
+              <p class="project-subtitle">식물 관리 스마트 타이머 (해커톤 참가작)</p>
+              <p>2025 선후배와 함께하는 코딩 페스티벌 해커톤 참가작<br />식물 관리를 돕는 스마트 타이머 시스템</p>
+              <div class="tech-stack"><span>IoT</span><span>Hackathon</span></div>
+            </div>
+
+            <!-- 헬스 케어 시스템 -->
+            <div class="project-card" data-category="web" data-tilt data-aos="fade-up" data-aos-delay="100">
+              <span class="project-num"></span>
+              <div class="project-top">
+                <i class="fas fa-heartbeat project-icon"></i>
+                <div class="project-links">
+                  <a href="projects/HEALTH_CHECK_PROJECT.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                  <a href="https://github.com/pachir1su/HEALTH_CHECK_PROJECT" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+              </div>
+              <h3>헬스 케어 시스템</h3>
+              <p class="project-subtitle">건강 데이터 기록·모니터링 시스템</p>
+              <p>사용자 맞춤형 헬스케어 시스템<br />건강 데이터를 기록하고 모니터링하는 기능 구현</p>
+              <div class="tech-stack"><span>Healthcare</span><span>Data</span></div>
+            </div>
+
+            <!-- 면진봇 -->
+            <div class="project-card" data-category="discord" data-tilt data-aos="fade-up" data-aos-delay="150">
+              <span class="project-num"></span>
+              <div class="project-top">
+                <i class="fab fa-discord project-icon"></i>
+                <div class="project-links">
+                  <a href="projects/MZ_bot.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                  <a href="https://github.com/pachir1su/MZ_bot" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+              </div>
+              <h3>면진봇</h3>
+              <p class="project-subtitle">디스코드 경제 시뮬레이션 봇</p>
+              <p>디스코드 경제 게임 봇</p>
+              <div class="tech-stack"><span>Python</span><span>Discord.py</span></div>
+            </div>
+
+            <!-- 공감 봇 & 레시피 AI -->
+            <div class="project-card" data-category="ai" data-tilt data-aos="fade-up" data-aos-delay="200">
+              <span class="project-num"></span>
+              <div class="project-top">
+                <i class="fas fa-robot project-icon"></i>
+                <div class="project-links">
+                  <a href="projects/Legend_SakSak_GongGam_AI.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                  <a href="https://github.com/pachir1su/Legend_SakSak_GongGam_AI" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+              </div>
+              <h3>공감 봇 & 레시피 AI</h3>
+              <p class="project-subtitle">감정 공감 챗봇 + 식재료 레시피 추천 AI</p>
+              <p>감정 공감 챗봇과 보유 식재료 기반 요리 레시피 추천 AI 서비스</p>
+              <div class="tech-stack"><span>AI</span><span>Gemini API</span><span>Flask</span></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 2024년 프로젝트 (5개) -->
         <div class="year-group" data-year="2024">
           <h3 class="year-heading">2024</h3>
           <div class="projects-grid">
+
+            <!-- 비밀번호 도어락 -->
             <div class="project-card" data-category="hardware contest" data-tilt data-aos="fade-up">
               <span class="project-num"></span>
               <div class="project-top">
@@ -623,6 +730,7 @@
               <div class="tech-stack"><span>Maker</span><span>Creative</span><span>Challenge</span></div>
             </div>
 
+            <!-- 해안 장벽 프로젝트 -->
             <div class="project-card" data-category="hardware" data-tilt data-aos="fade-up" data-aos-delay="50">
               <span class="project-num"></span>
               <div class="project-top">
@@ -638,6 +746,7 @@
               <div class="tech-stack"><span>Engineering</span><span>Environment</span><span>Modeling</span></div>
             </div>
 
+            <!-- 산불 조기 감지 알림 시스템 -->
             <div class="project-card" data-category="ai hardware contest" data-tilt data-aos="fade-up" data-aos-delay="100">
               <span class="project-num"></span>
               <div class="project-top">
@@ -653,6 +762,7 @@
               <div class="tech-stack"><span>Raspberry Pi</span><span>OpenCV</span><span>AI</span></div>
             </div>
 
+            <!-- 2024 SFPC -->
             <div class="project-card" data-category="contest" data-tilt data-aos="fade-up" data-aos-delay="150">
               <span class="project-num"></span>
               <div class="project-top">
@@ -668,6 +778,7 @@
               <div class="tech-stack"><span>Algorithm</span><span>Problem Solving</span><span>C++ / Python</span></div>
             </div>
 
+            <!-- 졸음 방지 시스템 -->
             <div class="project-card" data-category="hardware contest" data-tilt data-aos="fade-up" data-aos-delay="200">
               <span class="project-num"></span>
               <div class="project-top">
@@ -683,39 +794,10 @@
               <div class="tech-stack"><span>Robot</span><span>Embedded</span><span>HuskyLens</span></div>
             </div>
 
-            <div class="project-card" data-category="discord" data-tilt data-aos="fade-up" data-aos-delay="250">
-              <span class="project-num"></span>
-              <div class="project-top">
-                <i class="fab fa-discord project-icon"></i>
-                <div class="project-links">
-                  <a href="projects/MZ_bot.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/MZ_bot" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
-                </div>
-              </div>
-              <h3>면진봇</h3>
-              <p class="project-subtitle">디스코드 경제 시뮬레이션 봇</p>
-              <p>디스코드 경제 게임 봇</p>
-              <div class="tech-stack"><span>Python</span><span>Discord.py</span></div>
-            </div>
-
-            <div class="project-card" data-category="ai" data-tilt data-aos="fade-up" data-aos-delay="300">
-              <span class="project-num"></span>
-              <div class="project-top">
-                <i class="fas fa-robot project-icon"></i>
-                <div class="project-links">
-                  <a href="projects/Legend_SakSak_GongGam_AI.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/Legend_SakSak_GongGam_AI" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
-                </div>
-              </div>
-              <h3>공감 봇 & 레시피 AI</h3>
-              <p class="project-subtitle">감정 공감 챗봇 + 식재료 레시피 추천 AI</p>
-              <p>감정 공감 챗봇과 보유 식재료 기반 요리 레시피 추천 AI 서비스</p>
-              <div class="tech-stack"><span>AI</span><span>Gemini API</span><span>Flask</span></div>
-            </div>
           </div>
         </div>
 
-        <!-- ===== 진행 중 · 예정 (WIP) ===== -->
+        <!-- ===== 진행 중 · 예정 (WIP) — project-wip 클래스 추가로 사선 줄무늬 배경 표시 ===== -->
         <div class="year-group year-group-wip" data-year="wip">
           <h3 class="year-heading">진행 중 · 예정</h3>
           <div class="projects-grid">
@@ -834,6 +916,10 @@
       </div>
     </section>
 
+    <!-- ============================================================
+         푸터 — 로고, 저작권, 소셜 링크(GitHub + 이메일 복사 버튼)
+         이메일 버튼: 클릭 시 클립보드 복사 + 피드백 텍스트 변경 (script.js #19)
+         ============================================================ -->
     <footer>
       <div class="container footer-inner">
         <div class="footer-logo">
@@ -854,7 +940,9 @@
       </div>
     </footer>
 
+    <!-- AOS 라이브러리 JS — CSS보다 나중에 로드, AOS.init()은 script.js에서 호출 -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- 메인 인터랙션 스크립트 — 커서/스크롤/타이핑/필터/넘버링 등 모든 동작 포함 -->
     <script src="script.js"></script>
   </body>
 </html>

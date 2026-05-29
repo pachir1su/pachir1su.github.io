@@ -459,6 +459,7 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
 /* 19. 이메일 클릭 복사 (#30)                                      */
 /*    전역 selectstart 차단 때문에 클릭-복사 방식으로 제공          */
 /* ------------------------------------------------------------- */
+
 (function initEmailCopy() {
   const btn = document.getElementById('copyEmail');
   if (!btn) return;
@@ -496,4 +497,24 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
       }, 1500);
     }
   });
+})();
+
+/* ------------------------------------------------------------- */
+/* 20. 총 프로젝트 수 배지 (#20)                                   */
+/*    .project-card 전체 개수를 세어 #projectTotalCount에 표시    */
+/*    WIP 제외 완료 수와 WIP 수를 구분해서 "N개 완료 · M개 예정"  */
+/* ------------------------------------------------------------- */
+(function initProjectCount() {
+  const badge = document.getElementById('projectTotalCount');
+  if (!badge) return;
+
+  /* WIP 여부는 project-wip 클래스로 구분 */
+  const allCards = document.querySelectorAll('.project-card');
+  let done = 0, wip = 0;
+  allCards.forEach((c) => {
+    if (c.classList.contains('project-wip')) wip++;
+    else done++;
+  });
+
+  badge.textContent = `${done}개 완료 · ${wip}개 예정`;
 })();
