@@ -90,13 +90,18 @@ const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
 if (hamburger && mobileMenu) {
   hamburger.addEventListener('click', () => {
-    mobileMenu.classList.toggle('open');
+    const open = mobileMenu.classList.toggle('open');
     hamburger.classList.toggle('open');
+    // 스크린리더용 펼침 상태 동기화
+    hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
 }
 function closeMobile() {
   if (mobileMenu) mobileMenu.classList.remove('open');
-  if (hamburger) hamburger.classList.remove('open');
+  if (hamburger) {
+    hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+  }
 }
 
 /* ------------------------------------------------------------- */

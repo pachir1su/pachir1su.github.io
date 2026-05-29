@@ -11,6 +11,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>이건영 | Developer & Innovator</title>
 
+    <!-- ===== SEO · 공유(OG/Twitter) · 구조화 데이터 ===== -->
+    <meta
+      name="description"
+      content="이건영(Lee Geon Yeong) 포트폴리오 — 이윤을 넘어 혁신을 추구하는 기업가. AI·하드웨어·웹/앱·정보보안 등 20여 개 프로젝트와 수상 이력을 담았습니다."
+    />
+    <meta name="author" content="이건영 (Lee Geon Yeong)" />
+    <meta
+      name="keywords"
+      content="이건영, Lee Geon Yeong, 포트폴리오, 개발자, AI, 하드웨어, 임베디드, 웹 개발, 정보보안, 한국기술교육대학교"
+    />
+    <meta name="theme-color" content="#c63b3b" />
+    <link rel="canonical" href="https://pachir1su.github.io/" />
+
+    <!-- Open Graph — 카카오톡·디스코드·페이스북 공유 미리보기 -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="이건영 포트폴리오" />
+    <meta property="og:title" content="이건영 | Developer & Innovator" />
+    <meta
+      property="og:description"
+      content="이윤을 넘어 혁신을 추구하는 기업가. AI·하드웨어·웹/앱·정보보안 등 20여 개 프로젝트와 수상 이력."
+    />
+    <meta property="og:url" content="https://pachir1su.github.io/" />
+    <meta property="og:locale" content="ko_KR" />
+    <!-- 임시 OG 이미지: GitHub 아바타. 추후 1200×630 전용 이미지로 교체 권장 -->
+    <meta property="og:image" content="https://github.com/pachir1su.png" />
+    <meta property="og:image:alt" content="이건영 포트폴리오" />
+
+    <!-- Twitter Card (아바타가 정사각이라 summary 사용) -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="이건영 | Developer & Innovator" />
+    <meta
+      name="twitter:description"
+      content="이윤을 넘어 혁신을 추구하는 기업가. AI·하드웨어·웹/앱·정보보안 등 20여 개 프로젝트와 수상 이력."
+    />
+    <meta name="twitter:image" content="https://github.com/pachir1su.png" />
+
+    <!-- 구조화 데이터(JSON-LD) — 검색엔진용 Person 스키마 -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "이건영",
+        "alternateName": "Lee Geon Yeong",
+        "url": "https://pachir1su.github.io/",
+        "image": "https://github.com/pachir1su.png",
+        "jobTitle": "Developer & Innovator",
+        "description": "이윤을 넘어 혁신을 추구하는 기업가를 지향하는 개발자.",
+        "email": "mailto:capybara@koreatech.ac.kr",
+        "sameAs": ["https://github.com/pachir1su"],
+        "knowsAbout": ["AI", "통신", "웹/앱 개발", "임베디드", "하드웨어", "정보보안", "DB", "기획"],
+        "alumniOf": {
+          "@type": "CollegeOrUniversity",
+          "name": "한국기술교육대학교"
+        }
+      }
+    </script>
+
     <!-- 파비콘 — 닭 이모지를 SVG 데이터 URI로 인라인 삽입 -->
     <link
       rel="icon"
@@ -46,18 +103,18 @@
   </head>
   <body>
     <!-- 상단 스크롤 진행도 바 — 스크롤 위치를 퍼센트로 표시 (script.js #11) -->
-    <div class="progress-container">
+    <div class="progress-container" aria-hidden="true">
       <div class="progress-bar" id="myBar"></div>
     </div>
 
     <!-- 맨 위로 버튼 — 300px 이상 스크롤 시 .visible 클래스 추가로 표시 (script.js #3) -->
-    <button type="button" id="btn-back-to-top" title="맨 위로">
+    <button type="button" id="btn-back-to-top" title="맨 위로" aria-label="맨 위로">
       <i class="fas fa-arrow-up"></i>
     </button>
 
     <!-- 커스텀 커서 — cursor: none으로 기본 커서 숨기고 JS로 위치 추적 (script.js #2) -->
-    <div class="cursor-dot"></div>
-    <div class="cursor-outline"></div>
+    <div class="cursor-dot" aria-hidden="true"></div>
+    <div class="cursor-outline" aria-hidden="true"></div>
 
     <!-- ============================================================
          내비게이션 바 — 고정(fixed) 상단 메뉴
@@ -78,13 +135,14 @@
           <li>
             <a
               href="https://github.com/pachir1su"
-              target="_blank"
+              target="_blank" rel="noopener noreferrer"
               class="nav-github"
+              aria-label="GitHub"
               ><i class="fab fa-github"></i
             ></a>
           </li>
         </ul>
-        <button class="hamburger" id="hamburger">
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobileMenu">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -97,7 +155,7 @@
       <a href="#skills" onclick="closeMobile()">역량</a>
       <a href="#awards" onclick="closeMobile()">수상</a>
       <a href="#projects" onclick="closeMobile()">프로젝트</a>
-      <a href="https://github.com/pachir1su" target="_blank">GitHub</a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer">GitHub</a>
     </div>
 
     <!-- ============================================================
@@ -108,10 +166,10 @@
          ============================================================ -->
     <!-- HERO -->
     <section id="home" class="hero">
-      <div class="hero-grid-bg"></div>
-      <div class="hero-glow"></div>
+      <div class="hero-grid-bg" aria-hidden="true"></div>
+      <div class="hero-glow" aria-hidden="true"></div>
 
-      <div class="floating-icons">
+      <div class="floating-icons" aria-hidden="true">
         <i class="devicon-python-plain fi fi-1"></i>
         <i class="devicon-react-original fi fi-2"></i>
         <i class="devicon-java-plain fi fi-3"></i>
@@ -142,7 +200,7 @@
           >
           <a
             href="https://github.com/pachir1su"
-            target="_blank"
+            target="_blank" rel="noopener noreferrer"
             class="btn btn-ghost"
             ><i class="fab fa-github"></i> GitHub</a
           >
@@ -150,7 +208,7 @@
 
         <div class="hero-stats" data-aos="fade-up" data-aos-delay="500">
           <div class="stat-item">
-            <span class="stat-num">10+</span
+            <span class="stat-num">20+</span
             ><span class="stat-label">프로젝트</span>
           </div>
           <div class="stat-divider"></div>
@@ -166,7 +224,7 @@
         </div>
       </div>
 
-      <div class="scroll-hint">
+      <div class="scroll-hint" aria-hidden="true">
         <span>스크롤</span>
         <div class="scroll-line"></div>
       </div>
@@ -211,7 +269,7 @@
           <div class="about-github-link">
             <a
               href="https://github.com/pachir1su"
-              target="_blank"
+              target="_blank" rel="noopener noreferrer"
               class="github-activity-btn"
             >
               <i class="fab fa-github"></i> GitHub 활동 보러가기
@@ -458,8 +516,8 @@
             </div>
             <div class="featured-links">
               <a href="projects/nonofire.html" class="flink flink-primary"><i class="fas fa-arrow-right"></i> 자세히</a>
-              <a href="https://github.com/chae03yb/hstree-makerthon" target="_blank" class="flink"><i class="fab fa-github"></i> GitHub</a>
-              <a href="https://youtu.be/z0q6D7zNWyw?si=26KJn7oKrOzzY4kc" target="_blank" class="flink"><i class="fab fa-youtube"></i> 영상</a>
+              <a href="https://github.com/chae03yb/hstree-makerthon" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
+              <a href="https://youtu.be/z0q6D7zNWyw?si=26KJn7oKrOzzY4kc" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-youtube"></i> 영상</a>
             </div>
           </article>
 
@@ -482,8 +540,8 @@
             </div>
             <div class="featured-links">
               <a href="projects/2024_SFPC.html" class="flink flink-primary"><i class="fas fa-arrow-right"></i> 자세히</a>
-              <a href="https://github.com/pachir1su/2024_SFPC" target="_blank" class="flink"><i class="fab fa-github"></i> GitHub</a>
-              <a href="https://www.kait.re.kr/2024sfpc-summary" target="_blank" class="flink"><i class="fas fa-trophy"></i> 대회 요약</a>
+              <a href="https://github.com/pachir1su/2024_SFPC" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
+              <a href="https://www.kait.re.kr/2024sfpc-summary" target="_blank" rel="noopener noreferrer" class="flink"><i class="fas fa-trophy"></i> 대회 요약</a>
             </div>
           </article>
 
@@ -506,7 +564,7 @@
             </div>
             <div class="featured-links">
               <a href="projects/MultiMind.html" class="flink flink-primary"><i class="fas fa-arrow-right"></i> 자세히</a>
-              <a href="https://github.com/pachir1su/MultiMind" target="_blank" class="flink"><i class="fab fa-github"></i> GitHub</a>
+              <a href="https://github.com/pachir1su/MultiMind" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
             </div>
           </article>
         </div>
@@ -544,8 +602,8 @@
                 <i class="fas fa-book-open project-icon"></i>
                 <div class="project-links">
                   <a href="projects/koreatech_noob_guide.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://capybaracute.notion.site/26-2fca8de5ee5f806db9e9e64464a9ac78" target="_blank" class="plink plink-github" title="Notion"><i class="fas fa-external-link-alt"></i></a>
-                  <a href="https://github.com/pachir1su/koreatech_noob_guide" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://capybaracute.notion.site/26-2fca8de5ee5f806db9e9e64464a9ac78" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="Notion"><i class="fas fa-external-link-alt"></i></a>
+                  <a href="https://github.com/pachir1su/koreatech_noob_guide" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>한기대 26학번 신입생 가이드</h3>
@@ -561,8 +619,8 @@
                 <i class="fas fa-file-code project-icon"></i>
                 <div class="project-links">
                   <a href="projects/file_swordmaster.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://huggingface.co/spaces/capybaranice/file_swordmaster" target="_blank" class="plink plink-github" title="바로가기"><i class="fas fa-external-link-alt"></i></a>
-                  <a href="https://github.com/pachir1su/file_swordmaster" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://huggingface.co/spaces/capybaranice/file_swordmaster" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="바로가기"><i class="fas fa-external-link-alt"></i></a>
+                  <a href="https://github.com/pachir1su/file_swordmaster" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>File Swordmaster</h3>
@@ -578,7 +636,7 @@
                 <i class="fab fa-discord project-icon"></i>
                 <div class="project-links">
                   <a href="projects/computingSAGO.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/computingSAGO" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/computingSAGO" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>데일리 리포트 AI</h3>
@@ -594,7 +652,7 @@
                 <i class="fas fa-brain project-icon"></i>
                 <div class="project-links">
                   <a href="projects/MultiMind.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/MultiMind" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/MultiMind" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>MultiMind</h3>
@@ -633,7 +691,7 @@
                 <i class="fas fa-id-card project-icon"></i>
                 <div class="project-links">
                   <a href="projects/BerryIno.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/BerryIno" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/BerryIno" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>NFC 출석 체크 시스템</h3>
@@ -649,7 +707,7 @@
                 <i class="fas fa-leaf project-icon"></i>
                 <div class="project-links">
                   <a href="projects/PlantClock.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/PlantClock" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/PlantClock" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>식물 타이머</h3>
@@ -665,7 +723,7 @@
                 <i class="fas fa-heartbeat project-icon"></i>
                 <div class="project-links">
                   <a href="projects/HEALTH_CHECK_PROJECT.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/HEALTH_CHECK_PROJECT" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/HEALTH_CHECK_PROJECT" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>헬스 케어 시스템</h3>
@@ -681,7 +739,7 @@
                 <i class="fab fa-discord project-icon"></i>
                 <div class="project-links">
                   <a href="projects/MZ_bot.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/MZ_bot" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/MZ_bot" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>면진봇</h3>
@@ -697,7 +755,7 @@
                 <i class="fas fa-robot project-icon"></i>
                 <div class="project-links">
                   <a href="projects/Legend_SakSak_GongGam_AI.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/Legend_SakSak_GongGam_AI" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/Legend_SakSak_GongGam_AI" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>공감 봇 & 레시피 AI</h3>
@@ -721,7 +779,7 @@
                 <i class="fas fa-hammer project-icon"></i>
                 <div class="project-links">
                   <a href="projects/Master_Creator_Challenge.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/Master_Creator_Challenge" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/Master_Creator_Challenge" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>비밀번호 도어락</h3>
@@ -737,7 +795,7 @@
                 <i class="fas fa-water project-icon"></i>
                 <div class="project-links">
                   <a href="projects/Wall_Sina.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/Wall_Sina" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/Wall_Sina" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>해안 장벽 프로젝트</h3>
@@ -753,7 +811,7 @@
                 <i class="fas fa-fire-extinguisher project-icon"></i>
                 <div class="project-links">
                   <a href="projects/nonofire.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/chae03yb/hstree-makerthon" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/chae03yb/hstree-makerthon" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>산불 조기 감지 알림 시스템</h3>
@@ -769,7 +827,7 @@
                 <i class="fas fa-laptop-code project-icon"></i>
                 <div class="project-links">
                   <a href="projects/2024_SFPC.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/2024_SFPC" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/2024_SFPC" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>2024 SFPC</h3>
@@ -785,7 +843,7 @@
                 <i class="fas fa-robot project-icon"></i>
                 <div class="project-links">
                   <a href="projects/2024_5th_CSRC.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/2024_5th_CSRC" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/2024_5th_CSRC" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <h3>졸음 방지 시스템</h3>
@@ -807,7 +865,7 @@
                 <i class="fas fa-map-marked-alt project-icon"></i>
                 <div class="project-links">
                   <a href="projects/Koreatech_map.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/Koreatech_Map" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/Koreatech_Map" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <div class="wip-badge">진행 예정</div>
@@ -823,7 +881,7 @@
                 <i class="fab fa-discord project-icon"></i>
                 <div class="project-links">
                   <a href="projects/SG_bot.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/SG_bot" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/SG_bot" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <div class="wip-badge">개발 중</div>
@@ -839,7 +897,7 @@
                 <i class="fas fa-wine-glass-alt project-icon"></i>
                 <div class="project-links">
                   <a href="projects/Sibal_Life_Smoking.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/Sibal_Life_Smoking" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/Sibal_Life_Smoking" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <div class="wip-badge">진행 예정</div>
@@ -855,7 +913,7 @@
                 <i class="fas fa-code project-icon"></i>
                 <div class="project-links">
                   <a href="projects/HTML_Viewer.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/HTML_Viewer" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/HTML_Viewer" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <div class="wip-badge">개발 중</div>
@@ -871,7 +929,7 @@
                 <i class="fas fa-flask project-icon"></i>
                 <div class="project-links">
                   <a href="projects/CentrifugeAI.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/CentrifugeAI" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/CentrifugeAI" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <div class="wip-badge">개발 중</div>
@@ -902,7 +960,7 @@
                 <i class="fas fa-user-graduate project-icon"></i>
                 <div class="project-links">
                   <a href="projects/DelphiRec.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/DelphiRec" target="_blank" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://github.com/pachir1su/DelphiRec" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
               <div class="wip-badge">개발 예정</div>
@@ -930,7 +988,7 @@
           &copy; 2026 Lee Geon Yeong. All rights reserved.
         </p>
         <div class="social-links">
-          <a href="https://github.com/pachir1su" target="_blank" title="GitHub"
+          <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub"
             ><i class="fab fa-github"></i
           ></a>
           <button type="button" class="contact-email" id="copyEmail" title="클릭하면 복사됩니다">
@@ -941,8 +999,8 @@
     </footer>
 
     <!-- AOS 라이브러리 JS — CSS보다 나중에 로드, AOS.init()은 script.js에서 호출 -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script defer src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <!-- 메인 인터랙션 스크립트 — 커서/스크롤/타이핑/필터/넘버링 등 모든 동작 포함 -->
-    <script src="script.js"></script>
+    <script defer src="script.js"></script>
   </body>
 </html>
