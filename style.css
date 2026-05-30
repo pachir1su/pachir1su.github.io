@@ -2556,7 +2556,7 @@ html {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   gap: 20px;
   width: 100%;
 }
@@ -2577,8 +2577,8 @@ html {
 /* invert(1)으로 어두운 배경→밝게, hue-rotate(180deg)로 악센트 색상 보정, brightness로 미세 조정 */
 .gh-card-stats  { width: 480px; filter: invert(1) hue-rotate(180deg) brightness(0.9) saturate(1.1); border-radius: 8px; }
 .gh-card-streak { width: 480px; }
-/* 하단 상세 메트릭: 자연 너비(480px) 유지해 선명하게 중앙 정렬 */
-.gh-card-metrics { width: 100%; max-width: 480px; }
+/* 하단 상세 메트릭: 상단 행(Stats+Streak) 너비에 맞춰 중앙 정렬 */
+.gh-card-metrics { width: 100%; max-width: 980px; }
 
 /* ==========================================================================
    27. 자격증 (#39) — 수상 섹션 하위 블록
