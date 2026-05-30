@@ -2494,18 +2494,27 @@ html {
 }
 
 /* ==========================================================================
-   26. GitHub 활동 카드 (#5) — 종이톤 Stats(랭크) + Profile Details
+   26. GitHub 활동 카드 (#5) — Stats(랭크)+Streak 양옆 / 상세 메트릭 하단
    ========================================================================== */
 .github-activity {
   margin-top: 40px;
   text-align: center;
 }
+/* 카드 컨테이너: 상단 행(양옆) + 하단 메트릭을 세로로 쌓음 */
 .github-cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+/* 상단 행: Stats(랭크) + Streak 양옆 배치, 좁은 화면에선 줄바꿈 */
+.gh-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   gap: 20px;
+  width: 100%;
 }
 .gh-card {
   max-width: 100%;
@@ -2520,8 +2529,11 @@ html {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lift);
 }
-.gh-card-stats { width: 460px; }
-.gh-card-summary { width: 100%; max-width: 840px; }
+/* 상단 양옆 카드: 자연 너비로 또렷하게, 좁은 화면에선 100%로 축소 */
+.gh-card-stats  { width: 480px; }
+.gh-card-streak { width: 480px; }
+/* 하단 상세 메트릭: 자연 너비(480px) 유지해 선명하게 중앙 정렬 */
+.gh-card-metrics { width: 100%; max-width: 480px; }
 
 /* ==========================================================================
    27. 자격증 (#39) — 수상 섹션 하위 블록
