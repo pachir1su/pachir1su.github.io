@@ -1,0 +1,376 @@
+<!doctype html>
+<!-- =====================================================================
+     이건영 포트폴리오 — OG 공유 이미지 생성기 (og-image.html)  [이슈 #41]
+     1200×630 카드. 이 페이지를 1200×630 PNG로 내보내 레포 루트에 og-image.png
+     로 커밋하면 카카오톡·디스코드·트위터 공유 미리보기 이미지로 사용됩니다.
+
+     ▶ 내보내는 법 (택1)
+       1) 크롬 개발자도구 → Elements 에서 <div id="og-card"> 선택 →
+          우클릭 'Capture node screenshot' → og-image.png 저장 (가장 정확)
+       2) 브라우저 창을 1200×630 으로 맞추고 화면 캡처
+     ▶ 학교 로고는 assets/koreatech-logo.png 를 사용합니다(없으면 텍스트로 폴백).
+     ===================================================================== -->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>이건영 — OG Image (1200×630)</title>
+    <!-- 생성기 페이지: 검색·공유 색인 제외 (robots.txt 에서도 Disallow) -->
+    <meta name="robots" content="noindex, nofollow" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- 본문은 사이트와 동일 계열(Noto Sans KR), 도메인/모노는 Space Mono -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      /* KOREATECH 오렌지를 포인트로 쓰는 화이트(약간 웜) OG 카드 토큰 */
+      :root {
+        --ink: #1f1c14;
+        --muted: #6b6453;
+        --paper: #fffdf6;
+        --orange: #f4871e;
+        --orange-d: #e2761a;
+        --line: rgba(31, 28, 20, 0.14);
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #e9e4d6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        padding: 40px 20px;
+        min-height: 100vh;
+        font-family: "Noto Sans KR", sans-serif;
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ===== 1200×630 OG 카드 본체 (이 요소만 캡처) ===== */
+      #og-card {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        flex: 0 0 auto;
+        background: radial-gradient(circle at 88% 16%, #fffefa, transparent 42%),
+          var(--paper);
+        overflow: hidden;
+      }
+
+      /* 모서리 오렌지 삼각형 (우상단 / 좌하단) */
+      #og-card .corner-tr {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 230px;
+        height: 230px;
+        background: linear-gradient(135deg, var(--orange), var(--orange-d));
+        clip-path: polygon(100% 0, 0 0, 100% 100%);
+      }
+      #og-card .corner-bl {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 170px;
+        height: 170px;
+        background: linear-gradient(135deg, var(--orange), var(--orange-d));
+        clip-path: polygon(0 0, 0 100%, 100% 100%);
+      }
+      /* 도트 그리드(우상단) */
+      #og-card .dots {
+        position: absolute;
+        top: 74px;
+        right: 124px;
+        width: 150px;
+        height: 86px;
+        opacity: 0.85;
+        background-image: radial-gradient(var(--orange) 2.4px, transparent 2.6px);
+        background-size: 25px 25px;
+      }
+
+      /* 본문 3분할 레이아웃 */
+      #og-card .inner {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        gap: 46px;
+        padding: 74px 80px 92px;
+      }
+
+      /* 좌측: 이름 블록 */
+      #og-card .left {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      #og-card .name {
+        font-size: 108px;
+        font-weight: 900;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+      }
+      #og-card .role {
+        margin-top: 18px;
+        font-size: 31px;
+        font-weight: 700;
+        color: var(--orange);
+        letter-spacing: -0.01em;
+      }
+      #og-card .rule {
+        margin: 22px 0 20px;
+        width: 66px;
+        height: 5px;
+        background: var(--orange);
+        border-radius: 3px;
+      }
+      #og-card .keywords {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 23px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      #og-card .keywords .sep {
+        color: var(--orange);
+      }
+
+      /* 가운데 점선 구분선 (양끝 오렌지 점) */
+      #og-card .vline {
+        align-self: stretch;
+        margin: 44px 6px;
+        width: 0;
+        border-left: 2px dotted rgba(31, 28, 20, 0.28);
+        position: relative;
+      }
+      #og-card .vline::before,
+      #og-card .vline::after {
+        content: "";
+        position: absolute;
+        left: -5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--orange);
+      }
+      #og-card .vline::before {
+        top: -4px;
+      }
+      #og-card .vline::after {
+        bottom: -4px;
+      }
+
+      /* 가운데: 성과 통계 */
+      #og-card .mid {
+        flex: 0 0 332px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      #og-card .stat-big .num {
+        font-size: 66px;
+        font-weight: 900;
+        color: var(--orange);
+        line-height: 1;
+      }
+      #og-card .stat-big .lab {
+        font-size: 21px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      #og-card .mid .div {
+        height: 1px;
+        background: var(--line);
+      }
+      #og-card .stat-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      #og-card .stat-row i {
+        font-size: 30px;
+        color: var(--orange);
+        width: 34px;
+        text-align: center;
+      }
+      #og-card .stat-row .t {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1.2;
+      }
+      #og-card .stat-row .s {
+        font-size: 16px;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+
+      /* 우측: 학교 로고 (없으면 텍스트 폴백) */
+      #og-card .right {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 250px;
+      }
+      #og-card .kt-logo {
+        max-width: 240px;
+        max-height: 220px;
+        width: auto;
+        height: auto;
+        display: block;
+      }
+      #og-card .kt-fallback {
+        display: none;
+        text-align: center;
+        line-height: 1.4;
+      }
+      #og-card.no-logo .kt-logo {
+        display: none;
+      }
+      #og-card.no-logo .kt-fallback {
+        display: block;
+      }
+      #og-card .kt-fallback .k1 {
+        font-size: 25px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+      #og-card .kt-fallback .k2 {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--orange);
+        letter-spacing: 0.06em;
+      }
+
+      /* 하단 좌측 도메인 */
+      #og-card .domain {
+        position: absolute;
+        left: 80px;
+        bottom: 36px;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        font-family: "Space Mono", monospace;
+        font-size: 21px;
+        color: var(--muted);
+      }
+      #og-card .domain i {
+        color: var(--orange);
+        font-size: 22px;
+      }
+
+      /* 캡처 영역 밖 안내 (og-image.png 에는 포함되지 않음) */
+      .hint {
+        max-width: 1200px;
+        font-size: 14px;
+        color: #4a4636;
+        background: #fffdf6;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 12px 16px;
+        line-height: 1.75;
+      }
+      .hint b {
+        color: #c63b3b;
+      }
+      .hint code {
+        font-family: "Space Mono", monospace;
+        background: #efe9da;
+        padding: 1px 6px;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ===== 캡처 대상: 이 요소를 1200×630 PNG 로 내보내 og-image.png 로 저장 ===== -->
+    <div id="og-card">
+      <div class="corner-tr" aria-hidden="true"></div>
+      <div class="corner-bl" aria-hidden="true"></div>
+      <div class="dots" aria-hidden="true"></div>
+
+      <div class="inner">
+        <!-- 좌: 이름 · 역할 · 키워드 -->
+        <div class="left">
+          <div class="name">이건영</div>
+          <div class="role">대학생 개발자 · 혁신의 기업가</div>
+          <div class="rule"></div>
+          <div class="keywords">
+            <span>AI</span><span class="sep">|</span><span>임베디드</span
+            ><span class="sep">|</span><span>웹</span><span class="sep">|</span
+            ><span>보안</span><span class="sep">|</span><span>앱</span>
+          </div>
+        </div>
+
+        <!-- 점선 구분선 -->
+        <div class="vline" aria-hidden="true"></div>
+
+        <!-- 가운데: 정량적 성과 -->
+        <div class="mid">
+          <div class="stat-big">
+            <div class="num">20+</div>
+            <div class="lab">프로젝트</div>
+          </div>
+          <div class="div"></div>
+          <div class="stat-row">
+            <i class="fas fa-trophy"></i>
+            <div>
+              <div class="t">SFPC 전체 8위</div>
+              <div class="s">581팀 중 8위 (1661명)</div>
+            </div>
+          </div>
+          <div class="div"></div>
+          <div class="stat-row">
+            <i class="fas fa-medal"></i>
+            <div>
+              <div class="t">다수 수상</div>
+              <div class="s">메이커톤 · 공모전 외 다수</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 우: 한국기술교육대학교 로고 -->
+        <div class="right">
+          <img
+            class="kt-logo"
+            src="assets/koreatech-logo.png"
+            alt="한국기술교육대학교 KOREATECH"
+            onerror="document.getElementById('og-card').classList.add('no-logo')"
+          />
+          <div class="kt-fallback">
+            <div class="k1">한국기술교육대학교</div>
+            <div class="k2">KOREATECH</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 하단 도메인 -->
+      <div class="domain"><i class="fas fa-globe"></i> pachir1su.github.io</div>
+    </div>
+
+    <!-- 화면 안내 (캡처 영역 밖) -->
+    <div class="hint">
+      이 카드를 <b>1200×630 PNG</b>로 내보내 레포 루트에 <code>og-image.png</code>
+      로 커밋하세요. 크롬 개발자도구에서 <code>&lt;div id="og-card"&gt;</code>
+      요소를 우클릭 → <b>Capture node screenshot</b> 이 가장 정확합니다. 학교 로고는
+      <code>assets/koreatech-logo.png</code> 를 사용합니다(없으면 텍스트로 표시).
+    </div>
+  </body>
+</html>
