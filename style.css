@@ -2551,11 +2551,12 @@ html {
   align-items: center;
   gap: 20px;
 }
-/* 상단 행: Stats + Streak 세로 스택, 중앙 정렬 */
+/* 상단 행: Stats(랭크) + Streak 양옆 배치, 좁은 화면에선 줄바꿈 */
 .gh-row {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
   gap: 20px;
   width: 100%;
 }
@@ -2572,9 +2573,9 @@ html {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lift);
 }
-/* 각 카드: 동일 max-width로 통일, 세로 스택에서 일관된 너비 */
-.gh-card-stats  { width: 100%; max-width: 480px; filter: invert(1) hue-rotate(180deg) brightness(0.9) saturate(1.1); border-radius: 8px; }
-.gh-card-streak { width: 100%; max-width: 480px; }
+/* Stats/Streak: 480px 고정, filter 없이 원본 SVG 그대로 표시 */
+.gh-card-stats  { width: 480px; border-radius: 8px; }
+.gh-card-streak { width: 480px; }
 .gh-card-metrics { width: 100%; max-width: 480px; }
 
 /* ==========================================================================
