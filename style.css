@@ -2574,7 +2574,8 @@ html {
   box-shadow: var(--shadow-lift);
 }
 /* 상단 양옆 카드: 자연 너비로 또렷하게, 좁은 화면에선 100%로 축소 */
-.gh-card-stats  { width: 480px; }
+/* invert(1)으로 어두운 배경→밝게, hue-rotate(180deg)로 악센트 색상 보정, brightness로 미세 조정 */
+.gh-card-stats  { width: 480px; filter: invert(1) hue-rotate(180deg) brightness(0.9) saturate(1.1); border-radius: 8px; }
 .gh-card-streak { width: 480px; }
 /* 하단 상세 메트릭: 자연 너비(480px) 유지해 선명하게 중앙 정렬 */
 .gh-card-metrics { width: 100%; max-width: 480px; }
