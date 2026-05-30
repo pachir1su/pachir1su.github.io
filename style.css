@@ -63,7 +63,6 @@ body {
   color: var(--ink);
   line-height: 1.7;
   overflow-x: hidden;
-  cursor: none;
   background-image:
     radial-gradient(circle at 18% 22%, rgba(184, 138, 26, 0.04), transparent 40%),
     radial-gradient(circle at 82% 78%, rgba(198, 59, 59, 0.03), transparent 45%);
@@ -71,7 +70,6 @@ body {
 a {
   color: inherit;
   text-decoration: none;
-  cursor: none;
 }
 ul {
   list-style: none;
@@ -80,7 +78,7 @@ button {
   font-family: inherit;
   background: none;
   border: none;
-  cursor: none;
+  cursor: pointer;
   color: inherit;
 }
 img,
@@ -147,30 +145,6 @@ p {
 #btn-back-to-top:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lift);
-}
-
-/* 6. Custom cursor */
-.cursor-dot {
-  position: fixed;
-  width: 8px;
-  height: 8px;
-  background: var(--red);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: transform 0.05s;
-}
-.cursor-outline {
-  position: fixed;
-  width: 36px;
-  height: 36px;
-  border: 1.5px solid rgba(198, 59, 59, 0.5);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
 /* 7. Navbar */
@@ -382,14 +356,14 @@ p {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 38px 28px 28px 64px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
   box-shadow: var(--shadow-soft);
 }
 .about-card:hover,
 .skill-card:hover,
 .award-card:hover,
 .project-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-lift);
 }
 
@@ -621,8 +595,8 @@ p {
   box-shadow: 0 4px 0 #7a1f1f;
 }
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 #7a1f1f;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #7a1f1f;
 }
 .btn-ghost {
   background: var(--card);
@@ -631,7 +605,7 @@ p {
 }
 .btn-ghost:hover {
   background: var(--paper-2);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .hero-stats {
@@ -997,7 +971,7 @@ p {
 .plink-detail:hover {
   background: var(--red);
   color: var(--card);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 .plink-github {
   color: var(--text-muted);
@@ -1005,7 +979,7 @@ p {
 .plink-github:hover {
   background: var(--ink);
   color: var(--card);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 .project-card h3 {
   font-size: 1.05rem;
@@ -1146,7 +1120,7 @@ p {
     transform: translateY(0) rotate(0deg);
   }
   50% {
-    transform: translateY(-22px) rotate(6deg);
+    transform: translateY(-11px) rotate(3deg);
   }
 }
 @keyframes blink {
@@ -1161,28 +1135,17 @@ p {
 @keyframes scrollPulse {
   0%,
   100% {
-    opacity: 0.4;
+    opacity: 0.5;
     transform: scaleY(1);
   }
   50% {
     opacity: 1;
-    transform: scaleY(1.2);
+    transform: scaleY(1.1);
   }
 }
 
 /* 17. Media queries */
 @media (max-width: 768px) {
-  body {
-    cursor: auto;
-  }
-  a,
-  button {
-    cursor: auto;
-  }
-  .cursor-dot,
-  .cursor-outline {
-    display: none;
-  }
   .nav-links {
     display: none;
   }
@@ -1479,13 +1442,6 @@ p {
    19. 인터랙션 팩 — 잉크 트레일 / 도장 / 드래그 / 단축키 힌트
    ========================================================================== */
 
-/* 잉크 트레일 제거 (거슬림 — 제거됨) */
-
-/* 커서 강조 (링크/버튼 호버) */
-.cursor-outline.cursor-link {
-  background: rgba(198, 59, 59, 0.08);
-}
-
 /* 도장 클릭 효과 */
 .stamp-pop {
   position: fixed;
@@ -1502,7 +1458,7 @@ p {
   --stamp-rot: -12deg;
   transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(0);
   opacity: 0;
-  animation: stamp-pop 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: stamp-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   text-shadow: 0 0 1px var(--red);
 }
 .stamp-pop::before,
@@ -1522,19 +1478,15 @@ p {
 }
 @keyframes stamp-pop {
   0% {
-    transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(0.4);
+    transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(0.6);
     opacity: 0;
   }
-  25% {
-    transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(1.25);
-    opacity: 1;
-  }
-  45% {
-    transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(0.95);
+  30% {
+    transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(1.1);
     opacity: 1;
   }
   100% {
-    transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(0.85) translateY(-18px);
+    transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(0.9) translateY(-10px);
     opacity: 0;
   }
 }
@@ -1595,42 +1547,42 @@ p {
 
 @keyframes floatA {
   0%, 100% {
-    transform: translate(calc(var(--drag-x, 0px)), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(-6deg);
+    transform: translate(calc(var(--drag-x, 0px)), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(-3deg);
   }
   50% {
-    transform: translate(calc(var(--drag-x, 0px) + 12px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 22px)) rotate(2deg);
+    transform: translate(calc(var(--drag-x, 0px) + 6px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 11px)) rotate(1deg);
   }
 }
 @keyframes floatB {
   0%, 100% {
-    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(4deg);
+    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(2deg);
   }
   50% {
-    transform: translate(calc(var(--drag-x, 0px) - 18px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 16px)) rotate(-3deg);
+    transform: translate(calc(var(--drag-x, 0px) - 9px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 8px)) rotate(-1.5deg);
   }
 }
 @keyframes floatC {
   0%, 100% {
-    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(-3deg);
+    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(-1.5deg);
   }
   50% {
-    transform: translate(calc(var(--drag-x, 0px) + 8px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 26px)) rotate(5deg);
+    transform: translate(calc(var(--drag-x, 0px) + 4px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 13px)) rotate(2.5deg);
   }
 }
 @keyframes floatD {
   0%, 100% {
-    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(5deg);
+    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(2.5deg);
   }
   50% {
-    transform: translate(calc(var(--drag-x, 0px) - 10px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 20px)) rotate(-4deg);
+    transform: translate(calc(var(--drag-x, 0px) - 5px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 10px)) rotate(-2deg);
   }
 }
 @keyframes floatE {
   0%, 100% {
-    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(-4deg);
+    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(-2deg);
   }
   50% {
-    transform: translate(calc(var(--drag-x, 0px) + 14px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 18px)) rotate(3deg);
+    transform: translate(calc(var(--drag-x, 0px) + 7px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 9px)) rotate(1.5deg);
   }
 }
 
@@ -1641,7 +1593,7 @@ p {
 .nav-links a::after {
   transform: scaleX(0);
   transform-origin: left center;
-  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.25s;
+  transition: transform 0.2s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.15s;
   opacity: 1;
 }
 .nav-links a:hover::after {
@@ -1721,17 +1673,17 @@ p {
   --shadow-x: 0px;
   --shadow-y: 6px;
   box-shadow:
-    var(--shadow-x) var(--shadow-y) 18px rgba(31, 28, 20, 0.1),
+    var(--shadow-x) var(--shadow-y) 14px rgba(31, 28, 20, 0.08),
     0 1px 0 rgba(31, 28, 20, 0.04);
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 .about-card:hover,
 .skill-card:hover,
 .award-card:hover,
 .project-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow:
-    var(--shadow-x) calc(var(--shadow-y) + 12px) 28px rgba(31, 28, 20, 0.16),
+    var(--shadow-x) calc(var(--shadow-y) + 6px) 20px rgba(31, 28, 20, 0.12),
     0 1px 0 rgba(31, 28, 20, 0.04);
 }
 
@@ -1742,27 +1694,27 @@ p {
 .project-card .project-icon,
 .skill-card .skill-icon,
 .award-card .award-icon {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .project-card.taped .project-icon,
 .skill-card.taped .skill-icon,
 .award-card.taped .award-icon {
-  animation: icon-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: icon-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 @keyframes icon-pop {
-  0% { transform: scale(0.6) rotate(-12deg); opacity: 0; }
-  60% { transform: scale(1.18) rotate(6deg); opacity: 1; }
+  0% { transform: scale(0.8) rotate(-6deg); opacity: 0; }
+  60% { transform: scale(1.08) rotate(3deg); opacity: 1; }
   100% { transform: scale(1) rotate(0); opacity: 1; }
 }
 
 /* 카드 호버 시 푸시핀 살짝 흔들 */
 .project-card:hover::before {
-  animation: pin-wobble 0.5s ease-in-out;
+  animation: pin-wobble 0.3s ease-in-out;
 }
 @keyframes pin-wobble {
   0%, 100% { transform: rotate(0); }
-  25% { transform: rotate(-8deg) translateY(-1px); }
-  75% { transform: rotate(8deg) translateY(-1px); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
 }
 
 /* WIP 배지 호버 시 살짝 떨림 */
@@ -1770,13 +1722,11 @@ p {
   transition: transform 0.2s ease;
 }
 .project-card:hover .wip-badge {
-  animation: badge-wiggle 0.45s ease-in-out;
+  animation: badge-wiggle 0.25s ease-in-out;
 }
 @keyframes badge-wiggle {
   0%, 100% { transform: rotate(-2deg); }
-  25% { transform: rotate(-6deg) translateX(-1px); }
-  50% { transform: rotate(0deg); }
-  75% { transform: rotate(-4deg) translateX(1px); }
+  50% { transform: rotate(-4deg); }
 }
 
 /* ==========================================================================
@@ -1789,14 +1739,12 @@ p {
 }
 .logo.wobble,
 .footer-logo.wobble {
-  animation: logo-wobble 0.55s ease-in-out;
+  animation: logo-wobble 0.3s ease-in-out;
 }
 @keyframes logo-wobble {
   0%, 100% { transform: rotate(0); }
-  15% { transform: rotate(-6deg) scale(1.05); }
-  30% { transform: rotate(5deg); }
-  45% { transform: rotate(-3deg); }
-  60% { transform: rotate(2deg); }
+  20% { transform: rotate(-3deg) scale(1.02); }
+  50% { transform: rotate(2.5deg); }
   80% { transform: rotate(-1deg); }
 }
 
@@ -1805,12 +1753,12 @@ p {
    ========================================================================== */
 
 body.page-entry {
-  animation: page-land 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: page-land 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes page-land {
-  0% { opacity: 0.2; transform: translateY(-12px) rotate(-0.4deg); }
-  60% { opacity: 1; transform: translateY(2px) rotate(0.15deg); }
-  100% { opacity: 1; transform: translateY(0) rotate(0); }
+  0% { opacity: 0.4; transform: translateY(-6px); }
+  60% { opacity: 1; transform: translateY(1px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 /* ==========================================================================
@@ -1879,11 +1827,11 @@ body::before {
   pointer-events: none;
   z-index: 0;
   filter: blur(2px);
-  animation: ink-drift 14s ease-in-out infinite;
+  animation: ink-drift 20s ease-in-out infinite;
 }
 @keyframes ink-drift {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-12px, 8px) scale(1.1); }
+  50% { transform: translate(-6px, 4px) scale(1.05); }
 }
 
 /* 손글씨 잔흔 (about-quote 옆) */
@@ -2019,11 +1967,11 @@ html {
    ========================================================================== */
 
 .stat-item {
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
 }
 .stat-item:hover {
-  box-shadow: 3px 8px 16px rgba(31, 28, 20, 0.18);
-  transform: rotate(0) translateY(-5px);
+  box-shadow: 2px 5px 10px rgba(31, 28, 20, 0.14);
+  transform: rotate(0) translateY(-3px);
   z-index: 2;
 }
 
@@ -2100,8 +2048,6 @@ html {
    ========================================================================== */
 
 .fi,
-.cursor-dot,
-.cursor-outline,
 .progress-bar,
 #btn-back-to-top {
   will-change: transform;
@@ -2426,10 +2372,10 @@ html {
   border: 1.5px dashed var(--line);
   border-radius: 2px;
   padding: 7px 14px;
-  cursor: none;
+  cursor: pointer;
   transition: transform 0.15s, background 0.2s, color 0.2s, border-color 0.2s;
 }
-.pfilter:hover { transform: translateY(-2px); color: var(--ink); border-color: var(--red-margin); }
+.pfilter:hover { transform: translateY(-1px); color: var(--ink); border-color: var(--red-margin); }
 .pfilter.active {
   background: var(--red);
   color: var(--card);
@@ -2493,11 +2439,11 @@ html {
   border: 1px dashed var(--line);
   border-radius: 2px;
   padding: 8px 12px;
-  cursor: none;
+  cursor: pointer;
   transition: color 0.2s, border-color 0.2s, transform 0.2s;
 }
 .contact-email i { color: var(--red); }
-.contact-email:hover { color: var(--red); border-color: var(--red-margin); transform: translateY(-1px); }
+.contact-email:hover { color: var(--red); border-color: var(--red-margin); }
 .contact-email .copy-hint {
   font-family: var(--font-mono);
   font-size: 0.66rem;
