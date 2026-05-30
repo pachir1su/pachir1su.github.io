@@ -1,7 +1,8 @@
 # pachir1su.github.io — 크롤러 정책
 User-agent: *
 Allow: /
-# 디자인 시안(미공개)은 색인 제외
+# 디자인 시안·생성기(미공개)는 색인 제외
 Disallow: /preview.html
+Disallow: /og-image.html
 
 Sitemap: https://pachir1su.github.io/sitemap.xml

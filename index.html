@@ -34,18 +34,21 @@
     />
     <meta property="og:url" content="https://pachir1su.github.io/" />
     <meta property="og:locale" content="ko_KR" />
-    <!-- 임시 OG 이미지: GitHub 아바타. 추후 1200×630 전용 이미지로 교체 권장 -->
-    <meta property="og:image" content="https://github.com/pachir1su.png" />
-    <meta property="og:image:alt" content="이건영 포트폴리오" />
+    <!-- 전용 OG 이미지(1200×630) — 레포의 og-image.html 을 내보낸 결과물(og-image.png) -->
+    <meta property="og:image" content="https://pachir1su.github.io/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="이건영 포트폴리오 — 대학생 개발자·혁신의 기업가" />
 
-    <!-- Twitter Card (아바타가 정사각이라 summary 사용) -->
-    <meta name="twitter:card" content="summary" />
+    <!-- Twitter Card — 1200×630 대형 이미지 카드 -->
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="이건영 | Developer & Innovator" />
     <meta
       name="twitter:description"
       content="이윤을 넘어 혁신을 추구하는 기업가. AI·하드웨어·웹/앱·정보보안 등 20여 개 프로젝트와 수상 이력."
     />
-    <meta name="twitter:image" content="https://github.com/pachir1su.png" />
+    <meta name="twitter:image" content="https://pachir1su.github.io/og-image.png" />
 
     <!-- 구조화 데이터(JSON-LD) — 검색엔진용 Person 스키마 -->
     <script type="application/ld+json">
@@ -265,6 +268,21 @@
               <i class="fas fa-lightbulb"></i> 아이디어 뱅크
             </div>
             <div class="chip"><i class="fas fa-users"></i> 팀장 경험 多</div>
+          </div>
+          <!-- 학력 배지 (#41 연계) — 한국기술교육대학교 소속 표시. 로고: assets/koreatech-logo.png, 로드 실패 시 아이콘+텍스트 폴백 -->
+          <div class="about-edu" aria-label="학력: 한국기술교육대학교 재학">
+            <img
+              class="edu-logo"
+              src="assets/koreatech-logo.png"
+              alt="한국기술교육대학교 KOREATECH 로고"
+              loading="lazy"
+              onerror="this.style.display='none';this.closest('.about-edu').classList.add('edu-no-logo');"
+            />
+            <i class="fas fa-graduation-cap edu-fallback" aria-hidden="true"></i>
+            <div class="edu-text">
+              <span class="edu-school">한국기술교육대학교</span>
+              <span class="edu-sub">KOREATECH · 재학 중</span>
+            </div>
           </div>
           <div class="about-github-link">
             <a

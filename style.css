@@ -779,6 +779,50 @@ p {
   color: var(--ink);
 }
 
+/* --- 학력 배지 (#41) — 비전 섹션 소속(한국기술교육대학교) 표시. 종이 카드 + KOREATECH 오렌지 포인트 --- */
+.about-edu {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 22px;
+  padding: 10px 16px 10px 13px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 3px solid #f4871e;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+.about-edu .edu-logo {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+.about-edu .edu-fallback {
+  display: none; /* 로고 로드 실패 시에만 표시 */
+  font-size: 1.7rem;
+  color: #f4871e;
+  line-height: 1;
+}
+.about-edu.edu-no-logo .edu-fallback {
+  display: inline-flex;
+}
+.about-edu .edu-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.about-edu .edu-school {
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--ink);
+}
+.about-edu .edu-sub {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
 /* 12. Skills */
 .skills-grid {
   display: grid;
