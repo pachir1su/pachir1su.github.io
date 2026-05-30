@@ -303,11 +303,11 @@
           <div class="github-cards">
             <!-- 상단: Stats(랭크) + Streak 양옆 배치 -->
             <div class="gh-row">
-              <!-- jsDelivr CDN (안정적) + CSS filter로 다크→종이톤 변환 (style.css .gh-card-stats) -->
+              <!-- raw.githubusercontent.com: CDN 캐시 없이 항상 최신 SVG 직접 로드 -->
               <img
                 class="gh-card gh-card-stats"
                 loading="lazy"
-                src="https://cdn.jsdelivr.net/gh/pachir1su/pachir1su@main/github-stats.svg"
+                src="https://raw.githubusercontent.com/pachir1su/pachir1su/main/github-stats.svg"
                 alt="pachir1su님의 GitHub 통계 — 스타·커밋·PR·이슈·랭크"
               />
               <!-- 실시간 갱신: GitHub Streak Stats (종이톤 커스텀 색상) -->
@@ -319,11 +319,11 @@
               />
             </div>
             <!-- 하단: 상세 메트릭(활동·커뮤니티·사용 언어) 전체 너비 -->
-            <!-- 일일 자동 생성: pachir1su 프로필 저장소의 github-metrics.svg (jsDelivr CDN) -->
+            <!-- raw.githubusercontent.com: CDN 캐시 없이 항상 최신 SVG 직접 로드 -->
             <img
               class="gh-card gh-card-metrics"
               loading="lazy"
-              src="https://cdn.jsdelivr.net/gh/pachir1su/pachir1su@main/github-metrics.svg"
+              src="https://raw.githubusercontent.com/pachir1su/pachir1su/main/github-metrics.svg"
               alt="pachir1su님의 GitHub 상세 메트릭 — 활동·커뮤니티·사용 언어"
             />
           </div>
