@@ -14,38 +14,8 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 /* 1. AOS (기존)                                                  */
 /* ------------------------------------------------------------- */
 if (typeof AOS !== 'undefined') {
-  AOS.init({ once: true, duration: 700, easing: 'ease-out-cubic' });
+  AOS.init({ once: true, duration: 400, easing: 'ease-out-cubic' });
 }
-
-/* ------------------------------------------------------------- */
-/* 2. 커스텀 커서 (잉크 트레일 제거됨)                              */
-/* ------------------------------------------------------------- */
-(function initCursor() {
-  const dot = document.querySelector('.cursor-dot');
-  const outline = document.querySelector('.cursor-outline');
-  if (!dot || !outline) return;
-
-  document.addEventListener('mousemove', (e) => {
-    dot.style.left = e.clientX + 'px';
-    dot.style.top = e.clientY + 'px';
-    outline.style.left = e.clientX + 'px';
-    outline.style.top = e.clientY + 'px';
-  });
-
-  // 링크/버튼 호버 시 outline 강조
-  document.querySelectorAll('a, button').forEach((el) => {
-    el.addEventListener('mouseenter', () => {
-      outline.style.transform = 'translate(-50%,-50%) scale(1.6)';
-      outline.style.borderColor = 'rgba(198,59,59,0.85)';
-      outline.classList.add('cursor-link');
-    });
-    el.addEventListener('mouseleave', () => {
-      outline.style.transform = 'translate(-50%,-50%) scale(1)';
-      outline.style.borderColor = 'rgba(198,59,59,0.5)';
-      outline.classList.remove('cursor-link');
-    });
-  });
-})();
 
 /* ------------------------------------------------------------- */
 /* 3. 프로그레스 바 + Back-to-top (기존, scroll listener 통합)      */
@@ -131,12 +101,12 @@ document.addEventListener('mousedown', (e) => {
       const stamp = document.createElement('div');
       stamp.className = 'stamp-pop';
       stamp.textContent = stampWords[Math.floor(Math.random() * stampWords.length)];
-      const rot = -15 + Math.random() * 30;
+      const rot = -8 + Math.random() * 16;
       stamp.style.setProperty('--stamp-rot', rot + 'deg');
       stamp.style.left = e.clientX + 'px';
       stamp.style.top = e.clientY + 'px';
       document.body.appendChild(stamp);
-      setTimeout(() => stamp.remove(), 900);
+      setTimeout(() => stamp.remove(), 500);
     });
   });
 })();
@@ -159,12 +129,12 @@ document.addEventListener('mousedown', (e) => {
       scrollY: 0,
       phase: Math.random() * Math.PI * 2,
       // 5개 패턴
-      ampX: [12, -18, 8, -10, 14][i] || 10,
-      ampY: [-22, -16, -26, -20, -18][i] || -20,
-      speed: [0.00075, 0.00067, 0.0006, 0.0008, 0.00055][i] || 0.0007,
-      rotBase: [-6, 4, -3, 5, -4][i] || 0,
-      rotAmp: [8, -7, 8, -9, 7][i] || 8,
-      parallax: [0.18, 0.12, -0.1, 0.22, -0.16][i] || 0.15,
+      ampX: [6, -9, 4, -5, 7][i] || 5,
+      ampY: [-11, -8, -13, -10, -9][i] || -10,
+      speed: [0.0005, 0.00045, 0.0004, 0.00055, 0.00035][i] || 0.00045,
+      rotBase: [-3, 2, -1.5, 2.5, -2][i] || 0,
+      rotAmp: [4, -3.5, 4, -4.5, 3.5][i] || 4,
+      parallax: [0.09, 0.06, -0.05, 0.11, -0.08][i] || 0.08,
       dragging: false,
       moved: false,
       startX: 0, startY: 0, baseDX: 0, baseDY: 0,
@@ -256,7 +226,7 @@ document.addEventListener('mousedown', (e) => {
       const suffix = el.dataset.suffix || '';
       if (isNaN(target)) return;
       let curr = 0;
-      const duration = 900;
+      const duration = 500;
       const start = performance.now();
       function tick(t) {
         const p = Math.min(1, (t - start) / duration);
@@ -315,8 +285,8 @@ document.addEventListener('mousedown', (e) => {
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
       // 마우스 반대편으로 그림자 (최대 ±10px)
-      const sx = -x * 14;
-      const sy = -y * 14 + 8;
+      const sx = -x * 7;
+      const sy = -y * 7 + 4;
       card.style.setProperty('--shadow-x', sx + 'px');
       card.style.setProperty('--shadow-y', sy + 'px');
     });
@@ -361,8 +331,8 @@ document.addEventListener('mousedown', (e) => {
     hint.textContent = text;
     document.body.appendChild(hint);
     requestAnimationFrame(() => hint.classList.add('show'));
-    setTimeout(() => hint.classList.remove('show'), 700);
-    setTimeout(() => hint.remove(), 1100);
+    setTimeout(() => hint.classList.remove('show'), 400);
+    setTimeout(() => hint.remove(), 650);
   }
 })();
 
@@ -399,7 +369,7 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
 (function initPageEntry() {
   if (prefersReducedMotion) return;
   document.body.classList.add('page-entry');
-  setTimeout(() => document.body.classList.remove('page-entry'), 900);
+  setTimeout(() => document.body.classList.remove('page-entry'), 450);
 })();
 
 /* ------------------------------------------------------------- */
@@ -577,9 +547,9 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
     }, 2600);
 
     /* 첫 폭발 + 지속적인 닭 비 (reduce-motion이면 가볍게) */
-    const burst = prefersReducedMotion ? 6 : 18;
-    for (let i = 0; i < burst; i++) setTimeout(spawnChicken, i * 60);
-    if (!prefersReducedMotion) rainTimer = setInterval(spawnChicken, 260);
+    const burst = prefersReducedMotion ? 4 : 10;
+    for (let i = 0; i < burst; i++) setTimeout(spawnChicken, i * 80);
+    if (!prefersReducedMotion) rainTimer = setInterval(spawnChicken, 500);
 
     /* 되돌리기 버튼 */
     rollbackBtn = document.createElement('button');
