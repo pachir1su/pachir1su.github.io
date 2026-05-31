@@ -2640,3 +2640,290 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .chicken-drop { animation-duration: 7s !important; }
 }
+
+/* ==========================================================================
+   50. MBTI 차트 (#62)
+   ========================================================================== */
+
+.mbti-block {
+  margin-top: 36px;
+}
+.mbti-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  box-shadow: var(--shadow-soft);
+}
+.mbti-type {
+  font-family: var(--font-mono);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--red);
+  text-align: center;
+  margin-bottom: 22px;
+  letter-spacing: 0.06em;
+}
+.mbti-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.mbti-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.mbti-label {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink);
+  min-width: 62px;
+  white-space: nowrap;
+}
+.mbti-left {
+  text-align: right;
+}
+.mbti-right {
+  text-align: left;
+}
+.mbti-pct {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+.mbti-bar-track {
+  flex: 1;
+  height: 20px;
+  background: var(--paper-2);
+  border: 1px dashed var(--line);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+.mbti-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--red), #e06060);
+  border-radius: 2px;
+  transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 0%;
+}
+.mbti-bar-fill.animated {
+  width: attr(data-pct %) !important;
+}
+
+/* ==========================================================================
+   51. 프로젝트 진행률 바 (#61)
+   ========================================================================== */
+
+.progress-bar-wrap {
+  width: 100%;
+  height: 18px;
+  background: var(--paper-2);
+  border: 1px dashed var(--line);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), #d4a825);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 6px;
+  transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 0%;
+  min-width: fit-content;
+}
+.progress-text {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.progress-fill[data-progress="0"] {
+  background: var(--line);
+  min-width: 28px;
+}
+
+/* ==========================================================================
+   52. 실패한 프로젝트 (#60)
+   ========================================================================== */
+
+.project-failed {
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='28' viewBox='0 0 90 28'><g transform='rotate(-4 45 14)'><rect x='0' y='0' width='90' height='28' fill='%23e07070' fill-opacity='0.45'/><rect x='0' y='0' width='90' height='2' fill='%23c63b3b' fill-opacity='0.15'/></g></svg>"),
+    linear-gradient(var(--red-margin), var(--red-margin)),
+    radial-gradient(circle 5px at 22px 44px, var(--paper-2) 99%, transparent 100%),
+    radial-gradient(circle 5px at 22px 50%, var(--paper-2) 99%, transparent 100%),
+    radial-gradient(circle 5px at 22px calc(100% - 44px), var(--paper-2) 99%, transparent 100%),
+    repeating-linear-gradient(135deg, transparent 0 12px, rgba(198, 59, 59, 0.05) 12px 24px),
+    repeating-linear-gradient(transparent 0 31px, var(--rule) 31px 32px);
+  background-position:
+    18px -6px,
+    56px 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0,
+    0 0;
+  background-size:
+    90px 28px,
+    1px 100%,
+    auto, auto, auto,
+    auto, 100% auto;
+  background-repeat:
+    no-repeat,
+    no-repeat,
+    no-repeat,
+    no-repeat,
+    no-repeat,
+    repeat,
+    repeat-y;
+  opacity: 0.85;
+}
+.project-failed:hover {
+  opacity: 1;
+}
+.failed-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 4px 12px;
+  background: var(--red);
+  color: var(--card);
+  letter-spacing: 0.04em;
+  transform: rotate(-2deg);
+  box-shadow: 1px 2px 4px rgba(31, 28, 20, 0.12);
+  align-self: flex-start;
+  border-radius: 1px;
+}
+.failed-reason {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--red);
+  padding: 6px 10px;
+  background: rgba(198, 59, 59, 0.08);
+  border-left: 3px solid var(--red);
+  border-radius: 0 2px 2px 0;
+  margin-top: 4px;
+}
+.failed-reason i {
+  margin-right: 6px;
+}
+
+/* ==========================================================================
+   53. 프로젝트 마인드맵 (#58)
+   ========================================================================== */
+
+.mindmap-block {
+  margin-bottom: 36px;
+}
+.mindmap-container {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 40px 28px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+  overflow: hidden;
+  background-image: repeating-linear-gradient(transparent 0 31px, var(--rule) 31px 32px);
+}
+.mindmap-center {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--card);
+  background: var(--red);
+  padding: 12px 28px;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(198, 59, 59, 0.3);
+  position: relative;
+  z-index: 2;
+}
+.mindmap-branch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+.mindmap-cat {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--card);
+  padding: 6px 16px;
+  border-radius: 4px;
+  position: relative;
+}
+.mindmap-ai .mindmap-cat { background: var(--cyan); }
+.mindmap-hw .mindmap-cat { background: var(--bronze); }
+.mindmap-web .mindmap-cat { background: var(--gold); }
+.mindmap-discord .mindmap-cat { background: #5865F2; }
+.mindmap-contest .mindmap-cat { background: var(--red); }
+.mindmap-leaves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.mindmap-leaf {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 4px 12px;
+  background: var(--paper-2);
+  border: 1px dashed var(--line);
+  border-radius: 2px;
+  color: var(--ink);
+  transition: transform 0.15s, background 0.15s;
+}
+.mindmap-leaf:hover {
+  transform: translateY(-2px);
+  background: var(--card);
+  box-shadow: var(--shadow-soft);
+}
+
+@media (min-width: 769px) {
+  .mindmap-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 20px;
+    padding: 48px 36px;
+  }
+  .mindmap-center {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: center;
+  }
+  .mindmap-ai {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .mindmap-hw {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .mindmap-web {
+    grid-column: 3;
+    grid-row: 2;
+  }
+  .mindmap-discord {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  .mindmap-contest {
+    grid-column: 3;
+    grid-row: 3;
+  }
+}
