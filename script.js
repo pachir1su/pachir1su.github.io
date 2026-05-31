@@ -483,12 +483,12 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
   const badge = document.getElementById('projectTotalCount');
   if (!badge) return;
 
-  /* WIP 여부는 project-wip 클래스로 구분 */
+  /* WIP 여부는 project-wip, 실패는 project-failed 클래스로 구분 */
   const allCards = document.querySelectorAll('.project-card');
   let done = 0, wip = 0;
   allCards.forEach((c) => {
     if (c.classList.contains('project-wip')) wip++;
-    else done++;
+    else if (!c.classList.contains('project-failed')) done++;
   });
 
   badge.textContent = `${done}개 완료 · ${wip}개 예정`;
