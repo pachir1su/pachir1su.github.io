@@ -576,3 +576,70 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
     }
   }
 })();
+
+/* ------------------------------------------------------------- */
+/* 22. 진행률 바 애니메이션 (#61) — 스크롤 진입 시 width 전환      */
+/* ------------------------------------------------------------- */
+(function initProgressBars() {
+  const bars = document.querySelectorAll('.progress-fill');
+  if (!bars.length) return;
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const pct = entry.target.dataset.progress || '0';
+      entry.target.style.width = pct + '%';
+      obs.unobserve(entry.target);
+    });
+  }, { threshold: 0.3 });
+  bars.forEach((bar) => obs.observe(bar));
+})();
+
+/* ------------------------------------------------------------- */
+/* 23. MBTI 바 애니메이션 (#62) — 스크롤 진입 시 width 전환        */
+/* ------------------------------------------------------------- */
+(function initMbtiBars() {
+  const fills = document.querySelectorAll('.mbti-bar-fill');
+  if (!fills.length) return;
+  fills.forEach((f) => { f.style.width = '0%'; });
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const pct = entry.target.dataset.pct || '0';
+      entry.target.style.width = pct + '%';
+      obs.unobserve(entry.target);
+    });
+  }, { threshold: 0.3 });
+  fills.forEach((f) => obs.observe(f));
+})();
+
+/* ------------------------------------------------------------- */
+/* 24. 프로젝트 필터 — 실패 카테고리 지원 (#60)                    */
+/*    기존 #18 필터에 'failed' 필터 추가 (project-failed 클래스)   */
+/* ------------------------------------------------------------- */
+(function patchFailedFilter() {
+  const btns = document.querySelectorAll('.pfilter');
+  const groups = document.querySelectorAll('.year-group');
+  if (!btns.length || !groups.length) return;
+
+  btns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+      groups.forEach((group) => {
+        let visibleCount = 0;
+        group.querySelectorAll('.project-card').forEach((card) => {
+          const cats = (card.dataset.category || '').split(' ');
+          const isWip = card.classList.contains('project-wip');
+          const isFailed = card.classList.contains('project-failed');
+          const show =
+            filter === 'all' ||
+            (filter === 'wip' && isWip) ||
+            (filter === 'failed' && isFailed) ||
+            cats.includes(filter);
+          card.style.display = show ? '' : 'none';
+          if (show) visibleCount++;
+        });
+        group.style.display = visibleCount ? '' : 'none';
+      });
+    });
+  });
+})();
