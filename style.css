@@ -224,27 +224,88 @@ p {
 .hamburger:hover span {
   background: var(--red);
 }
+/* 모바일 사이드바 (#66) — 오른쪽에서 슬라이드 인 */
 .mobile-menu {
   position: fixed;
-  top: 60px;
-  left: 0;
-  width: 100%;
+  top: 0;
+  right: 0;
+  width: 260px;
+  max-width: 75vw;
+  height: 100vh;
+  height: 100dvh;
   background: var(--paper);
-  border-bottom: 1px solid var(--line);
-  padding: 18px 24px;
-  display: none;
+  border-left: 1px solid var(--line);
+  padding: 72px 24px 32px;
+  display: flex;
   flex-direction: column;
-  gap: 14px;
-  z-index: 999;
+  gap: 4px;
+  z-index: 1001;
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s, box-shadow 0.3s;
+  overflow-y: auto;
 }
 .mobile-menu.open {
-  display: flex;
+  transform: translateX(0);
+  visibility: visible;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
 }
 .mobile-menu a {
   font-family: var(--font-mono);
   color: var(--ink);
-  font-size: 0.95rem;
-  padding: 6px 0;
+  font-size: 0.9rem;
+  padding: 12px 16px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mobile-menu a:hover {
+  background: rgba(198, 59, 59, 0.06);
+  color: var(--red);
+}
+.mobile-menu a i {
+  width: 18px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+.mobile-menu a:hover i {
+  color: var(--red);
+}
+.sidebar-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+.sidebar-close:hover {
+  color: var(--red);
+  background: rgba(198, 59, 59, 0.06);
+}
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* 8. Section base */
@@ -2645,26 +2706,27 @@ html {
    50. MBTI 차트 (#62)
    ========================================================================== */
 
+/* MBTI 섹션 — 컴팩트 (#62) */
 .mbti-block {
-  margin-top: 36px;
+  margin-top: 20px;
 }
 .mbti-card {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 28px 32px;
+  padding: 14px 18px;
   box-shadow: var(--shadow-soft);
   position: relative;
   overflow: hidden;
+  max-width: 420px;
 }
-/* 배경 워터마크 */
 .mbti-card::before {
   content: 'ENTJ';
   position: absolute;
-  right: -4px;
-  bottom: -14px;
+  right: -2px;
+  bottom: -8px;
   font-family: var(--font-mono);
-  font-size: 5.5rem;
+  font-size: 3rem;
   font-weight: 900;
   color: rgba(198, 59, 59, 0.05);
   line-height: 1;
@@ -2672,29 +2734,28 @@ html {
 }
 .mbti-type {
   font-family: var(--font-mono);
-  font-size: 2.2rem;
+  font-size: 1rem;
   font-weight: 900;
   color: var(--red);
   text-align: center;
-  margin-bottom: 24px;
-  letter-spacing: 0.12em;
-  text-shadow: 0 2px 12px rgba(198, 59, 59, 0.18);
+  margin-bottom: 10px;
+  letter-spacing: 0.2em;
 }
 .mbti-bars {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 5px;
 }
 .mbti-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 .mbti-label {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.66rem;
   color: var(--ink);
-  min-width: 68px;
+  min-width: 50px;
   white-space: nowrap;
 }
 .mbti-left {
@@ -2704,20 +2765,19 @@ html {
   text-align: left;
   color: var(--text-muted);
 }
-/* 주도 지표 글자 크고 굵게 */
 .mbti-dim {
-  font-size: 1.05rem;
+  font-size: 0.82rem;
   font-weight: 900;
   font-style: normal;
 }
 .mbti-right .mbti-dim {
-  font-size: 0.85rem;
+  font-size: 0.68rem;
   font-weight: 500;
 }
 .mbti-pct {
   font-weight: 400;
   color: var(--text-muted);
-  font-size: 0.72rem;
+  font-size: 0.58rem;
 }
 .mbti-left .mbti-pct {
   color: var(--ink);
@@ -2725,14 +2785,13 @@ html {
 }
 .mbti-bar-track {
   flex: 1;
-  height: 22px;
+  height: 10px;
   background: var(--paper-2);
   border: 1px solid var(--line);
   border-radius: 3px;
   position: relative;
   overflow: hidden;
 }
-/* 50% 중앙 기준선 */
 .mbti-bar-track::after {
   content: '';
   position: absolute;
@@ -2740,7 +2799,7 @@ html {
   left: 50%;
   width: 1px;
   height: 100%;
-  background: rgba(31, 28, 20, 0.22);
+  background: rgba(31, 28, 20, 0.18);
   z-index: 1;
 }
 .mbti-bar-fill {
@@ -2749,7 +2808,6 @@ html {
   transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
   width: 0%;
 }
-/* 차원별 색상 */
 .mbti-row:nth-child(1) .mbti-bar-fill { background: linear-gradient(90deg, #2471a3, #5dade2); }
 .mbti-row:nth-child(2) .mbti-bar-fill { background: linear-gradient(90deg, #6c3483, #a569bd); }
 .mbti-row:nth-child(3) .mbti-bar-fill { background: linear-gradient(90deg, var(--bronze), #d4853a); }
@@ -2911,18 +2969,18 @@ html {
   background: var(--red);
 }
 
-/* 브랜치 래퍼 — 모바일: 세로 트리 */
+/* 브랜치 래퍼 — 모바일: 세로 트리, 카테고리별 색상 선 */
 .mindmap-branches-wrap {
   display: flex;
   flex-direction: column;
   align-self: stretch;
-  border-left: 2px solid rgba(31, 28, 20, 0.15);
+  border-left: none;
   margin-top: 16px;
-  padding-left: 18px;
-  gap: 14px;
+  padding-left: 0;
+  gap: 12px;
 }
 
-/* 각 브랜치 — 모바일: 가로 배치 (카테고리 + 잎) */
+/* 각 브랜치 — 모바일: 카테고리별 색상 왼쪽 선 */
 .mindmap-branch {
   display: flex;
   flex-direction: column;
@@ -2930,19 +2988,27 @@ html {
   position: relative;
   gap: 6px;
   min-width: 0;
+  border-left: 2.5px solid;
+  padding-left: 14px;
 }
+.mindmap-ai   { border-left-color: var(--cyan); }
+.mindmap-hw   { border-left-color: var(--bronze); }
+.mindmap-web  { border-left-color: var(--gold); }
+.mindmap-discord { border-left-color: #5865F2; }
+.mindmap-contest { border-left-color: var(--red); }
 
-/* 카테고리 노드 뱃지 */
+/* 카테고리 노드 뱃지 — 그림자와 둥근 모서리 (#58) */
 .mindmap-cat {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--card);
   padding: 5px 14px;
-  border-radius: 4px;
+  border-radius: 6px;
   white-space: nowrap;
   position: relative;
   z-index: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 .mindmap-ai   .mindmap-cat { background: var(--cyan);   }
 .mindmap-hw   .mindmap-cat { background: var(--bronze);  }
@@ -2960,16 +3026,22 @@ html {
   padding-top: 6px;
 }
 
+/* 잎 노드 — 카테고리별 왼쪽 색상 보더 (#58) */
 .mindmap-leaf {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   padding: 3px 10px;
   background: var(--paper-2);
   border: 1px dashed var(--line);
-  border-radius: 2px;
+  border-radius: 3px;
   color: var(--ink);
-  transition: transform 0.15s, background 0.15s;
+  transition: transform 0.15s, background 0.15s, border-color 0.15s;
 }
+.mindmap-ai .mindmap-leaf   { border-left: 2px solid var(--cyan); }
+.mindmap-hw .mindmap-leaf   { border-left: 2px solid var(--bronze); }
+.mindmap-web .mindmap-leaf  { border-left: 2px solid var(--gold); }
+.mindmap-discord .mindmap-leaf { border-left: 2px solid #5865F2; }
+.mindmap-contest .mindmap-leaf { border-left: 2px solid var(--red); }
 .mindmap-leaf:hover {
   background: var(--card);
   box-shadow: var(--shadow-soft);
@@ -2987,69 +3059,98 @@ html {
     height: 28px;
   }
 
-  /* 브랜치 래퍼: 가로 배치, 상단 크로스바 */
+  /* 브랜치 래퍼: 가로 배치, 카테고리별 색상 크로스바 (#58) */
   .mindmap-branches-wrap {
     flex-direction: row;
     align-items: flex-start;
     border-left: none;
-    border-top: 2px solid rgba(31, 28, 20, 0.15);
+    border-top: 2.5px solid;
+    border-image: linear-gradient(to right, var(--cyan) 0% 20%, var(--bronze) 20% 40%, var(--gold) 40% 60%, #5865F2 60% 80%, var(--red) 80% 100%) 1;
     margin-top: 28px;
     padding-left: 0;
     gap: 2px;
   }
 
-  /* 각 브랜치: 세로 컬럼, 상단 수직 연결선 */
+  /* 각 브랜치: 세로 컬럼, 상단 수직 연결선 + 접합 원형 도트 (#58) */
   .mindmap-branch {
     flex: 1;
     flex-direction: column;
     align-items: center;
-    padding-top: 26px;
+    padding-top: 30px;
     gap: 0;
+    border-left: none;
+    padding-left: 0;
   }
-  /* 크로스바 → 카테고리 수직 연결 */
   .mindmap-branch::before {
     content: '';
     position: absolute;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 2px;
-    height: 26px;
+    width: 2.5px;
+    height: 30px;
+    border-radius: 2px;
   }
+  /* 접합 도트 — 크로스바 위 */
+  .mindmap-branch::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    z-index: 2;
+  }
+  .mindmap-ai::after      { background: var(--cyan); }
+  .mindmap-hw::after      { background: var(--bronze); }
+  .mindmap-web::after     { background: var(--gold); }
+  .mindmap-discord::after { background: #5865F2; }
+  .mindmap-contest::after { background: var(--red); }
   .mindmap-ai::before      { background: var(--cyan);   }
   .mindmap-hw::before      { background: var(--bronze);  }
   .mindmap-web::before     { background: var(--gold);   }
   .mindmap-discord::before { background: #5865F2;        }
   .mindmap-contest::before { background: var(--red);    }
 
-  /* 잎 목록: 세로 스택, 왼쪽 가지선 */
+  /* 잎 목록: 세로 스택, 카테고리 색상 왼쪽 가지선 (#58) */
   .mindmap-leaves {
     flex-direction: column;
     flex-wrap: nowrap;
     border-top: none;
-    border-left: 1px dashed rgba(31, 28, 20, 0.25);
+    border-left: 1.5px dashed rgba(31, 28, 20, 0.2);
     padding-top: 0;
-    padding-left: 11px;
+    padding-left: 12px;
     margin-top: 10px;
     align-self: stretch;
     gap: 4px;
   }
+  .mindmap-ai .mindmap-leaves   { border-left-color: rgba(26, 188, 156, 0.4); }
+  .mindmap-hw .mindmap-leaves   { border-left-color: rgba(205, 127, 50, 0.4); }
+  .mindmap-web .mindmap-leaves  { border-left-color: rgba(218, 165, 32, 0.4); }
+  .mindmap-discord .mindmap-leaves { border-left-color: rgba(88, 101, 242, 0.4); }
+  .mindmap-contest .mindmap-leaves { border-left-color: rgba(198, 59, 59, 0.4); }
 
   .mindmap-leaf {
     width: 100%;
     position: relative;
-    padding: 3px 8px;
+    padding: 3px 8px 3px 10px;
   }
-  /* 잎 → 왼쪽 가지선 수평 연결 */
   .mindmap-leaf::before {
     content: '';
     position: absolute;
-    left: -11px;
+    left: -12px;
     top: 50%;
-    width: 7px;
-    height: 1px;
-    background: rgba(31, 28, 20, 0.2);
+    width: 8px;
+    height: 1.5px;
+    border-radius: 1px;
   }
+  .mindmap-ai .mindmap-leaf::before   { background: rgba(26, 188, 156, 0.5); }
+  .mindmap-hw .mindmap-leaf::before   { background: rgba(205, 127, 50, 0.5); }
+  .mindmap-web .mindmap-leaf::before  { background: rgba(218, 165, 32, 0.5); }
+  .mindmap-discord .mindmap-leaf::before { background: rgba(88, 101, 242, 0.5); }
+  .mindmap-contest .mindmap-leaf::before { background: rgba(198, 59, 59, 0.5); }
   .mindmap-leaf:hover {
     transform: translateX(3px);
   }
