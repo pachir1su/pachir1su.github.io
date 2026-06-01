@@ -148,14 +148,19 @@
     </nav>
 
     <!-- 모바일 드롭다운 메뉴 — .open 클래스 토글로 표시/숨김 (script.js #5) -->
+    <!-- 모바일 사이드바 (#66) — 오른쪽에서 슬라이드 인 -->
     <div class="mobile-menu" id="mobileMenu">
-      <a href="#home" onclick="closeMobile()">홈</a>
-      <a href="#about" onclick="closeMobile()">비전</a>
-      <a href="#skills" onclick="closeMobile()">역량</a>
-      <a href="#awards" onclick="closeMobile()">수상</a>
-      <a href="#projects" onclick="closeMobile()">프로젝트</a>
-      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="#home" onclick="closeMobile()"><i class="fas fa-home"></i> 홈</a>
+      <a href="#about" onclick="closeMobile()"><i class="fas fa-user"></i> 비전</a>
+      <a href="#skills" onclick="closeMobile()"><i class="fas fa-code"></i> 역량</a>
+      <a href="#awards" onclick="closeMobile()"><i class="fas fa-trophy"></i> 수상</a>
+      <a href="#projects" onclick="closeMobile()"><i class="fas fa-folder-open"></i> 프로젝트</a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
     </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- ============================================================
          히어로 섹션 (홈) — 포트폴리오의 첫 인상
@@ -693,21 +698,21 @@
                 <div class="mindmap-leaves">
                   <span class="mindmap-leaf">MultiMind</span>
                   <span class="mindmap-leaf">데일리 리포트 AI</span>
-                  <span class="mindmap-leaf">공감봇 & 레시피 AI</span>
+                  <span class="mindmap-leaf">공감 봇 & 레시피 AI</span>
                   <span class="mindmap-leaf">기술과사회</span>
                   <span class="mindmap-leaf">CentrifugeAI</span>
                   <span class="mindmap-leaf">DelphiRec</span>
-                  <span class="mindmap-leaf">산불 감지</span>
+                  <span class="mindmap-leaf">산불 조기 감지 시스템</span>
                 </div>
               </div>
               <div class="mindmap-branch mindmap-hw">
                 <div class="mindmap-node mindmap-cat">하드웨어</div>
                 <div class="mindmap-leaves">
-                  <span class="mindmap-leaf">NFC 출석 체크</span>
+                  <span class="mindmap-leaf">NFC 출석 체크 시스템</span>
                   <span class="mindmap-leaf">식물 타이머</span>
                   <span class="mindmap-leaf">비밀번호 도어락</span>
-                  <span class="mindmap-leaf">해안 장벽</span>
-                  <span class="mindmap-leaf">졸음 방지</span>
+                  <span class="mindmap-leaf">해안 장벽 프로젝트</span>
+                  <span class="mindmap-leaf">졸음 방지 시스템</span>
                 </div>
               </div>
               <div class="mindmap-branch mindmap-web">
@@ -716,7 +721,7 @@
                   <span class="mindmap-leaf">File Swordmaster</span>
                   <span class="mindmap-leaf">Media Swordmaster</span>
                   <span class="mindmap-leaf">신입생 가이드</span>
-                  <span class="mindmap-leaf">헬스 케어</span>
+                  <span class="mindmap-leaf">헬스 케어 시스템</span>
                   <span class="mindmap-leaf">HTML Viewer</span>
                   <span class="mindmap-leaf">온라인술담</span>
                   <span class="mindmap-leaf">한맵</span>
@@ -733,10 +738,10 @@
               <div class="mindmap-branch mindmap-contest">
                 <div class="mindmap-node mindmap-cat">대회</div>
                 <div class="mindmap-leaves">
-                  <span class="mindmap-leaf">2024 SFPC (8위)</span>
+                  <span class="mindmap-leaf">2024 SFPC</span>
                   <span class="mindmap-leaf">디지털새싹 메이커톤</span>
-                  <span class="mindmap-leaf">천안 로봇대회</span>
-                  <span class="mindmap-leaf">마스터 크리에이터</span>
+                  <span class="mindmap-leaf">천안 학생 로봇 대회</span>
+                  <span class="mindmap-leaf">마스터 크리에이터 챌린지</span>
                 </div>
               </div>
             </div>

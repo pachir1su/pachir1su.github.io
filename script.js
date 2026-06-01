@@ -56,15 +56,21 @@ if (backBtn) {
 /* ------------------------------------------------------------- */
 /* 5. 모바일 메뉴 (기존)                                          */
 /* ------------------------------------------------------------- */
+/* 모바일 사이드바 (#66) — 오버레이 + 스크롤 잠금 */
 const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
 if (hamburger && mobileMenu) {
   hamburger.addEventListener('click', () => {
     const open = mobileMenu.classList.toggle('open');
     hamburger.classList.toggle('open');
-    // 스크린리더용 펼침 상태 동기화
     hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (sidebarOverlay) sidebarOverlay.classList.toggle('active', open);
+    document.body.style.overflow = open ? 'hidden' : '';
   });
+}
+if (sidebarOverlay) {
+  sidebarOverlay.addEventListener('click', closeMobile);
 }
 function closeMobile() {
   if (mobileMenu) mobileMenu.classList.remove('open');
@@ -72,6 +78,8 @@ function closeMobile() {
     hamburger.classList.remove('open');
     hamburger.setAttribute('aria-expanded', 'false');
   }
+  if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+  document.body.style.overflow = '';
 }
 
 /* ------------------------------------------------------------- */
