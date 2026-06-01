@@ -1205,14 +1205,18 @@ p {
   }
 }
 
-/* 17. Media queries */
-@media (max-width: 768px) {
+/* 사이드바 네비게이션 — 태블릿+모바일 (#66) */
+@media (max-width: 1024px) {
   .nav-links {
     display: none;
   }
   .hamburger {
     display: flex;
   }
+}
+
+/* 17. Media queries — 모바일 레이아웃 */
+@media (max-width: 768px) {
   .scroll-hint {
     display: none;
   }
