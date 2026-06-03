@@ -3159,3 +3159,343 @@ html {
     transform: translateX(3px);
   }
 }
+
+/* ==========================================================================
+   54. 다크 모드 (#68) — data-theme="dark" 시 CSS 변수 오버라이드
+   ========================================================================== */
+
+[data-theme="dark"] {
+  --paper: #1a1a2e;
+  --paper-2: #16213e;
+  --card: #1f2937;
+  --ink: #e5e5e5;
+  --text-muted: #9ca3af;
+  --red: #e05050;
+  --red-soft: rgba(224, 80, 80, 0.18);
+  --red-margin: rgba(224, 80, 80, 0.35);
+  --cyan: #4dd0c8;
+  --gold: #d4a825;
+  --bronze: #d4853a;
+  --tape: rgba(212, 168, 37, 0.35);
+  --tape-solid: #b5922a;
+  --line: rgba(229, 229, 229, 0.15);
+  --rule: rgba(229, 229, 229, 0.06);
+  --postit: #2d2a1f;
+  --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.25);
+  --shadow-lift: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+[data-theme="dark"] body {
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(224, 80, 80, 0.04), transparent 40%),
+    radial-gradient(circle at 82% 78%, rgba(77, 208, 200, 0.03), transparent 45%);
+}
+[data-theme="dark"] body::before {
+  opacity: 0.08;
+}
+[data-theme="dark"] .hero {
+  background: var(--paper);
+}
+[data-theme="dark"] .navbar {
+  background: var(--paper);
+  border-bottom-color: var(--line);
+}
+[data-theme="dark"] .stat-item:nth-child(3) {
+  background: #332d1a;
+}
+[data-theme="dark"] .stat-item:nth-child(5) {
+  background: #1a2e30;
+}
+[data-theme="dark"] .chip:nth-child(2n) {
+  background: #1a2e30;
+}
+[data-theme="dark"] .chip:nth-child(3n) {
+  background: #332d1a;
+}
+[data-theme="dark"] .btn-primary {
+  box-shadow: 0 4px 0 #6e1a1a;
+}
+[data-theme="dark"] .btn-primary:hover {
+  box-shadow: 0 5px 0 #6e1a1a;
+}
+[data-theme="dark"] .btn-ghost {
+  background: var(--card);
+  border-color: var(--red-margin);
+}
+[data-theme="dark"] .gh-card {
+  filter: brightness(0.85) contrast(1.1);
+}
+[data-theme="dark"] .about-edu {
+  border-left-color: #d4853a;
+}
+[data-theme="dark"] .section-tag::after {
+  background: var(--paper);
+}
+[data-theme="dark"] .mobile-menu {
+  background: var(--paper);
+  border-left-color: var(--line);
+}
+[data-theme="dark"] .sidebar-overlay {
+  background: rgba(0, 0, 0, 0.55);
+}
+[data-theme="dark"] .progress-fill[data-progress="0"] {
+  background: var(--line);
+}
+[data-theme="dark"] html {
+  scrollbar-color: var(--red) var(--paper-2);
+}
+
+/* ==========================================================================
+   55. 유틸리티 버튼 — 언어 전환(#67) + 다크 모드(#68) 토글
+   ========================================================================== */
+
+.nav-utils {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+}
+.nav-util-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.15s;
+}
+.nav-util-btn:hover {
+  color: var(--red);
+  border-color: var(--red-margin);
+  transform: translateY(-1px);
+}
+.nav-util-btn .lang-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+}
+.nav-util-btn i {
+  font-size: 0.85rem;
+}
+
+/* 사이드바(모바일) 유틸리티 */
+.sidebar-utils {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+}
+.sidebar-util-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink);
+  padding: 12px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  background: none;
+  border: none;
+}
+.sidebar-util-btn:hover {
+  background: rgba(198, 59, 59, 0.06);
+  color: var(--red);
+}
+.sidebar-util-btn i {
+  width: 18px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+.sidebar-util-btn:hover i {
+  color: var(--red);
+}
+
+/* ==========================================================================
+   56. 섹션 네비게이터 — 책갈피 스타일 (#72)
+   ========================================================================== */
+
+.section-nav {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.section-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px 7px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  box-shadow: -2px 2px 8px rgba(31, 28, 20, 0.08);
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--ink);
+  white-space: nowrap;
+  transform: translateX(calc(100% - 16px));
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.2s,
+              border-color 0.2s,
+              box-shadow 0.2s;
+}
+.nav-bookmark-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.nav-bookmark-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+/* 호버 시 전체 네비게이터 펼침 */
+.section-nav:hover .section-nav-item {
+  transform: translateX(0);
+}
+.section-nav:hover .nav-bookmark-label {
+  opacity: 1;
+}
+
+/* 활성 섹션 — 주황색(빨간) 포인트 */
+.section-nav-item.active {
+  background: var(--red-soft);
+  border-color: var(--red);
+  box-shadow: -2px 2px 10px rgba(198, 59, 59, 0.15);
+}
+.section-nav-item.active .nav-bookmark-dot {
+  background: var(--red);
+  box-shadow: 0 0 6px rgba(198, 59, 59, 0.4);
+}
+.section-nav-item.active .nav-bookmark-label {
+  color: var(--red);
+  font-weight: 700;
+}
+
+/* 섹션별 dot 컬러 */
+.section-nav-item[data-nav-section="home"] .nav-bookmark-dot { background: var(--red); }
+.section-nav-item[data-nav-section="about"] .nav-bookmark-dot { background: var(--cyan); }
+.section-nav-item[data-nav-section="skills"] .nav-bookmark-dot { background: var(--gold); }
+.section-nav-item[data-nav-section="awards"] .nav-bookmark-dot { background: var(--bronze); }
+.section-nav-item[data-nav-section="projects"] .nav-bookmark-dot { background: var(--red); }
+.section-nav-item.active .nav-bookmark-dot { background: var(--red) !important; }
+
+/* 모바일: 네비게이터 숨김 */
+@media (max-width: 768px) {
+  .section-nav {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   57. MBTI 2컬럼 레이아웃 + 성격 특성 카드 (#62)
+   ========================================================================== */
+
+.mbti-layout {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+}
+.mbti-layout .mbti-card {
+  flex: 0 0 420px;
+}
+.mbti-traits {
+  flex: 1;
+  min-width: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.mbti-traits::before {
+  content: 'ENTJ';
+  position: absolute;
+  right: -4px;
+  bottom: -10px;
+  font-family: var(--font-mono);
+  font-size: 4rem;
+  font-weight: 900;
+  color: rgba(198, 59, 59, 0.04);
+  line-height: 1;
+  pointer-events: none;
+}
+.mbti-traits-header {
+  font-family: var(--font-hand);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--red);
+  line-height: 1.2;
+}
+.mbti-traits-sub {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.mbti-traits-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.mbti-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 5px 10px;
+  background: var(--paper-2);
+  border: 1px dashed var(--line);
+  border-radius: 3px;
+  color: var(--ink);
+  transition: transform 0.15s, background 0.15s;
+}
+.mbti-tag i {
+  font-size: 0.68rem;
+  color: var(--red);
+}
+.mbti-tag:hover {
+  transform: translateY(-1px);
+  background: var(--red-soft);
+}
+@media (max-width: 768px) {
+  .mbti-layout {
+    flex-direction: column;
+  }
+  .mbti-layout .mbti-card {
+    flex: none;
+    max-width: 100%;
+  }
+}

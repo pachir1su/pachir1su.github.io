@@ -37,10 +37,11 @@ if (backBtn) {
 (function initTyping() {
   const typingText = document.getElementById('typing-text');
   if (!typingText) return;
-  const words = ['풀스택 개발자', '메이커', '아이디어 뱅크', '팀 리더', '엔지니어'];
+  const defaultWords = ['풀스택 개발자', '메이커', '아이디어 뱅크', '팀 리더', '엔지니어'];
   let wordIndex = 0, charIndex = 0, isDeleting = false, typeSpeed = 100;
   function type() {
-    const currentWord = words[wordIndex];
+    const words = window._typingWords || defaultWords;
+    const currentWord = words[wordIndex % words.length];
     typingText.textContent = isDeleting
       ? currentWord.substring(0, charIndex - 1)
       : currentWord.substring(0, charIndex + 1);
@@ -650,4 +651,305 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
       });
     });
   });
+})();
+
+/* ------------------------------------------------------------- */
+/* 25. 다크 모드 토글 (#68)                                        */
+/*    localStorage로 상태 유지, 시스템 다크 모드 감지 지원           */
+/* ------------------------------------------------------------- */
+(function initDarkMode() {
+  const toggle = document.getElementById('themeToggle');
+  const toggleMobile = document.getElementById('themeToggleMobile');
+  const icon = document.getElementById('themeIcon');
+  const iconMobile = document.getElementById('themeIconMobile');
+  const labelMobile = document.querySelector('.theme-label-mobile');
+
+  function getPreferred() {
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function apply(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    const isDark = theme === 'dark';
+    if (icon) {
+      icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    if (iconMobile) {
+      iconMobile.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    if (labelMobile) {
+      labelMobile.textContent = isDark ? '라이트 모드' : '다크 모드';
+    }
+    if (toggle) toggle.title = isDark ? '라이트 모드' : '다크 모드';
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    apply(current === 'dark' ? 'light' : 'dark');
+  }
+
+  apply(getPreferred());
+  if (toggle) toggle.addEventListener('click', toggleTheme);
+  if (toggleMobile) toggleMobile.addEventListener('click', toggleTheme);
+})();
+
+/* ------------------------------------------------------------- */
+/* 26. 영어/한국어 전환 토글 (#67)                                 */
+/*    셀렉터 → 번역 텍스트 매핑으로 주요 UI 텍스트 교체            */
+/* ------------------------------------------------------------- */
+(function initLangToggle() {
+  const toggle = document.getElementById('langToggle');
+  const toggleMobile = document.getElementById('langToggleMobile');
+  if (!toggle) return;
+
+  /* 번역 맵 — 셀렉터 기반 (data-i18n 불필요) */
+  const translations = {
+    en: {
+      /* 네비게이션 */
+      '.nav-links li:nth-child(1) a': 'Home',
+      '.nav-links li:nth-child(2) a': 'Vision',
+      '.nav-links li:nth-child(3) a': 'Skills',
+      '.nav-links li:nth-child(4) a': 'Awards',
+      '.nav-links li:nth-child(5) a': 'Projects',
+      /* 모바일 메뉴 */
+      '.mobile-menu a:nth-of-type(1)': ' Home',
+      '.mobile-menu a:nth-of-type(2)': ' Vision',
+      '.mobile-menu a:nth-of-type(3)': ' Skills',
+      '.mobile-menu a:nth-of-type(4)': ' Awards',
+      '.mobile-menu a:nth-of-type(5)': ' Projects',
+      '.mobile-menu a:nth-of-type(6)': ' GitHub',
+      /* 히어로 */
+      '.hero-tag': 'Hello',
+      '.hero-role': { html: 'Innovator &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>' },
+      '.hero-desc': { html: 'I dream of being an entrepreneur who pursues <strong>innovation</strong> beyond profit.<br /><strong>1 million monthly users</strong> — that\'s my goal.' },
+      '.btn-primary': { html: '<i class="fas fa-folder-open"></i> Projects' },
+      '.stat-label': ['Projects', 'Awards', 'out of 581'],
+      /* 섹션 헤더 */
+      '#about .section-title': 'Vision',
+      '#skills .section-title': 'Skills',
+      '#awards .section-title': 'Awards',
+      '#projects .section-title': 'Projects',
+      /* About */
+      '.about-quote': '"An innovator who turns ideas into reality"',
+      '.about-body': { html: '<p>Hello, I\'m <strong>Lee Geon Yeong</strong>, someone who goes beyond simple development to plan and create services that can change the world. I aspire to be an <strong>entrepreneur</strong>, not just a businessman — creating unprecedented value and driving innovation through technology.</p><p>Whenever an idea strikes, I document and refine it. To make these ideas a reality, I study <strong>AI, Communications, Web/App Development, Embedded, Hardware, Information Security, Hacking, DB, and Planning</strong> — with no boundaries on the field.</p>' },
+      '.chip:nth-child(1)': { html: '<i class="fas fa-rocket"></i> Goal: 1M Monthly Users' },
+      '.chip:nth-child(2)': { html: '<i class="fas fa-lightbulb"></i> Idea Bank' },
+      '.chip:nth-child(3)': { html: '<i class="fas fa-users"></i> Team Lead Experience' },
+      '.edu-school': 'Korea University of Technology and Education',
+      '.edu-sub': 'KOREATECH · Enrolled',
+      '.github-activity-btn': { html: '<i class="fab fa-github"></i> GitHub Activity' },
+      /* MBTI */
+      '.mbti-traits-header': 'Bold Commander',
+      '.mbti-tag': ['Leadership', 'Efficiency', 'Strategic', 'Confidence', 'Challenger', 'Planner'],
+      /* 하위 라벨 */
+      '.subsection-label': { skip: true },
+      /* 필터 */
+      '.pfilter[data-filter="all"]': 'All',
+      '.pfilter[data-filter="ai"]': 'AI · ML',
+      '.pfilter[data-filter="hardware"]': 'Hardware',
+      '.pfilter[data-filter="discord"]': 'Discord Bot',
+      '.pfilter[data-filter="web"]': 'Web',
+      '.pfilter[data-filter="contest"]': 'Contest',
+      '.pfilter[data-filter="wip"]': 'WIP',
+      '.pfilter[data-filter="failed"]': 'Failed',
+      /* 연도 헤더 */
+      '.year-group-wip .year-heading': 'In Progress / Planned',
+      '.year-group-failed .year-heading': 'Failed Projects',
+      /* 푸터 */
+      '.footer-copy': '© 2026 Lee Geon Yeong. All rights reserved.',
+      '.copy-hint': 'Copy',
+      /* 섹션 네비게이터 */
+      '[data-nav-section="home"] .nav-bookmark-label': 'Home',
+      '[data-nav-section="about"] .nav-bookmark-label': 'Vision',
+      '[data-nav-section="skills"] .nav-bookmark-label': 'Skills',
+      '[data-nav-section="awards"] .nav-bookmark-label': 'Awards',
+      '[data-nav-section="projects"] .nav-bookmark-label': 'Projects',
+      /* 맨 위로 */
+      '#btn-back-to-top': { attr: { title: 'Back to top', 'aria-label': 'Back to top' } },
+      '.scroll-hint span': 'Scroll',
+    },
+    ko: {
+      '.nav-links li:nth-child(1) a': '홈',
+      '.nav-links li:nth-child(2) a': '비전',
+      '.nav-links li:nth-child(3) a': '역량',
+      '.nav-links li:nth-child(4) a': '수상',
+      '.nav-links li:nth-child(5) a': '프로젝트',
+      '.mobile-menu a:nth-of-type(1)': ' 홈',
+      '.mobile-menu a:nth-of-type(2)': ' 비전',
+      '.mobile-menu a:nth-of-type(3)': ' 역량',
+      '.mobile-menu a:nth-of-type(4)': ' 수상',
+      '.mobile-menu a:nth-of-type(5)': ' 프로젝트',
+      '.mobile-menu a:nth-of-type(6)': ' GitHub',
+      '.hero-tag': '안녕하세요',
+      '.hero-role': { html: '혁신의 기업가 &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>' },
+      '.hero-desc': { html: '이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br /><strong>월 100만 명</strong>이 사용하는 서비스를 만드는 것이 목표입니다.' },
+      '.btn-primary': { html: '<i class="fas fa-folder-open"></i> 프로젝트 보기' },
+      '.stat-label': ['프로젝트', '수상 경력', '581 팀 중'],
+      '#about .section-title': '비전',
+      '#skills .section-title': '역량',
+      '#awards .section-title': '수상',
+      '#projects .section-title': '프로젝트',
+      '.about-quote': '"아이디어를 현실로 만드는 혁신가"',
+      '.about-body': { html: '<p>안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고 만드는 <strong>이건영</strong>입니다. 저는 사업가가 아닌 <strong>기업가</strong>를 지향합니다. 이윤을 쫓기보다 기술을 통해 세상에 없던 가치를 창출하고 혁신을 일으키고 싶습니다.</p><p>떠오르는 아이디어가 있을 때마다 구체화하여 기록하고 있으며 이를 실현하기 위해 <strong>AI, 통신, 웹/앱 개발, 임베디드, 하드웨어, 정보보안, 해킹, DB, 기획</strong> 등 분야를 가리지 않고 기술을 익히고 있습니다.</p>' },
+      '.chip:nth-child(1)': { html: '<i class="fas fa-rocket"></i> 목표 : 월 100만명 유저 서비스' },
+      '.chip:nth-child(2)': { html: '<i class="fas fa-lightbulb"></i> 아이디어 뱅크' },
+      '.chip:nth-child(3)': { html: '<i class="fas fa-users"></i> 팀장 경험 多' },
+      '.edu-school': '한국기술교육대학교',
+      '.edu-sub': 'KOREATECH · 재학 중',
+      '.github-activity-btn': { html: '<i class="fab fa-github"></i> GitHub 활동 보러가기' },
+      '.mbti-traits-header': '대담한 통솔자',
+      '.mbti-tag': ['리더십', '효율성', '전략적 사고', '자신감', '도전 정신', '계획적'],
+      '.pfilter[data-filter="all"]': '전체',
+      '.pfilter[data-filter="ai"]': 'AI · ML',
+      '.pfilter[data-filter="hardware"]': '하드웨어',
+      '.pfilter[data-filter="discord"]': 'Discord 봇',
+      '.pfilter[data-filter="web"]': '웹',
+      '.pfilter[data-filter="contest"]': '대회',
+      '.pfilter[data-filter="wip"]': 'WIP',
+      '.pfilter[data-filter="failed"]': '실패',
+      '.year-group-wip .year-heading': '진행 중 · 예정',
+      '.year-group-failed .year-heading': '실패한 프로젝트',
+      '.footer-copy': '© 2026 Lee Geon Yeong. All rights reserved.',
+      '.copy-hint': '복사',
+      '[data-nav-section="home"] .nav-bookmark-label': '홈',
+      '[data-nav-section="about"] .nav-bookmark-label': '비전',
+      '[data-nav-section="skills"] .nav-bookmark-label': '역량',
+      '[data-nav-section="awards"] .nav-bookmark-label': '수상',
+      '[data-nav-section="projects"] .nav-bookmark-label': '프로젝트',
+      '#btn-back-to-top': { attr: { title: '맨 위로', 'aria-label': '맨 위로' } },
+      '.scroll-hint span': '스크롤',
+    }
+  };
+
+  /* 영어 타이핑 단어 목록 */
+  const typingWordsEN = ['Full-Stack Dev', 'Maker', 'Idea Bank', 'Team Leader', 'Engineer'];
+  const typingWordsKO = ['풀스택 개발자', '메이커', '아이디어 뱅크', '팀 리더', '엔지니어'];
+
+  let currentLang = localStorage.getItem('lang') || 'ko';
+
+  function applyLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('lang', lang);
+    const map = translations[lang];
+    if (!map) return;
+
+    Object.entries(map).forEach(([selector, value]) => {
+      if (value && value.skip) return;
+
+      /* 배열 — 같은 셀렉터로 여러 요소에 순서대로 매핑 */
+      if (Array.isArray(value)) {
+        const els = document.querySelectorAll(selector);
+        els.forEach((el, i) => {
+          if (i < value.length) el.textContent = value[i];
+        });
+        return;
+      }
+
+      /* 객체 — html 또는 attr */
+      if (typeof value === 'object') {
+        if (value.html !== undefined) {
+          const el = document.querySelector(selector);
+          if (el) el.innerHTML = value.html;
+        }
+        if (value.attr) {
+          const el = document.querySelector(selector);
+          if (el) {
+            Object.entries(value.attr).forEach(([k, v]) => el.setAttribute(k, v));
+          }
+        }
+        return;
+      }
+
+      /* 문자열 — textContent */
+      const el = document.querySelector(selector);
+      if (el) el.textContent = value;
+    });
+
+    /* MBTI 태그 — 아이콘 포함이므로 별도 처리 */
+    const tagIcons = ['fa-crown', 'fa-bullseye', 'fa-chess', 'fa-bolt', 'fa-mountain', 'fa-calendar-check'];
+    const tagTexts = translations[lang]['.mbti-tag'];
+    if (tagTexts) {
+      document.querySelectorAll('.mbti-tag').forEach((el, i) => {
+        if (i < tagTexts.length) {
+          el.innerHTML = '<i class="fas ' + tagIcons[i] + '"></i> ' + tagTexts[i];
+        }
+      });
+    }
+
+    /* 모바일 메뉴 — 아이콘 보존 */
+    const mobileIcons = ['fa-home', 'fa-user', 'fa-code', 'fa-trophy', 'fa-folder-open', 'fa-github'];
+    const mobileLabels = lang === 'en'
+      ? ['Home', 'Vision', 'Skills', 'Awards', 'Projects', 'GitHub']
+      : ['홈', '비전', '역량', '수상', '프로젝트', 'GitHub'];
+    document.querySelectorAll('.mobile-menu > a').forEach((a, i) => {
+      if (i < mobileIcons.length) {
+        const iconClass = i === 5 ? 'fab' : 'fas';
+        a.innerHTML = '<i class="' + iconClass + ' ' + mobileIcons[i] + '"></i> ' + mobileLabels[i];
+        a.setAttribute('onclick', 'closeMobile()');
+      }
+    });
+
+    /* 타이핑 효과 단어 교체 */
+    window._typingWords = lang === 'en' ? typingWordsEN : typingWordsKO;
+
+    /* 토글 버튼 라벨 업데이트 */
+    const langLabel = toggle.querySelector('.lang-label');
+    const langLabelMobile = document.querySelector('.lang-label-mobile');
+    if (langLabel) langLabel.textContent = lang === 'ko' ? 'EN' : 'KO';
+    if (langLabelMobile) langLabelMobile.textContent = lang === 'ko' ? 'English' : '한국어';
+    toggle.title = lang === 'ko' ? 'English' : '한국어';
+  }
+
+  function toggleLang() {
+    applyLang(currentLang === 'ko' ? 'en' : 'ko');
+  }
+
+  /* 타이핑 효과에서 단어 목록 참조 */
+  window._typingWords = currentLang === 'en' ? typingWordsEN : typingWordsKO;
+
+  if (currentLang !== 'ko') applyLang(currentLang);
+  toggle.addEventListener('click', toggleLang);
+  if (toggleMobile) toggleMobile.addEventListener('click', toggleLang);
+})();
+
+/* ------------------------------------------------------------- */
+/* 27. 우측 플로팅 섹션 네비게이터 (#72)                           */
+/*    IntersectionObserver로 현재 섹션 감지, 책갈피 활성 표시       */
+/* ------------------------------------------------------------- */
+(function initSectionNav() {
+  const navItems = document.querySelectorAll('.section-nav-item');
+  const sections = document.querySelectorAll('#home, #about, #skills, #awards, #projects');
+  if (!navItems.length || !sections.length) return;
+
+  /* 클릭 시 smooth scroll */
+  navItems.forEach((item) => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = item.getAttribute('href');
+      const target = document.querySelector(targetId);
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  /* IntersectionObserver — 현재 보이는 섹션 감지 */
+  let currentActive = 'home';
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
+        currentActive = entry.target.id;
+        navItems.forEach((item) => {
+          const isActive = item.dataset.navSection === currentActive;
+          item.classList.toggle('active', isActive);
+        });
+      }
+    });
+  }, {
+    threshold: [0.3, 0.5],
+    rootMargin: '-10% 0px -10% 0px'
+  });
+
+  sections.forEach((s) => obs.observe(s));
 })();
