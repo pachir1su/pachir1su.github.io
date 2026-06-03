@@ -141,6 +141,15 @@
             ></a>
           </li>
         </ul>
+        <!-- 유틸리티 버튼 — 언어 전환(#67) + 다크 모드(#68) -->
+        <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
         <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobileMenu">
           <span></span><span></span><span></span>
         </button>
@@ -159,6 +168,14 @@
       <a href="#awards" onclick="closeMobile()"><i class="fas fa-trophy"></i> 수상</a>
       <a href="#projects" onclick="closeMobile()"><i class="fas fa-folder-open"></i> 프로젝트</a>
       <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
     </div>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -297,47 +314,62 @@
         </div>
 
         <!-- ===== MBTI 섹션 (#62) — About Me 안에 상세 지표 차트 ===== -->
+        <!-- MBTI 섹션 (#62) — 2컬럼: 차트 + 성격 특성 -->
         <div class="mbti-block" data-aos="fade-up" data-aos-delay="120">
           <div class="subsection-label">
             <i class="fas fa-brain"></i> MBTI
           </div>
-          <div class="mbti-card">
-            <div class="mbti-type">ENTJ-A</div>
-            <div class="mbti-bars">
-              <div class="mbti-row">
-                <span class="mbti-label mbti-left"><b class="mbti-dim">E</b> <span class="mbti-pct">57%</span></span>
-                <div class="mbti-bar-track">
-                  <div class="mbti-bar-fill mbti-fill-left" style="width: 57%;" data-pct="57"></div>
+          <div class="mbti-layout">
+            <div class="mbti-card">
+              <div class="mbti-type">ENTJ-A</div>
+              <div class="mbti-bars">
+                <div class="mbti-row">
+                  <span class="mbti-label mbti-left"><b class="mbti-dim">E</b> <span class="mbti-pct">57%</span></span>
+                  <div class="mbti-bar-track">
+                    <div class="mbti-bar-fill mbti-fill-left" style="width: 57%;" data-pct="57"></div>
+                  </div>
+                  <span class="mbti-label mbti-right"><span class="mbti-pct">43%</span> <b class="mbti-dim">I</b></span>
                 </div>
-                <span class="mbti-label mbti-right"><span class="mbti-pct">43%</span> <b class="mbti-dim">I</b></span>
+                <div class="mbti-row">
+                  <span class="mbti-label mbti-left"><b class="mbti-dim">N</b> <span class="mbti-pct">84%</span></span>
+                  <div class="mbti-bar-track">
+                    <div class="mbti-bar-fill mbti-fill-left" style="width: 84%;" data-pct="84"></div>
+                  </div>
+                  <span class="mbti-label mbti-right"><span class="mbti-pct">16%</span> <b class="mbti-dim">S</b></span>
+                </div>
+                <div class="mbti-row">
+                  <span class="mbti-label mbti-left"><b class="mbti-dim">T</b> <span class="mbti-pct">60%</span></span>
+                  <div class="mbti-bar-track">
+                    <div class="mbti-bar-fill mbti-fill-left" style="width: 60%;" data-pct="60"></div>
+                  </div>
+                  <span class="mbti-label mbti-right"><span class="mbti-pct">40%</span> <b class="mbti-dim">F</b></span>
+                </div>
+                <div class="mbti-row">
+                  <span class="mbti-label mbti-left"><b class="mbti-dim">J</b> <span class="mbti-pct">89%</span></span>
+                  <div class="mbti-bar-track">
+                    <div class="mbti-bar-fill mbti-fill-left" style="width: 89%;" data-pct="89"></div>
+                  </div>
+                  <span class="mbti-label mbti-right"><span class="mbti-pct">11%</span> <b class="mbti-dim">P</b></span>
+                </div>
+                <div class="mbti-row">
+                  <span class="mbti-label mbti-left"><b class="mbti-dim">A</b> <span class="mbti-pct">76%</span></span>
+                  <div class="mbti-bar-track">
+                    <div class="mbti-bar-fill mbti-fill-left" style="width: 76%;" data-pct="76"></div>
+                  </div>
+                  <span class="mbti-label mbti-right"><span class="mbti-pct">24%</span> <b class="mbti-dim">T</b></span>
+                </div>
               </div>
-              <div class="mbti-row">
-                <span class="mbti-label mbti-left"><b class="mbti-dim">N</b> <span class="mbti-pct">84%</span></span>
-                <div class="mbti-bar-track">
-                  <div class="mbti-bar-fill mbti-fill-left" style="width: 84%;" data-pct="84"></div>
-                </div>
-                <span class="mbti-label mbti-right"><span class="mbti-pct">16%</span> <b class="mbti-dim">S</b></span>
-              </div>
-              <div class="mbti-row">
-                <span class="mbti-label mbti-left"><b class="mbti-dim">T</b> <span class="mbti-pct">60%</span></span>
-                <div class="mbti-bar-track">
-                  <div class="mbti-bar-fill mbti-fill-left" style="width: 60%;" data-pct="60"></div>
-                </div>
-                <span class="mbti-label mbti-right"><span class="mbti-pct">40%</span> <b class="mbti-dim">F</b></span>
-              </div>
-              <div class="mbti-row">
-                <span class="mbti-label mbti-left"><b class="mbti-dim">J</b> <span class="mbti-pct">89%</span></span>
-                <div class="mbti-bar-track">
-                  <div class="mbti-bar-fill mbti-fill-left" style="width: 89%;" data-pct="89"></div>
-                </div>
-                <span class="mbti-label mbti-right"><span class="mbti-pct">11%</span> <b class="mbti-dim">P</b></span>
-              </div>
-              <div class="mbti-row">
-                <span class="mbti-label mbti-left"><b class="mbti-dim">A</b> <span class="mbti-pct">76%</span></span>
-                <div class="mbti-bar-track">
-                  <div class="mbti-bar-fill mbti-fill-left" style="width: 76%;" data-pct="76"></div>
-                </div>
-                <span class="mbti-label mbti-right"><span class="mbti-pct">24%</span> <b class="mbti-dim">T</b></span>
+            </div>
+            <div class="mbti-traits">
+              <div class="mbti-traits-header">대담한 통솔자</div>
+              <div class="mbti-traits-sub">Commander</div>
+              <div class="mbti-traits-tags">
+                <span class="mbti-tag"><i class="fas fa-crown"></i> 리더십</span>
+                <span class="mbti-tag"><i class="fas fa-bullseye"></i> 효율성</span>
+                <span class="mbti-tag"><i class="fas fa-chess"></i> 전략적 사고</span>
+                <span class="mbti-tag"><i class="fas fa-bolt"></i> 자신감</span>
+                <span class="mbti-tag"><i class="fas fa-mountain"></i> 도전 정신</span>
+                <span class="mbti-tag"><i class="fas fa-calendar-check"></i> 계획적</span>
               </div>
             </div>
           </div>
@@ -1265,6 +1297,30 @@
         </div>
       </div>
     </section>
+
+    <!-- 섹션 네비게이터 (#72) — 책갈피 스타일 우측 플로팅 -->
+    <nav class="section-nav" id="sectionNav" aria-label="섹션 네비게이터">
+      <a href="#home" class="section-nav-item active" data-nav-section="home">
+        <span class="nav-bookmark-label">홈</span>
+        <span class="nav-bookmark-dot"></span>
+      </a>
+      <a href="#about" class="section-nav-item" data-nav-section="about">
+        <span class="nav-bookmark-label">비전</span>
+        <span class="nav-bookmark-dot"></span>
+      </a>
+      <a href="#skills" class="section-nav-item" data-nav-section="skills">
+        <span class="nav-bookmark-label">역량</span>
+        <span class="nav-bookmark-dot"></span>
+      </a>
+      <a href="#awards" class="section-nav-item" data-nav-section="awards">
+        <span class="nav-bookmark-label">수상</span>
+        <span class="nav-bookmark-dot"></span>
+      </a>
+      <a href="#projects" class="section-nav-item" data-nav-section="projects">
+        <span class="nav-bookmark-label">프로젝트</span>
+        <span class="nav-bookmark-dot"></span>
+      </a>
+    </nav>
 
     <!-- ============================================================
          푸터 — 로고, 저작권, 소셜 링크(GitHub + 이메일 복사 버튼)
