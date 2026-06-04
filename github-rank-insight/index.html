@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Rank Insight — 등급 분석기</title>
+    <meta name="description" content="GitHub Stats 등급을 자동 또는 수동으로 계산하고, 지표별 기여도와 등급 달성 조건을 시각화하는 웹 도구" />
+    <meta property="og:title" content="GitHub Rank Insight" />
+    <meta property="og:description" content="GitHub username 하나로 즉시 등급 분석 결과를 확인하세요" />
+    <meta property="og:type" content="website" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+
+    <!-- 스크롤 진행 바 -->
+    <div class="progress-container">
+      <div class="progress-bar" id="myBar"></div>
+    </div>
+
+    <!-- 네비게이션 -->
+    <nav class="navbar">
+      <div class="nav-inner container">
+        <a href="../index.html" class="nav-logo"><span>{</span> GY <span>}</span></a>
+        <a href="../index.html#projects" class="nav-back">
+          <i class="fas fa-arrow-left"></i> 포트폴리오
+        </a>
+        <div class="nav-utils">
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container">
+
+      <!-- 히어로 -->
+      <section class="hero-section">
+        <div class="hero-tag">GitHub Stats Analyzer</div>
+        <h1 class="hero-title">
+          GitHub <span class="accent">Rank</span> Insight
+        </h1>
+        <p class="hero-desc">
+          GitHub Stats 등급을 자동 또는 수동으로 계산하고,<br />
+          지표별 기여도와 <strong>다음 등급 달성 조건</strong>을 시각화합니다.
+        </p>
+      </section>
+
+      <!-- ─── 입력 카드 ─── -->
+      <section class="input-card">
+        <!-- 모드 탭 -->
+        <div class="mode-tabs" role="tablist">
+          <button type="button" class="mode-tab active" data-mode="auto" role="tab">
+            <i class="fas fa-bolt"></i> 자동 조회
+          </button>
+          <button type="button" class="mode-tab" data-mode="manual" role="tab">
+            <i class="fas fa-pencil-alt"></i> 수동 입력
+          </button>
+        </div>
+
+        <!-- 자동 모드 -->
+        <div id="auto-panel">
+          <label for="username-input" style="font-size:.85rem;font-weight:600;color:var(--text-sub);display:block;margin-bottom:.4rem;">
+            GitHub Username
+          </label>
+          <div class="auto-input-row">
+            <input
+              type="text"
+              id="username-input"
+              placeholder="예: torvalds"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button type="button" class="btn btn-primary" id="auto-submit-btn">
+              <i class="fas fa-search"></i> 조회
+            </button>
+          </div>
+        </div>
+
+        <!-- 수동 입력 모드 -->
+        <div id="manual-panel" hidden>
+          <div class="manual-grid">
+            <div class="manual-field">
+              <label for="m-stars"><i class="fas fa-star"></i> Stars</label>
+              <input type="number" id="m-stars" min="0" placeholder="0" />
+            </div>
+            <div class="manual-field">
+              <label for="m-prs"><i class="fas fa-code-branch"></i> Pull Requests</label>
+              <input type="number" id="m-prs" min="0" placeholder="0" />
+            </div>
+            <div class="manual-field">
+              <label for="m-commits"><i class="fas fa-history"></i> Commits</label>
+              <input type="number" id="m-commits" min="0" placeholder="0" />
+            </div>
+            <div class="manual-field">
+              <label for="m-issues"><i class="fas fa-exclamation-circle"></i> Issues</label>
+              <input type="number" id="m-issues" min="0" placeholder="0" />
+            </div>
+            <div class="manual-field">
+              <label for="m-followers"><i class="fas fa-users"></i> Followers</label>
+              <input type="number" id="m-followers" min="0" placeholder="0" />
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" id="manual-submit-btn">
+            <i class="fas fa-calculator"></i> 등급 계산
+          </button>
+        </div>
+
+        <!-- include_all_commits 토글 -->
+        <div class="toggle-row">
+          <input type="checkbox" id="include-all-commits" />
+          <label for="include-all-commits">
+            전체 커밋 포함 (커밋 중앙값 250 → 1000)
+          </label>
+        </div>
+      </section>
+
+      <!-- ─── 로딩 ─── -->
+      <section id="loading-section" hidden>
+        <div class="loading-section">
+          <div class="loading-spinner"></div>
+          <div id="loading-step-text" class="loading-step-text">데이터 불러오는 중...</div>
+          <div class="loading-progress-bar">
+            <div class="loading-progress-fill" id="loading-progress-fill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── 오류 ─── -->
+      <section id="error-section" hidden>
+        <div class="error-section">
+          <i class="fas fa-exclamation-triangle"></i>
+          <p id="error-msg"></p>
+        </div>
+      </section>
+
+      <!-- ─── 결과 ─── -->
+      <section id="result-section" hidden class="result-section">
+
+        <div class="result-grid">
+          <!-- 등급 카드 -->
+          <div class="result-card">
+            <div class="result-card-title">
+              <i class="fas fa-trophy"></i> 등급
+            </div>
+            <div class="grade-card-inner">
+              <div class="gauge-wrap">
+                <div id="grade-gauge"></div>
+                <div class="grade-overlay">
+                  <span id="grade-letter">-</span>
+                  <span id="grade-percentile">-</span>
+                </div>
+              </div>
+              <div id="user-info" class="user-info-row" hidden>
+                <img id="user-avatar" src="" alt="avatar" />
+                <span id="user-name"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 지표별 기여도 -->
+          <div class="result-card">
+            <div class="result-card-title">
+              <i class="fas fa-chart-bar"></i> 지표별 기여도
+            </div>
+            <div id="breakdown-bars"></div>
+          </div>
+        </div>
+
+        <!-- 다음 등급 달성 조건 -->
+        <div class="result-card" style="margin-bottom:1.2rem">
+          <div class="result-card-title">
+            <i class="fas fa-arrow-up"></i> 다음 등급 달성 조건
+          </div>
+          <div id="next-grade-section"></div>
+        </div>
+
+        <!-- 등급 체계 표 -->
+        <div class="grade-table-wrap">
+          <div class="result-card-title">
+            <i class="fas fa-list-ol"></i> 등급 체계
+          </div>
+          <table class="grade-system-table">
+            <thead>
+              <tr><th>등급</th><th>기준 (퍼센타일)</th><th></th></tr>
+            </thead>
+            <tbody id="grade-table-body"></tbody>
+          </table>
+        </div>
+
+      </section>
+
+      <!-- ─── 하단 부가 기능 ─── -->
+      <div class="footer-tools">
+
+        <!-- Copy Markdown 버튼 -->
+        <div style="margin-bottom:1.2rem">
+          <button type="button" class="btn btn-ghost" id="copy-markdown-btn">
+            <i class="fas fa-copy"></i> Copy Markdown
+          </button>
+          <span style="font-size:.78rem;color:var(--text-sub);margin-left:.6rem">결과를 README에 붙여넣기 가능한 텍스트로 복사</span>
+        </div>
+
+        <!-- GitHub Token 입력 -->
+        <div>
+          <button type="button" class="token-toggle-btn" id="token-section-toggle">
+            <span class="token-toggle-label">
+              <i class="fas fa-key"></i>
+              GitHub Personal Access Token (선택)
+              <span class="token-status-badge no-token" id="token-status-badge">토큰 없음</span>
+            </span>
+            <span class="toggle-arrow">▼</span>
+          </button>
+          <div id="token-section" class="token-section" hidden>
+            <div class="token-input-row">
+              <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off" />
+              <button type="button" class="btn-icon" id="token-show-btn" title="보기/숨기기">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="token-btns">
+              <button type="button" class="btn btn-primary" id="token-save-btn" style="padding:.45rem 1rem;font-size:.85rem">
+                <i class="fas fa-save"></i> 저장
+              </button>
+              <button type="button" class="btn btn-ghost" id="token-clear-btn" style="padding:.45rem 1rem;font-size:.85rem">
+                <i class="fas fa-trash"></i> 지우기
+              </button>
+            </div>
+            <p class="token-note">
+              <i class="fas fa-shield-alt"></i>
+              토큰은 브라우저 localStorage에만 저장되며, 서버로 전송되지 않습니다.<br />
+              토큰 없이는 시간당 60회, 토큰 사용 시 5,000회 API 요청이 가능합니다.
+            </p>
+          </div>
+        </div>
+
+        <!-- 계산 방식 설명 -->
+        <div class="accordion">
+          <button type="button" class="accordion-header">
+            <span><i class="fas fa-info-circle"></i> 계산 방식 설명</span>
+            <span class="acc-arrow">▼</span>
+          </button>
+          <div class="accordion-body" style="max-height:0">
+            <div class="accordion-body-inner">
+              <p>
+                <a href="https://github.com/anuraghazra/github-readme-stats" target="_blank" rel="noopener noreferrer">anuraghazra/github-readme-stats</a>의
+                <code>calculateRank.js</code> 공식을 그대로 구현합니다.
+              </p>
+              <div class="formula-block">exponential_cdf(x) = 1 - 2^(-x)
+log_normal_cdf(x)  = x / (1 + x)
+
+score = (stars×4 + prs×3 + commits×2 + issues×1 + followers×1) / 11
+percentile = (1 - score) × 100</div>
+              <p style="margin-top:.5rem">
+                지표는 각각 중앙값(Stars:50, PRs:50, Commits:250/1000, Issues:25, Followers:10)으로 정규화된 후 CDF 함수를 거쳐 0~1로 변환됩니다.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="site-footer">
+      <p>
+        Built by <a href="https://pachir1su.github.io" target="_blank" rel="noopener noreferrer">이건영 (Lee Geon Yeong)</a> ·
+        Algorithm from <a href="https://github.com/anuraghazra/github-readme-stats" target="_blank" rel="noopener noreferrer">github-readme-stats</a>
+      </p>
+    </footer>
+
+    <script>
+      // 스크롤 진행 바
+      window.addEventListener('scroll', () => {
+        const el = document.getElementById('myBar');
+        if (!el) return;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        el.style.width = (scrollTop / scrollHeight * 100) + '%';
+      });
+
+      // 다크 모드
+      (function() {
+        const saved = localStorage.getItem('gri_theme');
+        if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          const icon = document.getElementById('themeIcon');
+          if (icon) { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); }
+        }
+      })();
+
+      document.getElementById('themeToggle').addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
+        localStorage.setItem('gri_theme', isDark ? 'light' : 'dark');
+        const icon = document.getElementById('themeIcon');
+        icon.classList.toggle('fa-moon', isDark);
+        icon.classList.toggle('fa-sun', !isDark);
+      });
+    </script>
+
+    <!-- ES Module 진입점 -->
+    <script type="module" src="js/main.js"></script>
+
+  </body>
+</html>
