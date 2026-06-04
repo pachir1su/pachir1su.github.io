@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Rank Insight | 이건영 포트폴리오</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <div class="progress-container">
+      <div class="progress-bar" id="myBar"></div>
+    </div>
+    <button type="button" id="btn-back-to-top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <nav class="navbar">
+      <div class="container nav-content">
+        <a href="../index.html" class="logo"
+          ><span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span></a
+        >
+        <ul class="nav-links">
+          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li>
+            <a
+              href="https://github.com/pachir1su"
+              target="_blank" rel="noopener noreferrer"
+              class="nav-github"
+              ><i class="fab fa-github"></i
+            ></a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <section class="detail-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="detail-hero-glow"></div>
+      <div class="container" style="position: relative; z-index: 1">
+        <div class="detail-breadcrumb">
+          <a href="../index.html">홈</a> /
+          <a href="../index.html#projects">프로젝트</a> / GitHub Rank Insight
+        </div>
+        <div class="detail-hero-icon">
+          <i class="fab fa-github"></i>
+        </div>
+        <h1 class="detail-title" data-aos="fade-up">GitHub Rank Insight</h1>
+        <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
+          <span class="detail-badge">Web</span>
+          <span class="detail-badge">HTML/CSS/JS</span>
+          <span class="detail-badge">GitHub API</span>
+          <span class="detail-badge">개인 개발</span>
+        </div>
+        <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
+          <a
+            href="../github-rank-insight/"
+            class="btn btn-primary"
+            ><i class="fas fa-external-link-alt"></i> 라이브 데모</a
+          >
+          <a
+            href="https://github.com/pachir1su/github-rank-insight"
+            target="_blank" rel="noopener noreferrer"
+            class="btn btn-ghost"
+            ><i class="fab fa-github"></i> GitHub</a
+          >
+          <a href="../index.html#projects" class="btn btn-ghost"
+            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-body">
+      <div class="container">
+        <div class="detail-grid">
+          <div class="detail-main">
+
+            <div class="detail-section" data-aos="fade-up">
+              <h2>프로젝트 개요</h2>
+              <p>
+                GitHub Stats 등급(S·A+·A·A-·B+·B·B-·C+·C)을 <strong>자동 또는 수동으로 계산</strong>하고,
+                지표별 기여도와 <strong>다음 등급 달성 조건</strong>을 시각화하는 서버리스 웹 도구입니다.
+                GitHub username 하나만 입력하면 즉시 등급 분석 결과를 제공합니다.
+              </p>
+              <p style="margin-top: .6rem;">
+                <a href="https://github.com/anuraghazra/github-readme-stats" target="_blank" rel="noopener noreferrer">anuraghazra/github-readme-stats</a>의
+                <code>calculateRank.js</code> 공식을 그대로 구현해 기존 Stats 카드와 동일한 결과를 보장합니다.
+              </p>
+            </div>
+
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
+              <h2>주요 기능</h2>
+              <ul>
+                <li>
+                  <strong>자동 모드</strong> — GitHub username 입력 시 REST API를 통해 Stars·Commits·PRs·Issues·Followers 자동 조회
+                </li>
+                <li>
+                  <strong>수동 모드</strong> — 지표를 직접 입력해 미래 수치 시뮬레이션 가능
+                </li>
+                <li>
+                  <strong>원형 게이지</strong> + 등급 문자 + 상위 퍼센타일 수치 시각화
+                </li>
+                <li>
+                  <strong>지표별 기여도 바 차트</strong> — CDF 퍼센타일과 가중 기여량 시각화
+                </li>
+                <li>
+                  <strong>다음 등급 달성 조건</strong> — 한 단계 위 등급을 위해 지표별 필요 증가량 계산 (이진 탐색)
+                </li>
+                <li>
+                  <strong>Copy Markdown</strong> — 결과를 README에 바로 붙여넣기 가능한 텍스트로 복사
+                </li>
+                <li>
+                  <strong>GitHub Token 입력</strong> — localStorage 저장, API 한도 60→5000회/시간
+                </li>
+                <li>
+                  <strong>다크 모드</strong> — 시스템 설정 자동 감지, 수동 전환 가능
+                </li>
+              </ul>
+            </div>
+
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="80">
+              <h2>계산 알고리즘</h2>
+              <p>
+                지표별 CDF(누적분포함수)를 이용해 0~1로 정규화한 후 가중 합산합니다.
+              </p>
+              <div style="background:var(--bg-card,#f5f2ea);border:1px solid var(--border-color,rgba(90,80,64,.15));border-radius:8px;padding:.8rem 1rem;font-family:'Space Mono',monospace;font-size:.82rem;margin:.7rem 0;white-space:pre-wrap;overflow-x:auto">exponential_cdf(x) = 1 - 2^(-x)
+log_normal_cdf(x)  = x / (1 + x)
+
+score = (stars×4 + prs×3 + commits×2 + issues×1 + followers×1) / 11
+percentile = (1 - score) × 100</div>
+              <table style="width:100%;border-collapse:collapse;font-size:.875rem;margin-top:.5rem">
+                <thead>
+                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.15))">
+                    <th style="padding:.4rem .6rem;text-align:left;color:var(--text-muted,#5a5040)">지표</th>
+                    <th style="padding:.4rem .6rem;text-align:left;color:var(--text-muted,#5a5040)">가중치</th>
+                    <th style="padding:.4rem .6rem;text-align:left;color:var(--text-muted,#5a5040)">중앙값</th>
+                    <th style="padding:.4rem .6rem;text-align:left;color:var(--text-muted,#5a5040)">분포</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.1))"><td style="padding:.4rem .6rem">⭐ Stars</td><td style="padding:.4rem .6rem">4</td><td style="padding:.4rem .6rem">50</td><td style="padding:.4rem .6rem">log-normal</td></tr>
+                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.1))"><td style="padding:.4rem .6rem">🔀 Pull Requests</td><td style="padding:.4rem .6rem">3</td><td style="padding:.4rem .6rem">50</td><td style="padding:.4rem .6rem">exponential</td></tr>
+                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.1))"><td style="padding:.4rem .6rem">📝 Commits</td><td style="padding:.4rem .6rem">2</td><td style="padding:.4rem .6rem">250 / 1000</td><td style="padding:.4rem .6rem">exponential</td></tr>
+                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.1))"><td style="padding:.4rem .6rem">🐛 Issues</td><td style="padding:.4rem .6rem">1</td><td style="padding:.4rem .6rem">25</td><td style="padding:.4rem .6rem">exponential</td></tr>
+                  <tr><td style="padding:.4rem .6rem">👥 Followers</td><td style="padding:.4rem .6rem">1</td><td style="padding:.4rem .6rem">10</td><td style="padding:.4rem .6rem">log-normal</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="120">
+              <h2>기술적 구현 포인트</h2>
+              <ul>
+                <li>
+                  <strong>ES Module</strong> 구조로 calculate.js / api.js / ui.js / main.js 역할 분리
+                </li>
+                <li>
+                  GitHub REST API의 <strong>search/commits 엔드포인트</strong>를 <code>cloak-preview</code> 헤더로 호출해 전체 커밋 수 조회
+                </li>
+                <li>
+                  다음 등급 달성 조건: 각 지표별로 <strong>이진 탐색(60회 반복)</strong>으로 최소 필요 값 산출
+                </li>
+                <li>
+                  원형 게이지: SVG <code>stroke-dashoffset</code> 기법으로 CSS 트랜지션과 연동
+                </li>
+                <li>
+                  GitHub Token은 <strong>localStorage에만 저장</strong>, 서버 전송 없이 브라우저에서만 사용
+                </li>
+              </ul>
+            </div>
+
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="160">
+              <h2>나의 역할</h2>
+              <p class="role-position">
+                <i class="fas fa-user-tag"></i> 1인 개발 · 전 과정
+              </p>
+              <p>기획, 알고리즘 구현, 프론트엔드 개발, 배포 전 과정을 단독으로 진행했습니다.</p>
+            </div>
+
+          </div>
+
+          <div class="detail-sidebar">
+            <div class="sidebar-card" data-aos="fade-left">
+              <h4>Tech Stack</h4>
+              <div class="sidebar-stack">
+                <span>HTML</span>
+                <span>CSS</span>
+                <span>Vanilla JS</span>
+                <span>ES Modules</span>
+                <span>GitHub API</span>
+                <span>SVG</span>
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
+              <h4>Links</h4>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <a
+                  href="../github-rank-insight/"
+                  class="github-activity-btn"
+                  ><i class="fas fa-external-link-alt"></i> 라이브 데모</a
+                >
+                <a
+                  href="https://github.com/pachir1su/github-rank-insight"
+                  target="_blank" rel="noopener noreferrer"
+                  class="github-activity-btn"
+                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                >
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
+              <h4>프로젝트 유형</h4>
+              <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6;">
+                개인 개발 도구<br />
+                서버리스 · GitHub Pages<br />
+                2026
+              </p>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="200">
+              <h4>등급 체계</h4>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.3rem;font-size:.8rem">
+                <span style="color:#FFD700;font-weight:700">S</span><span style="color:var(--text-muted)">상위 1%</span>
+                <span style="color:#00C853;font-weight:700">A+</span><span style="color:var(--text-muted)">12.5%</span>
+                <span style="color:#1DE9B6;font-weight:700">A</span><span style="color:var(--text-muted)">25%</span>
+                <span style="color:#00BCD4;font-weight:700">A-</span><span style="color:var(--text-muted)">37.5%</span>
+                <span style="color:#2979FF;font-weight:700">B+</span><span style="color:var(--text-muted)">50%</span>
+                <span style="color:#651FFF;font-weight:700">B</span><span style="color:var(--text-muted)">62.5%</span>
+                <span style="color:#9C27B0;font-weight:700">B-</span><span style="color:var(--text-muted)">75%</span>
+                <span style="color:#FF6D00;font-weight:700">C+</span><span style="color:var(--text-muted)">87.5%</span>
+                <span style="color:#9E9E9E;font-weight:700">C</span><span style="color:var(--text-muted)">나머지</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">
+          <span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span>
+        </div>
+        <p class="footer-copy">
+          &copy; 2026 Lee Geon Yeong. All rights reserved.
+        </p>
+        <div class="social-links">
+          <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"
+            ><i class="fab fa-github"></i
+          ></a>
+          <a href="mailto:capybara@koreatech.ac.kr"
+            ><i class="fas fa-envelope"></i
+          ></a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="../script.js"></script>
+  </body>
+</html>
