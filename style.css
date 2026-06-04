@@ -3333,13 +3333,13 @@ html {
   z-index: 900;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 .section-nav-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 10px 7px 14px;
+  padding: 6px 10px 6px 14px;
   background: var(--card);
   border: 1px solid var(--line);
   border-right: none;
@@ -3395,18 +3395,91 @@ html {
   font-weight: 700;
 }
 
+/* 하위 섹션 항목 — 들여쓰기 */
+.section-nav-item.nav-sub {
+  padding-left: 18px;
+}
+.section-nav-item.nav-sub .nav-bookmark-dot {
+  width: 6px;
+  height: 6px;
+}
+.section-nav-item.nav-sub .nav-bookmark-label {
+  font-size: 0.62rem;
+}
+
 /* 섹션별 dot 컬러 */
 .section-nav-item[data-nav-section="home"] .nav-bookmark-dot { background: var(--red); }
 .section-nav-item[data-nav-section="about"] .nav-bookmark-dot { background: var(--cyan); }
+.section-nav-item[data-nav-section="mbti-section"] .nav-bookmark-dot { background: var(--cyan); }
+.section-nav-item[data-nav-section="github-section"] .nav-bookmark-dot { background: var(--cyan); }
 .section-nav-item[data-nav-section="skills"] .nav-bookmark-dot { background: var(--gold); }
 .section-nav-item[data-nav-section="awards"] .nav-bookmark-dot { background: var(--bronze); }
-.section-nav-item[data-nav-section="projects"] .nav-bookmark-dot { background: var(--red); }
+.section-nav-item[data-nav-section="cert-section"] .nav-bookmark-dot { background: var(--bronze); }
+.section-nav-item[data-nav-section="featured-section"] .nav-bookmark-dot { background: var(--red); }
+.section-nav-item[data-nav-section="mindmap-section"] .nav-bookmark-dot { background: var(--red); }
+.section-nav-item[data-nav-section="all-projects-section"] .nav-bookmark-dot { background: var(--red); }
 .section-nav-item.active .nav-bookmark-dot { background: var(--red) !important; }
 
-/* 모바일: 네비게이터 숨김 */
+/* 모바일: 하단 도트 네비게이션 */
 @media (max-width: 768px) {
   .section-nav {
-    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    transform: none;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0;
+    z-index: 900;
+    background: var(--card);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -2px 8px rgba(31, 28, 20, 0.08);
+    padding: 6px 4px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .section-nav-item {
+    transform: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+    padding: 4px 6px;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex-shrink: 0;
+  }
+  .section-nav-item.nav-sub {
+    padding-left: 6px;
+  }
+  .nav-bookmark-label {
+    font-size: 0.5rem;
+    opacity: 1;
+    max-width: 48px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+  }
+  .section-nav-item.nav-sub .nav-bookmark-label {
+    font-size: 0.48rem;
+  }
+  .nav-bookmark-dot {
+    width: 6px;
+    height: 6px;
+    order: -1;
+  }
+  .section-nav:hover .section-nav-item {
+    transform: none;
+  }
+  .section-nav-item.active {
+    background: var(--red-soft);
+    border-radius: 6px;
+  }
+  body {
+    padding-bottom: 52px;
   }
 }
 

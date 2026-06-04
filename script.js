@@ -34,23 +34,33 @@ if (backBtn) {
 /* ------------------------------------------------------------- */
 /* 4. 타이핑 효과 (기존)                                          */
 /* ------------------------------------------------------------- */
+/* 타이핑 효과 — 언어 전환 시에도 재시작 가능하도록 전역 참조 */
 (function initTyping() {
-  const typingText = document.getElementById('typing-text');
-  if (!typingText) return;
   const defaultWords = ['풀스택 개발자', '메이커', '아이디어 뱅크', '팀 리더', '엔지니어'];
   let wordIndex = 0, charIndex = 0, isDeleting = false, typeSpeed = 100;
+  let timerId = null;
   function type() {
+    const el = document.getElementById('typing-text');
+    if (!el) { timerId = setTimeout(type, 200); return; }
     const words = window._typingWords || defaultWords;
     const currentWord = words[wordIndex % words.length];
-    typingText.textContent = isDeleting
+    el.textContent = isDeleting
       ? currentWord.substring(0, charIndex - 1)
       : currentWord.substring(0, charIndex + 1);
     isDeleting ? charIndex-- : charIndex++;
     typeSpeed = isDeleting ? 50 : 100;
     if (!isDeleting && charIndex === currentWord.length) { isDeleting = true; typeSpeed = 2000; }
     else if (isDeleting && charIndex === 0) { isDeleting = false; wordIndex = (wordIndex + 1) % words.length; typeSpeed = 500; }
-    setTimeout(type, typeSpeed);
+    timerId = setTimeout(type, typeSpeed);
   }
+  /* 언어 전환 후 타이핑 상태 리셋 */
+  window._restartTyping = function () {
+    clearTimeout(timerId);
+    wordIndex = 0; charIndex = 0; isDeleting = false;
+    const el = document.getElementById('typing-text');
+    if (el) el.textContent = '';
+    timerId = setTimeout(type, 300);
+  };
   type();
 })();
 
@@ -488,20 +498,22 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
 /*    .project-card 전체 개수를 세어 #projectTotalCount에 표시    */
 /*    WIP 제외 완료 수와 WIP 수를 구분해서 "N개 완료 · M개 예정"  */
 /* ------------------------------------------------------------- */
-(function initProjectCount() {
-  const badge = document.getElementById('projectTotalCount');
+/* 전역 함수로 노출 — 언어 전환 시 재호출 */
+window._updateProjectCount = function () {
+  var badge = document.getElementById('projectTotalCount');
   if (!badge) return;
-
-  /* WIP 여부는 project-wip, 실패는 project-failed 클래스로 구분 */
-  const allCards = document.querySelectorAll('.project-card');
-  let done = 0, wip = 0;
-  allCards.forEach((c) => {
+  var allCards = document.querySelectorAll('.project-card');
+  var done = 0, wip = 0;
+  allCards.forEach(function (c) {
     if (c.classList.contains('project-wip')) wip++;
     else if (!c.classList.contains('project-failed')) done++;
   });
-
-  badge.textContent = `${done}개 완료 · ${wip}개 예정`;
-})();
+  var lang = localStorage.getItem('lang') || 'ko';
+  badge.textContent = lang === 'en'
+    ? done + ' done · ' + wip + ' upcoming'
+    : done + '개 완료 · ' + wip + '개 예정';
+};
+window._updateProjectCount();
 
 /* ------------------------------------------------------------- */
 /* 21. 🐔 치킨 모드 이스터에그 (#38)                               */
@@ -745,7 +757,12 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
       '.mbti-traits-header': 'Bold Commander',
       '.mbti-tag': ['Leadership', 'Efficiency', 'Strategic', 'Confidence', 'Challenger', 'Planner'],
       /* 하위 라벨 */
-      '.subsection-label': { skip: true },
+      '.mbti-block .subsection-label': { html: '<i class="fas fa-brain"></i> MBTI' },
+      '.github-activity .subsection-label': { html: '<i class="fab fa-github"></i> GitHub Activity' },
+      '.cert-block .subsection-label': { html: '<i class="fas fa-certificate"></i> Certifications' },
+      '#featured-section > .subsection-label': { html: '<i class="fas fa-star"></i> Featured Projects' },
+      '.mindmap-block .subsection-label': { html: '<i class="fas fa-project-diagram"></i> Project Mindmap' },
+      '#all-projects-section': { html: '<i class="fas fa-folder-open"></i> All Projects <span id="projectTotalCount" class="project-count-badge"></span>' },
       /* 필터 */
       '.pfilter[data-filter="all"]': 'All',
       '.pfilter[data-filter="ai"]': 'AI · ML',
@@ -764,9 +781,14 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
       /* 섹션 네비게이터 */
       '[data-nav-section="home"] .nav-bookmark-label': 'Home',
       '[data-nav-section="about"] .nav-bookmark-label': 'Vision',
+      '[data-nav-section="mbti-section"] .nav-bookmark-label': 'MBTI',
+      '[data-nav-section="github-section"] .nav-bookmark-label': 'GitHub',
       '[data-nav-section="skills"] .nav-bookmark-label': 'Skills',
       '[data-nav-section="awards"] .nav-bookmark-label': 'Awards',
-      '[data-nav-section="projects"] .nav-bookmark-label': 'Projects',
+      '[data-nav-section="cert-section"] .nav-bookmark-label': 'Certs',
+      '[data-nav-section="featured-section"] .nav-bookmark-label': 'Featured',
+      '[data-nav-section="mindmap-section"] .nav-bookmark-label': 'Map',
+      '[data-nav-section="all-projects-section"] .nav-bookmark-label': 'All',
       /* 맨 위로 */
       '#btn-back-to-top': { attr: { title: 'Back to top', 'aria-label': 'Back to top' } },
       '.scroll-hint span': 'Scroll',
@@ -802,6 +824,12 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
       '.github-activity-btn': { html: '<i class="fab fa-github"></i> GitHub 활동 보러가기' },
       '.mbti-traits-header': '대담한 통솔자',
       '.mbti-tag': ['리더십', '효율성', '전략적 사고', '자신감', '도전 정신', '계획적'],
+      '.mbti-block .subsection-label': { html: '<i class="fas fa-brain"></i> MBTI' },
+      '.github-activity .subsection-label': { html: '<i class="fab fa-github"></i> GitHub 활동' },
+      '.cert-block .subsection-label': { html: '<i class="fas fa-certificate"></i> 자격증' },
+      '#featured-section > .subsection-label': { html: '<i class="fas fa-star"></i> 대표 프로젝트' },
+      '.mindmap-block .subsection-label': { html: '<i class="fas fa-project-diagram"></i> 프로젝트 마인드맵' },
+      '#all-projects-section': { html: '<i class="fas fa-folder-open"></i> 전체 프로젝트 <span id="projectTotalCount" class="project-count-badge"></span>' },
       '.pfilter[data-filter="all"]': '전체',
       '.pfilter[data-filter="ai"]': 'AI · ML',
       '.pfilter[data-filter="hardware"]': '하드웨어',
@@ -816,9 +844,14 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
       '.copy-hint': '복사',
       '[data-nav-section="home"] .nav-bookmark-label': '홈',
       '[data-nav-section="about"] .nav-bookmark-label': '비전',
+      '[data-nav-section="mbti-section"] .nav-bookmark-label': 'MBTI',
+      '[data-nav-section="github-section"] .nav-bookmark-label': 'GitHub',
       '[data-nav-section="skills"] .nav-bookmark-label': '역량',
       '[data-nav-section="awards"] .nav-bookmark-label': '수상',
-      '[data-nav-section="projects"] .nav-bookmark-label': '프로젝트',
+      '[data-nav-section="cert-section"] .nav-bookmark-label': '자격증',
+      '[data-nav-section="featured-section"] .nav-bookmark-label': '대표',
+      '[data-nav-section="mindmap-section"] .nav-bookmark-label': '마인드맵',
+      '[data-nav-section="all-projects-section"] .nav-bookmark-label': '전체',
       '#btn-back-to-top': { attr: { title: '맨 위로', 'aria-label': '맨 위로' } },
       '.scroll-hint span': '스크롤',
     }
@@ -892,8 +925,26 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
       }
     });
 
-    /* 타이핑 효과 단어 교체 */
+    /* data-en / data-ko 속성 기반 번역 (스킬·수상·프로젝트 등 대량 텍스트) */
+    document.querySelectorAll('[data-en][data-ko]').forEach(function (el) {
+      var text = lang === 'en' ? el.dataset.en : el.dataset.ko;
+      var first = el.firstElementChild;
+      if (first && first.tagName === 'I') {
+        el.innerHTML = first.outerHTML + ' ' + text;
+      } else {
+        el.textContent = text;
+      }
+    });
+    document.querySelectorAll('[data-en-html][data-ko-html]').forEach(function (el) {
+      el.innerHTML = lang === 'en' ? el.dataset.enHtml : el.dataset.koHtml;
+    });
+
+    /* 프로젝트 수 배지 재계산 */
+    if (typeof window._updateProjectCount === 'function') window._updateProjectCount();
+
+    /* 타이핑 효과 단어 교체 + 재시작 */
     window._typingWords = lang === 'en' ? typingWordsEN : typingWordsKO;
+    if (typeof window._restartTyping === 'function') window._restartTyping();
 
     /* 토글 버튼 라벨 업데이트 */
     const langLabel = toggle.querySelector('.lang-label');
@@ -921,35 +972,42 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
 /* ------------------------------------------------------------- */
 (function initSectionNav() {
   const navItems = document.querySelectorAll('.section-nav-item');
-  const sections = document.querySelectorAll('#home, #about, #skills, #awards, #projects');
+  const sectionIds = [
+    'home', 'about', 'mbti-section', 'github-section',
+    'skills', 'awards', 'cert-section',
+    'featured-section', 'mindmap-section', 'all-projects-section'
+  ];
+  const sections = sectionIds
+    .map(function (id) { return document.getElementById(id); })
+    .filter(Boolean);
   if (!navItems.length || !sections.length) return;
 
   /* 클릭 시 smooth scroll */
-  navItems.forEach((item) => {
-    item.addEventListener('click', (e) => {
+  navItems.forEach(function (item) {
+    item.addEventListener('click', function (e) {
       e.preventDefault();
-      const targetId = item.getAttribute('href');
-      const target = document.querySelector(targetId);
+      var targetId = item.getAttribute('href');
+      var target = document.querySelector(targetId);
       if (target) target.scrollIntoView({ behavior: 'smooth' });
     });
   });
 
-  /* IntersectionObserver — 현재 보이는 섹션 감지 */
-  let currentActive = 'home';
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
+  /* IntersectionObserver — 현재 보이는 섹션/하위섹션 감지 */
+  var currentActive = 'home';
+  /* rootMargin: 뷰포트 상단 20%~하단 70% 영역을 감시 대역으로 설정 */
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
         currentActive = entry.target.id;
-        navItems.forEach((item) => {
-          const isActive = item.dataset.navSection === currentActive;
-          item.classList.toggle('active', isActive);
+        navItems.forEach(function (item) {
+          item.classList.toggle('active', item.dataset.navSection === currentActive);
         });
       }
     });
   }, {
-    threshold: [0.3, 0.5],
-    rootMargin: '-10% 0px -10% 0px'
+    threshold: 0,
+    rootMargin: '-20% 0px -70% 0px'
   });
 
-  sections.forEach((s) => obs.observe(s));
+  sections.forEach(function (s) { obs.observe(s); });
 })();

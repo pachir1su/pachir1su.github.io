@@ -315,7 +315,7 @@
 
         <!-- ===== MBTI 섹션 (#62) — About Me 안에 상세 지표 차트 ===== -->
         <!-- MBTI 섹션 (#62) — 2컬럼: 차트 + 성격 특성 -->
-        <div class="mbti-block" data-aos="fade-up" data-aos-delay="120">
+        <div class="mbti-block" id="mbti-section" data-aos="fade-up" data-aos-delay="120">
           <div class="subsection-label">
             <i class="fas fa-brain"></i> MBTI
           </div>
@@ -376,7 +376,7 @@
         </div>
 
         <!-- ===== GitHub 활동 카드 (#5 요청) — Stats(랭크)+Streak 양옆 / 상세 메트릭 하단 ===== -->
-        <div class="github-activity" data-aos="fade-up" data-aos-delay="150">
+        <div class="github-activity" id="github-section" data-aos="fade-up" data-aos-delay="150">
           <div class="subsection-label">
             <i class="fab fa-github"></i> GitHub 활동
           </div>
@@ -431,7 +431,7 @@
             data-aos-delay="0"
           >
             <div class="skill-icon"><i class="fas fa-code"></i></div>
-            <h3>핵심 언어</h3>
+            <h3 data-en="Core Languages" data-ko="핵심 언어">핵심 언어</h3>
             <ul class="skill-list">
               <li><i class="devicon-python-plain colored"></i> Python</li>
               <li><i class="devicon-c-plain colored"></i> C / C++</li>
@@ -451,16 +451,16 @@
             data-aos-delay="50"
           >
             <div class="skill-icon"><i class="fas fa-brain"></i></div>
-            <h3>AI & 데이터</h3>
+            <h3 data-en="AI &amp; Data" data-ko="AI &amp; 데이터">AI & 데이터</h3>
             <ul class="skill-list">
-              <li><i class="fas fa-robot"></i> LLM 활용 능력</li>
+              <li data-en="LLM Proficiency" data-ko="LLM 활용 능력"><i class="fas fa-robot"></i> LLM 활용 능력</li>
               <li>
                 <i class="devicon-scikitlearn-plain colored"></i> Scikit-learn /
                 Keras
               </li>
               <li><i class="fas fa-chart-pie"></i> Orange3</li>
-              <li><i class="fas fa-project-diagram"></i> 머신러닝 & 딥러닝</li>
-              <li><i class="fas fa-language"></i> NLP (자연어 처리)</li>
+              <li data-en="Machine Learning &amp; Deep Learning" data-ko="머신러닝 &amp; 딥러닝"><i class="fas fa-project-diagram"></i> 머신러닝 & 딥러닝</li>
+              <li data-en="NLP (Natural Language Processing)" data-ko="NLP (자연어 처리)"><i class="fas fa-language"></i> NLP (자연어 처리)</li>
             </ul>
           </div>
           <div
@@ -470,7 +470,7 @@
             data-aos-delay="100"
           >
             <div class="skill-icon"><i class="fas fa-laptop-code"></i></div>
-            <h3>웹 & 앱 개발</h3>
+            <h3 data-en="Web &amp; App Dev" data-ko="웹 &amp; 앱 개발">웹 & 앱 개발</h3>
             <ul class="skill-list">
               <li>
                 <i class="devicon-react-original colored"></i> React / HTML /
@@ -479,7 +479,7 @@
               <li><i class="devicon-flask-original colored"></i> Flask</li>
               <li><i class="devicon-flutter-plain colored"></i> Flutter</li>
               <li><i class="devicon-figma-plain colored"></i> Figma</li>
-              <li><i class="fab fa-discord"></i> Discord 봇 개발</li>
+              <li data-en="Discord Bot Dev" data-ko="Discord 봇 개발"><i class="fab fa-discord"></i> Discord 봇 개발</li>
             </ul>
           </div>
           <div
@@ -489,16 +489,16 @@
             data-aos-delay="150"
           >
             <div class="skill-icon"><i class="fas fa-microchip"></i></div>
-            <h3>하드웨어 & 메이커</h3>
+            <h3 data-en="Hardware &amp; Maker" data-ko="하드웨어 &amp; 메이커">하드웨어 & 메이커</h3>
             <ul class="skill-list">
-              <li>
+              <li data-en="Arduino / Raspberry Pi" data-ko="아두이노 / 라즈베리파이">
                 <i class="devicon-arduino-plain colored"></i> 아두이노 /
                 라즈베리파이
               </li>
-              <li><i class="fas fa-cube"></i> 3D 프린팅 / 모델링</li>
-              <li><i class="fas fa-burn"></i> 레이저 커팅</li>
-              <li><i class="fas fa-network-wired"></i> IoT 시스템 구축</li>
-              <li><i class="fas fa-tools"></i> 용접 & 납땜</li>
+              <li data-en="3D Printing / Modeling" data-ko="3D 프린팅 / 모델링"><i class="fas fa-cube"></i> 3D 프린팅 / 모델링</li>
+              <li data-en="Laser Cutting" data-ko="레이저 커팅"><i class="fas fa-burn"></i> 레이저 커팅</li>
+              <li data-en="IoT System Development" data-ko="IoT 시스템 구축"><i class="fas fa-network-wired"></i> IoT 시스템 구축</li>
+              <li data-en="Welding &amp; Soldering" data-ko="용접 &amp; 납땜"><i class="fas fa-tools"></i> 용접 & 납땜</li>
             </ul>
           </div>
           <div
@@ -508,12 +508,12 @@
             data-aos-delay="200"
           >
             <div class="skill-icon"><i class="fas fa-file-alt"></i></div>
-            <h3>문서화 & 협업</h3>
+            <h3 data-en="Documentation &amp; Collaboration" data-ko="문서화 &amp; 협업">문서화 & 협업</h3>
             <ul class="skill-list">
               <li><i class="devicon-notion-plain colored"></i> Notion</li>
-              <li><i class="fas fa-file-contract"></i> 탁월한 보고서 작성</li>
-              <li><i class="fas fa-folder-open"></i> 체계적인 자료 정리</li>
-              <li><i class="fas fa-pen-nib"></i> 기술 문서 작성</li>
+              <li data-en="Excellent Report Writing" data-ko="탁월한 보고서 작성"><i class="fas fa-file-contract"></i> 탁월한 보고서 작성</li>
+              <li data-en="Systematic File Organization" data-ko="체계적인 자료 정리"><i class="fas fa-folder-open"></i> 체계적인 자료 정리</li>
+              <li data-en="Technical Documentation" data-ko="기술 문서 작성"><i class="fas fa-pen-nib"></i> 기술 문서 작성</li>
             </ul>
           </div>
           <div
@@ -523,12 +523,12 @@
             data-aos-delay="250"
           >
             <div class="skill-icon"><i class="fas fa-crown"></i></div>
-            <h3>리더십 & 커뮤니케이션</h3>
+            <h3 data-en="Leadership &amp; Communication" data-ko="리더십 &amp; 커뮤니케이션">리더십 & 커뮤니케이션</h3>
             <ul class="skill-list">
-              <li><i class="fas fa-tasks"></i> 프로젝트 총괄 관리</li>
-              <li><i class="fas fa-user-friends"></i> 팀 리딩 경험 다수</li>
-              <li><i class="fas fa-microphone-alt"></i> 능숙한 발표 능력</li>
-              <li>
+              <li data-en="Overall Project Management" data-ko="프로젝트 총괄 관리"><i class="fas fa-tasks"></i> 프로젝트 총괄 관리</li>
+              <li data-en="Extensive Team Leading" data-ko="팀 리딩 경험 다수"><i class="fas fa-user-friends"></i> 팀 리딩 경험 다수</li>
+              <li data-en="Proficient Presentation Skills" data-ko="능숙한 발표 능력"><i class="fas fa-microphone-alt"></i> 능숙한 발표 능력</li>
+              <li data-en="Effective Presentation" data-ko="효과적인 프레젠테이션">
                 <i class="fas fa-chalkboard-teacher"></i> 효과적인 프레젠테이션
               </li>
             </ul>
@@ -540,10 +540,10 @@
             data-aos-delay="300"
           >
             <div class="skill-icon"><i class="fas fa-photo-video"></i></div>
-            <h3>미디어 & 프레젠테이션</h3>
+            <h3 data-en="Media &amp; Presentation" data-ko="미디어 &amp; 프레젠테이션">미디어 & 프레젠테이션</h3>
             <ul class="skill-list">
-              <li><i class="fas fa-film"></i> 영상 편집 기술</li>
-              <li>
+              <li data-en="Video Editing" data-ko="영상 편집 기술"><i class="fas fa-film"></i> 영상 편집 기술</li>
+              <li data-en="VTuber Technology" data-ko="버츄얼(VTuber) 기술 보유">
                 <i class="fas fa-vr-cardboard"></i> 버츄얼(VTuber) 기술 보유
               </li>
             </ul>
@@ -569,8 +569,8 @@
             <div class="award-icon"><i class="fas fa-trophy"></i></div>
             <div class="award-info">
               <h3>2024 SFPC</h3>
-              <p class="award-prize">전체 8위 (Top 1.3%)</p>
-              <p class="award-desc">
+              <p class="award-prize" data-en="Overall 8th (Top 1.3%)" data-ko="전체 8위 (Top 1.3%)">전체 8위 (Top 1.3%)</p>
+              <p class="award-desc" data-en="581 teams / 1,661 participants · Proven algorithm &amp; problem-solving skills" data-ko="총 581팀 / 1661명 참가 · 알고리즘 및 문제해결 능력 입증">
                 총 581팀 / 1661명 참가 · 알고리즘 및 문제해결 능력 입증
               </p>
             </div>
@@ -584,9 +584,9 @@
             <div class="award-rank">02</div>
             <div class="award-icon"><i class="fas fa-award"></i></div>
             <div class="award-info">
-              <h3>2024 디지털새싹 인공지능 메이커톤</h3>
-              <p class="award-prize">AI 어벤져스상 수상</p>
-              <p class="award-desc">
+              <h3 data-en="2024 Digital Saessak AI Makerthon" data-ko="2024 디지털새싹 인공지능 메이커톤">2024 디지털새싹 인공지능 메이커톤</h3>
+              <p class="award-prize" data-en="AI Avengers Award" data-ko="AI 어벤져스상 수상">AI 어벤져스상 수상</p>
+              <p class="award-desc" data-en="Wildfire early detection system · Raspberry Pi &amp; OpenCV" data-ko="산불 조기 감지 알림 시스템 개발 · Raspberry Pi &amp; OpenCV 활용">
                 산불 조기 감지 알림 시스템 개발 · Raspberry Pi & OpenCV 활용
               </p>
             </div>
@@ -600,15 +600,15 @@
             <div class="award-rank">03</div>
             <div class="award-icon"><i class="fas fa-medal"></i></div>
             <div class="award-info">
-              <h3>2024 제 5회 천안 학생 로봇 대회</h3>
-              <p class="award-prize">동상 수상</p>
-              <p class="award-desc">해커톤 분야, 총 97팀 참가</p>
+              <h3 data-en="2024 5th Cheonan Student Robot Contest" data-ko="2024 제 5회 천안 학생 로봇 대회">2024 제 5회 천안 학생 로봇 대회</h3>
+              <p class="award-prize" data-en="Bronze Award" data-ko="동상 수상">동상 수상</p>
+              <p class="award-desc" data-en="Hackathon category, 97 teams participated" data-ko="해커톤 분야, 총 97팀 참가">해커톤 분야, 총 97팀 참가</p>
             </div>
           </div>
         </div>
 
         <!-- ===== 자격증 (#39) — 수상 섹션 하위 블록 (내비/번호 변경 없음) ===== -->
-        <div class="cert-block" data-aos="fade-up" data-aos-delay="100">
+        <div class="cert-block" id="cert-section" data-aos="fade-up" data-aos-delay="100">
           <div class="subsection-label">
             <i class="fas fa-certificate"></i> 자격증
           </div>
@@ -616,8 +616,8 @@
             <div class="cert-card">
               <div class="cert-icon"><i class="fas fa-helicopter"></i></div>
               <div class="cert-info">
-                <h3>초경량비행장치 조종자 4종</h3>
-                <p class="cert-desc">드론(무인멀티콥터) 4종 조종 자격</p>
+                <h3 data-en="Ultralight Vehicle Pilot Class 4" data-ko="초경량비행장치 조종자 4종">초경량비행장치 조종자 4종</h3>
+                <p class="cert-desc" data-en="Drone (unmanned multicopter) Class 4 pilot license" data-ko="드론(무인멀티콥터) 4종 조종 자격">드론(무인멀티콥터) 4종 조종 자격</p>
               </div>
             </div>
           </div>
@@ -641,6 +641,7 @@
         </div>
 
         <!-- ===== 대표 프로젝트 (Featured · #29) — 성과가 뚜렷한 3개 선정 ===== -->
+        <div id="featured-section">
         <div class="subsection-label" data-aos="fade-up">
           <i class="fas fa-star"></i> 대표 프로젝트
         </div>
@@ -648,132 +649,133 @@
           <article class="featured-card">
             <div class="featured-top">
               <i class="fas fa-fire-extinguisher featured-icon"></i>
-              <span class="featured-badge">2024 · 수상작</span>
+              <span class="featured-badge" data-en="2024 · Award Winner" data-ko="2024 · 수상작">2024 · 수상작</span>
             </div>
-            <h4 class="featured-title">산불 조기 감지 알림 시스템</h4>
+            <h4 class="featured-title" data-en="Wildfire Early Detection Alert System" data-ko="산불 조기 감지 알림 시스템">산불 조기 감지 알림 시스템</h4>
             <dl class="featured-detail">
-              <dt>문제</dt>
-              <dd>산불은 초기 진압이 늦으면 대형 재난으로 번집니다.</dd>
-              <dt>한 일</dt>
-              <dd>라즈베리파이·카메라와 OpenCV로 화재·연기를 실시간 감지해 즉시 알림을 보내는 시스템을 개발하고 3D 케이스 제작과 발표를 맡았습니다.<span class="fd-role">4인 팀 · 엔지니어</span></dd>
-              <dt>결과</dt>
-              <dd>2024 디지털새싹 인공지능 메이커톤 <strong>'AI 어벤져스상' 수상</strong>.</dd>
+              <dt data-en="Problem" data-ko="문제">문제</dt>
+              <dd data-en="Late initial suppression of wildfires can escalate into major disasters." data-ko="산불은 초기 진압이 늦으면 대형 재난으로 번집니다.">산불은 초기 진압이 늦으면 대형 재난으로 번집니다.</dd>
+              <dt data-en="What I Did" data-ko="한 일">한 일</dt>
+              <dd data-en-html="Developed a real-time fire/smoke detection system using Raspberry Pi, camera, and OpenCV, and handled 3D case fabrication and presentation.<span class='fd-role'>4-person team · Engineer</span>" data-ko-html="라즈베리파이·카메라와 OpenCV로 화재·연기를 실시간 감지해 즉시 알림을 보내는 시스템을 개발하고 3D 케이스 제작과 발표를 맡았습니다.<span class='fd-role'>4인 팀 · 엔지니어</span>">라즈베리파이·카메라와 OpenCV로 화재·연기를 실시간 감지해 즉시 알림을 보내는 시스템을 개발하고 3D 케이스 제작과 발표를 맡았습니다.<span class="fd-role">4인 팀 · 엔지니어</span></dd>
+              <dt data-en="Result" data-ko="결과">결과</dt>
+              <dd data-en-html="2024 Digital Saessak AI Makerthon <strong>'AI Avengers Award'</strong>." data-ko-html="2024 디지털새싹 인공지능 메이커톤 <strong>'AI 어벤져스상' 수상</strong>.">2024 디지털새싹 인공지능 메이커톤 <strong>'AI 어벤져스상' 수상</strong>.</dd>
             </dl>
             <div class="tech-stack">
               <span>Raspberry Pi</span><span>Python</span><span>OpenCV</span><span>Computer Vision</span><span>IoT</span>
             </div>
             <div class="featured-links">
-              <a href="projects/nonofire.html" class="flink flink-primary"><i class="fas fa-arrow-right"></i> 자세히</a>
+              <a href="projects/nonofire.html" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
               <a href="https://github.com/chae03yb/hstree-makerthon" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
-              <a href="https://youtu.be/z0q6D7zNWyw?si=26KJn7oKrOzzY4kc" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-youtube"></i> 영상</a>
+              <a href="https://youtu.be/z0q6D7zNWyw?si=26KJn7oKrOzzY4kc" target="_blank" rel="noopener noreferrer" class="flink" data-en="Video" data-ko="영상"><i class="fab fa-youtube"></i> 영상</a>
             </div>
           </article>
 
           <article class="featured-card">
             <div class="featured-top">
               <i class="fas fa-laptop-code featured-icon"></i>
-              <span class="featured-badge">2024 · 전체 8위</span>
+              <span class="featured-badge" data-en="2024 · Overall 8th" data-ko="2024 · 전체 8위">2024 · 전체 8위</span>
             </div>
             <h4 class="featured-title">2024 SFPC</h4>
             <dl class="featured-detail">
-              <dt>문제</dt>
-              <dd>581팀·1,661명이 겨루는 대규모 알고리즘 대회를 도전했습니다.</dd>
-              <dt>한 일</dt>
-              <dd>Python으로 팀의 알고리즘 문제 풀이를 담당했습니다.<span class="fd-role">4인 팀 · 문제 풀이</span></dd>
-              <dt>결과</dt>
-              <dd>전체 <strong>8위 (Top 1.3%)</strong> 기록.</dd>
+              <dt data-en="Problem" data-ko="문제">문제</dt>
+              <dd data-en="Took on a large-scale algorithm contest with 581 teams and 1,661 participants." data-ko="581팀·1,661명이 겨루는 대규모 알고리즘 대회를 도전했습니다.">581팀·1,661명이 겨루는 대규모 알고리즘 대회를 도전했습니다.</dd>
+              <dt data-en="What I Did" data-ko="한 일">한 일</dt>
+              <dd data-en-html="Handled the team's algorithm problem solving in Python.<span class='fd-role'>4-person team · Problem Solver</span>" data-ko-html="Python으로 팀의 알고리즘 문제 풀이를 담당했습니다.<span class='fd-role'>4인 팀 · 문제 풀이</span>">Python으로 팀의 알고리즘 문제 풀이를 담당했습니다.<span class="fd-role">4인 팀 · 문제 풀이</span></dd>
+              <dt data-en="Result" data-ko="결과">결과</dt>
+              <dd data-en-html="Overall <strong>8th place (Top 1.3%)</strong>." data-ko-html="전체 <strong>8위 (Top 1.3%)</strong> 기록.">전체 <strong>8위 (Top 1.3%)</strong> 기록.</dd>
             </dl>
             <div class="tech-stack">
               <span>C++</span><span>Python</span><span>Algorithm</span><span>DP</span><span>Graph</span>
             </div>
             <div class="featured-links">
-              <a href="projects/2024_SFPC.html" class="flink flink-primary"><i class="fas fa-arrow-right"></i> 자세히</a>
+              <a href="projects/2024_SFPC.html" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
               <a href="https://github.com/pachir1su/2024_SFPC" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
-              <a href="https://www.kait.re.kr/2024sfpc-summary" target="_blank" rel="noopener noreferrer" class="flink"><i class="fas fa-trophy"></i> 대회 요약</a>
+              <a href="https://www.kait.re.kr/2024sfpc-summary" target="_blank" rel="noopener noreferrer" class="flink" data-en="Contest Summary" data-ko="대회 요약"><i class="fas fa-trophy"></i> 대회 요약</a>
             </div>
           </article>
 
           <article class="featured-card">
             <div class="featured-top">
               <i class="fas fa-brain featured-icon"></i>
-              <span class="featured-badge">2025 · 개인 개발</span>
+              <span class="featured-badge" data-en="2025 · Solo Project" data-ko="2025 · 개인 개발">2025 · 개인 개발</span>
             </div>
             <h4 class="featured-title">MultiMind</h4>
             <dl class="featured-detail">
-              <dt>문제</dt>
-              <dd>LLM마다 잘하는 영역이 달라 여러 사이트에 프롬프트를 일일이 복붙하는 게 번거롭고 API 비용도 부담스러웠습니다.</dd>
-              <dt>한 일</dt>
-              <dd>API 없이 pyautogui로 브라우저를 직접 조작해 여러 LLM에 동시에 질문하고 Head LLM이 답변을 종합하는 GUI 오케스트레이터를 단독 개발했습니다.<span class="fd-role">1인 개발 · 전 과정</span></dd>
-              <dt>결과</dt>
-              <dd>API 비용 <strong>0원</strong>으로 멀티 LLM을 동시 활용해서 단일 LLM보다 나은 답변 품질을 확보했습니다.</dd>
+              <dt data-en="Problem" data-ko="문제">문제</dt>
+              <dd data-en="Each LLM excels in different areas, making it tedious to copy-paste prompts across multiple sites, with API costs being a burden." data-ko="LLM마다 잘하는 영역이 달라 여러 사이트에 프롬프트를 일일이 복붙하는 게 번거롭고 API 비용도 부담스러웠습니다.">LLM마다 잘하는 영역이 달라 여러 사이트에 프롬프트를 일일이 복붙하는 게 번거롭고 API 비용도 부담스러웠습니다.</dd>
+              <dt data-en="What I Did" data-ko="한 일">한 일</dt>
+              <dd data-en-html="Solo-developed a GUI orchestrator that uses pyautogui to directly control browsers, querying multiple LLMs simultaneously while a Head LLM synthesizes the answers — no API needed.<span class='fd-role'>Solo dev · Full process</span>" data-ko-html="API 없이 pyautogui로 브라우저를 직접 조작해 여러 LLM에 동시에 질문하고 Head LLM이 답변을 종합하는 GUI 오케스트레이터를 단독 개발했습니다.<span class='fd-role'>1인 개발 · 전 과정</span>">API 없이 pyautogui로 브라우저를 직접 조작해 여러 LLM에 동시에 질문하고 Head LLM이 답변을 종합하는 GUI 오케스트레이터를 단독 개발했습니다.<span class="fd-role">1인 개발 · 전 과정</span></dd>
+              <dt data-en="Result" data-ko="결과">결과</dt>
+              <dd data-en-html="Achieved better answer quality than a single LLM by utilizing multiple LLMs simultaneously at <strong>$0 API cost</strong>." data-ko-html="API 비용 <strong>0원</strong>으로 멀티 LLM을 동시 활용해서 단일 LLM보다 나은 답변 품질을 확보했습니다.">API 비용 <strong>0원</strong>으로 멀티 LLM을 동시 활용해서 단일 LLM보다 나은 답변 품질을 확보했습니다.</dd>
             </dl>
             <div class="tech-stack">
               <span>Python</span><span>pyautogui</span><span>tkinter</span><span>threading</span><span>Multi-Agent</span>
             </div>
             <div class="featured-links">
-              <a href="projects/MultiMind.html" class="flink flink-primary"><i class="fas fa-arrow-right"></i> 자세히</a>
+              <a href="projects/MultiMind.html" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
               <a href="https://github.com/pachir1su/MultiMind" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
             </div>
           </article>
         </div>
+        </div>
 
         <!-- ===== 프로젝트 마인드맵 (#58) — 카테고리별 시각화 ===== -->
-        <div class="mindmap-block" data-aos="fade-up">
+        <div class="mindmap-block" id="mindmap-section" data-aos="fade-up">
           <div class="subsection-label">
             <i class="fas fa-project-diagram"></i> 프로젝트 마인드맵
           </div>
           <div class="mindmap-container">
-            <div class="mindmap-center">프로젝트</div>
+            <div class="mindmap-center" data-en="Projects" data-ko="프로젝트">프로젝트</div>
             <div class="mindmap-branches-wrap">
               <div class="mindmap-branch mindmap-ai">
                 <div class="mindmap-node mindmap-cat">AI · ML</div>
                 <div class="mindmap-leaves">
                   <span class="mindmap-leaf">MultiMind</span>
-                  <span class="mindmap-leaf">데일리 리포트 AI</span>
-                  <span class="mindmap-leaf">공감 봇 & 레시피 AI</span>
-                  <span class="mindmap-leaf">기술과사회</span>
+                  <span class="mindmap-leaf" data-en="Daily Report AI" data-ko="데일리 리포트 AI">데일리 리포트 AI</span>
+                  <span class="mindmap-leaf" data-en="Empathy Bot &amp; Recipe AI" data-ko="공감 봇 &amp; 레시피 AI">공감 봇 & 레시피 AI</span>
+                  <span class="mindmap-leaf" data-en="Tech &amp; Society" data-ko="기술과사회">기술과사회</span>
                   <span class="mindmap-leaf">CentrifugeAI</span>
                   <span class="mindmap-leaf">DelphiRec</span>
-                  <span class="mindmap-leaf">산불 조기 감지 시스템</span>
+                  <span class="mindmap-leaf" data-en="Wildfire Detection" data-ko="산불 조기 감지 시스템">산불 조기 감지 시스템</span>
                 </div>
               </div>
               <div class="mindmap-branch mindmap-hw">
-                <div class="mindmap-node mindmap-cat">하드웨어</div>
+                <div class="mindmap-node mindmap-cat" data-en="Hardware" data-ko="하드웨어">하드웨어</div>
                 <div class="mindmap-leaves">
-                  <span class="mindmap-leaf">NFC 출석 체크 시스템</span>
-                  <span class="mindmap-leaf">식물 타이머</span>
-                  <span class="mindmap-leaf">비밀번호 도어락</span>
-                  <span class="mindmap-leaf">해안 장벽 프로젝트</span>
-                  <span class="mindmap-leaf">졸음 방지 시스템</span>
+                  <span class="mindmap-leaf" data-en="NFC Attendance System" data-ko="NFC 출석 체크 시스템">NFC 출석 체크 시스템</span>
+                  <span class="mindmap-leaf" data-en="Plant Timer" data-ko="식물 타이머">식물 타이머</span>
+                  <span class="mindmap-leaf" data-en="Password Door Lock" data-ko="비밀번호 도어락">비밀번호 도어락</span>
+                  <span class="mindmap-leaf" data-en="Coastal Barrier Project" data-ko="해안 장벽 프로젝트">해안 장벽 프로젝트</span>
+                  <span class="mindmap-leaf" data-en="Drowsiness Prevention" data-ko="졸음 방지 시스템">졸음 방지 시스템</span>
                 </div>
               </div>
               <div class="mindmap-branch mindmap-web">
-                <div class="mindmap-node mindmap-cat">웹</div>
+                <div class="mindmap-node mindmap-cat" data-en="Web" data-ko="웹">웹</div>
                 <div class="mindmap-leaves">
                   <span class="mindmap-leaf">File Swordmaster</span>
                   <span class="mindmap-leaf">Media Swordmaster</span>
-                  <span class="mindmap-leaf">신입생 가이드</span>
-                  <span class="mindmap-leaf">헬스 케어 시스템</span>
+                  <span class="mindmap-leaf" data-en="Freshman Guide" data-ko="신입생 가이드">신입생 가이드</span>
+                  <span class="mindmap-leaf" data-en="Health Care System" data-ko="헬스 케어 시스템">헬스 케어 시스템</span>
                   <span class="mindmap-leaf">HTML Viewer</span>
-                  <span class="mindmap-leaf">온라인술담</span>
-                  <span class="mindmap-leaf">한맵</span>
-                  <span class="mindmap-leaf">마법 아카데미</span>
+                  <span class="mindmap-leaf" data-en="Online Suldam" data-ko="온라인술담">온라인술담</span>
+                  <span class="mindmap-leaf" data-en="HanMap" data-ko="한맵">한맵</span>
+                  <span class="mindmap-leaf" data-en="Magic Academy" data-ko="마법 아카데미">마법 아카데미</span>
                 </div>
               </div>
               <div class="mindmap-branch mindmap-discord">
-                <div class="mindmap-node mindmap-cat">Discord 봇</div>
+                <div class="mindmap-node mindmap-cat" data-en="Discord Bot" data-ko="Discord 봇">Discord 봇</div>
                 <div class="mindmap-leaves">
-                  <span class="mindmap-leaf">면진봇</span>
-                  <span class="mindmap-leaf">승기봇</span>
+                  <span class="mindmap-leaf" data-en="MZ Bot" data-ko="면진봇">면진봇</span>
+                  <span class="mindmap-leaf" data-en="SG Bot" data-ko="승기봇">승기봇</span>
                 </div>
               </div>
               <div class="mindmap-branch mindmap-contest">
-                <div class="mindmap-node mindmap-cat">대회</div>
+                <div class="mindmap-node mindmap-cat" data-en="Contest" data-ko="대회">대회</div>
                 <div class="mindmap-leaves">
                   <span class="mindmap-leaf">2024 SFPC</span>
-                  <span class="mindmap-leaf">디지털새싹 메이커톤</span>
-                  <span class="mindmap-leaf">천안 학생 로봇 대회</span>
-                  <span class="mindmap-leaf">마스터 크리에이터 챌린지</span>
+                  <span class="mindmap-leaf" data-en="Digital Saessak Makerthon" data-ko="디지털새싹 메이커톤">디지털새싹 메이커톤</span>
+                  <span class="mindmap-leaf" data-en="Cheonan Student Robot Contest" data-ko="천안 학생 로봇 대회">천안 학생 로봇 대회</span>
+                  <span class="mindmap-leaf" data-en="Master Creator Challenge" data-ko="마스터 크리에이터 챌린지">마스터 크리에이터 챌린지</span>
                 </div>
               </div>
             </div>
@@ -783,7 +785,7 @@
         <!-- ===== 전체 프로젝트 + 카테고리 필터 (#28) ===== -->
 
         <!-- 전체 프로젝트 헤더 — JS로 총 개수 배지를 동적으로 채움 (#20) -->
-        <div class="subsection-label" data-aos="fade-up">
+        <div id="all-projects-section" class="subsection-label" data-aos="fade-up">
           <i class="fas fa-folder-open"></i> 전체 프로젝트
           <span id="projectTotalCount" class="project-count-badge"></span>
         </div>
@@ -818,9 +820,9 @@
                   <a href="https://github.com/pachir1su/koreatech_noob_guide" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <h3>한기대 26학번 신입생 가이드</h3>
-              <p class="project-subtitle">한기대 26학번 신입생용 노션 가이드</p>
-              <p>한기대 26학번 신입생을 위한 노션 사이트</p>
+              <h3 data-en="KOREATECH Freshman Guide '26" data-ko="한기대 26학번 신입생 가이드">한기대 26학번 신입생 가이드</h3>
+              <p class="project-subtitle" data-en="Notion guide for KOREATECH freshmen '26" data-ko="한기대 26학번 신입생용 노션 가이드">한기대 26학번 신입생용 노션 가이드</p>
+              <p data-en="A Notion site for KOREATECH class of '26 freshmen" data-ko="한기대 26학번 신입생을 위한 노션 사이트">한기대 26학번 신입생을 위한 노션 사이트</p>
               <div class="tech-stack"><span>Notion</span><span>Documentation</span></div>
             </div>
 
@@ -836,8 +838,8 @@
                 </div>
               </div>
               <h3>File Swordmaster</h3>
-              <p class="project-subtitle">PDF·오디오 편집 다기능 웹 툴</p>
-              <p>PDF와 오디오 파일을 편집하는 다기능 스크립트</p>
+              <p class="project-subtitle" data-en="PDF & Audio multi-tool web app" data-ko="PDF·오디오 편집 다기능 웹 툴">PDF·오디오 편집 다기능 웹 툴</p>
+              <p data-en="A multi-function script for editing PDF and audio files" data-ko="PDF와 오디오 파일을 편집하는 다기능 스크립트">PDF와 오디오 파일을 편집하는 다기능 스크립트</p>
               <div class="tech-stack"><span>Python</span><span>Gradio</span><span>PyPDF</span></div>
             </div>
 
@@ -853,8 +855,8 @@
                 </div>
               </div>
               <h3>Media Swordmaster</h3>
-              <p class="project-subtitle">이미지·영상 처리 다기능 웹 앱</p>
-              <p>이미지와 영상 파일의 메타데이터 편집, 확장자 변환,<br />GIF 생성, 워터마크 추가를 지원하는 Gradio 기반 웹 앱</p>
+              <p class="project-subtitle" data-en="Image & video multi-tool web app" data-ko="이미지·영상 처리 다기능 웹 앱">이미지·영상 처리 다기능 웹 앱</p>
+              <p data-en-html="Gradio-based web app for metadata editing, format conversion,&lt;br /&gt;GIF creation, and watermarking of image and video files" data-ko-html="이미지와 영상 파일의 메타데이터 편집, 확장자 변환,&lt;br /&gt;GIF 생성, 워터마크 추가를 지원하는 Gradio 기반 웹 앱">이미지와 영상 파일의 메타데이터 편집, 확장자 변환,<br />GIF 생성, 워터마크 추가를 지원하는 Gradio 기반 웹 앱</p>
               <div class="tech-stack"><span>Python</span><span>Gradio</span><span>Pillow</span><span>FFmpeg</span></div>
             </div>
 
@@ -868,9 +870,9 @@
                   <a href="https://github.com/pachir1su/computingSAGO" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <h3>데일리 리포트 AI</h3>
-              <p class="project-subtitle">Gemini 기반 디스코드 아침 브리핑 봇</p>
-              <p>매일 정해진 시간에 Gemini가 날씨·뉴스·미세먼지를 종합해<br />Discord로 자동 브리핑</p>
+              <h3 data-en="Daily Report AI" data-ko="데일리 리포트 AI">데일리 리포트 AI</h3>
+              <p class="project-subtitle" data-en="Gemini-based Discord morning briefing bot" data-ko="Gemini 기반 디스코드 아침 브리핑 봇">Gemini 기반 디스코드 아침 브리핑 봇</p>
+              <p data-en-html="Gemini compiles weather, news, and air quality daily&lt;br /&gt;and auto-briefs via Discord at a set time" data-ko-html="매일 정해진 시간에 Gemini가 날씨·뉴스·미세먼지를 종합해&lt;br /&gt;Discord로 자동 브리핑">매일 정해진 시간에 Gemini가 날씨·뉴스·미세먼지를 종합해<br />Discord로 자동 브리핑</p>
               <div class="tech-stack"><span>Gemini API</span><span>discord.py</span><span>자동화</span></div>
             </div>
 
@@ -885,8 +887,8 @@
                 </div>
               </div>
               <h3>MultiMind</h3>
-              <p class="project-subtitle">API 없이 여러 LLM을 동시 조작하는 오케스트레이터</p>
-              <p>API 없이 pyautogui로 여러 LLM을 동시에 조작<br />Head LLM이 결과를 종합하는 멀티 LLM 오케스트레이터</p>
+              <p class="project-subtitle" data-en="Orchestrator controlling multiple LLMs without API" data-ko="API 없이 여러 LLM을 동시 조작하는 오케스트레이터">API 없이 여러 LLM을 동시 조작하는 오케스트레이터</p>
+              <p data-en-html="Controls multiple LLMs simultaneously via pyautogui without API&lt;br /&gt;Head LLM aggregates results as a multi-LLM orchestrator" data-ko-html="API 없이 pyautogui로 여러 LLM을 동시에 조작&lt;br /&gt;Head LLM이 결과를 종합하는 멀티 LLM 오케스트레이터">API 없이 pyautogui로 여러 LLM을 동시에 조작<br />Head LLM이 결과를 종합하는 멀티 LLM 오케스트레이터</p>
               <div class="tech-stack"><span>Python</span><span>pyautogui</span><span>tkinter</span><span>Multi-Agent</span></div>
             </div>
 
@@ -899,9 +901,9 @@
                   <a href="projects/tech_and_society.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
                 </div>
               </div>
-              <h3>기술과사회</h3>
-              <p class="project-subtitle">AI 델파이 기법 미래 예측 발표 프로젝트</p>
-              <p>델파이 기법을 이용한 일·직업과 삶의 미래 예측<br />AI 시뮬레이션 델파이 조사 · 발표 프로젝트</p>
+              <h3 data-en="Tech &amp; Society" data-ko="기술과사회">기술과사회</h3>
+              <p class="project-subtitle" data-en="AI Delphi method future prediction project" data-ko="AI 델파이 기법 미래 예측 발표 프로젝트">AI 델파이 기법 미래 예측 발표 프로젝트</p>
+              <p data-en-html="Predicting the future of work, jobs, and life using the Delphi method&lt;br /&gt;AI simulation Delphi survey &amp; presentation project" data-ko-html="델파이 기법을 이용한 일·직업과 삶의 미래 예측&lt;br /&gt;AI 시뮬레이션 델파이 조사 · 발표 프로젝트">델파이 기법을 이용한 일·직업과 삶의 미래 예측<br />AI 시뮬레이션 델파이 조사 · 발표 프로젝트</p>
               <div class="tech-stack"><span>Delphi Method</span><span>Claude</span><span>Gemini</span><span>Chart.js</span></div>
             </div>
 
@@ -923,9 +925,9 @@
                   <a href="https://github.com/pachir1su/BerryIno" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <h3>NFC 출석 체크 시스템</h3>
-              <p class="project-subtitle">NFC 태그 기반 자동 출석 체크 IoT</p>
-              <p>NFC 태그를 활용한 효율적인 출석 체크 시스템<br />아두이노와 라즈베리파이 연동으로 데이터 처리</p>
+              <h3 data-en="NFC Attendance System" data-ko="NFC 출석 체크 시스템">NFC 출석 체크 시스템</h3>
+              <p class="project-subtitle" data-en="NFC tag-based auto attendance IoT" data-ko="NFC 태그 기반 자동 출석 체크 IoT">NFC 태그 기반 자동 출석 체크 IoT</p>
+              <p data-en-html="NFC tag-based efficient attendance system&lt;br /&gt;Arduino and Raspberry Pi integration for data processing" data-ko-html="NFC 태그를 활용한 효율적인 출석 체크 시스템&lt;br /&gt;아두이노와 라즈베리파이 연동으로 데이터 처리">NFC 태그를 활용한 효율적인 출석 체크 시스템<br />아두이노와 라즈베리파이 연동으로 데이터 처리</p>
               <div class="tech-stack"><span>Arduino</span><span>Raspberry Pi</span><span>IoT</span></div>
             </div>
 
@@ -939,9 +941,9 @@
                   <a href="https://github.com/pachir1su/PlantClock" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <h3>식물 타이머</h3>
-              <p class="project-subtitle">식물 관리 스마트 타이머 (해커톤 참가작)</p>
-              <p>2025 선후배와 함께하는 코딩 페스티벌 해커톤 참가작<br />식물 관리를 돕는 스마트 타이머 시스템</p>
+              <h3 data-en="Plant Timer" data-ko="식물 타이머">식물 타이머</h3>
+              <p class="project-subtitle" data-en="Smart plant care timer (hackathon entry)" data-ko="식물 관리 스마트 타이머 (해커톤 참가작)">식물 관리 스마트 타이머 (해커톤 참가작)</p>
+              <p data-en-html="2025 Coding Festival hackathon entry&lt;br /&gt;Smart timer system for plant care" data-ko-html="2025 선후배와 함께하는 코딩 페스티벌 해커톤 참가작&lt;br /&gt;식물 관리를 돕는 스마트 타이머 시스템">2025 선후배와 함께하는 코딩 페스티벌 해커톤 참가작<br />식물 관리를 돕는 스마트 타이머 시스템</p>
               <div class="tech-stack"><span>IoT</span><span>Hackathon</span></div>
             </div>
 
@@ -955,9 +957,9 @@
                   <a href="https://github.com/pachir1su/HEALTH_CHECK_PROJECT" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <h3>헬스 케어 시스템</h3>
-              <p class="project-subtitle">건강 데이터 기록·모니터링 시스템</p>
-              <p>사용자 맞춤형 헬스케어 시스템<br />건강 데이터를 기록하고 모니터링하는 기능 구현</p>
+              <h3 data-en="Health Care System" data-ko="헬스 케어 시스템">헬스 케어 시스템</h3>
+              <p class="project-subtitle" data-en="Health data logging & monitoring system" data-ko="건강 데이터 기록·모니터링 시스템">건강 데이터 기록·모니터링 시스템</p>
+              <p data-en-html="Personalized healthcare system&lt;br /&gt;Health data logging and monitoring features" data-ko-html="사용자 맞춤형 헬스케어 시스템&lt;br /&gt;건강 데이터를 기록하고 모니터링하는 기능 구현">사용자 맞춤형 헬스케어 시스템<br />건강 데이터를 기록하고 모니터링하는 기능 구현</p>
               <div class="tech-stack"><span>Healthcare</span><span>Data</span></div>
             </div>
 
@@ -971,9 +973,9 @@
                   <a href="https://github.com/pachir1su/MZ_bot" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <h3>면진봇</h3>
-              <p class="project-subtitle">디스코드 경제 시뮬레이션 봇</p>
-              <p>디스코드 경제 게임 봇</p>
+              <h3 data-en="MZ Bot" data-ko="면진봇">면진봇</h3>
+              <p class="project-subtitle" data-en="Discord economy simulation bot" data-ko="디스코드 경제 시뮬레이션 봇">디스코드 경제 시뮬레이션 봇</p>
+              <p data-en="Discord economy game bot" data-ko="디스코드 경제 게임 봇">디스코드 경제 게임 봇</p>
               <div class="tech-stack"><span>Python</span><span>Discord.py</span></div>
             </div>
 
@@ -987,9 +989,9 @@
                   <a href="https://github.com/pachir1su/Legend_SakSak_GongGam_AI" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <h3>공감 봇 & 레시피 AI</h3>
-              <p class="project-subtitle">감정 공감 챗봇 + 식재료 레시피 추천 AI</p>
-              <p>감정 공감 챗봇과 보유 식재료 기반 요리 레시피 추천 AI 서비스</p>
+              <h3 data-en="Empathy Bot &amp; Recipe AI" data-ko="공감 봇 &amp; 레시피 AI">공감 봇 & 레시피 AI</h3>
+              <p class="project-subtitle" data-en="Emotional empathy chatbot + ingredient recipe AI" data-ko="감정 공감 챗봇 + 식재료 레시피 추천 AI">감정 공감 챗봇 + 식재료 레시피 추천 AI</p>
+              <p data-en="Emotional empathy chatbot and ingredient-based recipe recommendation AI service" data-ko="감정 공감 챗봇과 보유 식재료 기반 요리 레시피 추천 AI 서비스">감정 공감 챗봇과 보유 식재료 기반 요리 레시피 추천 AI 서비스</p>
               <div class="tech-stack"><span>AI</span><span>Gemini API</span><span>Flask</span></div>
             </div>
 
@@ -1011,9 +1013,9 @@
                   <a href="https://github.com/pachir1su/Master_Creator_Challenge" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <h3>비밀번호 도어락</h3>
-              <p class="project-subtitle">4x4 키패드 기반 비밀번호 도어락</p>
-              <p>2024 마스터 크리에이터 챌린지 참가 프로젝트<br />4x4 매트릭스 키패드를 활용한 도어락 시스템</p>
+              <h3 data-en="Password Door Lock" data-ko="비밀번호 도어락">비밀번호 도어락</h3>
+              <p class="project-subtitle" data-en="4x4 keypad-based password door lock" data-ko="4x4 키패드 기반 비밀번호 도어락">4x4 키패드 기반 비밀번호 도어락</p>
+              <p data-en-html="2024 Master Creator Challenge entry&lt;br /&gt;Door lock system using 4x4 matrix keypad" data-ko-html="2024 마스터 크리에이터 챌린지 참가 프로젝트&lt;br /&gt;4x4 매트릭스 키패드를 활용한 도어락 시스템">2024 마스터 크리에이터 챌린지 참가 프로젝트<br />4x4 매트릭스 키패드를 활용한 도어락 시스템</p>
               <div class="tech-stack"><span>Maker</span><span>Creative</span><span>Challenge</span></div>
             </div>
 
@@ -1027,9 +1029,9 @@
                   <a href="https://github.com/pachir1su/Wall_Sina" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <h3>해안 장벽 프로젝트</h3>
-              <p class="project-subtitle">해수면 상승 대비 해안 장벽 MVP</p>
-              <p>2024 지속 가능한 발전 프로젝트<br />해수면 상승에 대비한 해안 장벽 MVP</p>
+              <h3 data-en="Coastal Barrier Project" data-ko="해안 장벽 프로젝트">해안 장벽 프로젝트</h3>
+              <p class="project-subtitle" data-en="Coastal barrier MVP for sea level rise" data-ko="해수면 상승 대비 해안 장벽 MVP">해수면 상승 대비 해안 장벽 MVP</p>
+              <p data-en-html="2024 Sustainable Development Project&lt;br /&gt;Coastal barrier MVP for rising sea levels" data-ko-html="2024 지속 가능한 발전 프로젝트&lt;br /&gt;해수면 상승에 대비한 해안 장벽 MVP">2024 지속 가능한 발전 프로젝트<br />해수면 상승에 대비한 해안 장벽 MVP</p>
               <div class="tech-stack"><span>Engineering</span><span>Environment</span><span>Modeling</span></div>
             </div>
 
@@ -1043,9 +1045,9 @@
                   <a href="https://github.com/chae03yb/hstree-makerthon" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <h3>산불 조기 감지 알림 시스템</h3>
-              <p class="project-subtitle">라즈베리파이·OpenCV 실시간 산불 감지 (수상작)</p>
-              <p>2024 디지털새싹 'AI 어벤져스상' 수상작<br />라즈베리파이와 OpenCV로 산불을 실시간 감지합니다.</p>
+              <h3 data-en="Wildfire Early Detection Alert System" data-ko="산불 조기 감지 알림 시스템">산불 조기 감지 알림 시스템</h3>
+              <p class="project-subtitle" data-en="Raspberry Pi & OpenCV real-time wildfire detection (award winner)" data-ko="라즈베리파이·OpenCV 실시간 산불 감지 (수상작)">라즈베리파이·OpenCV 실시간 산불 감지 (수상작)</p>
+              <p data-en-html="2024 Digital Saessak 'AI Avengers Award' winner&lt;br /&gt;Real-time wildfire detection using Raspberry Pi and OpenCV" data-ko-html="2024 디지털새싹 'AI 어벤져스상' 수상작&lt;br /&gt;라즈베리파이와 OpenCV로 산불을 실시간 감지합니다.">2024 디지털새싹 'AI 어벤져스상' 수상작<br />라즈베리파이와 OpenCV로 산불을 실시간 감지합니다.</p>
               <div class="tech-stack"><span>Raspberry Pi</span><span>OpenCV</span><span>AI</span></div>
             </div>
 
@@ -1060,8 +1062,8 @@
                 </div>
               </div>
               <h3>2024 SFPC</h3>
-              <p class="project-subtitle">전국 581팀 중 8위 알고리즘 대회 (Top 1.3%)</p>
-              <p>총 581팀 중 8위를 기록한 알고리즘 대회 코드 아카이브.</p>
+              <p class="project-subtitle" data-en="8th place out of 581 teams in algorithm contest (Top 1.3%)" data-ko="전국 581팀 중 8위 알고리즘 대회 (Top 1.3%)">전국 581팀 중 8위 알고리즘 대회 (Top 1.3%)</p>
+              <p data-en="Code archive from the algorithm contest, ranked 8th out of 581 teams." data-ko="총 581팀 중 8위를 기록한 알고리즘 대회 코드 아카이브.">총 581팀 중 8위를 기록한 알고리즘 대회 코드 아카이브.</p>
               <div class="tech-stack"><span>Algorithm</span><span>Problem Solving</span><span>C++ / Python</span></div>
             </div>
 
@@ -1075,9 +1077,9 @@
                   <a href="https://github.com/pachir1su/2024_5th_CSRC" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <h3>졸음 방지 시스템</h3>
-              <p class="project-subtitle">허스키렌즈 실시간 졸음 감지 (로봇대회 동상)</p>
-              <p>2024 제 5회 천안학생로봇대회 동상 수상 프로젝트<br />허스키렌즈를 이용한 실시간 졸음 감지 시스템</p>
+              <h3 data-en="Drowsiness Prevention System" data-ko="졸음 방지 시스템">졸음 방지 시스템</h3>
+              <p class="project-subtitle" data-en="HuskyLens real-time drowsiness detection (robot contest bronze)" data-ko="허스키렌즈 실시간 졸음 감지 (로봇대회 동상)">허스키렌즈 실시간 졸음 감지 (로봇대회 동상)</p>
+              <p data-en-html="2024 5th Cheonan Student Robot Contest bronze award project&lt;br /&gt;Real-time drowsiness detection system using HuskyLens" data-ko-html="2024 제 5회 천안학생로봇대회 동상 수상 프로젝트&lt;br /&gt;허스키렌즈를 이용한 실시간 졸음 감지 시스템">2024 제 5회 천안학생로봇대회 동상 수상 프로젝트<br />허스키렌즈를 이용한 실시간 졸음 감지 시스템</p>
               <div class="tech-stack"><span>Robot</span><span>Embedded</span><span>HuskyLens</span></div>
             </div>
 
@@ -1097,10 +1099,10 @@
                   <a href="https://github.com/pachir1su/Koreatech_Map" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="wip-badge">진행 예정</div>
-              <h3>한맵 (Koreatech Map)</h3>
-              <p class="project-subtitle">한기대 캠퍼스 인터랙티브 지도 웹</p>
-              <p>한기대 캠퍼스 지도 서비스<br />건물 내부 지도 및 호실 정보 등의 모든 정보를 담은 웹 인터랙티브 지도</p>
+              <div class="wip-badge" data-en="Planned" data-ko="진행 예정">진행 예정</div>
+              <h3 data-en="HanMap (Koreatech Map)" data-ko="한맵 (Koreatech Map)">한맵 (Koreatech Map)</h3>
+              <p class="project-subtitle" data-en="KOREATECH campus interactive map web" data-ko="한기대 캠퍼스 인터랙티브 지도 웹">한기대 캠퍼스 인터랙티브 지도 웹</p>
+              <p data-en-html="KOREATECH campus map service&lt;br /&gt;Interactive web map with building floor plans and room info" data-ko-html="한기대 캠퍼스 지도 서비스&lt;br /&gt;건물 내부 지도 및 호실 정보 등의 모든 정보를 담은 웹 인터랙티브 지도">한기대 캠퍼스 지도 서비스<br />건물 내부 지도 및 호실 정보 등의 모든 정보를 담은 웹 인터랙티브 지도</p>
               <div class="progress-bar-wrap"><div class="progress-fill" data-progress="5"><span class="progress-text">5%</span></div></div>
               <div class="tech-stack"><span>Web</span><span>Interactive Map</span><span>Animation</span></div>
             </div>
@@ -1114,10 +1116,10 @@
                   <a href="https://github.com/pachir1su/SG_bot" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="wip-badge">개발 중</div>
-              <h3>승기봇</h3>
-              <p class="project-subtitle">면진봇 개편판 — 미니게임 디스코드 봇</p>
-              <p>기존 면진봇의 개편 버전<br />라이어게임, 양세찬게임, 마피아게임 등의 미니게임 봇</p>
+              <div class="wip-badge" data-en="In Dev" data-ko="개발 중">개발 중</div>
+              <h3 data-en="SG Bot" data-ko="승기봇">승기봇</h3>
+              <p class="project-subtitle" data-en="Revamped MZ Bot — mini-game Discord bot" data-ko="면진봇 개편판 — 미니게임 디스코드 봇">면진봇 개편판 — 미니게임 디스코드 봇</p>
+              <p data-en-html="Revamped version of MZ Bot&lt;br /&gt;Mini-game bot featuring Liar Game, Mafia, and more" data-ko-html="기존 면진봇의 개편 버전&lt;br /&gt;라이어게임, 양세찬게임, 마피아게임 등의 미니게임 봇">기존 면진봇의 개편 버전<br />라이어게임, 양세찬게임, 마피아게임 등의 미니게임 봇</p>
               <div class="progress-bar-wrap"><div class="progress-fill" data-progress="70"><span class="progress-text">70%</span></div></div>
               <div class="tech-stack"><span>Python</span><span>Discord.py</span></div>
             </div>
@@ -1131,10 +1133,10 @@
                   <a href="https://github.com/pachir1su/Sibal_Life_Smoking" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="wip-badge">진행 예정</div>
-              <h3>온라인술담</h3>
-              <p class="project-subtitle">온라인담타 벤치마킹 웹사이트</p>
-              <p>온라인담타를 벤치마킹한 사이트<br />GitHub Pages로 배포 예정</p>
+              <div class="wip-badge" data-en="Planned" data-ko="진행 예정">진행 예정</div>
+              <h3 data-en="Online Suldam" data-ko="온라인술담">온라인술담</h3>
+              <p class="project-subtitle" data-en="Online Damta benchmarking website" data-ko="온라인담타 벤치마킹 웹사이트">온라인담타 벤치마킹 웹사이트</p>
+              <p data-en-html="A site benchmarking Online Damta&lt;br /&gt;To be deployed via GitHub Pages" data-ko-html="온라인담타를 벤치마킹한 사이트&lt;br /&gt;GitHub Pages로 배포 예정">온라인담타를 벤치마킹한 사이트<br />GitHub Pages로 배포 예정</p>
               <div class="progress-bar-wrap"><div class="progress-fill" data-progress="0"><span class="progress-text">0%</span></div></div>
               <div class="tech-stack"><span>HTML/CSS/JS</span><span>GitHub Pages</span></div>
             </div>
@@ -1148,10 +1150,10 @@
                   <a href="https://github.com/pachir1su/HTML_Viewer" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="wip-badge">개발 중</div>
+              <div class="wip-badge" data-en="In Dev" data-ko="개발 중">개발 중</div>
               <h3>HTML Viewer</h3>
-              <p class="project-subtitle">HTML 실시간 미리보기 웹 뷰어</p>
-              <p>HTML 코드를 붙여넣으면<br />실시간으로 결과물을 보여주는 웹 뷰어</p>
+              <p class="project-subtitle" data-en="HTML real-time preview web viewer" data-ko="HTML 실시간 미리보기 웹 뷰어">HTML 실시간 미리보기 웹 뷰어</p>
+              <p data-en-html="Paste HTML code and&lt;br /&gt;see the result in real time" data-ko-html="HTML 코드를 붙여넣으면&lt;br /&gt;실시간으로 결과물을 보여주는 웹 뷰어">HTML 코드를 붙여넣으면<br />실시간으로 결과물을 보여주는 웹 뷰어</p>
               <div class="progress-bar-wrap"><div class="progress-fill" data-progress="45"><span class="progress-text">45%</span></div></div>
               <div class="tech-stack"><span>HTML</span><span>CSS</span><span>JavaScript</span></div>
             </div>
@@ -1165,10 +1167,10 @@
                   <a href="https://github.com/pachir1su/CentrifugeAI" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="wip-badge">개발 중</div>
+              <div class="wip-badge" data-en="In Dev" data-ko="개발 중">개발 중</div>
               <h3>CentrifugeAI</h3>
-              <p class="project-subtitle">Gemini 가상 과학 실험실</p>
-              <p>가상 실험 장치(원심분리기·현미경·가속기 등)에<br />재료를 넣고 Gemini AI로 결과를 예측·시각화하는 실험 시뮬레이터</p>
+              <p class="project-subtitle" data-en="Gemini virtual science lab" data-ko="Gemini 가상 과학 실험실">Gemini 가상 과학 실험실</p>
+              <p data-en-html="Put materials into virtual lab equipment (centrifuge, microscope, accelerator, etc.)&lt;br /&gt;and predict &amp; visualize results with Gemini AI" data-ko-html="가상 실험 장치(원심분리기·현미경·가속기 등)에&lt;br /&gt;재료를 넣고 Gemini AI로 결과를 예측·시각화하는 실험 시뮬레이터">가상 실험 장치(원심분리기·현미경·가속기 등)에<br />재료를 넣고 Gemini AI로 결과를 예측·시각화하는 실험 시뮬레이터</p>
               <div class="progress-bar-wrap"><div class="progress-fill" data-progress="80"><span class="progress-text">80%</span></div></div>
               <div class="tech-stack"><span>Python</span><span>Flask</span><span>SQLite</span><span>Gemini API</span><span>Discord.py</span><span>Matplotlib</span></div>
             </div>
@@ -1181,10 +1183,10 @@
                   <a href="projects/Magic_Academy.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
                 </div>
               </div>
-              <div class="wip-badge">진행 예정</div>
-              <h3>마법 아카데미</h3>
-              <p class="project-subtitle">원소 조합 마법 인터랙티브 시뮬레이션</p>
-              <p>원소를 조합해 마법을 만들고<br />시각화하는 인터랙티브 시뮬레이션</p>
+              <div class="wip-badge" data-en="Planned" data-ko="진행 예정">진행 예정</div>
+              <h3 data-en="Magic Academy" data-ko="마법 아카데미">마법 아카데미</h3>
+              <p class="project-subtitle" data-en="Element combination magic interactive simulation" data-ko="원소 조합 마법 인터랙티브 시뮬레이션">원소 조합 마법 인터랙티브 시뮬레이션</p>
+              <p data-en-html="Combine elements to create magic and&lt;br /&gt;visualize with interactive simulation" data-ko-html="원소를 조합해 마법을 만들고&lt;br /&gt;시각화하는 인터랙티브 시뮬레이션">원소를 조합해 마법을 만들고<br />시각화하는 인터랙티브 시뮬레이션</p>
               <div class="progress-bar-wrap"><div class="progress-fill" data-progress="0"><span class="progress-text">0%</span></div></div>
               <div class="tech-stack"><span>Python (예정)</span><span>p5.js (예정)</span></div>
             </div>
@@ -1198,10 +1200,10 @@
                   <a href="https://github.com/pachir1su/DelphiRec" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="wip-badge">개발 예정</div>
+              <div class="wip-badge" data-en="Planned" data-ko="개발 예정">개발 예정</div>
               <h3>DelphiRec</h3>
-              <p class="project-subtitle">생기부 분석·질의응답 멀티 에이전트 AI</p>
-              <p>생기부 분석 &amp; 질의응답 AI<br />멀티 전문가 페르소나와 델파이 기법으로 생기부를 심층 분석</p>
+              <p class="project-subtitle" data-en="Student record analysis &amp; Q&amp;A multi-agent AI" data-ko="생기부 분석·질의응답 멀티 에이전트 AI">생기부 분석·질의응답 멀티 에이전트 AI</p>
+              <p data-en-html="Student record analysis &amp;amp; Q&amp;amp;A AI&lt;br /&gt;In-depth analysis using multi-expert personas and Delphi method" data-ko-html="생기부 분석 &amp;amp; 질의응답 AI&lt;br /&gt;멀티 전문가 페르소나와 델파이 기법으로 생기부를 심층 분석">생기부 분석 &amp; 질의응답 AI<br />멀티 전문가 페르소나와 델파이 기법으로 생기부를 심층 분석</p>
               <div class="progress-bar-wrap"><div class="progress-fill" data-progress="20"><span class="progress-text">20%</span></div></div>
               <div class="tech-stack"><span>Claude API</span><span>FastAPI</span><span>React</span><span>Multi-Agent</span></div>
             </div>
@@ -1221,11 +1223,11 @@
                   <a href="https://github.com/pachir1su/InfoCatch" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="failed-badge">실패</div>
+              <div class="failed-badge" data-en="Failed" data-ko="실패">실패</div>
               <h3>InfoCatch</h3>
-              <p class="project-subtitle">AI 뉴스 요약 웹 애플리케이션</p>
-              <p>Google Gemini API를 활용한 뉴스 요약 및 실시간 증시 정보 제공 웹앱</p>
-              <div class="failed-reason"><i class="fas fa-times-circle"></i> AI 구현 실패 · 당시 웹서버 구축 몰랐음</div>
+              <p class="project-subtitle" data-en="AI news summarization web app" data-ko="AI 뉴스 요약 웹 애플리케이션">AI 뉴스 요약 웹 애플리케이션</p>
+              <p data-en="News summarization and real-time stock info web app using Google Gemini API" data-ko="Google Gemini API를 활용한 뉴스 요약 및 실시간 증시 정보 제공 웹앱">Google Gemini API를 활용한 뉴스 요약 및 실시간 증시 정보 제공 웹앱</p>
+              <div class="failed-reason" data-en-html="<i class=&quot;fas fa-times-circle&quot;></i> AI implementation failed; didn't know web server setup at the time" data-ko-html="<i class=&quot;fas fa-times-circle&quot;></i> AI 구현 실패 · 당시 웹서버 구축 몰랐음"><i class="fas fa-times-circle"></i> AI 구현 실패 · 당시 웹서버 구축 몰랐음</div>
               <div class="tech-stack"><span>React</span><span>Gemini API</span><span>NewsAPI</span></div>
             </div>
 
@@ -1237,11 +1239,11 @@
                   <a href="https://github.com/pachir1su/InvestAI" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="failed-badge">실패</div>
+              <div class="failed-badge" data-en="Failed" data-ko="실패">실패</div>
               <h3>InvestAI</h3>
-              <p class="project-subtitle">Fear/Greed 지표 · 환율·주가 웹 위젯</p>
-              <p>뉴스·소셜 미디어 분석으로 시장 Fear/Greed 지표를 제공하는 실시간 위젯</p>
-              <div class="failed-reason"><i class="fas fa-times-circle"></i> API 연동 실패</div>
+              <p class="project-subtitle" data-en="Fear/Greed index &amp; forex/stock web widget" data-ko="Fear/Greed 지표 · 환율·주가 웹 위젯">Fear/Greed 지표 · 환율·주가 웹 위젯</p>
+              <p data-en="Real-time widget providing market Fear/Greed index via news and social media analysis" data-ko="뉴스·소셜 미디어 분석으로 시장 Fear/Greed 지표를 제공하는 실시간 위젯">뉴스·소셜 미디어 분석으로 시장 Fear/Greed 지표를 제공하는 실시간 위젯</p>
+              <div class="failed-reason" data-en-html="<i class=&quot;fas fa-times-circle&quot;></i> API integration failed" data-ko-html="<i class=&quot;fas fa-times-circle&quot;></i> API 연동 실패"><i class="fas fa-times-circle"></i> API 연동 실패</div>
               <div class="tech-stack"><span>Python</span><span>API</span><span>Data Analysis</span></div>
             </div>
 
@@ -1253,11 +1255,11 @@
                   <a href="https://github.com/pachir1su/GY_Fortune" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="failed-badge">실패</div>
-              <h3>건영운세</h3>
-              <p class="project-subtitle">날짜 기반 운세 생성 웹앱</p>
-              <p>이름·생년월일 입력 시 날짜 고정 시드 기반으로 운세를 생성하는 서비스</p>
-              <div class="failed-reason"><i class="fas fa-times-circle"></i> 운세 로직 구현 실패</div>
+              <div class="failed-badge" data-en="Failed" data-ko="실패">실패</div>
+              <h3 data-en="GY Fortune" data-ko="건영운세">건영운세</h3>
+              <p class="project-subtitle" data-en="Date-based fortune generator web app" data-ko="날짜 기반 운세 생성 웹앱">날짜 기반 운세 생성 웹앱</p>
+              <p data-en="Fortune generation service based on name and birthdate with date-fixed seed" data-ko="이름·생년월일 입력 시 날짜 고정 시드 기반으로 운세를 생성하는 서비스">이름·생년월일 입력 시 날짜 고정 시드 기반으로 운세를 생성하는 서비스</p>
+              <div class="failed-reason" data-en-html="<i class=&quot;fas fa-times-circle&quot;></i> Fortune logic implementation failed" data-ko-html="<i class=&quot;fas fa-times-circle&quot;></i> 운세 로직 구현 실패"><i class="fas fa-times-circle"></i> 운세 로직 구현 실패</div>
               <div class="tech-stack"><span>React</span><span>Zustand</span><span>Vite</span></div>
             </div>
 
@@ -1269,11 +1271,11 @@
                   <a href="https://github.com/pachir1su/Koreatech_Map" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="failed-badge">지연</div>
-              <h3>한기대 지도 (초기 버전)</h3>
-              <p class="project-subtitle">캠퍼스 내부 지도 데이터 수집 프로젝트</p>
-              <p>대피도 기반 실내 지도 변환 시도 · 데이터 수집의 현실적 한계에 부딪힘</p>
-              <div class="failed-reason"><i class="fas fa-times-circle"></i> 데이터 수집 난이도 · AI 지도 변환 실패</div>
+              <div class="failed-badge" data-en="Delayed" data-ko="지연">지연</div>
+              <h3 data-en="KOREATECH Map (Early Ver.)" data-ko="한기대 지도 (초기 버전)">한기대 지도 (초기 버전)</h3>
+              <p class="project-subtitle" data-en="Campus indoor map data collection project" data-ko="캠퍼스 내부 지도 데이터 수집 프로젝트">캠퍼스 내부 지도 데이터 수집 프로젝트</p>
+              <p data-en="Attempted evacuation-map-based indoor map conversion; hit realistic limits of data collection" data-ko="대피도 기반 실내 지도 변환 시도 · 데이터 수집의 현실적 한계에 부딪힘">대피도 기반 실내 지도 변환 시도 · 데이터 수집의 현실적 한계에 부딪힘</p>
+              <div class="failed-reason" data-en-html="<i class=&quot;fas fa-times-circle&quot;></i> Data collection difficulty; AI map conversion failed" data-ko-html="<i class=&quot;fas fa-times-circle&quot;></i> 데이터 수집 난이도 · AI 지도 변환 실패"><i class="fas fa-times-circle"></i> 데이터 수집 난이도 · AI 지도 변환 실패</div>
               <div class="tech-stack"><span>Web</span><span>GPT-Image</span><span>Data Collection</span></div>
             </div>
 
@@ -1285,11 +1287,11 @@
                   <a href="https://github.com/pachir1su/BrawlCraft" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="failed-badge">실패</div>
+              <div class="failed-badge" data-en="Failed" data-ko="실패">실패</div>
               <h3>BrawlCraft</h3>
-              <p class="project-subtitle">브롤스타즈 × 마인크래프트 웹 게임</p>
-              <p>탐사·재료 조합·전투를 결합한 웹 게임 · 봇 알고리즘까지 구현 시도</p>
-              <div class="failed-reason"><i class="fas fa-times-circle"></i> 최적화 실패 · 디자인 실패</div>
+              <p class="project-subtitle" data-en="Brawl Stars x Minecraft web game" data-ko="브롤스타즈 × 마인크래프트 웹 게임">브롤스타즈 × 마인크래프트 웹 게임</p>
+              <p data-en="Web game combining exploration, crafting, and combat; attempted bot algorithm implementation" data-ko="탐사·재료 조합·전투를 결합한 웹 게임 · 봇 알고리즘까지 구현 시도">탐사·재료 조합·전투를 결합한 웹 게임 · 봇 알고리즘까지 구현 시도</p>
+              <div class="failed-reason" data-en-html="<i class=&quot;fas fa-times-circle&quot;></i> Optimization failed; design failed" data-ko-html="<i class=&quot;fas fa-times-circle&quot;></i> 최적화 실패 · 디자인 실패"><i class="fas fa-times-circle"></i> 최적화 실패 · 디자인 실패</div>
               <div class="tech-stack"><span>JavaScript</span><span>Game Dev</span><span>Canvas</span></div>
             </div>
 
@@ -1308,6 +1310,14 @@
         <span class="nav-bookmark-label">비전</span>
         <span class="nav-bookmark-dot"></span>
       </a>
+      <a href="#mbti-section" class="section-nav-item nav-sub" data-nav-section="mbti-section">
+        <span class="nav-bookmark-label">MBTI</span>
+        <span class="nav-bookmark-dot"></span>
+      </a>
+      <a href="#github-section" class="section-nav-item nav-sub" data-nav-section="github-section">
+        <span class="nav-bookmark-label">GitHub</span>
+        <span class="nav-bookmark-dot"></span>
+      </a>
       <a href="#skills" class="section-nav-item" data-nav-section="skills">
         <span class="nav-bookmark-label">역량</span>
         <span class="nav-bookmark-dot"></span>
@@ -1316,8 +1326,20 @@
         <span class="nav-bookmark-label">수상</span>
         <span class="nav-bookmark-dot"></span>
       </a>
-      <a href="#projects" class="section-nav-item" data-nav-section="projects">
-        <span class="nav-bookmark-label">프로젝트</span>
+      <a href="#cert-section" class="section-nav-item nav-sub" data-nav-section="cert-section">
+        <span class="nav-bookmark-label">자격증</span>
+        <span class="nav-bookmark-dot"></span>
+      </a>
+      <a href="#featured-section" class="section-nav-item nav-sub" data-nav-section="featured-section">
+        <span class="nav-bookmark-label">대표</span>
+        <span class="nav-bookmark-dot"></span>
+      </a>
+      <a href="#mindmap-section" class="section-nav-item nav-sub" data-nav-section="mindmap-section">
+        <span class="nav-bookmark-label">마인드맵</span>
+        <span class="nav-bookmark-dot"></span>
+      </a>
+      <a href="#all-projects-section" class="section-nav-item" data-nav-section="all-projects-section">
+        <span class="nav-bookmark-label">전체</span>
         <span class="nav-bookmark-dot"></span>
       </a>
     </nav>
