@@ -93,9 +93,9 @@
             <div class="detail-section" data-aos="fade-up">
               <h2>프로젝트 개요</h2>
               <p>
-                GitHub Stats 등급(S·A+·A·A-·B+·B·B-·C+·C)을 <strong>자동 또는 수동으로 계산</strong>하고,
+                GitHub Stats 등급(S·A+·A·A-·B+·B·B-·C+·C)을 <strong>자동 또는 수동으로 계산</strong>하고
                 지표별 기여도와 <strong>다음 등급 달성 조건</strong>을 시각화하는 서버리스 웹 도구입니다.
-                GitHub username 하나만 입력하면 즉시 등급 분석 결과를 제공합니다.
+                GitHub username 하나만 입력하면 바로 등급 분석 결과를 제공합니다.
               </p>
               <p style="margin-top: .6rem;">
                 <a href="https://github.com/anuraghazra/github-readme-stats" target="_blank" rel="noopener noreferrer">anuraghazra/github-readme-stats</a>의
@@ -124,12 +124,6 @@
                 <li>
                   <strong>Copy Markdown</strong> — 결과를 README에 바로 붙여넣기 가능한 텍스트로 복사
                 </li>
-                <li>
-                  <strong>GitHub Token 입력</strong> — localStorage 저장, API 한도 60→5000회/시간
-                </li>
-                <li>
-                  <strong>다크 모드</strong> — 시스템 설정 자동 감지, 수동 전환 가능
-                </li>
               </ul>
             </div>
 
@@ -153,11 +147,11 @@ percentile = (1 - score) × 100</div>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.1))"><td style="padding:.4rem .6rem">⭐ Stars</td><td style="padding:.4rem .6rem">4</td><td style="padding:.4rem .6rem">50</td><td style="padding:.4rem .6rem">log-normal</td></tr>
-                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.1))"><td style="padding:.4rem .6rem">🔀 Pull Requests</td><td style="padding:.4rem .6rem">3</td><td style="padding:.4rem .6rem">50</td><td style="padding:.4rem .6rem">exponential</td></tr>
-                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.1))"><td style="padding:.4rem .6rem">📝 Commits</td><td style="padding:.4rem .6rem">2</td><td style="padding:.4rem .6rem">250 / 1000</td><td style="padding:.4rem .6rem">exponential</td></tr>
-                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.1))"><td style="padding:.4rem .6rem">🐛 Issues</td><td style="padding:.4rem .6rem">1</td><td style="padding:.4rem .6rem">25</td><td style="padding:.4rem .6rem">exponential</td></tr>
-                  <tr><td style="padding:.4rem .6rem">👥 Followers</td><td style="padding:.4rem .6rem">1</td><td style="padding:.4rem .6rem">10</td><td style="padding:.4rem .6rem">log-normal</td></tr>
+                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.1))"><td style="padding:.4rem .6rem">Stars</td><td style="padding:.4rem .6rem">4</td><td style="padding:.4rem .6rem">50</td><td style="padding:.4rem .6rem">log-normal</td></tr>
+                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.1))"><td style="padding:.4rem .6rem">Pull Requests</td><td style="padding:.4rem .6rem">3</td><td style="padding:.4rem .6rem">50</td><td style="padding:.4rem .6rem">exponential</td></tr>
+                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.1))"><td style="padding:.4rem .6rem">Commits</td><td style="padding:.4rem .6rem">2</td><td style="padding:.4rem .6rem">250 / 1000</td><td style="padding:.4rem .6rem">exponential</td></tr>
+                  <tr style="border-bottom:1px solid var(--border-color,rgba(90,80,64,.1))"><td style="padding:.4rem .6rem">Issues</td><td style="padding:.4rem .6rem">1</td><td style="padding:.4rem .6rem">25</td><td style="padding:.4rem .6rem">exponential</td></tr>
+                  <tr><td style="padding:.4rem .6rem">Followers</td><td style="padding:.4rem .6rem">1</td><td style="padding:.4rem .6rem">10</td><td style="padding:.4rem .6rem">log-normal</td></tr>
                 </tbody>
               </table>
             </div>
@@ -232,15 +226,15 @@ percentile = (1 - score) × 100</div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="200">
               <h4>등급 체계</h4>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:.3rem;font-size:.8rem">
-                <span style="color:#FFD700;font-weight:700">S</span><span style="color:var(--text-muted)">상위 1%</span>
-                <span style="color:#00C853;font-weight:700">A+</span><span style="color:var(--text-muted)">12.5%</span>
-                <span style="color:#1DE9B6;font-weight:700">A</span><span style="color:var(--text-muted)">25%</span>
-                <span style="color:#00BCD4;font-weight:700">A-</span><span style="color:var(--text-muted)">37.5%</span>
-                <span style="color:#2979FF;font-weight:700">B+</span><span style="color:var(--text-muted)">50%</span>
-                <span style="color:#651FFF;font-weight:700">B</span><span style="color:var(--text-muted)">62.5%</span>
-                <span style="color:#9C27B0;font-weight:700">B-</span><span style="color:var(--text-muted)">75%</span>
-                <span style="color:#FF6D00;font-weight:700">C+</span><span style="color:var(--text-muted)">87.5%</span>
-                <span style="color:#9E9E9E;font-weight:700">C</span><span style="color:var(--text-muted)">나머지</span>
+               <span style="color:#FFD700;font-weight:700">S</span><span style="color:var(--text-muted)">0 ~ 1%</span>
+               <span style="color:#00C853;font-weight:700">A+</span><span style="color:var(--text-muted)">1 ~ 12.5%</span>
+               <span style="color:#1DE9B6;font-weight:700">A</span><span style="color:var(--text-muted)">12.5 ~ 25%</span>
+               <span style="color:#00BCD4;font-weight:700">A-</span><span style="color:var(--text-muted)">25 ~ 37.5%</span>
+               <span style="color:#2979FF;font-weight:700">B+</span><span style="color:var(--text-muted)">37.5 ~ 50%</span>
+               <span style="color:#651FFF;font-weight:700">B</span><span style="color:var(--text-muted)">50 ~ 62.5%</span>
+               <span style="color:#9C27B0;font-weight:700">B-</span><span style="color:var(--text-muted)">62.5 ~ 75%</span>
+               <span style="color:#FF6D00;font-weight:700">C+</span><span style="color:var(--text-muted)">75 ~ 87.5%</span>
+               <span style="color:#9E9E9E;font-weight:700">C</span><span style="color:var(--text-muted)">87.5% ~</span>
               </div>
             </div>
           </div>
