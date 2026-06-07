@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,21 +45,50 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / 한맵
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / 한맵
         </div>
         <div class="detail-hero-icon">
           <i class="fas fa-map-marked-alt"></i>
         </div>
-        <h1 class="detail-title" data-aos="fade-up">한맵 (Koreatech Map)</h1>
+        <h1 class="detail-title" data-aos="fade-up"><span data-en="HanMap (Koreatech Map)" data-ko="한맵 (Koreatech Map)">한맵 (Koreatech Map)</span></h1>
         <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
           <span class="detail-badge">Web</span>
           <span class="detail-badge">Interactive Map</span>
@@ -82,7 +111,7 @@
             ><i class="fab fa-github"></i> GitHub</a
           >
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -93,7 +122,7 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
               <p>
                 한국기술교육대학교 캠퍼스의 지도를 웹으로 구현하는
                 프로젝트입니다. 학교 대피도를 참고하거나 직접 탐사, 혹은
@@ -107,14 +136,14 @@
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능 / 내용</h2>
+              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li>한기대 캠퍼스 전체 지도 시각화</li>
-                <li>각 건물 내부 층별 지도 및 호실 구조 출력</li>
-                <li>호실별 담당자 연락처 정보 제공</li>
-                <li>건물 · 호실 클릭 시 애니메이션으로 부드럽게 전환</li>
-                <li>대피도 데이터 참고 및 직접 탐사 기반 데이터 구축</li>
-                <li>시설팀 협조를 통한 공식 지도 데이터 확보 시도</li>
+                <li data-en="Full KOREATECH campus map visualization">한기대 캠퍼스 전체 지도 시각화</li>
+                <li data-en="Building-level floor maps">각 건물 내부 층별 지도 및 호실 구조 출력</li>
+                <li data-en="Room-level contact information for staff">호실별 담당자 연락처 정보 제공</li>
+                <li data-en="Smooth animated transitions on building/room click">건물 · 호실 클릭 시 애니메이션으로 부드럽게 전환</li>
+                <li data-en="Data built from evacuation maps and on-site exploration">대피도 데이터 참고 및 직접 탐사 기반 데이터 구축</li>
+                <li data-en="Attempted to obtain official map data via facilities team">시설팀 협조를 통한 공식 지도 데이터 확보 시도</li>
               </ul>
             </div>
             <div
@@ -141,12 +170,12 @@
                   href="https://github.com/pachir1su/Koreatech_Map"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);

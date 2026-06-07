@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,16 +45,45 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / HTML Viewer
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / HTML Viewer
         </div>
         <div class="detail-hero-icon">
           <i class="fas fa-code"></i>
@@ -82,7 +111,7 @@
             ><i class="fab fa-github"></i> GitHub</a
           >
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -93,7 +122,7 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
               <p>
                 HTML 코드를 붙여넣으면 즉시 결과물을 보여주는 가벼운 웹 뷰어입니다.
                 별도의 설치 없이 브라우저 안에서 마크업·스타일·스크립트를
@@ -101,18 +130,18 @@
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능 / 내용</h2>
+              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li>HTML / CSS / JavaScript 통합 입력 에디터</li>
-                <li>입력과 동시에 갱신되는 실시간 미리보기</li>
-                <li>결과 화면 캡처 및 코드 저장</li>
-                <li>코드 공유용 URL 생성 (예정)</li>
+                <li data-en="Integrated HTML / CSS / JavaScript input editor">HTML / CSS / JavaScript 통합 입력 에디터</li>
+                <li data-en="Real-time preview that updates as you type">입력과 동시에 갱신되는 실시간 미리보기</li>
+                <li data-en="Result screen capture and code save">결과 화면 캡처 및 코드 저장</li>
+                <li data-en="Code sharing URL generation (planned)">코드 공유용 URL 생성 (예정)</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="120">
-              <h2>나의 역할</h2>
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> 1인 개발
+                <i class="fas fa-user-tag"></i> <span data-en="Solo Development" data-ko="1인 개발">1인 개발</span>
               </p>
               <p>기획부터 개발, 배포까지 전 과정을 단독으로 진행했습니다.</p>
             </div>
@@ -134,12 +163,12 @@
                   href="https://github.com/pachir1su/HTML_Viewer"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);

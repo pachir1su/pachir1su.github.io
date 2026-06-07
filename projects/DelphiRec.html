@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,16 +45,45 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / DelphiRec
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / DelphiRec
         </div>
         <div class="detail-hero-icon"><i class="fas fa-user-graduate"></i></div>
         <h1 class="detail-title" data-aos="fade-up">DelphiRec</h1>
@@ -62,7 +91,7 @@
           <span class="detail-badge">AI</span
           ><span class="detail-badge">Multi-Agent</span
           ><span class="detail-badge">Claude API</span
-          ><span class="detail-badge">개발 예정</span>
+          ><span class="detail-badge" data-en="Planned" data-ko="개발 예정">개발 예정</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
@@ -73,7 +102,7 @@
           >
 
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -84,7 +113,7 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
               <p>
                 DelphiRec은 <strong>멀티 전문가 페르소나</strong>와
                 <strong>델파이 기법</strong>을 결합한 AI 기반 생활기록부 분석·
@@ -93,7 +122,7 @@
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>기획 배경</h2>
+              <h2 data-en="Background" data-ko="기획 배경">기획 배경</h2>
               <p>
                 기존 생기부 분석 서비스는 요약 및 피드백 출력, 점수 매기기에 그칩니다.
                 DelphiRec은 전문가 집단의 토론을 시뮬레이션하고 두 가지 평가
@@ -101,59 +130,59 @@
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2>핵심 기능</h2>
-              <h3>1. 생기부 입력 및 전처리</h3>
+              <h2 data-en="Core Features" data-ko="핵심 기능">핵심 기능</h2>
+              <h3 data-en="1. Student Record Input &amp; Preprocessing">1. 생기부 입력 및 전처리</h3>
               <ul>
-                <li>텍스트 · 이미지 · PDF 등 다양한 형식 입력 지원</li>
-                <li>OCR 및 구조화 파싱을 통한 데이터 정제</li>
+                <li data-en="Supports text, image, PDF, and other input formats">텍스트 · 이미지 · PDF 등 다양한 형식 입력 지원</li>
+                <li data-en="Data refinement via OCR and structured parsing">OCR 및 구조화 파싱을 통한 데이터 정제</li>
               </ul>
-              <h3>2. 전문가 페르소나 시스템</h3>
+              <h3 data-en="2. Expert Persona System">2. 전문가 페르소나 시스템</h3>
               <ul>
-                <li>분야별 전문가 프로필(학력 · 논문 · 프로젝트 등) 사전 등록</li>
-                <li>사용자 커스텀 페르소나 설정 (목표 학교 · 학과 맞춤형 평가)</li>
+                <li data-en="Pre-registered expert profiles (education, papers, projects, etc.)">분야별 전문가 프로필(학력 · 논문 · 프로젝트 등) 사전 등록</li>
+                <li data-en="Custom persona setup (target school/dept tailored evaluation)">사용자 커스텀 페르소나 설정 (목표 학교 · 학과 맞춤형 평가)</li>
               </ul>
-              <h3>3. 분석 모드 (토글 전환)</h3>
+              <h3 data-en="3. Analysis Mode (Toggle Switch)">3. 분석 모드 (토글 전환)</h3>
               <ul>
-                <li>
+                <li data-en-html="<strong>Debate Mode</strong> — Real-time opinion exchange &amp; rebuttal between personas, raw diverse opinions via chat bubble UI">
                   <strong>토론 모드</strong> — 페르소나 간 실시간 의견 교환 및
                   반박, 채팅 버블 UI로 다양한 시각의 날것 의견 제공
                 </li>
-                <li>
+                <li data-en-html="<strong>Delphi Mode</strong> — Anonymous individual evaluation followed by round-by-round convergence, refined consensus feedback in report format">
                   <strong>델파이 모드</strong> — 익명 개별 평가 후 라운드별 수렴
                   반복, 합의된 정제 피드백을 리포트 형식으로 제공
                 </li>
               </ul>
-              <h3>4. 실시간 질의응답</h3>
+              <h3 data-en="4. Real-time Q&amp;A">4. 실시간 질의응답</h3>
               <ul>
-                <li>분석 결과를 컨텍스트로 유지한 채 사용자와 대화</li>
-                <li>특정 페르소나를 지목한 질문 가능</li>
-                <li>면접 시뮬레이션으로 자연스럽게 확장</li>
+                <li data-en="Conversation with analysis results kept in context">분석 결과를 컨텍스트로 유지한 채 사용자와 대화</li>
+                <li data-en="Ask questions directed at specific personas">특정 페르소나를 지목한 질문 가능</li>
+                <li data-en="Naturally extends into interview simulation">면접 시뮬레이션으로 자연스럽게 확장</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="150">
-              <h2>차별점</h2>
+              <h2 data-en="Differentiators" data-ko="차별점">차별점</h2>
               <ul>
-                <li>단순 분석을 넘어 전문가 집단 토론 시뮬레이션 제공</li>
-                <li>두 가지 평가 방법론(토론 · 델파이) 선택 가능</li>
-                <li>커스텀 페르소나로 목표 학교 · 학과 맞춤형 평가</li>
-                <li>질의응답 연계로 생기부 분석에서 면접 준비까지 원스톱</li>
+                <li data-en="Expert group discussion simulation beyond simple analysis">단순 분석을 넘어 전문가 집단 토론 시뮬레이션 제공</li>
+                <li data-en="Choice of two evaluation methods (debate &amp; Delphi)">두 가지 평가 방법론(토론 · 델파이) 선택 가능</li>
+                <li data-en="Tailored evaluation for target school/dept via custom personas">커스텀 페르소나로 목표 학교 · 학과 맞춤형 평가</li>
+                <li data-en="One-stop from transcript analysis to interview prep via Q&amp;A">질의응답 연계로 생기부 분석에서 면접 준비까지 원스톱</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="200">
-              <h2>개발 범위 (MVP)</h2>
+              <h2 data-en="Development Scope (MVP)" data-ko="개발 범위 (MVP)">개발 범위 (MVP)</h2>
               <ul>
-                <li>생기부 PDF 파싱 및 구조화</li>
-                <li>기본 페르소나 3종 이상 구성</li>
-                <li>델파이 모드 2라운드 수렴 구현</li>
-                <li>토론 모드 채팅 UI 구현</li>
-                <li>최종 질의응답 인터페이스</li>
+                <li data-en="Student record PDF parsing and structuring">생기부 PDF 파싱 및 구조화</li>
+                <li data-en="At least 3 default persona configurations">기본 페르소나 3종 이상 구성</li>
+                <li data-en="Delphi mode 2-round convergence implementation">델파이 모드 2라운드 수렴 구현</li>
+                <li data-en="Debate mode chat UI implementation">토론 모드 채팅 UI 구현</li>
+                <li data-en="Final Q&amp;A interface">최종 질의응답 인터페이스</li>
               </ul>
             </div>
           </div>
 
           <div class="detail-sidebar">
             <div class="sidebar-card" data-aos="fade-left">
-              <h4>Tech Stack (예정)</h4>
+              <h4 data-en="Tech Stack (Planned)" data-ko="Tech Stack (예정)">Tech Stack (예정)</h4>
               <div class="sidebar-stack">
                 <span class="tech-stack"><span>Python</span></span
                 ><span class="tech-stack"><span>FastAPI</span></span
@@ -171,12 +200,12 @@
                   href="https://github.com/pachir1su/DelphiRec"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);
@@ -184,7 +213,7 @@
                   line-height: 1.6;
                 "
               >
-                개인 프로젝트<br />개발 예정
+                <span data-en="Personal project" data-ko="개인 프로젝트">개인 프로젝트</span><br />개발 예정
               </p>
             </div>
           </div>

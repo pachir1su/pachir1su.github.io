@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,16 +45,45 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / CentrifugeAI
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / CentrifugeAI
         </div>
         <div class="detail-hero-icon">
           <i class="fas fa-flask"></i>
@@ -83,7 +112,7 @@
             ><i class="fab fa-github"></i> GitHub</a
           >
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -94,7 +123,7 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
               <p>
                 콧물을 원심분리기에 돌리면 어떻게 될 지 궁금해서 만들어 봤습니다.
                 사용자가 임의의 재료를 고르고 실험 장치에 투입하면 Gemini API가 결과를 예측해
@@ -113,56 +142,56 @@
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능</h2>
-              <h3>다양한 가상 실험 장치</h3>
+              <h2 data-en="Key Features" data-ko="주요 기능">주요 기능</h2>
+              <h3 data-en="Various Virtual Lab Equipment">다양한 가상 실험 장치</h3>
               <ul>
-                <li>원심분리기 — 층 분리 시뮬레이션</li>
-                <li>화학 반응기 — 반응 예측 및 부산물 생성</li>
-                <li>현미경 — 미시적 구조 시각화</li>
-                <li>가열/냉각기 — 상태 변화 추적</li>
-                <li>믹서기 / 압력솥 / 전자레인지</li>
-                <li>입자 가속기 — 극한 조건 실험</li>
+                <li data-en="Centrifuge — layer separation simulation">원심분리기 — 층 분리 시뮬레이션</li>
+                <li data-en="Chemical reactor — reaction prediction &amp; byproduct generation">화학 반응기 — 반응 예측 및 부산물 생성</li>
+                <li data-en="Microscope — microscopic structure visualization">현미경 — 미시적 구조 시각화</li>
+                <li data-en="Heater/Cooler — state change tracking">가열/냉각기 — 상태 변화 추적</li>
+                <li data-en="Mixer / Pressure cooker / Microwave">믹서기 / 압력솥 / 전자레인지</li>
+                <li data-en="Particle accelerator — extreme condition experiments">입자 가속기 — 극한 조건 실험</li>
               </ul>
-              <h3>Gemini AI 기반 결과 생성</h3>
+              <h3 data-en="Gemini AI-based Result Generation">Gemini AI 기반 결과 생성</h3>
               <ul>
-                <li>물질의 반응 예측</li>
-                <li>분리 결과 및 상태 변화 설명</li>
-                <li>실험 결과 JSON 구조화</li>
+                <li data-en="Substance reaction prediction">물질의 반응 예측</li>
+                <li data-en="Separation results and state change explanation">분리 결과 및 상태 변화 설명</li>
+                <li data-en="Experiment result JSON structuring">실험 결과 JSON 구조화</li>
               </ul>
-              <h3>실험 결과 시각화</h3>
+              <h3 data-en="Experiment Result Visualization">실험 결과 시각화</h3>
               <ul>
-                <li>층 분리 이미지 자동 렌더링</li>
-                <li>SVG 기반 결과 그래프</li>
-                <li>시각적 결과 카드 출력</li>
+                <li data-en="Auto-rendering of layer separation images">층 분리 이미지 자동 렌더링</li>
+                <li data-en="SVG-based result graphs">SVG 기반 결과 그래프</li>
+                <li data-en="Visual result card output">시각적 결과 카드 출력</li>
               </ul>
-              <h3>실험 기록 저장</h3>
+              <h3 data-en="Experiment History Storage">실험 기록 저장</h3>
               <ul>
-                <li>SQLite 기반 히스토리 영속화</li>
-                <li>이전 실험 조회 및 재생(Replay)</li>
+                <li data-en="SQLite-based history persistence">SQLite 기반 히스토리 영속화</li>
+                <li data-en="Previous experiment lookup and replay">이전 실험 조회 및 재생(Replay)</li>
               </ul>
-              <h3>웹 + 디스코드 동시 지원</h3>
+              <h3 data-en="Web + Discord Dual Support">웹 + 디스코드 동시 지원</h3>
               <ul>
-                <li>Flask 기반 웹 UI — 실험 선택 / 결과 확인 / 히스토리</li>
-                <li>Discord Slash Command 기반 실험 봇</li>
+                <li data-en="Flask-based web UI — experiment selection / results / history">Flask 기반 웹 UI — 실험 선택 / 결과 확인 / 히스토리</li>
+                <li data-en="Discord Slash Command-based experiment bot">Discord Slash Command 기반 실험 봇</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2>추가 예정 기능</h2>
+              <h2 data-en="Upcoming Features" data-ko="추가 예정 기능">추가 예정 기능</h2>
               <ul>
-                <li>실험 히스토리 UI 개선</li>
-                <li>실험 결과 공유 기능</li>
-                <li>사용자 커스텀 실험 제작</li>
-                <li>실시간 애니메이션</li>
-                <li>3D 시각화</li>
-                <li>모바일 최적화</li>
+                <li data-en="Experiment history UI improvements">실험 히스토리 UI 개선</li>
+                <li data-en="Experiment result sharing">실험 결과 공유 기능</li>
+                <li data-en="User custom experiment creation">사용자 커스텀 실험 제작</li>
+                <li data-en="Real-time animation">실시간 애니메이션</li>
+                <li data-en="3D visualization">3D 시각화</li>
+                <li data-en="Mobile optimization">모바일 최적화</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="120">
-              <h2>나의 역할</h2>
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> 1인 개발
+                <i class="fas fa-user-tag"></i> <span data-en="Solo Development" data-ko="1인 개발">1인 개발</span>
               </p>
-              <p>기획부터 개발, 배포까지 전 과정을 단독으로 진행했습니다.</p>
+              <p data-en="Conducted the entire process from planning to development and deployment solo.">기획부터 개발, 배포까지 전 과정을 단독으로 진행했습니다.</p>
             </div>
           </div>
 
@@ -186,12 +215,12 @@
                   href="https://github.com/pachir1su/CentrifugeAI"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);

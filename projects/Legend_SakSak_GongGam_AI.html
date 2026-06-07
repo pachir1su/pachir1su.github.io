@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,24 +45,53 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / 공감 봇 & 레시피 AI
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / 공감 봇 & 레시피 AI
         </div>
         <div class="detail-hero-icon"><i class="fas fa-robot"></i></div>
-        <h1 class="detail-title" data-aos="fade-up">공감 봇 & 레시피 AI</h1>
+        <h1 class="detail-title" data-aos="fade-up"><span data-en="Empathy Bot &amp; Recipe AI" data-ko="공감 봇 & 레시피 AI">공감 봇 & 레시피 AI</span></h1>
         <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
           <span class="detail-badge">AI</span
           ><span class="detail-badge">Gemini API</span
           ><span class="detail-badge">Flask</span
-          ><span class="detail-badge">팀 프로젝트</span>
+          ><span class="detail-badge" data-en="Team Project" data-ko="<span data-en="Team project" data-ko="팀 프로젝트">팀 프로젝트</span>">팀 프로젝트</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
@@ -73,7 +102,7 @@
           >
 
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -84,7 +113,7 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
               <p>
                 두 가지 AI 기능을 결합한 복합 서비스입니다. 사용자의 감정에
                 공감하며 대화하는 감정 인식 챗봇과 냉장고에 있는 재료를 입력하면
@@ -92,29 +121,29 @@
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능 / 내용</h2>
+              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li>사용자 입력 텍스트 감정 분류 (긍정/부정/중립)</li>
-                <li>감정에 맞는 공감 응답 생성</li>
-                <li>자연어 처리(NLP) 기반 감정 분석</li>
-                <li>보유 재료 입력 기반 레시피 추천</li>
-                <li>콘텐츠 기반 필터링 추천 알고리즘</li>
-                <li>직관적인 대화형 인터페이스</li>
+                <li data-en="User text sentiment classification (positive/negative/neutral)">사용자 입력 텍스트 감정 분류 (긍정/부정/중립)</li>
+                <li data-en="Empathetic response generation matching sentiment">감정에 맞는 공감 응답 생성</li>
+                <li data-en="NLP-based sentiment analysis">자연어 처리(NLP) 기반 감정 분석</li>
+                <li data-en="Recipe recommendation based on available ingredients">보유 재료 입력 기반 레시피 추천</li>
+                <li data-en="Content-based filtering recommendation algorithm">콘텐츠 기반 필터링 추천 알고리즘</li>
+                <li data-en="Intuitive conversational interface">직관적인 대화형 인터페이스</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2>나의 역할</h2>
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> 팀장 · 4인 팀
+                <i class="fas fa-user-tag"></i> <span data-en="Team Lead · 4-person Team" data-ko="팀장 · 4인 팀">팀장 · 4인 팀</span>
               </p>
               <ul>
-                <li>기획</li>
-                <li>API 통신</li>
-                <li>백엔드 전체 개발</li>
-                <li>프론트엔드 전체 개발</li>
-                <li>QA &amp; 디버깅</li>
-                <li>디자인 &amp; UI·UX</li>
-                <li>그 외 다수</li>
+                <li data-en="Planning">기획</li>
+                <li data-en="API integration">API 통신</li>
+                <li data-en="Full backend development">백엔드 전체 개발</li>
+                <li data-en="Full frontend development">프론트엔드 전체 개발</li>
+                <li data-en="QA &amp; Debugging">QA &amp; 디버깅</li>
+                <li data-en="Design &amp; UI/UX">디자인 &amp; UI·UX</li>
+                <li data-en="And more">그 외 다수</li>
               </ul>
             </div>
           </div>
@@ -136,12 +165,12 @@
                   href="https://github.com/pachir1su/Legend_SakSak_GongGam_AI"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);

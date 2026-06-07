@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,16 +45,45 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / 기술과사회
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / 기술과사회
         </div>
         <div class="detail-hero-icon"><i class="fas fa-chart-line"></i></div>
         <h1 class="detail-title" data-aos="fade-up">
@@ -67,7 +96,7 @@
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -78,7 +107,7 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
               <p>
                 기술과사회 수업의 조별 과제로, <strong>일(노동 · 직업)과 삶의
                 미래</strong>를 주제로 진행한 발표 프로젝트입니다. 델파이 기법을
@@ -86,88 +115,88 @@
                 인터랙티브 시각화 자료와 발표로 정리했습니다.
               </p>
               <ul>
-                <li><strong>수업</strong> · 기술과사회</li>
-                <li><strong>주제</strong> · 일(노동 · 직업)과 삶의 미래</li>
-                <li><strong>기간</strong> · 2026년 5월</li>
-                <li>
+                <li data-en-html="<strong>Course</strong> · Technology and Society"><strong>수업</strong> · 기술과사회</li>
+                <li data-en-html="<strong>Topic</strong> · The Future of Work and Life"><strong>주제</strong> · 일(노동 · 직업)과 삶의 미래</li>
+                <li data-en-html="<strong>Period</strong> · May 2026"><strong>기간</strong> · 2026년 5월</li>
+                <li data-en-html="<strong>Deliverables</strong> · Presentation video (11–13 min) · PPT · VTuber + live-action hybrid">
                   <strong>결과물</strong> · 발표 영상(11~13분) · PPT · 버튜버+실사
                   혼합
                 </li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기여</h2>
-              <h3>1. 델파이 기법 설계 및 실행</h3>
+              <h2 data-en="Key Contributions" data-ko="주요 기여">주요 기여</h2>
+              <h3 data-en="1. Delphi Method Design &amp; Execution">1. 델파이 기법 설계 및 실행</h3>
               <ul>
-                <li>
+                <li data-en-html="Designed AI-simulated Delphi survey based on public research histories of 8 KOREATECH CS professors">
                   한국기술교육대학교 컴퓨터공학부 교수 8명의 공개된 연구 이력을
                   기반으로 AI 시뮬레이션 델파이 조사 설계
                 </li>
-                <li>
+                <li data-en-html="Minimized bias via cross-validation by independently running Google Gemini and Anthropic Claude">
                   Google Gemini와 Anthropic Claude를 각각 독립적으로 운용해 교차
                   검증 방식으로 편향 최소화
                 </li>
-                <li>
+                <li data-en-html="6 questions (Likert scale + multiple choice), conducted over 2 rounds">
                   총 6개 문항(Likert 척도 + 복수 선택형)으로 구성, 1차 · 2차
                   2라운드 진행
                 </li>
-                <li>2차 조사 결과 수렴 · 이견 항목 분석 및 최종 보고서 작성</li>
+                <li data-en="Round 2 result convergence, divergence analysis, and final report">2차 조사 결과 수렴 · 이견 항목 분석 및 최종 보고서 작성</li>
               </ul>
-              <h3>핵심 결론</h3>
+              <h3 data-en="Key Findings">핵심 결론</h3>
               <ul>
-                <li>Q2 대체 직군 — 사무 · 행정직 8명 만장일치</li>
-                <li>Q4-B 긱 이코노미 보편화 — 평균 5.5점으로 전원 긍정 수렴</li>
-                <li>Q3 노동 가치 — 축소가 아닌 확장 방향으로 합의</li>
-                <li>
+                <li data-en="Q2 Replaceable jobs — office/admin roles, unanimous (8/8)">Q2 대체 직군 — 사무 · 행정직 8명 만장일치</li>
+                <li data-en="Q4-B Gig economy — converged positive at avg 5.5">Q4-B 긱 이코노미 보편화 — 평균 5.5점으로 전원 긍정 수렴</li>
+                <li data-en="Q3 Labor value — consensus toward expansion, not reduction">Q3 노동 가치 — 축소가 아닌 확장 방향으로 합의</li>
+                <li data-en-html="Q4-A 4-day work week — structural disagreement between SW vs HW fields confirmed">
                   Q4-A 주 4일제 — 소프트웨어 계열 vs 하드웨어 계열 구조적 이견
                   확인
                 </li>
               </ul>
-              <h3>2. 시각화 자료 제작</h3>
+              <h3 data-en="2. Visualization Material Creation">2. 시각화 자료 제작</h3>
               <ul>
-                <li>
+                <li data-en-html="Interactive Delphi result charts (Chart.js — Likert, multiple choice, convergence tabs)">
                   델파이 조사 결과 인터랙티브 차트 제작 (Chart.js 기반,
                   Likert · 선택형 · 수렴 과정 탭 3종)
                 </li>
-                <li>델파이 기법 흐름도 SVG 제작 (수직형 · 가로형 2종)</li>
-                <li>PPT 초안 제작 및 목차 설계 (16장, 11~13분 분량)</li>
+                <li data-en="Delphi method flowchart SVG (vertical &amp; horizontal)">델파이 기법 흐름도 SVG 제작 (수직형 · 가로형 2종)</li>
+                <li data-en="PPT draft and outline design (16 slides, 11–13 min)">PPT 초안 제작 및 목차 설계 (16장, 11~13분 분량)</li>
               </ul>
-              <h3>3. 팀 운영</h3>
+              <h3 data-en="3. Team Management">3. 팀 운영</h3>
               <ul>
-                <li>Notion 기반 팀 워크스페이스 구축 및 일정 관리</li>
-                <li>역할 분배 및 마일스톤 설정</li>
-                <li>버튜버 기획 및 발표 방향 결정</li>
+                <li data-en="Notion-based team workspace and schedule management">Notion 기반 팀 워크스페이스 구축 및 일정 관리</li>
+                <li data-en="Role assignment and milestone setting">역할 분배 및 마일스톤 설정</li>
+                <li data-en="VTuber planning and presentation direction">버튜버 기획 및 발표 방향 결정</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2>나의 역할</h2>
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> 팀장 · 5인 팀
+                <i class="fas fa-user-tag"></i> <span data-en="Team Lead · 5-person Team" data-ko="팀장 · 5인 팀">팀장 · 5인 팀</span>
               </p>
               <ul>
-                <li>팀 리딩</li>
-                <li>기획</li>
-                <li>회의 기획</li>
-                <li>버추얼(버튜버) 기획</li>
-                <li>델파이 기법 시행</li>
-                <li>PPT 제작</li>
-                <li>Notion 제작</li>
-                <li>그 외 다수</li>
+                <li data-en="Team leading">팀 리딩</li>
+                <li data-en="Planning">기획</li>
+                <li data-en="Meeting planning">회의 기획</li>
+                <li data-en="Virtual (VTuber) planning">버추얼(버튜버) 기획</li>
+                <li data-en="Delphi method execution">델파이 기법 시행</li>
+                <li data-en="PPT creation">PPT 제작</li>
+                <li data-en="Notion creation">Notion 제작</li>
+                <li data-en="And more">그 외 다수</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="150">
-              <h2>배운 점</h2>
+              <h2 data-en="Lessons Learned" data-ko="배운 점">배운 점</h2>
               <ul>
-                <li>
+                <li data-en-html="Empirically confirmed that different LLMs can produce different results for the same prompt (Q6: Gemini unanimous on creative problem-solving, Claude on AI literacy with 7/8 consensus)">
                   동일한 프롬프트에 대해 LLM마다 다른 추론 결과가 나올 수 있음을
                   실증적으로 확인 (Q6에서 Gemini는 창의적 문제해결 만장일치,
                   Claude는 AI 리터러시 7명 합의)
                 </li>
-                <li>
+                <li data-en-html="Learned firsthand that the core of Delphi lies in &quot;discovering structural disagreements&quot; rather than convergence">
                   델파이 기법의 핵심은 수렴보다 "구조적 이견의 발견"에 있다는 점을
                   직접 경험
                 </li>
-                <li>
+                <li data-en-html="Confirmed that AI simulation can't fully replace real expert responses, but is valid as a methodological exploration tool for education">
                   AI 시뮬레이션이 실제 전문가 응답을 완전히 대체할 수 없지만, 교육
                   목적의 방법론 탐구 도구로서 유효함을 확인
                 </li>
@@ -188,7 +217,7 @@
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
-              <h4>팀 구성</h4>
+              <h4 data-en="Team" data-ko="팀 구성">팀 구성</h4>
               <p
                 style="
                   color: var(--text-muted);
@@ -200,7 +229,7 @@
               </p>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);

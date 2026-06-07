@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,16 +45,45 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / Media Swordmaster
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / Media Swordmaster
         </div>
         <div class="detail-hero-icon"><i class="fas fa-photo-video"></i></div>
         <h1 class="detail-title" data-aos="fade-up">Media Swordmaster</h1>
@@ -62,7 +91,7 @@
           <span class="detail-badge">Python</span>
           <span class="detail-badge">Gradio</span>
           <span class="detail-badge">HuggingFace</span>
-          <span class="detail-badge">개인 프로젝트</span>
+          <span class="detail-badge" data-en="Personal Project" data-ko="<span data-en="Personal project" data-ko="개인 프로젝트">개인 프로젝트</span>">개인 프로젝트</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
@@ -72,7 +101,7 @@
             ><i class="fab fa-github"></i> GitHub</a
           >
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -83,47 +112,47 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
               <p>
                 Media Swordmaster는 이미지와 영상 파일을 위한 Gradio 기반 웹 앱으로,
                 HuggingFace Spaces에 배포됩니다. 기존 File Swordmaster(PDF + 오디오)와
                 분리된 독립 앱으로, 이미지/영상에 특화된 4가지 기능을 제공합니다.
               </p>
-              <p>
+              <p data-en="Image/video metadata editing">
                 JPEG, PNG, WEBP, HEIC 이미지와 MP4, MOV, AVI, MKV 영상 파일을 지원하며,
                 메타데이터 편집부터 확장자 변환, GIF 생성, 워터마크 추가까지
                 미디어 처리에 필요한 핵심 기능을 하나의 앱에서 제공합니다.
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능</h2>
-              <h3>메타데이터 편집</h3>
+              <h2 data-en="Key Features" data-ko="주요 기능">주요 기능</h2>
+              <h3 data-en="Metadata Editing">메타데이터 편집</h3>
               <ul>
-                <li>이미지/영상 파일의 메타데이터 조회 (EXIF, GPS, 날짜/시간, 기기 정보, 해상도)</li>
-                <li>필드별 값 수정 / 추가 / 삭제 후 파일 다운로드</li>
+                <li data-en="Metadata inspection for image/video files (EXIF, GPS, date/time, device info, resolution)">이미지/영상 파일의 메타데이터 조회 (EXIF, GPS, 날짜/시간, 기기 정보, 해상도)</li>
+                <li data-en="Edit / add / delete metadata fields and download">필드별 값 수정 / 추가 / 삭제 후 파일 다운로드</li>
               </ul>
-              <h3>확장자 변환</h3>
+              <h3 data-en="Format Conversion">확장자 변환</h3>
               <ul>
-                <li>이미지: JPEG ↔ PNG ↔ WEBP ↔ HEIC</li>
-                <li>영상: MP4 ↔ MOV ↔ AVI ↔ MKV</li>
+                <li data-en="Image: JPEG ↔ PNG ↔ WEBP ↔ HEIC">이미지: JPEG ↔ PNG ↔ WEBP ↔ HEIC</li>
+                <li data-en="Video: MP4 ↔ MOV ↔ AVI ↔ MKV">영상: MP4 ↔ MOV ↔ AVI ↔ MKV</li>
               </ul>
-              <h3>GIF 만들기</h3>
+              <h3 data-en="GIF Creation">GIF 만들기</h3>
               <ul>
-                <li>영상 파일을 GIF로 변환</li>
-                <li>시작/끝 시간 지정, FPS 설정, 출력 해상도 조절</li>
+                <li data-en="Convert video files to GIF">영상 파일을 GIF로 변환</li>
+                <li data-en="Start/end time, FPS, and output resolution settings">시작/끝 시간 지정, FPS 설정, 출력 해상도 조절</li>
               </ul>
-              <h3>워터마크 추가</h3>
+              <h3 data-en="Add Watermark">워터마크 추가</h3>
               <ul>
-                <li>이미지/영상에 텍스트 워터마크 삽입</li>
-                <li>위치·날짜·모델명·폰트 크기·색상 커스터마이징</li>
+                <li data-en="Text watermark insertion for images/videos">이미지/영상에 텍스트 워터마크 삽입</li>
+                <li data-en="Customizable location, date, model, font size, and color">위치·날짜·모델명·폰트 크기·색상 커스터마이징</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2>나의 역할</h2>
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> 1인 개발
+                <i class="fas fa-user-tag"></i> <span data-en="Solo Development" data-ko="1인 개발">1인 개발</span>
               </p>
-              <p>기획부터 개발, 배포까지 전 과정을 단독으로 진행했습니다.</p>
+              <p data-en="Conducted the entire process from planning to development and deployment solo.">기획부터 개발, 배포까지 전 과정을 단독으로 진행했습니다.</p>
             </div>
           </div>
 
@@ -147,12 +176,12 @@
                   href="https://github.com/pachir1su/media_swordmaster"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);
@@ -164,7 +193,7 @@
               </p>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="200">
-              <h4>지원 파일</h4>
+              <h4 data-en="Supported Files" data-ko="지원 파일">지원 파일</h4>
               <p
                 style="
                   color: var(--text-muted);
