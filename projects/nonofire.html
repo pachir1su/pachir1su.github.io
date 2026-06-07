@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,16 +45,45 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / 산불 조기 감지 알림
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / 산불 조기 감지 알림
           시스템
         </div>
         <div class="detail-hero-icon">
@@ -67,7 +96,7 @@
           <span class="detail-badge">Raspberry Pi</span
           ><span class="detail-badge">OpenCV</span
           ><span class="detail-badge">AI</span
-          ><span class="detail-badge">수상작</span>
+          ><span class="detail-badge" data-en="Award Winner" data-ko="수상작">수상작</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
@@ -78,7 +107,7 @@
           >
 
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -89,33 +118,33 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
-              <p>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
+              <p data-en-html="2024 Digital Saessak AI Makerthon <strong>'AI Avengers Award'</strong>">
                 2024 디지털새싹 인공지능 메이커톤에서 'AI 어벤져스상'을 수상한
                 프로젝트입니다. 라즈베리파이와 OpenCV를 활용해 산불 화재를
                 실시간으로 감지한 즉시 알림을 전송하는 시스템을 개발했습니다.
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능 / 내용</h2>
+              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li>라즈베리파이 + 카메라 모듈로 실시간 영상 처리</li>
-                <li>OpenCV 기반 화재/연기 색상 감지 알고리즘</li>
-                <li>임계값 이상 감지 시 알림 발송 시스템</li>
-                <li>원격 모니터링 대시보드 구현</li>
-                <li>2024 디지털새싹 AI 어벤져스상 수상</li>
+                <li data-en="Real-time video processing with Raspberry Pi + camera module">라즈베리파이 + 카메라 모듈로 실시간 영상 처리</li>
+                <li data-en="OpenCV-based fire/smoke color detection algorithm">OpenCV 기반 화재/연기 색상 감지 알고리즘</li>
+                <li data-en="Alert system triggered when threshold is exceeded">임계값 이상 감지 시 알림 발송 시스템</li>
+                <li data-en="Remote monitoring dashboard">원격 모니터링 대시보드 구현</li>
+                <li data-en="2024 Digital Saessak AI Avengers Award">2024 디지털새싹 AI 어벤져스상 수상</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2>나의 역할</h2>
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> 팀원 (엔지니어) · 4인 팀
+                <i class="fas fa-user-tag"></i> <span data-en="Team Member (Engineer) · 4-person Team" data-ko="팀원 (엔지니어) · 4인 팀">팀원 (엔지니어) · 4인 팀</span>
               </p>
               <ul>
-                <li>라즈베리파이 세팅</li>
-                <li>3D 모델링 및 케이스 제작</li>
-                <li>발표</li>
-                <li>그 외 다수</li>
+                <li data-en="Raspberry Pi setup">라즈베리파이 세팅</li>
+                <li data-en="3D modeling and case fabrication">3D 모델링 및 케이스 제작</li>
+                <li data-en="Presentation">발표</li>
+                <li data-en="And more">그 외 다수</li>
               </ul>
             </div>
           </div>
@@ -138,18 +167,18 @@
                   href="https://github.com/chae03yb/hstree-makerthon"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="120">
-              <h4>보도 · 관련 자료</h4>
+              <h4 data-en="News &amp; References" data-ko="보도 · 관련 자료">보도 · 관련 자료</h4>
               <div style="display: flex; flex-direction: column; gap: 10px">
                 <a
                   href="https://youtu.be/z0q6D7zNWyw?si=26KJn7oKrOzzY4kc"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-youtube"></i> 활동 영상</a
+                  ><i class="fab fa-youtube"></i> <span data-en="Activity Video" data-ko="활동 영상">활동 영상</span></a
                 >
                 <a
                   href="https://www.hstree.org/news/noticeView.do?seq=2295"
@@ -161,7 +190,7 @@
                   href="http://www.gynews.co.kr/news/articleView.html?idxno=23300"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fas fa-newspaper"></i> 언론 보도</a
+                  ><i class="fas fa-newspaper"></i> <span data-en="Press Coverage" data-ko="언론 보도">언론 보도</span></a
                 >
                 <a
                   href="https://www.hstree.org/board/eventInformationView.do?bbsSeq=38116"
@@ -172,7 +201,7 @@
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);

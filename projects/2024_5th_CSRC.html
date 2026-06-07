@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,16 +45,45 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / 허스키렌즈를 이용한
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / 허스키렌즈를 이용한
           졸음 방지 시스템
         </div>
         <div class="detail-hero-icon"><i class="fas fa-robot"></i></div>
@@ -65,7 +94,7 @@
           <span class="detail-badge">Arduino</span
           ><span class="detail-badge">HuskyLens</span
           ><span class="detail-badge">Embedded</span
-          ><span class="detail-badge">수상작</span>
+          ><span class="detail-badge" data-en="Award Winner" data-ko="수상작">수상작</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
@@ -76,7 +105,7 @@
           >
 
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -87,8 +116,8 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
-              <p>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
+              <p data-en="5th Cheonan Student Robot Contest hackathon entry. Built a real-time drowsiness prevention system using HuskyLens and Arduino, winning the Bronze Award out of 97 participating teams.">
                 2024 제 5회 천안 학생 로봇 대회에서 동상을 수상한
                 프로젝트입니다. 아두이노 허스키렌즈의 얼굴 인식 기능을 활용하여
                 학생의 졸음을 실시간으로 감지하고 경보를 울리는 시스템을
@@ -96,29 +125,29 @@
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능 / 내용</h2>
+              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li>허스키렌즈로 눈 감김 및 고개 떨굼 실시간 감지</li>
-                <li>졸음 감지 시 진동 모터로 경보 출력</li>
-                <li>아두이노와 허스키렌즈 통신</li>
-                <li>졸음을 날려버릴 선풍기</li>
-                <li>공부 타이머</li>
-                <li>전원 시스템</li>
-                <li>피젯 토이</li>
-                <li>2024 제 5회 천안 학생 로봇 대회 동상 수상</li>
+                <li data-en="Real-time eye closure and head drop detection via HuskyLens">허스키렌즈로 눈 감김 및 고개 떨굼 실시간 감지</li>
+                <li data-en="Vibration motor alarm on drowsiness detection">졸음 감지 시 진동 모터로 경보 출력</li>
+                <li data-en="Arduino-HuskyLens communication">아두이노와 허스키렌즈 통신</li>
+                <li data-en="Anti-drowsiness fan">졸음을 날려버릴 선풍기</li>
+                <li data-en="Study timer">공부 타이머</li>
+                <li data-en="Power system">전원 시스템</li>
+                <li data-en="Fidget toy">피젯 토이</li>
+                <li data-en="Bronze Award at the 5th Cheonan Student Robot Competition 2024">2024 제 5회 천안 학생 로봇 대회 동상 수상</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2>나의 역할</h2>
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> 아두이노 개발 · 2인 팀
+                <i class="fas fa-user-tag"></i> <span data-en="Arduino Dev · 2-person Team" data-ko="아두이노 개발 · 2인 팀">아두이노 개발 · 2인 팀</span>
               </p>
               <ul>
-                <li>기획</li>
-                <li>발표</li>
-                <li>아두이노 프로그래밍</li>
-                <li>아두이노 배선</li>
-                <li>그 외 다수</li>
+                <li data-en="Planning">기획</li>
+                <li data-en="Presentation">발표</li>
+                <li data-en="Arduino programming">아두이노 프로그래밍</li>
+                <li data-en="Arduino wiring">아두이노 배선</li>
+                <li data-en="And more">그 외 다수</li>
               </ul>
             </div>
           </div>
@@ -141,18 +170,18 @@
                   href="https://github.com/pachir1su/2024_5th_CSRC"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="120">
-              <h4>보도 · 관련 자료</h4>
+              <h4 data-en="News &amp; References" data-ko="보도 · 관련 자료">보도 · 관련 자료</h4>
               <div style="display: flex; flex-direction: column; gap: 10px">
                 <a
                   href="https://www.jbnews.com/news/articleViewAmp.html?idxno=1457646"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fas fa-newspaper"></i> 중부매일 보도</a
+                  ><i class="fas fa-newspaper"></i> <span data-en="JoongBu Daily" data-ko="중부매일 보도">중부매일 보도</span></a
                 >
                 <a
                   href="http://m.cndnews.co.kr/415339"
@@ -169,7 +198,7 @@
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);

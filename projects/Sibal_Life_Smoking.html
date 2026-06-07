@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,21 +45,50 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / 온라인술담
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / 온라인술담
         </div>
         <div class="detail-hero-icon">
           <i class="fas fa-wine-glass-alt"></i>
         </div>
-        <h1 class="detail-title" data-aos="fade-up">온라인술담</h1>
+        <h1 class="detail-title" data-aos="fade-up"><span data-en="Online Suldam" data-ko="온라인술담">온라인술담</span></h1>
         <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
           <span class="detail-badge">HTML/CSS/JS</span>
           <span class="detail-badge">GitHub Pages</span>
@@ -81,7 +110,7 @@
             ><i class="fab fa-github"></i> GitHub</a
           >
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -92,7 +121,7 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
               <p>
                 온라인담타 사이트를 벤치마킹하여 기획한 술담(술 + 담배)
                 사이트입니다.
@@ -104,12 +133,12 @@
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능 / 내용</h2>
+              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li>야무진 술담배 UI/UX 디자인</li>
-                <li>GitHub Pages 정적 사이트 배포</li>
-                <li>온라인담타 벤치마킹 기반 기능 설계</li>
-                <li>서버 없이 동작하는 프론트엔드 중심 구현</li>
+                <li data-en="Bold alcohol &amp; tobacco UI/UX design">야무진 술담배 UI/UX 디자인</li>
+                <li data-en="GitHub Pages static site deployment">GitHub Pages 정적 사이트 배포</li>
+                <li data-en="Online Damta benchmarking">온라인담타 벤치마킹 기반 기능 설계</li>
+                <li data-en="Frontend-only implementation, no server required">서버 없이 동작하는 프론트엔드 중심 구현</li>
               </ul>
             </div>
             <div
@@ -136,12 +165,12 @@
                   href="https://github.com/pachir1su/Sibal_Life_Smoking"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);
@@ -165,7 +194,7 @@
                   font-size: 0.88rem;
                   line-height: 1.6;
                 "
-              >
+               data-en="Currently in planning phase.">
                 🔧 기획 단계
               </p>
             </div>

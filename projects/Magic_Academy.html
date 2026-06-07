@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,21 +45,50 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / 마법 아카데미
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / 마법 아카데미
         </div>
         <div class="detail-hero-icon">
           <i class="fas fa-hat-wizard"></i>
         </div>
-        <h1 class="detail-title" data-aos="fade-up">마법 아카데미</h1>
+        <h1 class="detail-title" data-aos="fade-up"><span data-en="Magic Academy" data-ko="마법 아카데미">마법 아카데미</span></h1>
         <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
           <span class="detail-badge">Simulation</span>
           <span class="detail-badge">Interactive</span>
@@ -76,7 +105,7 @@
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -87,8 +116,8 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
-              <p>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
+              <p data-en="Combine elements to create magic spells and visualize them through interactive simulation. An experimental project exploring creative coding and game mechanics.">
                 원소를 조합해 마법을 만들고 결과를 시각화하는 인터랙티브
                 시뮬레이션입니다. 기초 원소(불·물·바람·흙 등)에서 시작해
                 조합 규칙에 따라 점차 복잡한 마법으로 확장되는
@@ -98,14 +127,14 @@
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
               <h2>주요 기능 (예정)</h2>
               <ul>
-                <li>원소 조합 시스템 — 예 : 불 + 물 → 수증기</li>
-                <li>마법 효과 실시간 시각화 (파티클, 컬러 변화)</li>
-                <li>단계적 난이도 — 기본 원소에서 복합 마법으로 확장</li>
-                <li>발견한 마법 컬렉션 / 도감</li>
+                <li data-en="Element combination system">원소 조합 시스템 — 예 : 불 + 물 → 수증기</li>
+                <li data-en="Real-time magic effect visualization (particles, color changes)">마법 효과 실시간 시각화 (파티클, 컬러 변화)</li>
+                <li data-en="Progressive difficulty — from basic elements to complex spells">단계적 난이도 — 기본 원소에서 복합 마법으로 확장</li>
+                <li data-en="Discovered magic collection / encyclopedia">발견한 마법 컬렉션 / 도감</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2>설계 메모</h2>
+              <h2 data-en="Design Notes" data-ko="설계 메모">설계 메모</h2>
               <p>
                 원소 간 조합 규칙은 데이터 테이블로 분리해 쉽게 확장
                 가능하도록 만들 예정입니다. 시각화 레이어는 p5.js 혹은
@@ -117,7 +146,7 @@
 
           <div class="detail-sidebar">
             <div class="sidebar-card" data-aos="fade-left">
-              <h4>Tech Stack (예정)</h4>
+              <h4 data-en="Tech Stack (Planned)" data-ko="Tech Stack (예정)">Tech Stack (예정)</h4>
               <div class="sidebar-stack">
                 <span>Python (예정)</span>
                 <span>p5.js (예정)</span>
@@ -137,7 +166,7 @@
               </p>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);

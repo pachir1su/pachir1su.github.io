@@ -484,7 +484,7 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
     if (hint) {
       const prev = hint.textContent;
       btn.classList.add('copied');
-      hint.textContent = '복사됨!';
+      hint.textContent = (localStorage.getItem('lang') || 'ko') === 'en' ? 'Copied!' : '복사됨!';
       setTimeout(() => {
         btn.classList.remove('copied');
         hint.textContent = prev;
@@ -686,6 +686,7 @@ window._updateProjectCount();
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
     const isDark = theme === 'dark';
+    const lang = localStorage.getItem('lang') || 'ko';
     if (icon) {
       icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
     }
@@ -693,9 +694,13 @@ window._updateProjectCount();
       iconMobile.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
     }
     if (labelMobile) {
-      labelMobile.textContent = isDark ? '라이트 모드' : '다크 모드';
+      labelMobile.textContent = isDark
+        ? (lang === 'en' ? 'Light Mode' : '라이트 모드')
+        : (lang === 'en' ? 'Dark Mode' : '다크 모드');
     }
-    if (toggle) toggle.title = isDark ? '라이트 모드' : '다크 모드';
+    if (toggle) toggle.title = isDark
+      ? (lang === 'en' ? 'Light Mode' : '라이트 모드')
+      : (lang === 'en' ? 'Dark Mode' : '다크 모드');
   }
 
   function toggleTheme() {
@@ -925,6 +930,14 @@ window._updateProjectCount();
       }
     });
 
+    /* data-en만 있고 data-ko가 없는 요소: 현재 콘텐츠를 한국어 원본으로 자동 저장 */
+    document.querySelectorAll('[data-en]:not([data-ko])').forEach(function (el) {
+      el.setAttribute('data-ko', el.textContent.trim());
+    });
+    document.querySelectorAll('[data-en-html]:not([data-ko-html])').forEach(function (el) {
+      el.setAttribute('data-ko-html', el.innerHTML.trim());
+    });
+
     /* data-en / data-ko 속성 기반 번역 (스킬·수상·프로젝트 등 대량 텍스트) */
     document.querySelectorAll('[data-en][data-ko]').forEach(function (el) {
       var text = lang === 'en' ? el.dataset.en : el.dataset.ko;
@@ -938,6 +951,27 @@ window._updateProjectCount();
     document.querySelectorAll('[data-en-html][data-ko-html]').forEach(function (el) {
       el.innerHTML = lang === 'en' ? el.dataset.enHtml : el.dataset.koHtml;
     });
+
+    /* 다크 모드 라벨 갱신 */
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var themeLabel = document.querySelector('.theme-label-mobile');
+    var themeToggleBtn = document.getElementById('themeToggle');
+    if (themeLabel) {
+      themeLabel.textContent = isDark
+        ? (lang === 'en' ? 'Light Mode' : '라이트 모드')
+        : (lang === 'en' ? 'Dark Mode' : '다크 모드');
+    }
+    if (themeToggleBtn) {
+      themeToggleBtn.title = isDark
+        ? (lang === 'en' ? 'Light Mode' : '라이트 모드')
+        : (lang === 'en' ? 'Dark Mode' : '다크 모드');
+    }
+
+    /* 이메일 버튼 title 갱신 */
+    var emailBtn = document.getElementById('copyEmail');
+    if (emailBtn) {
+      emailBtn.title = lang === 'en' ? 'Click to copy' : '클릭하면 복사됩니다';
+    }
 
     /* 프로젝트 수 배지 재계산 */
     if (typeof window._updateProjectCount === 'function') window._updateProjectCount();

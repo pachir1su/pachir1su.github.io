@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,16 +45,45 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / GitHub Rank Insight
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / GitHub Rank Insight
         </div>
         <div class="detail-hero-icon">
           <i class="fab fa-github"></i>
@@ -64,13 +93,13 @@
           <span class="detail-badge">Web</span>
           <span class="detail-badge">HTML/CSS/JS</span>
           <span class="detail-badge">GitHub API</span>
-          <span class="detail-badge">개인 개발</span>
+          <span class="detail-badge" data-en="Solo Development" data-ko="개인 개발">개인 개발</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
             href="../github-rank-insight/"
             class="btn btn-primary"
-            ><i class="fas fa-external-link-alt"></i> 라이브 데모</a
+            ><i class="fas fa-external-link-alt"></i> <span data-en="Live Demo" data-ko="라이브 데모">라이브 데모</span></a
           >
           <a
             href="https://github.com/pachir1su/github-rank-insight"
@@ -79,7 +108,7 @@
             ><i class="fab fa-github"></i> GitHub</a
           >
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -91,8 +120,8 @@
           <div class="detail-main">
 
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
-              <p>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
+              <p data-en-html="A serverless web tool that <strong>automatically or manually calculates</strong> GitHub Stats ranks (S·A+·A·A-·B+·B·B-·C+·C), visualizing per-metric contributions and <strong>next-rank requirements</strong>. Enter a GitHub username for instant rank analysis.">
                 GitHub Stats 등급(S·A+·A·A-·B+·B·B-·C+·C)을 <strong>자동 또는 수동으로 계산</strong>하고
                 지표별 기여도와 <strong>다음 등급 달성 조건</strong>을 시각화하는 서버리스 웹 도구입니다.
                 GitHub username 하나만 입력하면 바로 등급 분석 결과를 제공합니다.
@@ -104,32 +133,32 @@
             </div>
 
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능</h2>
+              <h2 data-en="Key Features" data-ko="주요 기능">주요 기능</h2>
               <ul>
-                <li>
+                <li data-en-html="<strong>Auto Mode</strong> — Enter a GitHub username to auto-fetch Stars·Commits·PRs·Issues·Followers via REST API">
                   <strong>자동 모드</strong> — GitHub username 입력 시 REST API를 통해 Stars·Commits·PRs·Issues·Followers 자동 조회
                 </li>
-                <li>
+                <li data-en-html="<strong>Manual Mode</strong> — Input metrics directly to simulate future scenarios">
                   <strong>수동 모드</strong> — 지표를 직접 입력해 미래 수치 시뮬레이션 가능
                 </li>
-                <li>
+                <li data-en-html="<strong>Circular gauge</strong> + rank letter + top percentile visualization">
                   <strong>원형 게이지</strong> + 등급 문자 + 상위 퍼센타일 수치 시각화
                 </li>
-                <li>
+                <li data-en-html="<strong>Per-metric contribution bar chart</strong> — CDF percentile and weighted contribution visualization">
                   <strong>지표별 기여도 바 차트</strong> — CDF 퍼센타일과 가중 기여량 시각화
                 </li>
-                <li>
+                <li data-en-html="<strong>Next-rank requirements</strong> — calculates minimum increase per metric via binary search">
                   <strong>다음 등급 달성 조건</strong> — 한 단계 위 등급을 위해 지표별 필요 증가량 계산 (이진 탐색)
                 </li>
-                <li>
+                <li data-en-html="<strong>Copy Markdown</strong> — copy results as README-ready text">
                   <strong>Copy Markdown</strong> — 결과를 README에 바로 붙여넣기 가능한 텍스트로 복사
                 </li>
               </ul>
             </div>
 
             <div class="detail-section" data-aos="fade-up" data-aos-delay="80">
-              <h2>계산 알고리즘</h2>
-              <p>
+              <h2 data-en="Calculation Algorithm" data-ko="계산 알고리즘">계산 알고리즘</h2>
+              <p data-en="Uses per-metric CDF (cumulative distribution function) to normalize values to 0–1, then applies weighted summation.">
                 지표별 CDF(누적분포함수)를 이용해 0~1로 정규화한 후 가중 합산합니다.
               </p>
               <div style="background:var(--bg-card,#f5f2ea);border:1px solid var(--border-color,rgba(90,80,64,.15));border-radius:8px;padding:.8rem 1rem;font-family:'Space Mono',monospace;font-size:.82rem;margin:.7rem 0;white-space:pre-wrap;overflow-x:auto">exponential_cdf(x) = 1 - 2^(-x)
@@ -157,32 +186,32 @@ percentile = (1 - score) × 100</div>
             </div>
 
             <div class="detail-section" data-aos="fade-up" data-aos-delay="120">
-              <h2>기술적 구현 포인트</h2>
+              <h2 data-en="Technical Implementation" data-ko="기술적 구현 포인트">기술적 구현 포인트</h2>
               <ul>
-                <li>
+                <li data-en-html="<strong>ES Module</strong> architecture separating calculate.js / api.js / ui.js / main.js">
                   <strong>ES Module</strong> 구조로 calculate.js / api.js / ui.js / main.js 역할 분리
                 </li>
-                <li>
+                <li data-en-html="GitHub REST API <strong>search/commits endpoint</strong> called with <code>cloak-preview</code> header to fetch total commit counts">
                   GitHub REST API의 <strong>search/commits 엔드포인트</strong>를 <code>cloak-preview</code> 헤더로 호출해 전체 커밋 수 조회
                 </li>
-                <li>
+                <li data-en-html="Next-rank requirements: <strong>binary search (60 iterations)</strong> per metric to find minimum needed value">
                   다음 등급 달성 조건: 각 지표별로 <strong>이진 탐색(60회 반복)</strong>으로 최소 필요 값 산출
                 </li>
-                <li>
+                <li data-en-html="Circular gauge: SVG <code>stroke-dashoffset</code> technique linked with CSS transitions">
                   원형 게이지: SVG <code>stroke-dashoffset</code> 기법으로 CSS 트랜지션과 연동
                 </li>
-                <li>
+                <li data-en-html="GitHub Token stored <strong>only in localStorage</strong>, used in the browser without any server transmission">
                   GitHub Token은 <strong>localStorage에만 저장</strong>, 서버 전송 없이 브라우저에서만 사용
                 </li>
               </ul>
             </div>
 
             <div class="detail-section" data-aos="fade-up" data-aos-delay="160">
-              <h2>나의 역할</h2>
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> 1인 개발 · 전 과정
+                <i class="fas fa-user-tag"></i> <span data-en="Solo Dev · Full Process" data-ko="1인 개발 · 전 과정">1인 개발 · 전 과정</span>
               </p>
-              <p>기획, 알고리즘 구현, 프론트엔드 개발, 배포 전 과정을 단독으로 진행했습니다.</p>
+              <p data-en="Conducted the entire process — planning, algorithm implementation, frontend development, and deployment — solo.">기획, 알고리즘 구현, 프론트엔드 개발, 배포 전 과정을 단독으로 진행했습니다.</p>
             </div>
 
           </div>
@@ -205,26 +234,26 @@ percentile = (1 - score) × 100</div>
                 <a
                   href="../github-rank-insight/"
                   class="github-activity-btn"
-                  ><i class="fas fa-external-link-alt"></i> 라이브 데모</a
+                  ><i class="fas fa-external-link-alt"></i> <span data-en="Live Demo" data-ko="라이브 데모">라이브 데모</span></a
                 >
                 <a
                   href="https://github.com/pachir1su/github-rank-insight"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
-              <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6;">
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
+              <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6;" data-en-html="Personal dev tool<br />Serverless · GitHub Pages<br />2026">
                 개인 개발 도구<br />
                 서버리스 · GitHub Pages<br />
                 2026
               </p>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="200">
-              <h4>등급 체계</h4>
+              <h4 data-en="Grade System" data-ko="등급 체계">등급 체계</h4>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:.3rem;font-size:.8rem">
                <span style="color:#FFD700;font-weight:700">S</span><span style="color:var(--text-muted)">0 ~ 1%</span>
                <span style="color:#00C853;font-weight:700">A+</span><span style="color:var(--text-muted)">1 ~ 12.5%</span>

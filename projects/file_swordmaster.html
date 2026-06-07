@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,16 +45,45 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / File Swordmaster
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / File Swordmaster
         </div>
         <div class="detail-hero-icon"><i class="fas fa-file-code"></i></div>
         <h1 class="detail-title" data-aos="fade-up">File Swordmaster</h1>
@@ -62,7 +91,7 @@
           <span class="detail-badge">Python</span>
           <span class="detail-badge">Gradio</span>
           <span class="detail-badge">HuggingFace</span>
-          <span class="detail-badge">개인 프로젝트</span>
+          <span class="detail-badge" data-en="Personal Project" data-ko="<span data-en="Personal project" data-ko="개인 프로젝트">개인 프로젝트</span>">개인 프로젝트</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
@@ -72,7 +101,7 @@
             ><i class="fab fa-github"></i> GitHub</a
           >
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -83,7 +112,7 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
               <p>
                 File Swordmaster는 PDF와 오디오 파일을 다양한 방식으로 편집할 수
                 있는 다기능 파일 처리 스크립트입니다. Gradio를 UI 프레임워크로
@@ -97,24 +126,24 @@
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능</h2>
+              <h2 data-en="Key Features" data-ko="주요 기능">주요 기능</h2>
               <ul>
-                <li>PDF 분할 (페이지 범위 지정)</li>
-                <li>PDF 병합 (여러 파일 순서 병합)</li>
-                <li>PDF 워터마크 삽입</li>
-                <li>PDF 텍스트 추출 (OCR 포함)</li>
-                <li>오디오 구간 분할 (타임스탬프 지정)</li>
-                <li>오디오 N등분 자동 분할</li>
-                <li>HuggingFace Spaces 웹 배포 지원</li>
-                <li>Google Colab 실행 지원</li>
+                <li data-en="PDF split (page range selection)">PDF 분할 (페이지 범위 지정)</li>
+                <li data-en="PDF merge (multi-file ordered merge)">PDF 병합 (여러 파일 순서 병합)</li>
+                <li data-en="PDF watermark insertion">PDF 워터마크 삽입</li>
+                <li data-en="PDF text extraction">PDF 텍스트 추출 (OCR 포함)</li>
+                <li data-en="Audio segment split (timestamp-based)">오디오 구간 분할 (타임스탬프 지정)</li>
+                <li data-en="Auto-split audio into N equal parts">오디오 N등분 자동 분할</li>
+                <li data-en="HuggingFace Spaces web deployment support">HuggingFace Spaces 웹 배포 지원</li>
+                <li data-en="Google Colab execution support">Google Colab 실행 지원</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2>나의 역할</h2>
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> 1인 개발
+                <i class="fas fa-user-tag"></i> <span data-en="Solo Development" data-ko="1인 개발">1인 개발</span>
               </p>
-              <p>기획부터 개발, 배포까지 전 과정을 단독으로 진행했습니다.</p>
+              <p data-en="Conducted the entire process from planning to development and deployment solo.">기획부터 개발, 배포까지 전 과정을 단독으로 진행했습니다.</p>
             </div>
           </div>
 
@@ -136,12 +165,12 @@
                   href="https://github.com/pachir1su/file_swordmaster"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);

@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,24 +45,53 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / 식물 타이머
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / 식물 타이머
         </div>
         <div class="detail-hero-icon"><i class="fas fa-leaf"></i></div>
-        <h1 class="detail-title" data-aos="fade-up">식물 타이머</h1>
+        <h1 class="detail-title" data-aos="fade-up"><span data-en="Plant Timer" data-ko="식물 타이머">식물 타이머</span></h1>
         <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
           <span class="detail-badge">IoT</span
           ><span class="detail-badge">Arduino</span
           ><span class="detail-badge">Hackathon</span
-          ><span class="detail-badge">팀 프로젝트</span>
+          ><span class="detail-badge" data-en="Team Project" data-ko="<span data-en="Team project" data-ko="팀 프로젝트">팀 프로젝트</span>">팀 프로젝트</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
@@ -73,7 +102,7 @@
           >
 
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -84,36 +113,36 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
-              <p>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
+              <p data-en="2025 Coding Festival hackathon entry. A smart timer system that helps users manage plant watering schedules with IoT sensors.">
                 2025 선후배와 함께하는 코딩 페스티벌 참가작으로 제작한 스마트
                 식물 관리 타이머 시스템입니다. 여러 명이 하나의 식물을 키울 때
                 발생하는 중복 급수 문제를 해결하기 위해 개발되었습니다.
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능 / 내용</h2>
+              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li>습도 모니터링</li>
-                <li>LCD 현재 상태 디스플레이</li>
-                <li>마지막으로 언제 급수했는지 알려주는 타이머</li>
-                <li>식물 ㄹㅈㄷ 복지 선풍기</li>
-                <li>태양광 전원 시스템(장식)</li>
-                <li>부저와 진동 모터로 급수 알림</li>
+                <li data-en="Humidity monitoring">습도 모니터링</li>
+                <li data-en="LCD current status display">LCD 현재 상태 디스플레이</li>
+                <li data-en="Timer showing last watering time">마지막으로 언제 급수했는지 알려주는 타이머</li>
+                <li data-en="Plant welfare fan">식물 ㄹㅈㄷ 복지 선풍기</li>
+                <li data-en="Solar power system (decorative)">태양광 전원 시스템(장식)</li>
+                <li data-en="Watering alerts via buzzer and vibration motor">부저와 진동 모터로 급수 알림</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2>나의 역할</h2>
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> 1인 개발
+                <i class="fas fa-user-tag"></i> <span data-en="Solo Development" data-ko="1인 개발">1인 개발</span>
               </p>
               <ul>
-                <li>기획</li>
-                <li>아두이노 프로그래밍</li>
-                <li>아두이노 배선</li>
-                <li>발표</li>
-                <li>케이스 모델 제작</li>
-                <li>그 외 다수</li>
+                <li data-en="Planning">기획</li>
+                <li data-en="Arduino programming">아두이노 프로그래밍</li>
+                <li data-en="Arduino wiring">아두이노 배선</li>
+                <li data-en="Presentation">발표</li>
+                <li data-en="Case model fabrication">케이스 모델 제작</li>
+                <li data-en="And more">그 외 다수</li>
               </ul>
             </div>
           </div>
@@ -136,12 +165,12 @@
                   href="https://github.com/pachir1su/PlantClock"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);
@@ -149,7 +178,7 @@
                   line-height: 1.6;
                 "
               >
-                해커톤 참가작<br />IoT 프로젝트 <br />
+                <span data-en="Hackathon entry" data-ko="해커톤 참가">해커톤 참가</span>작<br />IoT 프로젝트 <br />
                 아두이노
               </p>
             </div>

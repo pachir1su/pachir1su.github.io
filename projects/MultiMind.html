@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,16 +45,45 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / MultiMind
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / MultiMind
         </div>
         <div class="detail-hero-icon"><i class="fas fa-brain"></i></div>
         <h1 class="detail-title" data-aos="fade-up">MultiMind</h1>
@@ -73,7 +102,7 @@
             ><i class="fab fa-github"></i> GitHub</a
           >
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -85,7 +114,7 @@
           <div class="detail-main">
 
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
               <p>
                 <strong>API 없이</strong> pyautogui로 브라우저를 직접 조작해서
                 여러 LLM(Claude·ChatGPT·Gemini 등)에 동시에 프롬프트를 던지고
@@ -99,7 +128,7 @@
             </div>
 
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>시스템 아키텍처</h2>
+              <h2 data-en="System Architecture" data-ko="시스템 아키텍처">시스템 아키텍처</h2>
               <!-- 흐름도 포스트잇 스타일 -->
               <div style="display:flex; flex-direction:column; gap:8px; margin:14px 0; font-family:var(--font-mono); font-size:0.8rem;">
                 <div style="background:var(--postit); padding:10px 16px; border-radius:3px; transform:rotate(-0.5deg); box-shadow:1px 3px 8px rgba(31,28,20,.1); max-width:380px;">
@@ -128,51 +157,51 @@
             </div>
 
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2>주요 기능</h2>
-              <h3>Head / Worker 자유 설정</h3>
+              <h2 data-en="Key Features" data-ko="주요 기능">주요 기능</h2>
+              <h3 data-en="Free Head / Worker Configuration">Head / Worker 자유 설정</h3>
               <ul>
-                <li>GUI에서 Head LLM을 직접 선택 → 결과 합성 담당</li>
-                <li>Worker LLM 체크박스로 자유 구성 (Claude·ChatGPT·Gemini·Perplexity·Grok 등)</li>
-                <li>Head로 선택된 LLM은 Worker 목록에서 자동 제외</li>
-                <li>설정값 <code>json</code>으로 저장 → 재시작 시 자동 복원</li>
+                <li data-en="Select Head LLM directly in GUI → handles result synthesis">GUI에서 Head LLM을 직접 선택 → 결과 합성 담당</li>
+                <li data-en="Freely configure Worker LLMs via checkboxes (Claude, ChatGPT, Gemini, Perplexity, Grok, etc.)">Worker LLM 체크박스로 자유 구성 (Claude·ChatGPT·Gemini·Perplexity·Grok 등)</li>
+                <li data-en="LLM selected as Head is auto-excluded from Worker list">Head로 선택된 LLM은 Worker 목록에서 자동 제외</li>
+                <li data-en-html="Settings saved as <code>JSON</code> → auto-restored on restart">설정값 <code>json</code>으로 저장 → 재시작 시 자동 복원</li>
               </ul>
-              <h3>병렬 자동화 (입력 순차 + 대기 병렬)</h3>
+              <h3 data-en="Parallel Automation (Sequential Input + Parallel Wait)">병렬 자동화 (입력 순차 + 대기 병렬)</h3>
               <ul>
-                <li>pyautogui로 각 LLM 브라우저 탭 순차 입력 (각 2~3초)</li>
-                <li>응답 대기는 <code>threading</code>으로 병렬 처리 → 시간 단축</li>
-                <li>응답 완료 감지: 전송 버튼 재등장 이미지 인식 (<code>locateOnScreen</code>)</li>
+                <li data-en="Sequential input to each LLM browser tab via pyautogui (2–3 sec each)">pyautogui로 각 LLM 브라우저 탭 순차 입력 (각 2~3초)</li>
+                <li data-en-html="Response waiting parallelized with <code>threading</code> → time savings">응답 대기는 <code>threading</code>으로 병렬 처리 → 시간 단축</li>
+                <li data-en-html="Response detection: send button reappearance via <code>locateOnScreen</code>">응답 완료 감지: 전송 버튼 재등장 이미지 인식 (<code>locateOnScreen</code>)</li>
               </ul>
-              <h3>한글 입력 우회</h3>
+              <h3 data-en="Korean Input Workaround">한글 입력 우회</h3>
               <ul>
-                <li>pyautogui <code>typewrite()</code>는 한글 미지원</li>
-                <li><code>pyperclip.copy()</code> + <code>Ctrl+V</code> 방식으로 해결</li>
+                <li data-en-html="pyautogui <code>typewrite()</code> doesn't support Korean">pyautogui <code>typewrite()</code>는 한글 미지원</li>
+                <li data-en-html="Solved via <code>pyperclip.copy()</code> + <code>Ctrl+V</code>"><code>pyperclip.copy()</code> + <code>Ctrl+V</code> 방식으로 해결</li>
               </ul>
             </div>
 
             <div class="detail-section" data-aos="fade-up" data-aos-delay="150">
-              <h2>기존 유사 프로젝트와의 차별점</h2>
+              <h2 data-en="What Sets This Apart" data-ko="기존 유사 프로젝트와의 차별점">기존 유사 프로젝트와의 차별점</h2>
               <ul>
-                <li><strong>AutoChatScript / AutoChatgpt</strong> : 단일 LLM, 결과 종합 없음</li>
-                <li><strong>TalkingHeads</strong> : 다중 LLM 지원하지만 결과 종합 기능 없음</li>
-                <li><strong>WebAI-to-API</strong> : 복잡한 설치 필요 & 기술 난이도 높음</li>
-                <li><strong>MultiMind</strong> : API 비용 0원, LLM 구성 자유 설정, Head가 최종 합성 → 전부 해결</li>
+                <li data-en-html="<strong>AutoChatScript / AutoChatgpt</strong>: Single LLM, no result synthesis"><strong>AutoChatScript / AutoChatgpt</strong> : 단일 LLM, 결과 종합 없음</li>
+                <li data-en-html="<strong>TalkingHeads</strong>: Multi-LLM but no result synthesis"><strong>TalkingHeads</strong> : 다중 LLM 지원하지만 결과 종합 기능 없음</li>
+                <li data-en-html="<strong>WebAI-to-API</strong>: Complex setup &amp; high technical barrier"><strong>WebAI-to-API</strong> : 복잡한 설치 필요 & 기술 난이도 높음</li>
+                <li data-en-html="<strong>MultiMind</strong>: Zero API cost, free LLM config, Head synthesizes → solves all"><strong>MultiMind</strong> : API 비용 0원, LLM 구성 자유 설정, Head가 최종 합성 → 전부 해결</li>
               </ul>
             </div>
 
             <div class="detail-section" data-aos="fade-up" data-aos-delay="200">
-              <h2>확장 계획</h2>
+              <h2 data-en="Future Plans" data-ko="확장 계획">확장 계획</h2>
               <ul>
-                <li>지원 LLM 추가 : Perplexity, Grok, HuggingChat 등</li>
-                <li>질문 유형 자동 감지 → 최적 LLM 조합 추천</li>
-                <li>Worker별 답변 개별 확인 탭</li>
-                <li>답변 히스토리 저장 및 검색</li>
+                <li data-en="Add more LLMs: Perplexity, Grok, HuggingChat, etc.">지원 LLM 추가 : Perplexity, Grok, HuggingChat 등</li>
+                <li data-en="Auto-detect question type → recommend optimal LLM combo">질문 유형 자동 감지 → 최적 LLM 조합 추천</li>
+                <li data-en="Individual Worker response tabs">Worker별 답변 개별 확인 탭</li>
+                <li data-en="Response history save and search">답변 히스토리 저장 및 검색</li>
               </ul>
             </div>
 
             <div class="detail-section" data-aos="fade-up" data-aos-delay="120">
-              <h2>나의 역할</h2>
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> 1인 개발
+                <i class="fas fa-user-tag"></i> <span data-en="Solo Development" data-ko="1인 개발">1인 개발</span>
               </p>
               <p>기획부터 개발, 배포까지 전 과정을 단독으로 진행했습니다.</p>
             </div>
@@ -199,18 +228,18 @@
                   href="https://github.com/pachir1su/MultiMind"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fab fa-github"></i> GitHub 저장소</a
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.6;">
-                RPA · Multi-Agent · LLM Orchestrator<br/>개인 프로젝트
+                RPA · Multi-Agent · LLM Orchestrator<br/><span data-en="Personal project" data-ko="개인 프로젝트">개인 프로젝트</span>
               </p>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="200">
-              <h4>핵심 특징</h4>
+              <h4 data-en="Highlights" data-ko="핵심 특징">핵심 특징</h4>
               <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7;">
                 API 키 불필요 : 무료 브라우저 계정만으로 멀티 LLM 활용.<br/>
                 Head LLM이 결과를 종합하여 단일 LLM 대비 답변 품질 향상.

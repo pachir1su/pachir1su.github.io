@@ -35,7 +35,7 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects">← 프로젝트 목록</a></li>
+          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -45,16 +45,45 @@
             ></a>
           </li>
         </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html">홈</a> /
-          <a href="../index.html#projects">프로젝트</a> / 한기대 26학번 신입생
+          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / 한기대 26학번 신입생
           가이드
         </div>
         <div class="detail-hero-icon"><i class="fas fa-book-open"></i></div>
@@ -64,17 +93,17 @@
         <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
           <span class="detail-badge">Notion</span
           ><span class="detail-badge">Documentation</span
-          ><span class="detail-badge">교내 프로젝트</span>
+          ><span class="detail-badge" data-en="Campus Project" data-ko="<span data-en="Campus project" data-ko="교내 프로젝트">교내 프로젝트</span>">교내 프로젝트</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
             href="https://capybaracute.notion.site/26-2fca8de5ee5f806db9e9e64464a9ac78"
             target="_blank" rel="noopener noreferrer"
             class="btn btn-primary"
-            ><i class="fas fa-external-link-alt"></i> Notion 페이지</a
+            ><i class="fas fa-external-link-alt"></i> <span data-en="Notion Page" data-ko="Notion 페이지">Notion 페이지</span></a
           >
           <a href="../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> 돌아가기</a
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
       </div>
@@ -85,7 +114,7 @@
         <div class="detail-grid">
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
-              <h2>프로젝트 개요</h2>
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
               <p>
                 한국기술교육대학교 26학번 신입생들을 위해 제작한 온라인 중점강좌
                 안내 사이트입니다. 노션을 활용하여 강좌 소개, 수강 방법, 과제
@@ -93,19 +122,19 @@
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능 / 내용</h2>
+              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li>온라인 중점강좌 전체 안내 및 소개</li>
-                <li>과제 및 평가 기준 안내</li>
-                <li>자주 묻는 질문(FAQ) 모음</li>
-                <li>유용한 외부 링크 및 자료 큐레이션</li>
-                <li>노션 퍼블릭 페이지로 누구나 접근 가능</li>
+                <li data-en="Full guide to online core courses">온라인 중점강좌 전체 안내 및 소개</li>
+                <li data-en="Assignment and evaluation criteria guide">과제 및 평가 기준 안내</li>
+                <li data-en="Frequently Asked Questions (FAQ) collection">자주 묻는 질문(FAQ) 모음</li>
+                <li data-en="Curated useful external links and resources">유용한 외부 링크 및 자료 큐레이션</li>
+                <li data-en="Publicly accessible via Notion page">노션 퍼블릭 페이지로 누구나 접근 가능</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2>나의 역할</h2>
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> 1인 개발
+                <i class="fas fa-user-tag"></i> <span data-en="Solo Development" data-ko="1인 개발">1인 개발</span>
               </p>
               <p>기획부터 제작까지 전 과정을 단독으로 진행했습니다.</p>
             </div>
@@ -129,12 +158,12 @@
                   href="https://capybaracute.notion.site/26-2fca8de5ee5f806db9e9e64464a9ac78"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
-                  ><i class="fas fa-external-link-alt"></i> Notion 페이지</a
+                  ><i class="fas fa-external-link-alt"></i> <span data-en="Notion Page" data-ko="Notion 페이지">Notion 페이지</span></a
                 >
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4>프로젝트 유형</h4>
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);
