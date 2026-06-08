@@ -83,7 +83,7 @@
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
           <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
-          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / 마법 아카데미
+          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / <span data-en="Magic Academy" data-ko="마법 아카데미">마법 아카데미</span>
         </div>
         <div class="detail-hero-icon">
           <i class="fas fa-hat-wizard"></i>
@@ -95,6 +95,8 @@
           <span class="detail-badge">Visualization</span>
           <span
             class="detail-badge"
+            data-en="Planned"
+            data-ko="진행 예정"
             style="
               border-color: rgba(43, 138, 147, 0.4);
               color: var(--cyan);
@@ -125,7 +127,7 @@
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2>주요 기능 (예정)</h2>
+              <h2 data-en="Key Features (Planned)" data-ko="주요 기능 (예정)">주요 기능 (예정)</h2>
               <ul>
                 <li data-en="Element combination system">원소 조합 시스템 — 예 : 불 + 물 → 수증기</li>
                 <li data-en="Real-time magic effect visualization (particles, color changes)">마법 효과 실시간 시각화 (파티클, 컬러 변화)</li>
@@ -135,7 +137,7 @@
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
               <h2 data-en="Design Notes" data-ko="설계 메모">설계 메모</h2>
-              <p>
+              <p data-en="The element combination rules will be separated into a data table so they can be extended easily. The visualization layer will be kept lightweight using p5.js or Canvas, and mobile touch interaction will be considered where possible.">
                 원소 간 조합 규칙은 데이터 테이블로 분리해 쉽게 확장
                 가능하도록 만들 예정입니다. 시각화 레이어는 p5.js 혹은
                 Canvas 기반으로 가볍게 구성하고, 가능하다면 모바일 터치
@@ -148,14 +150,15 @@
             <div class="sidebar-card" data-aos="fade-left">
               <h4 data-en="Tech Stack (Planned)" data-ko="Tech Stack (예정)">Tech Stack (예정)</h4>
               <div class="sidebar-stack">
-                <span>Python (예정)</span>
-                <span>p5.js (예정)</span>
+                <span data-en="Python (Planned)" data-ko="Python (예정)">Python (예정)</span>
+                <span data-en="p5.js (Planned)" data-ko="p5.js (예정)">p5.js (예정)</span>
                 <span>Canvas / SVG</span>
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
-              <h4>Links</h4>
+              <h4 data-en="Links" data-ko="링크">Links</h4>
               <p
+                data-en="Repository in preparation"
                 style="
                   color: var(--text-muted);
                   font-size: 0.88rem;
@@ -173,6 +176,7 @@
                   font-size: 0.88rem;
                   line-height: 1.6;
                 "
+                data-en-html="Personal concept project<br />Learning-oriented simulation"
               >
                 개인 기획 프로젝트<br />학습형 시뮬레이션
               </p>
@@ -183,8 +187,9 @@
               data-aos-delay="200"
               style="border-color: rgba(43, 138, 147, 0.3)"
             >
-              <h4 style="color: var(--cyan)">진행 상태</h4>
+              <h4 style="color: var(--cyan)" data-en="Status" data-ko="진행 상태">진행 상태</h4>
               <p
+                data-en="Planning stage"
                 style="
                   color: var(--text-muted);
                   font-size: 0.88rem;
