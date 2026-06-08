@@ -101,6 +101,7 @@
               color: var(--gold);
               background: rgba(184, 138, 26, 0.1);
             "
+            data-en="In Development" data-ko="개발 중"
             >개발 중</span
           >
         </div>
@@ -124,18 +125,18 @@
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
               <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
-              <p>
+              <p data-en="I built this out of curiosity about what would happen if you put snot in a centrifuge. When the user picks any material and inserts it into the lab equipment, the Gemini API predicts and outputs the result.">
                 콧물을 원심분리기에 돌리면 어떻게 될 지 궁금해서 만들어 봤습니다.
                 사용자가 임의의 재료를 고르고 실험 장치에 투입하면 Gemini API가 결과를 예측해
                 출력합니다.
               </p>
-              <p>
+              <p data-en="Results are not output as plain text only; they are presented as layer separation images, SVG graphs, and result cards to provide a real experiment feel. All experiment records are persisted in SQLite, enabling history lookup and replay.">
                 결과는 텍스트로만 출력되지 않고 층 분리 이미지·SVG 그래프·결과
                 카드 형태로 출력되어 실제 실험 느낌을 제공합니다. 모든 실험
                 기록은 SQLite에 영속화되어 히스토리 조회와 재생(Replay)이
                 가능합니다.
               </p>
-              <p>
+              <p data-en="Along with a Flask-based web interface, it also supports a Discord Slash Command-based bot, designed so you can easily run experiments from anywhere.">
                 Flask 기반의 웹 인터페이스와 함께 Discord Slash Command 기반
                 봇도 동시에 지원해 어디서나 쉽게 실험을 돌릴 수 있도록
                 설계했습니다.
@@ -197,7 +198,7 @@
 
           <div class="detail-sidebar">
             <div class="sidebar-card" data-aos="fade-left">
-              <h4>Tech Stack</h4>
+              <h4 data-en="Tech Stack" data-ko="기술 스택">Tech Stack</h4>
               <div class="sidebar-stack">
                 <span>Python</span>
                 <span>Flask</span>
@@ -209,7 +210,7 @@
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
-              <h4>Links</h4>
+              <h4 data-en="Links" data-ko="링크">Links</h4>
               <div style="display: flex; flex-direction: column; gap: 10px">
                 <a
                   href="https://github.com/pachir1su/CentrifugeAI"
@@ -227,6 +228,7 @@
                   font-size: 0.88rem;
                   line-height: 1.6;
                 "
+                data-en="Personal Research / Experiment Project" data-ko="개인 연구·실험 프로젝트"
               >
                 개인 연구·실험 프로젝트
               </p>
@@ -237,13 +239,14 @@
               data-aos-delay="200"
               style="border-color: rgba(184, 138, 26, 0.3)"
             >
-              <h4 style="color: var(--gold)">진행 상태</h4>
+              <h4 style="color: var(--gold)" data-en="Status" data-ko="진행 상태">진행 상태</h4>
               <p
                 style="
                   color: var(--text-muted);
                   font-size: 0.88rem;
                   line-height: 1.6;
                 "
+                data-en="Core feature implementation phase" data-ko="핵심 기능 구현 단계"
               >
                 핵심 기능 구현 단계
               </p>

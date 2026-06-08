@@ -228,14 +228,18 @@ document.addEventListener('mousedown', (e) => {
 (function initStatCounter() {
   const stats = document.querySelectorAll('.stat-num');
   if (!stats.length) return;
-  // 원본 텍스트 저장 (예: "10+", "3", "8위")
+  // 원본 텍스트 저장 (예: "10+", "3", "8위") — 접미사는 언어별로 분리 저장
+  const statLang = localStorage.getItem('lang') || 'ko';
   stats.forEach((el) => {
     const txt = el.textContent.trim();
     const m = txt.match(/^(\d+)(.*)$/);
     if (!m) return;
     el.dataset.target = m[1];
-    el.dataset.suffix = m[2];
-    el.textContent = '0' + m[2];
+    // data-suffix-ko / data-suffix-en 이 지정돼 있으면 우선 사용(예: "8위" ↔ "8th")
+    if (el.dataset.suffixKo === undefined) el.dataset.suffixKo = m[2];
+    if (el.dataset.suffixEn === undefined) el.dataset.suffixEn = m[2];
+    el.dataset.suffix = statLang === 'en' ? el.dataset.suffixEn : el.dataset.suffixKo;
+    el.textContent = '0' + el.dataset.suffix;
   });
   const obs = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -939,7 +943,7 @@ window._updateProjectCount();
     });
 
     /* data-en / data-ko 속성 기반 번역 (스킬·수상·프로젝트 등 대량 텍스트) */
-    document.querySelectorAll('[data-en][data-ko]').forEach(function (el) {
+    document.querySelectorAll('[data-en][data-ko]:not(meta)').forEach(function (el) {
       var text = lang === 'en' ? el.dataset.en : el.dataset.ko;
       var first = el.firstElementChild;
       if (first && first.tagName === 'I') {
@@ -972,6 +976,34 @@ window._updateProjectCount();
     if (emailBtn) {
       emailBtn.title = lang === 'en' ? 'Click to copy' : '클릭하면 복사됩니다';
     }
+
+    /* <html lang> 속성 — 접근성·SEO·스크린리더 언어 일치 */
+    document.documentElement.setAttribute('lang', lang);
+
+    /* 문서 제목(<title>) — 양방향 치환(멱등). 인덱스/상세 페이지 공통 처리 */
+    var titlePairs = [
+      ['이건영 포트폴리오', 'Lee Geon Yeong Portfolio'],
+      ['이건영 | Developer', 'Lee Geon Yeong | Developer']
+    ];
+    var newTitle = document.title;
+    titlePairs.forEach(function (p) {
+      newTitle = lang === 'en' ? newTitle.split(p[0]).join(p[1])
+                               : newTitle.split(p[1]).join(p[0]);
+    });
+    document.title = newTitle;
+
+    /* 메타 설명(공유 미리보기·검색) — data-en/data-ko 속성으로 원문/번역 보관 */
+    document.querySelectorAll('meta[data-en][data-ko]').forEach(function (meta) {
+      meta.setAttribute('content', lang === 'en' ? meta.dataset.en : meta.dataset.ko);
+    });
+
+    /* 히어로 통계 접미사 — "8위" ↔ "8th" 등 언어별 단위 교체(카운트업과 연동) */
+    document.querySelectorAll('.stat-num[data-suffix-en]').forEach(function (el) {
+      var suf = lang === 'en' ? el.dataset.suffixEn : el.dataset.suffixKo;
+      el.dataset.suffix = suf;
+      var num = (el.textContent.match(/\d+/) || ['0'])[0];
+      el.textContent = num + suf;
+    });
 
     /* 프로젝트 수 배지 재계산 */
     if (typeof window._updateProjectCount === 'function') window._updateProjectCount();

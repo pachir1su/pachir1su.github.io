@@ -14,6 +14,8 @@
     <!-- ===== SEO · 공유(OG/Twitter) · 구조화 데이터 ===== -->
     <meta
       name="description"
+      data-ko="이건영(Lee Geon Yeong) 포트폴리오 — 이윤을 넘어 혁신을 추구하는 기업가. AI·하드웨어·웹/앱·정보보안 등 20여 개 프로젝트와 수상 이력을 담았습니다."
+      data-en="Lee Geon Yeong portfolio — an entrepreneur pursuing innovation beyond profit. Featuring 20+ projects and awards across AI, hardware, web/app, and information security."
       content="이건영(Lee Geon Yeong) 포트폴리오 — 이윤을 넘어 혁신을 추구하는 기업가. AI·하드웨어·웹/앱·정보보안 등 20여 개 프로젝트와 수상 이력을 담았습니다."
     />
     <meta name="author" content="이건영 (Lee Geon Yeong)" />
@@ -27,13 +29,15 @@
     <!-- Open Graph — 카카오톡·디스코드·페이스북 공유 미리보기 -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="이건영 포트폴리오" />
-    <meta property="og:title" content="이건영 | Developer & Innovator" />
+    <meta property="og:title" data-ko="이건영 | Developer & Innovator" data-en="Lee Geon Yeong | Developer & Innovator" content="이건영 | Developer & Innovator" />
     <meta
       property="og:description"
+      data-ko="이윤을 넘어 혁신을 추구하는 기업가. AI·하드웨어·웹/앱·정보보안 등 20여 개 프로젝트와 수상 이력."
+      data-en="An entrepreneur pursuing innovation beyond profit. 20+ projects and awards across AI, hardware, web/app, and information security."
       content="이윤을 넘어 혁신을 추구하는 기업가. AI·하드웨어·웹/앱·정보보안 등 20여 개 프로젝트와 수상 이력."
     />
     <meta property="og:url" content="https://pachir1su.github.io/" />
-    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:locale" data-ko="ko_KR" data-en="en_US" content="ko_KR" />
     <!-- 전용 OG 이미지(1200×630) — 레포의 og-image.html 을 내보낸 결과물(og-image.png) -->
     <meta property="og:image" content="https://pachir1su.github.io/og-image.png" />
     <meta property="og:image:type" content="image/png" />
@@ -43,9 +47,11 @@
 
     <!-- Twitter Card — 1200×630 대형 이미지 카드 -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="이건영 | Developer & Innovator" />
+    <meta name="twitter:title" data-ko="이건영 | Developer & Innovator" data-en="Lee Geon Yeong | Developer & Innovator" content="이건영 | Developer & Innovator" />
     <meta
       name="twitter:description"
+      data-ko="이윤을 넘어 혁신을 추구하는 기업가. AI·하드웨어·웹/앱·정보보안 등 20여 개 프로젝트와 수상 이력."
+      data-en="An entrepreneur pursuing innovation beyond profit. 20+ projects and awards across AI, hardware, web/app, and information security."
       content="이윤을 넘어 혁신을 추구하는 기업가. AI·하드웨어·웹/앱·정보보안 등 20여 개 프로젝트와 수상 이력."
     />
     <meta name="twitter:image" content="https://pachir1su.github.io/og-image.png" />
@@ -239,7 +245,7 @@
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
-            <span class="stat-num">8위</span
+            <span class="stat-num" data-suffix-ko="위" data-suffix-en="th">8위</span
             ><span class="stat-label">581 팀 중</span>
           </div>
         </div>
@@ -817,7 +823,6 @@
                 <i class="fab fa-github project-icon"></i>
                 <div class="project-links">
                   <a href="projects/github_rank_insight.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="github-rank-insight/" class="plink plink-github" title="라이브 데모"><i class="fas fa-external-link-alt"></i></a>
                   <a href="https://github.com/pachir1su/github-rank-insight" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
@@ -891,7 +896,7 @@
               <h3 data-en="Daily Report AI" data-ko="데일리 리포트 AI">데일리 리포트 AI</h3>
               <p class="project-subtitle" data-en="Gemini-based Discord morning briefing bot" data-ko="Gemini 기반 디스코드 아침 브리핑 봇">Gemini 기반 디스코드 아침 브리핑 봇</p>
               <p data-en-html="Gemini compiles weather, news, and air quality daily&lt;br /&gt;and auto-briefs via Discord at a set time" data-ko-html="매일 정해진 시간에 Gemini가 날씨·뉴스·미세먼지를 종합해&lt;br /&gt;Discord로 자동 브리핑">매일 정해진 시간에 Gemini가 날씨·뉴스·미세먼지를 종합해<br />Discord로 자동 브리핑</p>
-              <div class="tech-stack"><span>Gemini API</span><span>discord.py</span><span>자동화</span></div>
+              <div class="tech-stack"><span>Gemini API</span><span>discord.py</span><span data-en="Automation" data-ko="자동화">자동화</span></div>
             </div>
 
             <!-- MultiMind -->
@@ -1206,7 +1211,7 @@
               <p class="project-subtitle" data-en="Element combination magic interactive simulation" data-ko="원소 조합 마법 인터랙티브 시뮬레이션">원소 조합 마법 인터랙티브 시뮬레이션</p>
               <p data-en-html="Combine elements to create magic and&lt;br /&gt;visualize with interactive simulation" data-ko-html="원소를 조합해 마법을 만들고&lt;br /&gt;시각화하는 인터랙티브 시뮬레이션">원소를 조합해 마법을 만들고<br />시각화하는 인터랙티브 시뮬레이션</p>
               <div class="progress-bar-wrap"><div class="progress-fill" data-progress="0"><span class="progress-text">0%</span></div></div>
-              <div class="tech-stack"><span>Python (예정)</span><span>p5.js (예정)</span></div>
+              <div class="tech-stack"><span data-en="Python (Planned)" data-ko="Python (예정)">Python (예정)</span><span data-en="p5.js (Planned)" data-ko="p5.js (예정)">p5.js (예정)</span></div>
             </div>
 
             <div class="project-card project-wip" data-category="ai" data-tilt>
