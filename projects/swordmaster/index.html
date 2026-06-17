@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Swordmaster | 이건영 포트폴리오</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../../style.css" />
+  </head>
+  <body>
+    <div class="progress-container">
+      <div class="progress-bar" id="myBar"></div>
+    </div>
+    <button type="button" id="btn-back-to-top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <nav class="navbar">
+      <div class="container nav-content">
+        <a href="../../index.html" class="logo"
+          ><span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span></a
+        >
+        <ul class="nav-links">
+          <li><a href="../../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
+          <li>
+            <a
+              href="https://github.com/pachir1su"
+              target="_blank" rel="noopener noreferrer"
+              class="nav-github"
+              ><i class="fab fa-github"></i
+            ></a>
+          </li>
+        </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
+        </button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+
+    <section class="detail-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="detail-hero-glow"></div>
+      <div class="container" style="position: relative; z-index: 1">
+        <div class="detail-breadcrumb">
+          <a href="../../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / Swordmaster
+        </div>
+        <div class="detail-hero-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+        <h1 class="detail-title" data-aos="fade-up">Swordmaster</h1>
+        <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
+          <span class="detail-badge">Python</span>
+          <span class="detail-badge">Gradio</span>
+          <span class="detail-badge">HuggingFace</span>
+          <span class="detail-badge" data-en="Personal Project" data-ko="개인 프로젝트">개인 프로젝트</span>
+        </div>
+        <p
+          data-aos="fade-up" data-aos-delay="150"
+          style="margin-top: 18px; max-width: 640px; color: var(--text-muted); line-height: 1.7"
+          data-en="A pair of Gradio-based file/media processing web tools. Pick the toolkit you need below — File Swordmaster (PDF · Audio) or Media Swordmaster (Image · Video)."
+          data-ko="Gradio 기반의 파일/미디어 처리 웹 툴 모음입니다. 아래에서 필요한 도구를 선택해 들어가세요 — File Swordmaster(PDF · 오디오) 또는 Media Swordmaster(이미지 · 영상)."
+        >
+          Gradio 기반의 파일/미디어 처리 웹 툴 모음입니다. 아래에서 필요한
+          도구를 선택해 들어가세요 — File Swordmaster(PDF · 오디오) 또는
+          Media Swordmaster(이미지 · 영상).
+        </p>
+      </div>
+    </section>
+
+    <section class="detail-body">
+      <div class="container">
+        <div class="projects-grid">
+
+          <!-- File Swordmaster -->
+          <div class="project-card" data-tilt data-aos="fade-up">
+            <span class="project-num"></span>
+            <div class="project-top">
+              <i class="fas fa-file-code project-icon"></i>
+              <div class="project-links">
+                <a href="file.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://huggingface.co/spaces/capybaranice/file_swordmaster" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="바로가기"><i class="fas fa-external-link-alt"></i></a>
+                <a href="https://github.com/pachir1su/file_swordmaster" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+              </div>
+            </div>
+            <h3>File Swordmaster</h3>
+            <p class="project-subtitle" data-en="PDF & Audio multi-tool web app" data-ko="PDF·오디오 편집 다기능 웹 툴">PDF·오디오 편집 다기능 웹 툴</p>
+            <p data-en="A multi-function script for editing PDF and audio files" data-ko="PDF와 오디오 파일을 편집하는 다기능 스크립트">PDF와 오디오 파일을 편집하는 다기능 스크립트</p>
+            <div class="tech-stack"><span>Python</span><span>Gradio</span><span>PyPDF</span></div>
+          </div>
+
+          <!-- Media Swordmaster -->
+          <div class="project-card" data-tilt data-aos="fade-up" data-aos-delay="100">
+            <span class="project-num"></span>
+            <div class="project-top">
+              <i class="fas fa-photo-video project-icon"></i>
+              <div class="project-links">
+                <a href="media.html" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                <a href="https://huggingface.co/spaces/capybaranice/media_swordmaster" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="바로가기"><i class="fas fa-external-link-alt"></i></a>
+                <a href="https://github.com/pachir1su/media_swordmaster" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+              </div>
+            </div>
+            <h3>Media Swordmaster</h3>
+            <p class="project-subtitle" data-en="Image & video multi-tool web app" data-ko="이미지·영상 처리 다기능 웹 앱">이미지·영상 처리 다기능 웹 앱</p>
+            <p data-en-html="Gradio-based web app for metadata editing, format conversion,&lt;br /&gt;GIF creation, and watermarking of image and video files" data-ko-html="이미지와 영상 파일의 메타데이터 편집, 확장자 변환,&lt;br /&gt;GIF 생성, 워터마크 추가를 지원하는 Gradio 기반 웹 앱">이미지와 영상 파일의 메타데이터 편집, 확장자 변환,<br />GIF 생성, 워터마크 추가를 지원하는 Gradio 기반 웹 앱</p>
+            <div class="tech-stack"><span>Python</span><span>Gradio</span><span>Pillow</span><span>FFmpeg</span></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">
+          <span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span>
+        </div>
+        <p class="footer-copy">
+          &copy; 2026 Lee Geon Yeong. All rights reserved.
+        </p>
+        <div class="social-links">
+          <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"
+            ><i class="fab fa-github"></i
+          ></a>
+          <a href="mailto:capybara@koreatech.ac.kr"
+            ><i class="fas fa-envelope"></i
+          ></a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="../../script.js"></script>
+  </body>
+</html>
