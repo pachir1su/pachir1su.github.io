@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>2024 SFPC | 이건영 포트폴리오</title>
+    <title>한맵 (Koreatech Map) | 이건영 포트폴리오</title>
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
@@ -18,7 +18,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../../style.css" />
   </head>
   <body>
     <div class="progress-container">
@@ -30,12 +30,12 @@
 
     <nav class="navbar">
       <div class="container nav-content">
-        <a href="../index.html" class="logo"
+        <a href="../../index.html" class="logo"
           ><span class="logo-bracket">{</span> GY
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
+          <li><a href="../../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -63,7 +63,7 @@
       <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
         <i class="fas fa-times"></i>
       </button>
-      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="../../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
       <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
       <div class="sidebar-utils">
         <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
@@ -82,26 +82,36 @@
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
-          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / 2024 SFPC
+          <a href="../../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / <span data-en="HanMap" data-ko="한맵">한맵</span>
         </div>
-        <div class="detail-hero-icon"><i class="fas fa-laptop-code"></i></div>
-        <h1 class="detail-title" data-aos="fade-up">2024 SFPC</h1>
+        <div class="detail-hero-icon">
+          <i class="fas fa-map-marked-alt"></i>
+        </div>
+        <h1 class="detail-title" data-aos="fade-up"><span data-en="HanMap (Koreatech Map)" data-ko="한맵 (Koreatech Map)">한맵 (Koreatech Map)</span></h1>
         <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
-          <span class="detail-badge">Algorithm</span
-          ><span class="detail-badge">C++</span
-          ><span class="detail-badge">Python</span
-          ><span class="detail-badge" data-en="Team Contest" data-ko="팀 대회">팀 대회</span>
+          <span class="detail-badge">Web</span>
+          <span class="detail-badge">Interactive Map</span>
+          <span class="detail-badge">HTML/CSS/JS</span>
+          <span
+            class="detail-badge"
+            style="
+              border-color: rgba(124, 109, 245, 0.4);
+              color: var(--accent2);
+              background: rgba(124, 109, 245, 0.1);
+            "
+            data-en="Planned" data-ko="진행 예정"
+            >진행 예정</span
+          >
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
-            href="https://github.com/pachir1su/2024_SFPC"
+            href="https://github.com/pachir1su/Koreatech_Map"
             target="_blank" rel="noopener noreferrer"
             class="btn btn-primary"
             ><i class="fab fa-github"></i> GitHub</a
           >
-
-          <a href="../index.html#projects" class="btn btn-ghost"
+          <a href="../../index.html#projects" class="btn btn-ghost"
             ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
@@ -114,59 +124,54 @@
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
               <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
-              <p data-en="A code archive that ranked 8th overall (Top 1.3%) in the SFPC (School Friends Programming Challenge) algorithm contest, which had 581 teams / 1,661 participants.">
-                총 581팀 / 1661명이 참가한 알고리즘 대회 SFPC(School Friends
-                Programming Challenge)에서 전체 8위(Top 1.3%)를 기록한 코드
-                아카이브입니다.
+              <p data-en="A project to implement a web-based map of the KOREATECH (Korea University of Technology and Education) campus. The data will be built by referencing the school's evacuation maps, exploring the site in person, or obtaining official maps from the facilities team. It is planned to include the full building map as well as the floor-by-floor structure and room information inside each building." data-ko="한국기술교육대학교 캠퍼스의 지도를 웹으로 구현하는 프로젝트입니다. 학교 대피도를 참고하거나 직접 탐사, 혹은 시설팀으로부터 공식 지도를 받아 데이터 구축 예정입니다. 건물 전체 지도와 각 건물 내부의 층별 구조와 호실 정보를 담을 예정입니다.">
+                한국기술교육대학교 캠퍼스의 지도를 웹으로 구현하는
+                프로젝트입니다. 학교 대피도를 참고하거나 직접 탐사, 혹은
+                시설팀으로부터 공식 지도를 받아 데이터 구축 예정입니다. 건물
+                전체 지도와 각 건물 내부의 층별 구조와 호실 정보를 담을
+                예정입니다.
+              </p>
+              <p data-en="An interactive UX is planned where clicking a building or room smoothly transitions to detailed information with animation." data-ko="건물 또는 호실을 클릭하면 애니메이션과 함께 부드럽게 상세 정보로 전환되는 인터랙티브 UX를 설계할 예정입니다.">
+                건물 또는 호실을 클릭하면 애니메이션과 함께 부드럽게 상세 정보로
+                전환되는 인터랙티브 UX를 설계할 예정입니다.
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
               <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li data-en="Ranked 8th out of 581 teams (Top 1.3%)">581팀 중 전체 8위 (Top 1.3%) 달성</li>
-                <li data-en="Collection of various algorithm problem solutions">다양한 알고리즘 문제 풀이 코드 수록</li>
+                <li data-en="Full KOREATECH campus map visualization">한기대 캠퍼스 전체 지도 시각화</li>
+                <li data-en="Building-level floor maps">각 건물 내부 층별 지도 및 호실 구조 출력</li>
+                <li data-en="Room-level contact information for staff">호실별 담당자 연락처 정보 제공</li>
+                <li data-en="Smooth animated transitions on building/room click">건물 · 호실 클릭 시 애니메이션으로 부드럽게 전환</li>
+                <li data-en="Data built from evacuation maps and on-site exploration">대피도 데이터 참고 및 직접 탐사 기반 데이터 구축</li>
+                <li data-en="Attempted to obtain official map data via facilities team">시설팀 협조를 통한 공식 지도 데이터 확보 시도</li>
               </ul>
             </div>
-            <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
-              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
-              <p class="role-position">
-                <i class="fas fa-user-tag"></i> <span data-en="Team Member · 4-person Team" data-ko="팀원 · 4인 팀">팀원 · 4인 팀</span>
-              </p>
-              <p data-en="Handled algorithm problem solving in Python.">Python으로 알고리즘 문제 풀이를 담당했습니다.</p>
-            </div>
+            <div
+              class="detail-section"
+              data-aos="fade-up"
+              data-aos-delay="100"
+            ></div>
           </div>
 
           <div class="detail-sidebar">
             <div class="sidebar-card" data-aos="fade-left">
-              <h4>Tech Stack</h4>
+              <h4 data-en="Tech Stack" data-ko="기술 스택">Tech Stack</h4>
               <div class="sidebar-stack">
-                <span class="tech-stack"><span>C++</span></span
-                ><span class="tech-stack"><span>Python</span></span
-                ><span class="tech-stack"><span>Algorithm</span></span
-                ><span class="tech-stack"><span>Data Structure</span></span
-                ><span class="tech-stack"><span>DP</span></span
-                ><span class="tech-stack"><span>Graph</span></span>
+                <span class="tech-stack"><span>HTML/CSS/JS</span></span>
+                <span class="tech-stack"><span>SVG / Canvas</span></span>
+                <span class="tech-stack"><span>Animation</span></span>
+                <span class="tech-stack"><span>GitHub Pages</span></span>
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
-              <h4>Links</h4>
+              <h4 data-en="Links" data-ko="링크">Links</h4>
               <div style="display: flex; flex-direction: column; gap: 10px">
                 <a
-                  href="https://github.com/pachir1su/2024_SFPC"
+                  href="https://github.com/pachir1su/Koreatech_Map"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
                   ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
-                >
-              </div>
-            </div>
-            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="120">
-              <h4 data-en="News &amp; References" data-ko="보도 · 관련 자료">보도 · 관련 자료</h4>
-              <div style="display: flex; flex-direction: column; gap: 10px">
-                <a
-                  href="https://www.kait.re.kr/2024sfpc-summary"
-                  target="_blank" rel="noopener noreferrer"
-                  class="github-activity-btn"
-                  ><i class="fas fa-trophy"></i> <span data-en="2024 SFPC Contest Summary" data-ko="2024 SFPC 대회 요약">2024 SFPC 대회 요약</span></a
                 >
               </div>
             </div>
@@ -178,10 +183,27 @@
                   font-size: 0.88rem;
                   line-height: 1.6;
                 "
-                data-en-html="SFPC Algorithm Contest<br />8th Overall (Top 1.3%)"
-                data-ko-html="SFPC 알고리즘 대회<br />전체 8위 (Top 1.3%)"
+                data-en-html="Personal planning project<br />A convenient, smart campus" data-ko-html="개인 기획 프로젝트<br />편리한 싹싹 캠퍼스"
               >
-                SFPC 알고리즘 대회<br />전체 8위 (Top 1.3%)
+                개인 기획 프로젝트<br />편리한 싹싹 캠퍼스
+              </p>
+            </div>
+            <div
+              class="sidebar-card"
+              data-aos="fade-left"
+              data-aos-delay="200"
+              style="border-color: rgba(124, 109, 245, 0.3)"
+            >
+              <h4 style="color: var(--accent2)" data-en="Status" data-ko="진행 상태">진행 상태</h4>
+              <p
+                style="
+                  color: var(--text-muted);
+                  font-size: 0.88rem;
+                  line-height: 1.6;
+                "
+                data-en="🔧 Planning and data collection stage" data-ko="🔧 기획 및 데이터 수집 단계"
+              >
+                🔧 기획 및 데이터 수집 단계
               </p>
             </div>
           </div>
@@ -211,6 +233,6 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
-    <script src="../script.js"></script>
+    <script src="../../script.js"></script>
   </body>
 </html>

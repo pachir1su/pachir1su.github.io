@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MZ_bot | 이건영 포트폴리오</title>
+    <title>산불 조기 감지 알림 시스템 | 이건영 포트폴리오</title>
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
@@ -18,7 +18,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../../style.css" />
   </head>
   <body>
     <div class="progress-container">
@@ -30,12 +30,12 @@
 
     <nav class="navbar">
       <div class="container nav-content">
-        <a href="../index.html" class="logo"
+        <a href="../../index.html" class="logo"
           ><span class="logo-bracket">{</span> GY
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
+          <li><a href="../../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -63,7 +63,7 @@
       <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
         <i class="fas fa-times"></i>
       </button>
-      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="../../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
       <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
       <div class="sidebar-utils">
         <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
@@ -82,26 +82,30 @@
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
-          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / MZ_bot
+          <a href="../../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / <span data-en="Wildfire Early Detection Alert System" data-ko="산불 조기 감지 알림 시스템">산불 조기 감지 알림 시스템</span>
         </div>
-        <div class="detail-hero-icon"><i class="fab fa-discord"></i></div>
-        <h1 class="detail-title" data-aos="fade-up"><span data-en="MZ Bot" data-ko="면진봇">면진봇</span></h1>
+        <div class="detail-hero-icon">
+          <i class="fas fa-fire-extinguisher"></i>
+        </div>
+        <h1 class="detail-title" data-aos="fade-up" data-en="Wildfire Early Detection Alert System" data-ko="산불 조기 감지 알림 시스템">
+          산불 조기 감지 알림 시스템
+        </h1>
         <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
-          <span class="detail-badge">Python</span
-          ><span class="detail-badge">Discord.py</span
-          ><span class="detail-badge">Bot</span
-          ><span class="detail-badge" data-en="Personal Project" data-ko="개인 프로젝트">개인 프로젝트</span>
+          <span class="detail-badge">Raspberry Pi</span
+          ><span class="detail-badge">OpenCV</span
+          ><span class="detail-badge">AI</span
+          ><span class="detail-badge" data-en="Award Winner" data-ko="수상작">수상작</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
-            href="https://github.com/pachir1su/MZ_bot"
+            href="https://github.com/chae03yb/hstree-makerthon"
             target="_blank" rel="noopener noreferrer"
             class="btn btn-primary"
             ><i class="fab fa-github"></i> GitHub</a
           >
 
-          <a href="../index.html#projects" class="btn btn-ghost"
+          <a href="../../index.html#projects" class="btn btn-ghost"
             ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
@@ -114,33 +118,31 @@
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
               <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
-              <p data-en="A Discord economy game bot. I built an economy system where users earn and spend virtual coins within a server." data-ko="디스코드 경제 게임 봇입니다. 사용자들이 서버 내에서 가상 주화를 획득하고 소비하는 경제 시스템을 구축했습니다.">
-                디스코드 경제 게임 봇입니다. 사용자들이 서버 내에서 가상 주화를
-                획득하고 소비하는 경제 시스템을 구축했습니다.
+              <p data-en-html="2024 Digital Saessak AI Makerthon <strong>'AI Avengers Award'</strong>">
+                2024 디지털새싹 인공지능 메이커톤에서 'AI 어벤져스상'을 수상한
+                프로젝트입니다. 라즈베리파이와 OpenCV를 활용해 산불 화재를
+                실시간으로 감지한 즉시 알림을 전송하는 시스템을 개발했습니다.
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
               <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li data-en="Virtual coin earning and spending system">가상 주화 획득 및 소비 시스템</li>
-                <li data-en="Gambling, coin flip, duel, and more">도박, 코인, 맞짱 등 기능</li>
-                <li data-en="Daily check-in reward system">출석 체크 일일 보상 기능</li>
-                <li data-en="Coin transfer between users">사용자 간 주화 송금 기능</li>
-                <li data-en="Shop system (buy/sell items)">상점 시스템 (아이템 구매/판매)</li>
-                <li data-en="Leaderboard feature">순위표 (리더보드) 기능</li>
-                <li data-en="SQLite-based user data storage">SQLite 기반 사용자 데이터 저장</li>
+                <li data-en="Real-time video processing with Raspberry Pi + camera module">라즈베리파이 + 카메라 모듈로 실시간 영상 처리</li>
+                <li data-en="OpenCV-based fire/smoke color detection algorithm">OpenCV 기반 화재/연기 색상 감지 알고리즘</li>
+                <li data-en="Alert system triggered when threshold is exceeded">임계값 이상 감지 시 알림 발송 시스템</li>
+                <li data-en="Remote monitoring dashboard">원격 모니터링 대시보드 구현</li>
+                <li data-en="2024 Digital Saessak AI Avengers Award">2024 디지털새싹 AI 어벤져스상 수상</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
               <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> <span data-en="Solo Development" data-ko="1인 개발">1인 개발</span>
+                <i class="fas fa-user-tag"></i> <span data-en="Team Member (Engineer) · 4-person Team" data-ko="팀원 (엔지니어) · 4인 팀">팀원 (엔지니어) · 4인 팀</span>
               </p>
               <ul>
-                <li data-en="Planning">기획</li>
-                <li data-en="API integration">API 통신</li>
-                <li data-en="DB development">DB 개발</li>
-                <li data-en="QA &amp; Debugging">QA &amp; 디버깅</li>
+                <li data-en="Raspberry Pi setup">라즈베리파이 세팅</li>
+                <li data-en="3D modeling and case fabrication">3D 모델링 및 케이스 제작</li>
+                <li data-en="Presentation">발표</li>
                 <li data-en="And more">그 외 다수</li>
               </ul>
             </div>
@@ -148,22 +150,52 @@
 
           <div class="detail-sidebar">
             <div class="sidebar-card" data-aos="fade-left">
-              <h4 data-en="Tech Stack" data-ko="기술 스택">Tech Stack</h4>
+              <h4>Tech Stack</h4>
               <div class="sidebar-stack">
-                <span class="tech-stack"><span>Python</span></span
-                ><span class="tech-stack"><span>Discord.py</span></span
-                ><span class="tech-stack"><span>SQLite</span></span
-                ><span class="tech-stack"><span>asyncio</span></span>
+                <span class="tech-stack"><span>Raspberry Pi</span></span
+                ><span class="tech-stack"><span>Python</span></span
+                ><span class="tech-stack"><span>OpenCV</span></span
+                ><span class="tech-stack"><span>Computer Vision</span></span
+                ><span class="tech-stack"><span>IoT</span></span>
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
-              <h4 data-en="Links" data-ko="링크">Links</h4>
+              <h4>Links</h4>
               <div style="display: flex; flex-direction: column; gap: 10px">
                 <a
-                  href="https://github.com/pachir1su/MZ_bot"
+                  href="https://github.com/chae03yb/hstree-makerthon"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
                   ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
+                >
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="120">
+              <h4 data-en="News &amp; References" data-ko="보도 · 관련 자료">보도 · 관련 자료</h4>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <a
+                  href="https://youtu.be/z0q6D7zNWyw?si=26KJn7oKrOzzY4kc"
+                  target="_blank" rel="noopener noreferrer"
+                  class="github-activity-btn"
+                  ><i class="fab fa-youtube"></i> <span data-en="Activity Video" data-ko="활동 영상">활동 영상</span></a
+                >
+                <a
+                  href="https://www.hstree.org/news/noticeView.do?seq=2295"
+                  target="_blank" rel="noopener noreferrer"
+                  class="github-activity-btn"
+                  data-en="HSTree News" data-ko="휴스트리 소식"><i class="fas fa-bullhorn"></i> 휴스트리 소식</a
+                >
+                <a
+                  href="http://www.gynews.co.kr/news/articleView.html?idxno=23300"
+                  target="_blank" rel="noopener noreferrer"
+                  class="github-activity-btn"
+                  ><i class="fas fa-newspaper"></i> <span data-en="Press Coverage" data-ko="언론 보도">언론 보도</span></a
+                >
+                <a
+                  href="https://www.hstree.org/board/eventInformationView.do?bbsSeq=38116"
+                  target="_blank" rel="noopener noreferrer"
+                  class="github-activity-btn"
+                  data-en="Event Info" data-ko="행사 안내"><i class="fas fa-calendar-day"></i> 행사 안내</a
                 >
               </div>
             </div>
@@ -175,9 +207,9 @@
                   font-size: 0.88rem;
                   line-height: 1.6;
                 "
-                data-en="Discord bot" data-ko="Discord 봇"
+                data-en-html="2024 Digital Saessak Makerthon<br />AI Avengers Award"
               >
-                Discord 봇
+                2024 디지털새싹 메이커톤<br />AI 어벤져스상 수상
               </p>
             </div>
           </div>
@@ -207,6 +239,6 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
-    <script src="../script.js"></script>
+    <script src="../../script.js"></script>
   </body>
 </html>

@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>비밀번호 도어락 | 이건영 포트폴리오</title>
+    <title>HTML Viewer | 이건영 포트폴리오</title>
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <link
@@ -18,7 +18,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../../style.css" />
   </head>
   <body>
     <div class="progress-container">
@@ -30,12 +30,12 @@
 
     <nav class="navbar">
       <div class="container nav-content">
-        <a href="../index.html" class="logo"
+        <a href="../../index.html" class="logo"
           ><span class="logo-bracket">{</span> GY
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
+          <li><a href="../../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -63,7 +63,7 @@
       <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
         <i class="fas fa-times"></i>
       </button>
-      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="../../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
       <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
       <div class="sidebar-utils">
         <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
@@ -82,26 +82,36 @@
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
-          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / <span data-en="Password Door Lock" data-ko="비밀번호 도어락">비밀번호 도어락</span>
+          <a href="../../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / HTML Viewer
         </div>
-        <div class="detail-hero-icon"><i class="fas fa-hammer"></i></div>
-        <h1 class="detail-title" data-aos="fade-up"><span data-en="Password Door Lock" data-ko="비밀번호 도어락">비밀번호 도어락</span></h1>
+        <div class="detail-hero-icon">
+          <i class="fas fa-code"></i>
+        </div>
+        <h1 class="detail-title" data-aos="fade-up">HTML Viewer</h1>
         <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
-          <span class="detail-badge">Maker</span
-          ><span class="detail-badge">Arduino</span
-          ><span class="detail-badge">Creative</span
-          ><span class="detail-badge" data-en="Team Project" data-ko="팀 프로젝트">팀 프로젝트</span>
+          <span class="detail-badge">Web</span>
+          <span class="detail-badge">HTML/CSS/JS</span>
+          <span class="detail-badge">Live Preview</span>
+          <span
+            class="detail-badge"
+            style="
+              border-color: rgba(184, 138, 26, 0.4);
+              color: var(--gold);
+              background: rgba(184, 138, 26, 0.1);
+            "
+            data-en="In Development" data-ko="개발 중"
+            >개발 중</span
+          >
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
-            href="https://github.com/pachir1su/Master_Creator_Challenge"
+            href="https://github.com/pachir1su/HTML_Viewer"
             target="_blank" rel="noopener noreferrer"
             class="btn btn-primary"
             ><i class="fab fa-github"></i> GitHub</a
           >
-
-          <a href="../index.html#projects" class="btn btn-ghost"
+          <a href="../../index.html#projects" class="btn btn-ghost"
             ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
@@ -114,53 +124,44 @@
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
               <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
-              <p data-en="2024 Master Creator Challenge entry. Built a password door lock system using a 4x4 matrix keypad and servo motor with Arduino.">
-                2024 마스터 크리에이터 챌린지 참가 프로젝트로, 아두이노를
-                기반으로 제작한 비밀번호 도어락 시스템입니다. 4x4 매트릭스
-                키패드를 이용해 보안 잠금 장치를 구현했습니다.
+              <p data-en="A lightweight web viewer that instantly shows the result when you paste HTML code. The goal is to let you run markup, styles, and scripts directly in the browser without any installation." data-ko="HTML 코드를 붙여넣으면 즉시 결과물을 보여주는 가벼운 웹 뷰어입니다. 별도의 설치 없이 브라우저 안에서 마크업·스타일·스크립트를 바로 실행해 볼 수 있게 만드는 것이 목표입니다.">
+                HTML 코드를 붙여넣으면 즉시 결과물을 보여주는 가벼운 웹 뷰어입니다.
+                별도의 설치 없이 브라우저 안에서 마크업·스타일·스크립트를
+                바로 실행해 볼 수 있게 만드는 것이 목표입니다.
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
               <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li data-en="4-digit password input system">4자리 비밀번호 입력 시스템 구현</li>
-                <li data-en="Keypad interface design">키패드 인터페이스 설계</li>
-                <li data-en="Servo motor unlock on correct password">맞는 비밀번호 입력 시 서보모터로 잠금 해제</li>
-                <li data-en="Alarm on 3 incorrect password attempts">틀린 비밀번호 3회 입력 시 경보음 출력</li>
-                <li data-en="LCD display for status indication">LCD 디스플레이로 상태 표시</li>
+                <li data-en="Integrated HTML / CSS / JavaScript input editor">HTML / CSS / JavaScript 통합 입력 에디터</li>
+                <li data-en="Real-time preview that updates as you type">입력과 동시에 갱신되는 실시간 미리보기</li>
+                <li data-en="Result screen capture and code save">결과 화면 캡처 및 코드 저장</li>
+                <li data-en="Code sharing URL generation (planned)">코드 공유용 URL 생성 (예정)</li>
               </ul>
             </div>
-            <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="120">
               <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> <span data-en="Team Lead · 4-person Team" data-ko="팀장 · 4인 팀">팀장 · 4인 팀</span>
+                <i class="fas fa-user-tag"></i> <span data-en="Solo Development" data-ko="1인 개발">1인 개발</span>
               </p>
-              <ul>
-                <li data-en="Planning">기획</li>
-                <li data-en="Arduino programming">아두이노 프로그래밍</li>
-                <li data-en="Arduino wiring">아두이노 배선</li>
-                <li data-en="Presentation">발표</li>
-                <li data-en="And more">그 외 다수</li>
-              </ul>
+              <p data-en="I handled the entire process alone, from planning to development and deployment." data-ko="기획부터 개발, 배포까지 전 과정을 단독으로 진행했습니다.">기획부터 개발, 배포까지 전 과정을 단독으로 진행했습니다.</p>
             </div>
           </div>
 
           <div class="detail-sidebar">
             <div class="sidebar-card" data-aos="fade-left">
-              <h4>Tech Stack</h4>
+              <h4 data-en="Tech Stack" data-ko="기술 스택">Tech Stack</h4>
               <div class="sidebar-stack">
-                <span class="tech-stack"><span>Arduino</span></span
-                ><span class="tech-stack"><span>C++</span></span
-                ><span class="tech-stack"><span>Servo Motor</span></span
-                ><span class="tech-stack"><span>Keypad</span></span
-                ><span class="tech-stack"><span>LCD</span></span>
+                <span>HTML</span>
+                <span>CSS</span>
+                <span>JavaScript</span>
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
-              <h4>Links</h4>
+              <h4 data-en="Links" data-ko="링크">Links</h4>
               <div style="display: flex; flex-direction: column; gap: 10px">
                 <a
-                  href="https://github.com/pachir1su/Master_Creator_Challenge"
+                  href="https://github.com/pachir1su/HTML_Viewer"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
                   ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
@@ -175,10 +176,27 @@
                   font-size: 0.88rem;
                   line-height: 1.6;
                 "
-                data-en-html="Master Creator Challenge<br />Maker project <br />Hackathon"
+                data-en-html="Personal learning tool<br />Runs standalone in browser" data-ko-html="개인 학습용 도구<br />브라우저 단독 동작"
               >
-                마스터 크리에이터 챌린지<br />메이커 프로젝트 <br />
-                해커톤
+                개인 학습용 도구<br />브라우저 단독 동작
+              </p>
+            </div>
+            <div
+              class="sidebar-card"
+              data-aos="fade-left"
+              data-aos-delay="200"
+              style="border-color: rgba(184, 138, 26, 0.3)"
+            >
+              <h4 style="color: var(--gold)" data-en="Status" data-ko="진행 상태">진행 상태</h4>
+              <p
+                style="
+                  color: var(--text-muted);
+                  font-size: 0.88rem;
+                  line-height: 1.6;
+                "
+                data-en="Early development stage" data-ko="초기 개발 단계"
+              >
+                초기 개발 단계
               </p>
             </div>
           </div>
@@ -207,7 +225,6 @@
     </footer>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
-    <script src="../script.js"></script>
+    <script src="../../script.js"></script>
   </body>
 </html>
