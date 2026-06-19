@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>해안 장벽 프로젝트 | 이건영 포트폴리오</title>
+    <title>식물 타이머 | 이건영 포트폴리오</title>
     <link
       rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22htt p://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -18,7 +18,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../../style.css" />
   </head>
   <body>
     <div class="progress-container">
@@ -30,12 +30,12 @@
 
     <nav class="navbar">
       <div class="container nav-content">
-        <a href="../index.html" class="logo"
+        <a href="../../index.html" class="logo"
           ><span class="logo-bracket">{</span> GY
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
+          <li><a href="../../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -63,7 +63,7 @@
       <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
         <i class="fas fa-times"></i>
       </button>
-      <a href="../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="../../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
       <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
       <div class="sidebar-utils">
         <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
@@ -82,26 +82,26 @@
       <div class="detail-hero-glow"></div>
       <div class="container" style="position: relative; z-index: 1">
         <div class="detail-breadcrumb">
-          <a href="../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
-          <a href="../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / <span data-en="Coastal Barrier Project" data-ko="해안 장벽 프로젝트">해안 장벽 프로젝트</span>
+          <a href="../../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / <span data-en="Plant Timer" data-ko="식물 타이머">식물 타이머</span>
         </div>
-        <div class="detail-hero-icon"><i class="fas fa-water"></i></div>
-        <h1 class="detail-title" data-aos="fade-up"><span data-en="Coastal Barrier Project" data-ko="해안 장벽 프로젝트">해안 장벽 프로젝트</span></h1>
+        <div class="detail-hero-icon"><i class="fas fa-leaf"></i></div>
+        <h1 class="detail-title" data-aos="fade-up"><span data-en="Plant Timer" data-ko="식물 타이머">식물 타이머</span></h1>
         <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
-          <span class="detail-badge">Engineering</span
-          ><span class="detail-badge">Environment</span
-          ><span class="detail-badge">Modeling</span
+          <span class="detail-badge">IoT</span
+          ><span class="detail-badge">Arduino</span
+          ><span class="detail-badge">Hackathon</span
           ><span class="detail-badge" data-en="Team Project" data-ko="팀 프로젝트">팀 프로젝트</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a
-            href="https://github.com/pachir1su/Wall_Sina"
+            href="https://github.com/pachir1su/PlantClock"
             target="_blank" rel="noopener noreferrer"
             class="btn btn-primary"
             ><i class="fab fa-github"></i> GitHub</a
           >
 
-          <a href="../index.html#projects" class="btn btn-ghost"
+          <a href="../../index.html#projects" class="btn btn-ghost"
             ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
         </div>
@@ -114,36 +114,34 @@
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
               <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
-              <p data-en="2024 Sustainable Development Project. Built a coastal barrier MVP model addressing sea-level rise issues, featuring sensor-controlled water barrier mechanisms.">
-                2024 지속 가능한 발전 프로젝트로, 기후 위기로 인한 해수면 상승에
-                대비한 해안 장벽 MVP입니다. 수조 안에 가상의 도시와 바다를
-                만들고, 이를 분리하는 장벽을 설계하여 해수면 상승 시나리오를
-                시뮬레이션하는 프로젝트입니다.
+              <p data-en="A smart plant-care timer system built as an entry for the 2025 Coding Festival with seniors and juniors. It was developed to solve the duplicate-watering problem that occurs when several people raise a single plant together." data-ko="2025 선후배와 함께하는 코딩 페스티벌 참가작으로 제작한 스마트 식물 관리 타이머 시스템입니다. 여러 명이 하나의 식물을 키울 때 발생하는 중복 급수 문제를 해결하기 위해 개발되었습니다.">
+                2025 선후배와 함께하는 코딩 페스티벌 참가작으로 제작한 스마트
+                식물 관리 타이머 시스템입니다. 여러 명이 하나의 식물을 키울 때
+                발생하는 중복 급수 문제를 해결하기 위해 개발되었습니다.
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
               <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li data-en="Sea level rise scenario simulation and analysis">해수면 상승 시나리오 시뮬레이션 및 분석</li>
-                <li data-en="Multi-layer breakwater structure design">다층 방파 구조 설계</li>
-                <li data-en="Prototype model fabrication with laser cutter">레이저 커터로 프로토타입 모형 제작</li>
-                <li data-en="Application of Sustainable Development Goals (SDGs)">지속 가능한 발전 목표(SDGs) 적용</li>
+                <li data-en="Humidity monitoring" data-ko="습도 모니터링">습도 모니터링</li>
+                <li data-en="LCD current status display" data-ko="LCD 현재 상태 디스플레이">LCD 현재 상태 디스플레이</li>
+                <li data-en="Timer showing last watering time" data-ko="마지막으로 언제 급수했는지 알려주는 타이머">마지막으로 언제 급수했는지 알려주는 타이머</li>
+                <li data-en="Plant welfare fan" data-ko="식물 ㄹㅈㄷ 복지 선풍기">식물 ㄹㅈㄷ 복지 선풍기</li>
+                <li data-en="Solar power system (decorative)" data-ko="태양광 전원 시스템(장식)">태양광 전원 시스템(장식)</li>
+                <li data-en="Watering alerts via buzzer and vibration motor" data-ko="부저와 진동 모터로 급수 알림">부저와 진동 모터로 급수 알림</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
               <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position">
-                <i class="fas fa-user-tag"></i> <span data-en="Team Member (Arduino Dev Lead) · 4-person Team" data-ko="팀원 (아두이노 개발 총괄) · 4인 팀">팀원 (아두이노 개발 총괄) · 4인 팀</span>
+                <i class="fas fa-user-tag"></i> <span data-en="Solo Development" data-ko="1인 개발">1인 개발</span>
               </p>
               <ul>
-                <li data-en="Sub-planning">서브 기획</li>
+                <li data-en="Planning">기획</li>
                 <li data-en="Arduino programming">아두이노 프로그래밍</li>
                 <li data-en="Arduino wiring">아두이노 배선</li>
-                <li data-en="Barrier waterproofing">장벽 방수 처리</li>
-                <li data-en="Resource procurement">물자 파밍 및 조달</li>
-                <li data-en="Snack support">간식 지원</li>
                 <li data-en="Presentation">발표</li>
-                <li data-en="QA &amp; Debugging">QA &amp; 디버깅</li>
+                <li data-en="Case model fabrication">케이스 모델 제작</li>
                 <li data-en="And more">그 외 다수</li>
               </ul>
             </div>
@@ -153,19 +151,18 @@
             <div class="sidebar-card" data-aos="fade-left">
               <h4>Tech Stack</h4>
               <div class="sidebar-stack">
-                <span class="tech-stack"><span>3D Modeling</span></span
-                ><span class="tech-stack"><span>Engineering Design</span></span
-                ><span class="tech-stack"><span>Prototyping</span></span
-                ><span class="tech-stack"
-                  ><span>Environmental Science</span></span
-                >
+                <span class="tech-stack"><span>Arduino</span></span
+                ><span class="tech-stack"><span>C++</span></span
+                ><span class="tech-stack"><span>Sensor</span></span
+                ><span class="tech-stack"><span>Motor Control</span></span
+                ><span class="tech-stack"><span>IoT</span></span>
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
               <h4>Links</h4>
               <div style="display: flex; flex-direction: column; gap: 10px">
                 <a
-                  href="https://github.com/pachir1su/Wall_Sina"
+                  href="https://github.com/pachir1su/PlantClock"
                   target="_blank" rel="noopener noreferrer"
                   class="github-activity-btn"
                   ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
@@ -180,9 +177,10 @@
                   font-size: 0.88rem;
                   line-height: 1.6;
                 "
-                data-en-html="Sustainable development project<br />Environmental engineering project"
+                data-en-html="Hackathon entry<br />IoT project <br />Arduino"
               >
-                지속 가능한 발전 프로젝트<br />환경 공학 프로젝트
+                해커톤 참가작<br />IoT 프로젝트 <br />
+                아두이노
               </p>
             </div>
           </div>
@@ -212,6 +210,6 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
-    <script src="../script.js"></script>
+    <script src="../../script.js"></script>
   </body>
 </html>
