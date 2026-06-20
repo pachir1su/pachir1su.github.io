@@ -1,0 +1,489 @@
+{
+  "groups": [
+    {
+      "kind": "year",
+      "year": "2026",
+      "cards": [
+        {
+          "comment": "github-rank-insight",
+          "category": "web",
+          "icon": "fab fa-github",
+          "detail": "projects/github_rank_insight/",
+          "links": [
+            { "href": "https://github.com/pachir1su/github-rank-insight", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "GitHub Rank Insight", "ko": "GitHub Rank Insight" },
+          "subtitle": { "en": "GitHub Stats rank analyzer & next-grade advisor", "ko": "GitHub Stats 등급 분석기" },
+          "descHtml": {
+            "en": "Username one input → instant rank analysis<br />Auto/manual mode, per-metric chart &amp; next-grade tips",
+            "ko": "username 입력하면 즉시 등급 분석<br />자동/수동 모드 · 지표별 기여도 차트"
+          },
+          "tech": ["HTML/CSS/JS", "GitHub API", "ES Modules"]
+        },
+        {
+          "comment": "한기대 26학번 신입생 가이드",
+          "category": "web",
+          "icon": "fas fa-book-open",
+          "detail": "projects/koreatech_noob_guide/",
+          "links": [
+            { "href": "https://capybaracute.notion.site/26-2fca8de5ee5f806db9e9e64464a9ac78", "title": "Notion", "icon": "fas fa-external-link-alt" },
+            { "href": "https://github.com/pachir1su/koreatech_noob_guide", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "KOREATECH Freshman Guide '26", "ko": "한기대 26학번 신입생 가이드" },
+          "subtitle": { "en": "Notion guide for KOREATECH freshmen '26", "ko": "한기대 26학번 신입생용 노션 가이드" },
+          "desc": { "en": "A Notion site for KOREATECH class of '26 freshmen", "ko": "한기대 26학번 신입생을 위한 노션 사이트" },
+          "tech": ["Notion", "Documentation"]
+        },
+        {
+          "comment": "Swordmaster (File + Media 통합 허브)",
+          "category": "web",
+          "icon": "fas fa-wand-magic-sparkles",
+          "detail": "projects/swordmaster/",
+          "links": [
+            { "href": "https://github.com/pachir1su", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": "Swordmaster",
+          "subtitle": { "en": "File & Media processing web tool collection", "ko": "파일·미디어 처리 다기능 웹 툴 모음" },
+          "descHtml": {
+            "en": "Two Gradio web tools in one<br />File Swordmaster (PDF·Audio) · Media Swordmaster (Image·Video)",
+            "ko": "두 개의 Gradio 웹 툴을 하나로<br />File Swordmaster(PDF·오디오) · Media Swordmaster(이미지·영상)"
+          },
+          "tech": ["Python", "Gradio", "HuggingFace"]
+        },
+        {
+          "comment": "데일리 리포트 AI",
+          "category": "ai discord",
+          "icon": "fab fa-discord",
+          "detail": "projects/computingSAGO/",
+          "links": [
+            { "href": "https://github.com/pachir1su/computingSAGO", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "Daily Report AI", "ko": "데일리 리포트 AI" },
+          "subtitle": { "en": "Gemini-based Discord morning briefing bot", "ko": "Gemini 기반 디스코드 아침 브리핑 봇" },
+          "descHtml": {
+            "en": "Gemini compiles weather, news, and air quality daily<br />and auto-briefs via Discord at a set time",
+            "ko": "매일 정해진 시간에 Gemini가 날씨·뉴스·미세먼지를 종합해<br />Discord로 자동 브리핑"
+          },
+          "tech": ["Gemini API", "discord.py", { "en": "Automation", "ko": "자동화" }]
+        },
+        {
+          "comment": "MultiMind",
+          "category": "ai",
+          "icon": "fas fa-brain",
+          "detail": "projects/MultiMind/",
+          "links": [
+            { "href": "https://github.com/pachir1su/MultiMind", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": "MultiMind",
+          "subtitle": { "en": "Orchestrator controlling multiple LLMs without API", "ko": "API 없이 여러 LLM을 동시 조작하는 오케스트레이터" },
+          "descHtml": {
+            "en": "Controls multiple LLMs simultaneously via pyautogui without API<br />Head LLM aggregates results as a multi-LLM orchestrator",
+            "ko": "API 없이 pyautogui로 여러 LLM을 동시에 조작<br />Head LLM이 결과를 종합하는 멀티 LLM 오케스트레이터"
+          },
+          "tech": ["Python", "pyautogui", "tkinter", "Multi-Agent"]
+        },
+        {
+          "comment": "기술과사회",
+          "category": "ai",
+          "icon": "fas fa-chart-line",
+          "detail": "projects/tech_and_society/",
+          "links": [],
+          "title": { "en": "Tech & Society", "ko": "기술과사회" },
+          "subtitle": { "en": "AI Delphi method future prediction project", "ko": "AI 델파이 기법 미래 예측 발표 프로젝트" },
+          "descHtml": {
+            "en": "Predicting the future of work, jobs, and life using the Delphi method<br />AI simulation Delphi survey & presentation project",
+            "ko": "델파이 기법을 이용한 일·직업과 삶의 미래 예측<br />AI 시뮬레이션 델파이 조사 · 발표 프로젝트"
+          },
+          "tech": ["Delphi Method", "Claude", "Gemini", "Chart.js"]
+        }
+      ]
+    },
+    {
+      "kind": "year",
+      "year": "2025",
+      "cards": [
+        {
+          "comment": "NFC 출석 체크 시스템",
+          "category": "hardware",
+          "icon": "fas fa-id-card",
+          "detail": "projects/BerryIno/",
+          "links": [
+            { "href": "https://github.com/pachir1su/BerryIno", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "NFC Attendance System", "ko": "NFC 출석 체크 시스템" },
+          "subtitle": { "en": "NFC tag-based auto attendance IoT", "ko": "NFC 태그 기반 자동 출석 체크 IoT" },
+          "descHtml": {
+            "en": "NFC tag-based efficient attendance system<br />Arduino and Raspberry Pi integration for data processing",
+            "ko": "NFC 태그를 활용한 효율적인 출석 체크 시스템<br />아두이노와 라즈베리파이 연동으로 데이터 처리"
+          },
+          "tech": ["Arduino", "Raspberry Pi", "IoT"]
+        },
+        {
+          "comment": "식물 타이머",
+          "category": "hardware contest",
+          "icon": "fas fa-leaf",
+          "detail": "projects/PlantClock/",
+          "links": [
+            { "href": "https://github.com/pachir1su/PlantClock", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "Plant Timer", "ko": "식물 타이머" },
+          "subtitle": { "en": "Smart plant care timer (hackathon entry)", "ko": "식물 관리 스마트 타이머 (해커톤 참가작)" },
+          "descHtml": {
+            "en": "2025 Coding Festival hackathon entry<br />Smart timer system for plant care",
+            "ko": "2025 선후배와 함께하는 코딩 페스티벌 해커톤 참가작<br />식물 관리를 돕는 스마트 타이머 시스템"
+          },
+          "tech": ["IoT", "Hackathon"]
+        },
+        {
+          "comment": "헬스 케어 시스템",
+          "category": "web",
+          "icon": "fas fa-heartbeat",
+          "detail": "projects/HEALTH_CHECK_PROJECT/",
+          "links": [
+            { "href": "https://github.com/pachir1su/HEALTH_CHECK_PROJECT", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "Health Care System", "ko": "헬스 케어 시스템" },
+          "subtitle": { "en": "Health data logging & monitoring system", "ko": "건강 데이터 기록·모니터링 시스템" },
+          "descHtml": {
+            "en": "Personalized healthcare system<br />Health data logging and monitoring features",
+            "ko": "사용자 맞춤형 헬스케어 시스템<br />건강 데이터를 기록하고 모니터링하는 기능 구현"
+          },
+          "tech": ["Python", "Tkinter", "Arduino", "Raspberry Pi", "Gemini API"]
+        },
+        {
+          "comment": "면진봇",
+          "category": "discord",
+          "icon": "fab fa-discord",
+          "detail": "projects/MZ_bot/",
+          "links": [
+            { "href": "https://github.com/pachir1su/MZ_bot", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "MZ Bot", "ko": "면진봇" },
+          "subtitle": { "en": "Discord economy simulation bot", "ko": "디스코드 경제 시뮬레이션 봇" },
+          "desc": { "en": "Discord economy game bot", "ko": "디스코드 경제 게임 봇" },
+          "tech": ["Python", "Discord.py"]
+        },
+        {
+          "comment": "공감 봇 & 레시피 AI",
+          "category": "ai",
+          "icon": "fas fa-robot",
+          "detail": "projects/Legend_SakSak_GongGam_AI/",
+          "links": [
+            { "href": "https://github.com/pachir1su/Legend_SakSak_GongGam_AI", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "Empathy Bot & Recipe AI", "ko": "공감 봇 & 레시피 AI" },
+          "subtitle": { "en": "Emotional empathy chatbot + ingredient recipe AI", "ko": "감정 공감 챗봇 + 식재료 레시피 추천 AI" },
+          "desc": { "en": "Emotional empathy chatbot and ingredient-based recipe recommendation AI service", "ko": "감정 공감 챗봇과 보유 식재료 기반 요리 레시피 추천 AI 서비스" },
+          "tech": ["AI", "Gemini API", "Flask"]
+        }
+      ]
+    },
+    {
+      "kind": "year",
+      "year": "2024",
+      "cards": [
+        {
+          "comment": "비밀번호 도어락",
+          "category": "hardware contest",
+          "icon": "fas fa-hammer",
+          "detail": "projects/Master_Creator_Challenge/",
+          "links": [
+            { "href": "https://github.com/pachir1su/Master_Creator_Challenge", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "Password Door Lock", "ko": "비밀번호 도어락" },
+          "subtitle": { "en": "4x4 keypad-based password door lock", "ko": "4x4 키패드 기반 비밀번호 도어락" },
+          "descHtml": {
+            "en": "2024 Master Creator Challenge entry<br />Door lock system using 4x4 matrix keypad",
+            "ko": "2024 마스터 크리에이터 챌린지 참가 프로젝트<br />4x4 매트릭스 키패드를 활용한 도어락 시스템"
+          },
+          "tech": ["Arduino", "C++", "Servo Motor", "Keypad", "LCD"]
+        },
+        {
+          "comment": "해안 장벽 프로젝트",
+          "category": "hardware",
+          "icon": "fas fa-water",
+          "detail": "projects/Wall_Sina/",
+          "links": [
+            { "href": "https://github.com/pachir1su/Wall_Sina", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "Coastal Barrier Project", "ko": "해안 장벽 프로젝트" },
+          "subtitle": { "en": "Coastal barrier MVP for sea level rise", "ko": "해수면 상승 대비 해안 장벽 MVP" },
+          "descHtml": {
+            "en": "2024 Sustainable Development Project<br />Coastal barrier MVP for rising sea levels",
+            "ko": "2024 지속 가능한 발전 프로젝트<br />해수면 상승에 대비한 해안 장벽 MVP"
+          },
+          "tech": ["Engineering", "Environment", "Modeling"]
+        },
+        {
+          "comment": "산불 조기 감지 알림 시스템",
+          "category": "ai hardware contest",
+          "icon": "fas fa-fire-extinguisher",
+          "detail": "projects/nonofire/",
+          "links": [
+            { "href": "https://github.com/chae03yb/hstree-makerthon", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "Wildfire Early Detection Alert System", "ko": "산불 조기 감지 알림 시스템" },
+          "subtitle": { "en": "Raspberry Pi & OpenCV real-time wildfire detection (award winner)", "ko": "라즈베리파이·OpenCV 실시간 산불 감지 (수상작)" },
+          "descHtml": {
+            "en": "2024 Digital Saessak 'AI Avengers Award' winner<br />Real-time wildfire detection using Raspberry Pi and OpenCV",
+            "ko": "2024 디지털새싹 'AI 어벤져스상' 수상작<br />라즈베리파이와 OpenCV로 산불을 실시간 감지합니다."
+          },
+          "tech": ["Raspberry Pi", "OpenCV", "AI"]
+        },
+        {
+          "comment": "2024 SFPC",
+          "category": "contest",
+          "icon": "fas fa-laptop-code",
+          "detail": "projects/2024_SFPC/",
+          "links": [
+            { "href": "https://github.com/pachir1su/2024_SFPC", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": "2024 SFPC",
+          "subtitle": { "en": "8th place out of 581 teams in algorithm contest (Top 1.3%)", "ko": "전국 581팀 중 8위 알고리즘 대회 (Top 1.3%)" },
+          "desc": { "en": "Code archive from the algorithm contest, ranked 8th out of 581 teams.", "ko": "총 581팀 중 8위를 기록한 알고리즘 대회 코드 아카이브." },
+          "tech": ["Algorithm", "Problem Solving", "C++ / Python"]
+        },
+        {
+          "comment": "졸음 방지 시스템",
+          "category": "hardware contest",
+          "icon": "fas fa-robot",
+          "detail": "projects/2024_5th_CSRC/",
+          "links": [
+            { "href": "https://github.com/pachir1su/2024_5th_CSRC", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "Drowsiness Prevention System", "ko": "졸음 방지 시스템" },
+          "subtitle": { "en": "HuskyLens real-time drowsiness detection (robot contest bronze)", "ko": "허스키렌즈 실시간 졸음 감지 (로봇대회 동상)" },
+          "descHtml": {
+            "en": "2024 5th Cheonan Student Robot Contest bronze award project<br />Real-time drowsiness detection system using HuskyLens",
+            "ko": "2024 제 5회 천안학생로봇대회 동상 수상 프로젝트<br />허스키렌즈를 이용한 실시간 졸음 감지 시스템"
+          },
+          "tech": ["Robot", "Embedded", "HuskyLens"]
+        }
+      ]
+    },
+    {
+      "kind": "wip",
+      "heading": "진행 중 · 예정",
+      "cards": [
+        {
+          "comment": "한맵 (Koreatech Map)",
+          "category": "web",
+          "icon": "fas fa-map-marked-alt",
+          "detail": "projects/Koreatech_map/",
+          "links": [
+            { "href": "https://github.com/pachir1su/Koreatech_Map", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "badge": { "en": "Planned", "ko": "진행 예정" },
+          "title": { "en": "HanMap (Koreatech Map)", "ko": "한맵 (Koreatech Map)" },
+          "subtitle": { "en": "KOREATECH campus interactive map web", "ko": "한기대 캠퍼스 인터랙티브 지도 웹" },
+          "descHtml": {
+            "en": "KOREATECH campus map service<br />Interactive web map with building floor plans and room info",
+            "ko": "한기대 캠퍼스 지도 서비스<br />건물 내부 지도 및 호실 정보 등의 모든 정보를 담은 웹 인터랙티브 지도"
+          },
+          "progress": 5,
+          "tech": ["Web", "Interactive Map", "Animation"]
+        },
+        {
+          "comment": "승기봇",
+          "category": "discord",
+          "icon": "fab fa-discord",
+          "detail": "projects/SG_bot/",
+          "links": [
+            { "href": "https://github.com/pachir1su/SG_bot", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "badge": { "en": "In Dev", "ko": "개발 중" },
+          "title": { "en": "SG Bot", "ko": "승기봇" },
+          "subtitle": { "en": "Revamped MZ Bot — mini-game Discord bot", "ko": "면진봇 개편판 — 미니게임 디스코드 봇" },
+          "descHtml": {
+            "en": "Revamped version of MZ Bot<br />Mini-game bot featuring Liar Game, Mafia, and more",
+            "ko": "기존 면진봇의 개편 버전<br />라이어게임, 양세찬게임, 마피아게임 등의 미니게임 봇"
+          },
+          "progress": 70,
+          "tech": ["Python", "Discord.py"]
+        },
+        {
+          "comment": "온라인술담",
+          "category": "web",
+          "icon": "fas fa-wine-glass-alt",
+          "detail": "projects/Sibal_Life_Smoking/",
+          "links": [
+            { "href": "https://github.com/pachir1su/Sibal_Life_Smoking", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "badge": { "en": "Planned", "ko": "진행 예정" },
+          "title": { "en": "Online Suldam", "ko": "온라인술담" },
+          "subtitle": { "en": "Online Damta benchmarking website", "ko": "온라인담타 벤치마킹 웹사이트" },
+          "descHtml": {
+            "en": "A site benchmarking Online Damta<br />To be deployed via GitHub Pages",
+            "ko": "온라인담타를 벤치마킹한 사이트<br />GitHub Pages로 배포 예정"
+          },
+          "progress": 0,
+          "tech": ["HTML/CSS/JS", "GitHub Pages"]
+        },
+        {
+          "comment": "HTML Viewer",
+          "category": "web",
+          "icon": "fas fa-code",
+          "detail": "projects/HTML_Viewer/",
+          "links": [
+            { "href": "https://github.com/pachir1su/HTML_Viewer", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "badge": { "en": "In Dev", "ko": "개발 중" },
+          "title": "HTML Viewer",
+          "subtitle": { "en": "HTML real-time preview web viewer", "ko": "HTML 실시간 미리보기 웹 뷰어" },
+          "descHtml": {
+            "en": "Paste HTML code and<br />see the result in real time",
+            "ko": "HTML 코드를 붙여넣으면<br />실시간으로 결과물을 보여주는 웹 뷰어"
+          },
+          "progress": 45,
+          "tech": ["HTML", "CSS", "JavaScript"]
+        },
+        {
+          "comment": "CentrifugeAI",
+          "category": "ai web",
+          "icon": "fas fa-flask",
+          "detail": "projects/CentrifugeAI/",
+          "links": [
+            { "href": "https://github.com/pachir1su/CentrifugeAI", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "badge": { "en": "In Dev", "ko": "개발 중" },
+          "title": "CentrifugeAI",
+          "subtitle": { "en": "Gemini virtual science lab", "ko": "Gemini 가상 과학 실험실" },
+          "descHtml": {
+            "en": "Put materials into virtual lab equipment (centrifuge, microscope, accelerator, etc.)<br />and predict & visualize results with Gemini AI",
+            "ko": "가상 실험 장치(원심분리기·현미경·가속기 등)에<br />재료를 넣고 Gemini AI로 결과를 예측·시각화하는 실험 시뮬레이터"
+          },
+          "progress": 80,
+          "tech": ["Python", "Flask", "SQLite", "Gemini API", "Discord.py", "Matplotlib"]
+        },
+        {
+          "comment": "마법 아카데미",
+          "category": "web",
+          "icon": "fas fa-hat-wizard",
+          "detail": "projects/Magic_Academy/",
+          "links": [],
+          "badge": { "en": "Planned", "ko": "진행 예정" },
+          "title": { "en": "Magic Academy", "ko": "마법 아카데미" },
+          "subtitle": { "en": "Element combination magic interactive simulation", "ko": "원소 조합 마법 인터랙티브 시뮬레이션" },
+          "descHtml": {
+            "en": "Combine elements to create magic and<br />visualize with interactive simulation",
+            "ko": "원소를 조합해 마법을 만들고<br />시각화하는 인터랙티브 시뮬레이션"
+          },
+          "progress": 0,
+          "tech": [
+            { "en": "Python (Planned)", "ko": "Python (예정)" },
+            { "en": "p5.js (Planned)", "ko": "p5.js (예정)" }
+          ]
+        },
+        {
+          "comment": "DelphiRec",
+          "category": "ai",
+          "icon": "fas fa-user-graduate",
+          "detail": "projects/DelphiRec/",
+          "links": [
+            { "href": "https://github.com/pachir1su/DelphiRec", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "badge": { "en": "Planned", "ko": "개발 예정" },
+          "title": "DelphiRec",
+          "subtitle": { "en": "Student record analysis & Q&A multi-agent AI", "ko": "생기부 분석·질의응답 멀티 에이전트 AI" },
+          "descHtml": {
+            "en": "Student record analysis &amp; Q&amp;A AI<br />In-depth analysis using multi-expert personas and Delphi method",
+            "ko": "생기부 분석 &amp; 질의응답 AI<br />멀티 전문가 페르소나와 델파이 기법으로 생기부를 심층 분석"
+          },
+          "progress": 20,
+          "tech": ["Claude API", "FastAPI", "React", "Multi-Agent"]
+        }
+      ]
+    },
+    {
+      "kind": "failed",
+      "heading": "실패한 프로젝트",
+      "cards": [
+        {
+          "comment": "InfoCatch",
+          "category": "ai web",
+          "icon": "fas fa-newspaper",
+          "links": [
+            { "href": "https://github.com/pachir1su/InfoCatch", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "badge": { "en": "Failed", "ko": "실패" },
+          "title": "InfoCatch",
+          "subtitle": { "en": "AI news summarization web app", "ko": "AI 뉴스 요약 웹 애플리케이션" },
+          "desc": { "en": "News summarization and real-time stock info web app using Google Gemini API", "ko": "Google Gemini API를 활용한 뉴스 요약 및 실시간 증시 정보 제공 웹앱" },
+          "failedReason": {
+            "en": "<i class=\"fas fa-times-circle\"></i> AI implementation failed; didn't know web server setup at the time",
+            "ko": "<i class=\"fas fa-times-circle\"></i> AI 구현 실패 · 당시 웹서버 구축 몰랐음"
+          },
+          "tech": ["React", "Gemini API", "NewsAPI"]
+        },
+        {
+          "comment": "InvestAI",
+          "category": "ai web",
+          "icon": "fas fa-chart-line",
+          "links": [
+            { "href": "https://github.com/pachir1su/InvestAI", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "badge": { "en": "Failed", "ko": "실패" },
+          "title": "InvestAI",
+          "subtitle": { "en": "Fear/Greed index & forex/stock web widget", "ko": "Fear/Greed 지표 · 환율·주가 웹 위젯" },
+          "desc": { "en": "Real-time widget providing market Fear/Greed index via news and social media analysis", "ko": "뉴스·소셜 미디어 분석으로 시장 Fear/Greed 지표를 제공하는 실시간 위젯" },
+          "failedReason": {
+            "en": "<i class=\"fas fa-times-circle\"></i> API integration failed",
+            "ko": "<i class=\"fas fa-times-circle\"></i> API 연동 실패"
+          },
+          "tech": ["Python", "API", "Data Analysis"]
+        },
+        {
+          "comment": "건영운세",
+          "category": "web",
+          "icon": "fas fa-star-half-alt",
+          "links": [
+            { "href": "https://github.com/pachir1su/GY_Fortune", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "badge": { "en": "Failed", "ko": "실패" },
+          "title": { "en": "GY Fortune", "ko": "건영운세" },
+          "subtitle": { "en": "Date-based fortune generator web app", "ko": "날짜 기반 운세 생성 웹앱" },
+          "desc": { "en": "Fortune generation service based on name and birthdate with date-fixed seed", "ko": "이름·생년월일 입력 시 날짜 고정 시드 기반으로 운세를 생성하는 서비스" },
+          "failedReason": {
+            "en": "<i class=\"fas fa-times-circle\"></i> Fortune logic implementation failed",
+            "ko": "<i class=\"fas fa-times-circle\"></i> 운세 로직 구현 실패"
+          },
+          "tech": ["React", "Zustand", "Vite"]
+        },
+        {
+          "comment": "한기대 지도 (초기 버전)",
+          "category": "web",
+          "icon": "fas fa-map",
+          "links": [
+            { "href": "https://github.com/pachir1su/Koreatech_Map", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "badge": { "en": "Delayed", "ko": "지연" },
+          "title": { "en": "KOREATECH Map (Early Ver.)", "ko": "한기대 지도 (초기 버전)" },
+          "subtitle": { "en": "Campus indoor map data collection project", "ko": "캠퍼스 내부 지도 데이터 수집 프로젝트" },
+          "desc": { "en": "Attempted evacuation-map-based indoor map conversion; hit realistic limits of data collection", "ko": "대피도 기반 실내 지도 변환 시도 · 데이터 수집의 현실적 한계에 부딪힘" },
+          "failedReason": {
+            "en": "<i class=\"fas fa-times-circle\"></i> Data collection difficulty; AI map conversion failed",
+            "ko": "<i class=\"fas fa-times-circle\"></i> 데이터 수집 난이도 · AI 지도 변환 실패"
+          },
+          "tech": ["Web", "GPT-Image", "Data Collection"]
+        },
+        {
+          "comment": "BrawlCraft",
+          "category": "web",
+          "icon": "fas fa-gamepad",
+          "links": [
+            { "href": "https://github.com/pachir1su/BrawlCraft", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "badge": { "en": "Failed", "ko": "실패" },
+          "title": "BrawlCraft",
+          "subtitle": { "en": "Brawl Stars x Minecraft web game", "ko": "브롤스타즈 × 마인크래프트 웹 게임" },
+          "desc": { "en": "Web game combining exploration, crafting, and combat; attempted bot algorithm implementation", "ko": "탐사·재료 조합·전투를 결합한 웹 게임 · 봇 알고리즘까지 구현 시도" },
+          "failedReason": {
+            "en": "<i class=\"fas fa-times-circle\"></i> Optimization failed; design failed",
+            "ko": "<i class=\"fas fa-times-circle\"></i> 최적화 실패 · 디자인 실패"
+          },
+          "tech": ["JavaScript", "Game Dev", "Canvas"]
+        }
+      ]
+    }
+  ]
+}
