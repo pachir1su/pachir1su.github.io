@@ -3,944 +3,775 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>이건영 — Index Card (Preview)</title>
-<!-- 비공개 디자인 시안: 검색·공유 노출 차단 (robots.txt에서도 Disallow) -->
+<title>UI/UX 시안 비교 — 노트 테마 강화</title>
 <meta name="robots" content="noindex, nofollow" />
-<link
-  rel="icon"
-  href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
-/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Caveat:wght@500;600;700&family=Pretendard:wght@400;500;600;700&display=swap"
-  rel="stylesheet"
-/>
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-/>
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&family=Pretendard:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
-  :root{
-    --paper:#f6f1e0;
-    --paper-2:#ece4cc;
-    --paper-3:#fffaea;
-    --ink:#1f1c14;
-    --g:#6b6453;
-    --g2:#a39c8a;
-    --red:#c63b3b;
-    --red-l:rgba(198,59,59,0.32);
-    --line:rgba(31,28,20,0.18);
-    --rule:rgba(31,28,20,0.085);
-    --tape:#e9c66a;
-    --tape-2:#f0d987;
-    --hl:rgba(255,222,84,0.55);
-    --row-h:32px;
-  }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* ===== 시안 비교 레이아웃 ===== */
+:root {
+  --paper: #faf7ee;
+  --ink: #1f1c14;
+  --red: #c63b3b;
+  --cyan: #2b8a93;
+  --gold: #b88a1a;
+  --muted: #6b6453;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  background: #f0ebe0;
+  color: var(--ink);
+  padding: 40px 24px 80px;
+  line-height: 1.6;
+}
+.page-title {
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 1.8rem;
+  font-weight: 900;
+}
+.page-desc {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 48px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.concepts {
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.concept {
+  background: #fff;
+  border: 1px solid rgba(31,28,20,0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(31,28,20,0.08);
+}
+.concept-header {
+  padding: 24px 32px;
+  border-bottom: 1px solid rgba(31,28,20,0.08);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.concept-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--red);
+  padding: 4px 10px;
+  border-radius: 3px;
+  letter-spacing: 0.1em;
+}
+.concept-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+.concept-tags {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.concept-tags span {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border: 1px solid rgba(31,28,20,0.15);
+  border-radius: 2px;
+  color: var(--muted);
+}
+.concept-body {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  min-height: 600px;
+}
+@media (max-width: 900px) {
+  .concept-body { grid-template-columns: 1fr; }
+  .concept-sidebar { border-left: none; border-top: 1px solid rgba(31,28,20,0.08); }
+}
+.concept-preview {
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+.concept-sidebar {
+  padding: 24px;
+  border-left: 1px solid rgba(31,28,20,0.08);
+  background: #fafaf8;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.sidebar-section h4 {
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--red);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.sidebar-section p {
+  font-size: 0.85rem;
+  color: var(--ink);
+  line-height: 1.7;
+}
+.sidebar-section ul {
+  list-style: none;
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+.sidebar-section ul li {
+  padding: 4px 0;
+  padding-left: 14px;
+  position: relative;
+}
+.sidebar-section ul li::before {
+  content: "·";
+  position: absolute;
+  left: 2px;
+  color: var(--red);
+  font-weight: 700;
+}
+.pros-cons { display: flex; flex-direction: column; gap: 10px; }
+.pro, .con { font-size: 0.8rem; padding: 6px 10px; border-radius: 4px; }
+.pro { background: rgba(43, 138, 147, 0.08); color: var(--cyan); }
+.con { background: rgba(198, 59, 59, 0.06); color: var(--red); }
 
-  /* === paper grain on whole page === */
-  body{
-    background:var(--paper);
-    background-image:
-      radial-gradient(circle at 12% 22%,rgba(255,238,180,0.55),transparent 55%),
-      radial-gradient(circle at 92% 78%,rgba(180,150,80,0.18),transparent 50%),
-      radial-gradient(circle at 50% 50%,rgba(200,170,110,0.08),transparent 70%);
-    color:var(--ink);
-    font-family:'Pretendard','Inter',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;
-    min-height:100vh;position:relative;
-  }
-  body::before{
-    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.55;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.1  0 0 0 0 0.07  0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    mix-blend-mode:multiply;
-  }
-  body::after{
-    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.6;
-    background-image:repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(180,150,90,0.03) 3px,rgba(180,150,90,0.03) 4px);
-    mix-blend-mode:multiply;
-  }
-  a{color:inherit;text-decoration:none}
-  ul{list-style:none}
+/* ===== 시안 A: 스프링 노트 ===== */
+.preview-a {
+  background: #faf7ee;
+  min-height: 600px;
+  position: relative;
+  padding: 0;
+}
+.preview-a .spiral {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(90deg, #e8e3d6 0%, #faf7ee 100%);
+  border-right: 1px solid rgba(31,28,20,0.1);
+  z-index: 2;
+}
+.preview-a .spiral::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 20px;
+  bottom: 20px;
+  width: 20px;
+  background-image: repeating-linear-gradient(
+    180deg,
+    transparent 0px, transparent 12px,
+    #faf7ee 12px, #faf7ee 14px,
+    rgba(31,28,20,0.4) 14px, rgba(31,28,20,0.4) 26px,
+    #faf7ee 26px, #faf7ee 28px,
+    transparent 28px, transparent 40px
+  );
+}
+.preview-a .page-content {
+  margin-left: 40px;
+  padding: 32px 28px;
+  background-image:
+    linear-gradient(rgba(198,59,59,0.25), rgba(198,59,59,0.25)),
+    repeating-linear-gradient(transparent 0 31px, rgba(31,28,20,0.07) 31px 32px);
+  background-size: 1px 100%, 100% auto;
+  background-position: 48px 0, 0 0;
+  background-repeat: no-repeat, repeat-y;
+  min-height: 600px;
+}
+.preview-a .hero-title {
+  font-size: 2.4rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  position: relative;
+  display: inline-block;
+}
+.preview-a .hero-title::before {
+  content: "";
+  position: absolute;
+  left: -4px; right: -4px;
+  bottom: 6px;
+  height: 14px;
+  background: rgba(198,59,59,0.15);
+  z-index: -1;
+  transform: skewX(-2deg);
+}
+.preview-a .hero-sub {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.preview-a .handnote {
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  color: var(--red);
+  transform: rotate(-2deg);
+  margin: 16px 0;
+  opacity: 0.8;
+}
+.preview-a .postit {
+  display: inline-block;
+  background: #fff7a8;
+  padding: 12px 16px;
+  box-shadow: 2px 3px 6px rgba(31,28,20,0.12);
+  transform: rotate(-1.5deg);
+  margin: 12px 0;
+  font-size: 0.85rem;
+  position: relative;
+}
+.preview-a .postit::after {
+  content: "";
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 0 0 12px 12px;
+  border-color: transparent transparent rgba(31,28,20,0.1) transparent;
+}
+.preview-a .tape-deco {
+  position: absolute;
+  top: 12px;
+  right: 32px;
+  width: 90px;
+  height: 22px;
+  background: repeating-linear-gradient(90deg, rgba(230,200,120,0.6) 0px 6px, rgba(230,200,120,0.4) 6px 10px);
+  transform: rotate(4deg);
+  border-radius: 1px;
+  opacity: 0.85;
+}
+.preview-a .skill-cards {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.preview-a .skill-chip {
+  background: #fffdf6;
+  border: 1px solid rgba(31,28,20,0.12);
+  padding: 8px 14px;
+  font-size: 0.78rem;
+  position: relative;
+  font-family: 'Space Mono', monospace;
+  border-top: 2.5px solid var(--red);
+}
+.preview-a .skill-chip:nth-child(2) { border-top-color: var(--cyan); }
+.preview-a .skill-chip:nth-child(3) { border-top-color: var(--gold); }
 
-  /* progress bar (preserved) */
-  .progress-container{position:fixed;top:0;left:0;right:0;height:3px;background:transparent;z-index:100;pointer-events:none}
-  .progress-bar{height:100%;width:0;background:var(--red);transition:width .08s linear;box-shadow:0 0 6px rgba(198,59,59,0.5)}
+/* ===== 시안 B: 스크랩북 ===== */
+.preview-b {
+  background: #f4efe1;
+  min-height: 600px;
+  position: relative;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.preview-b .scrap-tape {
+  position: absolute;
+  width: 100px;
+  height: 24px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.4), transparent 30%, transparent 70%, rgba(0,0,0,0.05)),
+    repeating-linear-gradient(90deg, transparent 0 3px, rgba(180,140,40,0.08) 3px 4px),
+    linear-gradient(135deg, #e9c66a 0%, #f0d987 50%, #e9c66a 100%);
+  transform: rotate(-3deg);
+  opacity: 0.85;
+  z-index: 5;
+  clip-path: polygon(2% 12%,8% 0%,16% 14%,28% 4%,38% 18%,50% 2%,62% 16%,72% 6%,82% 18%,92% 0%,98% 14%,100% 50%,98% 86%,92% 100%,82% 84%,72% 94%,62% 86%,50% 98%,38% 84%,28% 96%,16% 86%,8% 100%,2% 88%,0% 50%);
+}
+.preview-b .scrap-tape.t1 { top: 18px; left: 30px; }
+.preview-b .scrap-tape.t2 { top: 22px; right: 50px; transform: rotate(5deg); background: linear-gradient(180deg, rgba(255,255,255,0.4), transparent 30%, transparent 70%, rgba(0,0,0,0.05)), repeating-linear-gradient(90deg, transparent 0 3px, rgba(43,138,147,0.12) 3px 4px), linear-gradient(135deg, #a8dce0 0%, #c5e8eb 50%, #a8dce0 100%); }
+.preview-b .scrap-tape.t3 { bottom: 20px; left: 120px; transform: rotate(2deg); width: 80px; }
+.preview-b .main-card {
+  background: #fffdf6;
+  border: 1px solid rgba(31,28,20,0.12);
+  padding: 28px 24px;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(31,28,20,0.06);
+  transform: rotate(-0.5deg);
+}
+.preview-b .main-card .clip {
+  position: absolute;
+  top: -6px;
+  left: 32px;
+  width: 16px;
+  height: 40px;
+  border: 2.5px solid rgba(31,28,20,0.4);
+  border-radius: 0 0 8px 8px;
+  border-top: none;
+}
+.preview-b .hero-title {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+.preview-b .hero-sub {
+  font-family: 'Caveat', cursive;
+  font-size: 1.3rem;
+  color: var(--red);
+  transform: rotate(-1deg);
+}
+.preview-b .photo-area {
+  background: #fff;
+  border: 6px solid #fff;
+  box-shadow: 0 3px 10px rgba(31,28,20,0.15);
+  padding: 0;
+  width: 140px;
+  height: 100px;
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  transform: rotate(3deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Caveat', cursive;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.preview-b .postit-stack {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.preview-b .postit-item {
+  padding: 14px 16px;
+  min-width: 120px;
+  box-shadow: 2px 3px 8px rgba(31,28,20,0.1);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.preview-b .postit-item:nth-child(1) { background: #fff7a8; transform: rotate(-2deg); }
+.preview-b .postit-item:nth-child(2) { background: #c5e4e7; transform: rotate(1.5deg); }
+.preview-b .postit-item:nth-child(3) { background: #ffe5a8; transform: rotate(-1deg); }
+.preview-b .sticker {
+  position: absolute;
+  bottom: 24px;
+  right: 28px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2.5px solid var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Caveat', cursive;
+  font-size: 0.8rem;
+  color: var(--red);
+  font-weight: 700;
+  transform: rotate(-8deg);
+  background: rgba(255,253,246,0.8);
+}
+.preview-b .washi-divider {
+  width: 100%;
+  height: 18px;
+  background: repeating-linear-gradient(90deg,
+    rgba(198,59,59,0.3) 0px 5px,
+    rgba(198,59,59,0.15) 5px 8px);
+  margin: 8px 0;
+  border-radius: 1px;
+}
 
-  /* back-to-top (preserved) */
-  #btn-back-to-top{position:fixed;bottom:24px;right:24px;width:46px;height:46px;border:1.5px solid var(--ink);background:var(--paper-3);color:var(--ink);font-family:'JetBrains Mono';font-size:14px;font-weight:700;cursor:pointer;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s,background .15s,color .15s,transform .15s;display:flex;align-items:center;justify-content:center;box-shadow:2px 2px 0 var(--ink)}
-  #btn-back-to-top.show{opacity:1;pointer-events:auto}
-  #btn-back-to-top:hover{background:var(--ink);color:var(--paper);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--red)}
-
-  /* nav */
-  nav{position:sticky;top:0;background:var(--paper);border-bottom:1px solid var(--line);padding:12px 28px;display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.05em;z-index:50;backdrop-filter:saturate(120%)}
-  nav .lhs{display:flex;align-items:center;gap:14px;color:var(--g)}
-  nav .lhs .stamp{font-family:'JetBrains Mono';font-size:10px;border:1.5px solid var(--red);color:var(--red);padding:2px 6px;letter-spacing:0.08em;font-weight:700;transform:rotate(-2deg)}
-  nav .lhs b{color:var(--ink);font-weight:700;letter-spacing:0.1em}
-  nav .links{display:flex;gap:22px}
-  nav .links a{color:var(--g);transition:color .15s;position:relative}
-  nav .links a::after{content:'';position:absolute;left:0;right:100%;bottom:-3px;height:1.5px;background:var(--red);transition:right .2s}
-  nav .links a:hover{color:var(--ink)}
-  nav .links a:hover::after{right:0}
-
-  main{max-width:1120px;margin:0 auto;padding:48px 28px 80px;position:relative;z-index:1}
-
-  /* INDEX CARD base */
-  .card{
-    background:var(--paper-3);
-    border:1px solid var(--line);
-    box-shadow:
-      0 1px 0 var(--line),
-      0 14px 32px -18px rgba(31,28,20,0.35),
-      0 2px 4px -2px rgba(31,28,20,0.08);
-    position:relative;margin-bottom:42px;
-    isolation:isolate;
-  }
-  .card::before{content:'';position:absolute;left:64px;top:0;bottom:0;width:1px;background:var(--red-l);z-index:1}
-  .card::after{
-    content:'';position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.5;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.1  0 0 0 0 0.07  0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    mix-blend-mode:multiply;
-  }
-  .card .lines{position:absolute;left:0;right:0;top:60px;bottom:0;background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--row-h) - 1px),var(--rule) calc(var(--row-h) - 1px),var(--rule) var(--row-h));pointer-events:none;z-index:1}
-  .card .holes{position:absolute;left:22px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-around;padding:30px 0;align-items:center;gap:0;z-index:2}
-  .card .holes span{display:block;width:14px;height:14px;border-radius:50%;background:var(--paper-2);border:1px solid var(--line);box-shadow:inset 0 1px 2px rgba(31,28,20,0.25)}
-  .card .head{display:flex;justify-content:space-between;align-items:center;padding:14px 24px 12px 84px;border-bottom:1px solid var(--line);font-family:'JetBrains Mono';font-size:11px;color:var(--g);letter-spacing:0.05em;position:relative;z-index:2;flex-wrap:wrap;gap:8px;background:linear-gradient(to bottom,rgba(255,250,234,0.7),transparent)}
-  .card .head b{color:var(--ink);font-weight:700}
-  .card .head .red{color:var(--red);font-weight:700}
-  .card .body{padding:20px 28px 30px 84px;position:relative;z-index:2}
-
-  /* === masking tape === */
-  .tape{
-    position:absolute;
-    width:108px;height:26px;
-    background:
-      linear-gradient(180deg,rgba(255,255,255,0.4) 0%,transparent 30%,transparent 70%,rgba(0,0,0,0.08) 100%),
-      repeating-linear-gradient(90deg,transparent 0,transparent 3px,rgba(180,140,40,0.08) 3px,rgba(180,140,40,0.08) 4px),
-      linear-gradient(135deg,var(--tape) 0%,var(--tape-2) 50%,var(--tape) 100%);
-    box-shadow:0 3px 6px rgba(31,28,20,0.12),inset 0 0 1px rgba(150,100,30,0.4);
-    opacity:.88;z-index:5;
-    clip-path:polygon(2% 12%,8% 0%,16% 14%,28% 4%,38% 18%,50% 2%,62% 16%,72% 6%,82% 18%,92% 0%,98% 14%,100% 50%,98% 86%,92% 100%,82% 84%,72% 94%,62% 86%,50% 98%,38% 84%,28% 96%,16% 86%,8% 100%,2% 88%,0% 50%);
-  }
-  .tape.tl{top:-10px;left:42px;transform:rotate(-6deg)}
-  .tape.tr{top:-12px;right:48px;transform:rotate(5deg)}
-  .tape.bl{bottom:-12px;left:120px;transform:rotate(3deg)}
-  .tape.br{bottom:-10px;right:64px;transform:rotate(-4deg)}
-
-  /* index-card tab */
-  .tab{
-    position:absolute;top:-16px;left:120px;
-    background:var(--paper-2);
-    border:1px solid var(--line);border-bottom:none;
-    padding:5px 14px 4px;
-    font-family:'JetBrains Mono';font-size:9px;
-    letter-spacing:0.18em;font-weight:700;
-    color:var(--g);text-transform:uppercase;
-    box-shadow:0 -2px 4px rgba(31,28,20,0.06);
-    z-index:4;
-  }
-  .tab.red{color:var(--red);border-color:var(--red-l)}
-
-  /* stamp */
-  .card .stamp{position:absolute;top:24px;right:32px;font-family:'JetBrains Mono';font-size:11px;color:var(--red);border:2px solid var(--red);padding:6px 12px;letter-spacing:0.12em;font-weight:700;transform:rotate(7deg);background:rgba(255,250,234,0.6);z-index:6;text-align:center}
-  .card .stamp small{display:block;font-size:8px;font-weight:500;margin-top:2px;letter-spacing:0.06em}
-  .card .stamp::before,.card .stamp::after{
-    content:'';position:absolute;left:0;right:0;height:2px;background:var(--red);opacity:0.5;
-  }
-  .card .stamp::before{top:50%;left:-6px;right:-6px;height:0;border-top:1.5px dashed var(--red);opacity:.25;transform:rotate(-3deg)}
-  .card .stamp::after{display:none}
-
-  /* HERO card */
-  .hero-card{min-height:560px}
-  .hero-card .body{display:flex;flex-direction:column;justify-content:flex-start;gap:6px}
-  .meta-row{font-family:'JetBrains Mono';font-size:10px;color:var(--g);letter-spacing:0.06em;height:var(--row-h);display:flex;align-items:center;gap:8px}
-  .meta-row b{color:var(--ink);font-weight:600}
-  .meta-row .dot{width:5px;height:5px;background:var(--red);border-radius:50%}
-  .name{font-family:'Space Grotesk';font-weight:700;font-size:82px;line-height:66px;letter-spacing:-0.04em;margin:8px 0 0;display:flex;flex-direction:column}
-  .name span{display:block;height:66px;line-height:66px}
-  .name em{font-style:normal;color:var(--red);position:relative}
-  .name em::after{content:'';position:absolute;left:0;right:6px;bottom:6px;height:3px;background:var(--red);opacity:0.4}
-  .scribble{position:absolute;font-family:'Caveat';font-size:24px;color:var(--red);transform:rotate(-4deg);line-height:1;z-index:6;font-weight:600}
-  .scribble.s1{top:264px;right:120px}
-  .scribble.s2{top:108px;right:172px;font-size:20px;transform:rotate(-12deg)}
-  .scribble.s3{top:404px;right:48px;font-size:18px;transform:rotate(6deg);color:var(--g)}
-
-  .quote-row{min-height:var(--row-h);font-family:'Space Grotesk';font-weight:600;font-size:17px;color:var(--ink);display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:14px}
-  .quote-row em{font-style:normal;background:var(--hl);color:var(--ink);padding:0 4px;font-weight:700;box-decoration-break:clone}
-  .caret{display:inline-block;width:2px;height:0.95em;background:var(--ink);margin-left:2px;vertical-align:-2px;animation:bl 1s steps(2) infinite}
-  @keyframes bl{50%{opacity:0}}
-
-  /* stat grid */
-  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
-  .stat{padding:14px 16px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,250,234,0.85),rgba(246,241,224,0.5));position:relative;transition:.15s}
-  .stat::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:2px solid var(--red);border-left:2px solid var(--red);opacity:.6}
-  .stat:hover{transform:translateY(-2px);box-shadow:0 6px 14px -4px rgba(31,28,20,0.18)}
-  .stat .l{font-family:'JetBrains Mono';font-size:9px;color:var(--g);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px}
-  .stat .v{font-family:'Space Grotesk';font-weight:700;font-size:30px;line-height:1;letter-spacing:-0.03em;color:var(--ink)}
-  .stat .v small{font-size:13px;color:var(--g);font-weight:500;margin-left:2px}
-  .stat .s{font-size:11px;color:var(--g);margin-top:6px}
-
-  .cta-row{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap}
-  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;font-family:'JetBrains Mono';font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:1.5px solid var(--ink);background:transparent;color:var(--ink);transition:.15s;border-radius:0;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
-  .btn:hover{background:var(--ink);color:var(--paper);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--red)}
-  .btn.red{background:var(--red);border-color:var(--red);color:#fff;box-shadow:2px 2px 0 var(--ink)}
-  .btn.red:hover{background:var(--ink);border-color:var(--ink);box-shadow:3px 3px 0 var(--red)}
-
-  /* content rows */
-  .rows{padding-top:8px}
-  .rows .li{display:flex;align-items:center;min-height:var(--row-h);padding:2px 0;font-size:14px;color:var(--ink);gap:10px}
-  .rows .li > .desc{flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.5}
-  .rows .li b{font-weight:700}
-  .rows .li .bullet{color:var(--red);font-weight:700;font-size:18px;line-height:1;flex:0 0 auto;font-family:'Caveat'}
-  .rows .li .tag{color:var(--g);font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.04em;flex:0 0 auto;font-weight:700}
-  .rows .li .red{color:var(--red);font-weight:700;font-family:'JetBrains Mono';font-size:11px;flex:0 0 auto;letter-spacing:0.04em}
-  .rows .li mark{background:var(--hl);color:var(--ink);padding:0 4px;font-weight:600}
-  .rows .li .skicon{color:var(--red);font-size:13px;width:18px;text-align:center;flex:0 0 auto}
-
-  /* about narrative */
-  .quote-mark{font-family:'Space Grotesk';font-style:italic;font-size:20px;color:var(--ink);padding:6px 0 14px;border-bottom:1px dashed var(--line);margin-bottom:18px;font-weight:600;position:relative}
-  .quote-mark::before{content:'\201C';color:var(--red);margin-right:4px;font-size:32px;vertical-align:-8px;font-family:'Space Grotesk'}
-  .quote-mark::after{content:'\201D';color:var(--red);margin-left:4px;font-size:32px;vertical-align:-8px;font-family:'Space Grotesk'}
-  .narrative{font-size:15px;line-height:1.9;color:var(--ink)}
-  .narrative + .narrative{margin-top:12px}
-  .narrative b{font-weight:700}
-  .narrative em{font-style:normal;background:var(--hl);color:var(--ink);padding:0 3px;font-weight:600;box-decoration-break:clone}
-  .narrative .pen{font-weight:700;border-bottom:2px solid var(--red);padding-bottom:1px}
-
-  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
-  .chip{font-family:'JetBrains Mono';font-size:11px;padding:4px 10px;border:1px solid var(--line);color:var(--g);display:inline-flex;align-items:center;gap:6px;background:rgba(255,250,234,0.5);transition:.15s}
-  .chip:hover{border-color:var(--ink);color:var(--ink)}
-  .chip i{color:var(--red);font-size:10px}
-  .chip b{color:var(--ink);font-weight:700}
-
-  .gh-cta{margin-top:20px;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border:1.5px solid var(--ink);font-family:'JetBrains Mono';font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--ink);transition:.15s;text-transform:uppercase;box-shadow:2px 2px 0 var(--ink)}
-  .gh-cta:hover{background:var(--ink);color:var(--paper);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--red)}
-
-  /* skill cards in grid */
-  .skill-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px;padding-top:8px}
-  .skill-grid .li{padding-left:0}
-  @media (max-width:880px){.skill-grid{grid-template-columns:1fr;gap:8px}}
-
-  /* === WORKS section === */
-  .works-divider{
-    position:relative;
-    margin:24px 0 14px;
-    display:flex;align-items:center;gap:14px;
-  }
-  .works-divider::before,.works-divider::after{content:'';flex:1;height:1px;background:var(--line)}
-  .works-divider span{
-    font-family:'JetBrains Mono';font-size:11px;
-    letter-spacing:0.2em;font-weight:700;color:var(--g);
-    text-transform:uppercase;padding:0 12px;
-    border:1px solid var(--line);
-    background:var(--paper-3);
-    box-shadow:0 1px 0 var(--line);
-  }
-  .works-divider.wip span{color:var(--red);border-color:var(--red-l)}
-
-  .works-grid{
-    display:grid;grid-template-columns:1fr 1fr;
-    gap:14px;
-  }
-  @media (max-width:880px){.works-grid{grid-template-columns:1fr}}
-
-  .wmini{
-    position:relative;border:1px solid var(--line);
-    padding:14px 16px 12px;
-    background:linear-gradient(180deg,rgba(255,250,234,0.85) 0%,rgba(246,241,224,0.55) 100%);
-    transition:transform .18s,box-shadow .18s,border-color .18s;
-    min-height:148px;display:flex;flex-direction:column;
-  }
-  .wmini::before{
-    content:'';position:absolute;top:0;left:0;width:6px;height:100%;
-    background:var(--g2);opacity:.35;
-  }
-  .wmini:hover{
-    transform:translateY(-3px);
-    box-shadow:0 8px 18px -8px rgba(31,28,20,0.25);
-    border-color:var(--ink);
-  }
-  .wmini:hover::before{background:var(--red);opacity:.7}
-  .wmini.award{border:1.5px solid var(--red);background:linear-gradient(180deg,rgba(255,235,235,0.4) 0%,rgba(246,241,224,0.55) 100%)}
-  .wmini.award::before{background:var(--red);opacity:.85}
-  .wmini.wip::before{background:var(--red);opacity:.55;background:repeating-linear-gradient(45deg,var(--red) 0,var(--red) 4px,transparent 4px,transparent 8px)}
-
-  .wmini-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-  .wmini-top .tag{font-family:'JetBrains Mono';font-size:10px;color:var(--g);font-weight:700;letter-spacing:0.06em}
-  .wmini-top .ico{color:var(--red);font-size:13px;width:18px;text-align:center}
-  .wmini-top .status{margin-left:auto;font-family:'JetBrains Mono';font-size:9px;color:var(--g);letter-spacing:0.08em;font-weight:600}
-  .wmini-top .status.r{color:var(--red);font-weight:700}
-  .wmini h4{font-family:'Pretendard';font-size:15px;font-weight:700;line-height:1.35;margin-bottom:5px;letter-spacing:-0.01em}
-  .wmini h4 .hl{background:var(--hl);padding:0 3px}
-  .wmini p{font-size:12.5px;color:var(--g);line-height:1.55;flex:1}
-  .wmini-bot{
-    display:flex;align-items:center;justify-content:space-between;gap:8px;
-    margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);
-  }
-  .wmini-bot .tech{font-family:'JetBrains Mono';font-size:9px;color:var(--g);letter-spacing:0.04em;line-height:1.4;flex:1;min-width:0}
-  .wmini-bot .links{display:inline-flex;gap:4px;flex:0 0 auto}
-  .wmini-bot .links a{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border:1px solid var(--line);color:var(--g);transition:.15s;background:rgba(255,250,234,0.6)}
-  .wmini-bot .links a:hover{border-color:var(--ink);color:var(--ink);background:#fff}
-  .wmini-bot .links i{font-size:10px}
-  .wmini .seal{
-    position:absolute;top:-10px;right:-10px;width:30px;height:30px;
-    background:var(--red);color:#fff;font-size:14px;
-    display:flex;align-items:center;justify-content:center;
-    border-radius:50%;font-weight:700;z-index:3;
-    box-shadow:0 2px 6px rgba(198,59,59,0.45);
-    transform:rotate(-8deg);
-  }
-  .wmini .pin{
-    position:absolute;top:-6px;left:14px;width:10px;height:10px;
-    background:radial-gradient(circle at 35% 35%,#ff8a8a,#c63b3b 60%,#7d2020);
-    border-radius:50%;
-    box-shadow:0 2px 3px rgba(31,28,20,0.4),inset -1px -1px 2px rgba(0,0,0,0.3);
-    z-index:3;
-  }
-
-  /* footer card */
-  .foot{
-    background:var(--ink);color:var(--paper);
-    padding:40px 36px 28px;
-    display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px;align-items:start;margin-top:24px;
-    position:relative;overflow:hidden;
-  }
-  .foot::before{
-    content:'';position:absolute;inset:0;pointer-events:none;opacity:.18;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    mix-blend-mode:overlay;
-  }
-  .foot > *{position:relative;z-index:1}
-  .foot h4{font-family:'JetBrains Mono';font-size:10px;color:var(--g2);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px}
-  .foot .mk{font-family:'Space Grotesk';font-weight:700;font-size:44px;line-height:0.9;letter-spacing:-0.04em}
-  .foot .mk .r{color:var(--red)}
-  .foot .mk small{display:block;font-family:'JetBrains Mono';font-size:11px;color:var(--g2);margin-top:10px;font-weight:500;letter-spacing:0.05em}
-  .foot ul li{font-size:13px;line-height:1.9;color:var(--g2)}
-  .foot ul li a{transition:color .15s;display:inline-flex;align-items:center;gap:6px}
-  .foot ul li a:hover{color:#fff}
-  .foot-bot{grid-column:1/-1;padding-top:18px;margin-top:18px;border-top:1px solid rgba(255,255,255,0.12);display:flex;justify-content:space-between;font-family:'JetBrains Mono';font-size:10px;color:var(--g2);letter-spacing:0.05em;flex-wrap:wrap;gap:8px}
-
-  @media (max-width:880px){
-    main{padding:24px 16px 60px}
-    nav{padding:10px 16px}
-    nav .links{display:none}
-    .card{margin-bottom:32px}
-    .card .head{padding-left:64px;padding-right:14px;font-size:10px}
-    .card .body{padding:18px 18px 26px 64px}
-    .card::before{left:48px}
-    .card .holes{left:14px}
-    .name{font-size:48px;line-height:46px}
-    .name span{height:46px;line-height:46px}
-    .stat-grid{grid-template-columns:1fr 1fr;gap:8px}
-    .card .stamp{top:14px;right:14px;transform:rotate(7deg) scale(.82)}
-    .scribble.s1{top:auto;bottom:8px;right:18px;font-size:18px}
-    .scribble.s2{top:66px;right:14px;font-size:16px}
-    .scribble.s3{display:none}
-    .tape{width:80px;height:20px}
-    .tape.tl{left:30px;top:-8px}
-    .tape.tr{right:18px;top:-8px}
-    .tab{font-size:8px;left:90px;padding:4px 10px 3px}
-    .foot{grid-template-columns:1fr;padding:30px 22px 22px}
-    #btn-back-to-top{bottom:16px;right:16px;width:40px;height:40px}
-    .rows .li{font-size:13px}
-    .wmini{padding:12px 14px 10px;min-height:auto}
-    .wmini-bot .tech{font-size:9px}
-  }
+/* ===== 시안 C: 학생 공책 (필기감) ===== */
+.preview-c {
+  background: #fefcf4;
+  min-height: 600px;
+  position: relative;
+  overflow: hidden;
+}
+.preview-c .ruled-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(198,59,59,0.2), rgba(198,59,59,0.2)),
+    repeating-linear-gradient(transparent 0 27px, rgba(100,150,200,0.18) 27px 28px);
+  background-size: 1px 100%, 100% auto;
+  background-position: 68px 0, 0 12px;
+  background-repeat: no-repeat, repeat-y;
+  pointer-events: none;
+}
+.preview-c .page-content {
+  position: relative;
+  z-index: 1;
+  padding: 24px 28px 28px 82px;
+}
+.preview-c .margin-note {
+  position: absolute;
+  left: 8px;
+  font-family: 'Caveat', cursive;
+  color: var(--red);
+  font-size: 0.85rem;
+  transform: rotate(-90deg);
+  transform-origin: left center;
+  white-space: nowrap;
+  opacity: 0.6;
+}
+.preview-c .margin-note.n1 { top: 80px; }
+.preview-c .margin-note.n2 { top: 280px; color: var(--cyan); }
+.preview-c .margin-note.n3 { top: 440px; color: var(--gold); }
+.preview-c .title-line {
+  font-family: 'Caveat', cursive;
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+  line-height: 28px;
+  padding-top: 14px;
+}
+.preview-c .underline-hand {
+  display: inline-block;
+  border-bottom: 2.5px solid var(--red);
+  padding-bottom: 2px;
+}
+.preview-c .sub-hand {
+  font-family: 'Caveat', cursive;
+  font-size: 1.2rem;
+  color: var(--muted);
+  margin-bottom: 20px;
+  margin-top: 12px;
+}
+.preview-c .highlight-box {
+  display: inline;
+  background: linear-gradient(180deg, transparent 55%, rgba(255,222,84,0.5) 55%);
+  padding: 0 3px;
+}
+.preview-c .doodle-arrow {
+  position: absolute;
+  right: 40px;
+  top: 100px;
+  font-family: 'Caveat', cursive;
+  font-size: 1rem;
+  color: var(--red);
+  transform: rotate(12deg);
+  opacity: 0.6;
+}
+.preview-c .bullet-list {
+  margin: 16px 0;
+  font-size: 0.9rem;
+  line-height: 28px;
+}
+.preview-c .bullet-list li {
+  padding-left: 16px;
+  position: relative;
+  list-style: none;
+}
+.preview-c .bullet-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--red);
+  font-weight: 700;
+}
+.preview-c .stamp-circle {
+  position: absolute;
+  right: 32px;
+  bottom: 60px;
+  width: 72px;
+  height: 72px;
+  border: 3px solid var(--red);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--red);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transform: rotate(-12deg);
+  opacity: 0.4;
+  text-align: center;
+  line-height: 1.3;
+}
+.preview-c .tape-corner {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 60px;
+  height: 20px;
+  background: rgba(230,200,120,0.55);
+  transform: rotate(42deg);
+  transform-origin: top right;
+  border-radius: 1px;
+}
+.preview-c .postit-small {
+  position: absolute;
+  bottom: 32px;
+  left: 82px;
+  background: #fff7a8;
+  padding: 10px 14px;
+  font-family: 'Caveat', cursive;
+  font-size: 0.95rem;
+  color: var(--ink);
+  box-shadow: 2px 3px 6px rgba(31,28,20,0.1);
+  transform: rotate(2deg);
+  max-width: 180px;
+  line-height: 1.4;
+}
+.preview-c .pencil-box {
+  margin-top: 24px;
+  padding: 16px 20px;
+  border: 1.5px dashed rgba(31,28,20,0.2);
+  border-radius: 3px;
+  background: rgba(255,250,234,0.4);
+}
+.preview-c .pencil-box h4 {
+  font-family: 'Caveat', cursive;
+  font-size: 1.2rem;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.preview-c .pencil-box .tech-tag {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-bottom: 2px solid var(--cyan);
+  margin: 3px 4px 3px 0;
+  color: var(--ink);
+}
 </style>
 </head>
 <body>
 
-<div class="progress-container"><div class="progress-bar" id="myBar"></div></div>
-<button type="button" id="btn-back-to-top" title="맨 위로"><i class="fas fa-arrow-up"></i></button>
+<h1 class="page-title">UI/UX 시안 비교</h1>
+<p class="page-desc">
+  현재 노트 테마를 더 강화하는 3가지 방향입니다.<br>
+  각 시안의 핵심 컨셉과 장단점을 비교해보세요.
+</p>
 
-<nav>
-  <div class="lhs">
-    <span class="stamp">REC. A.2</span>
-    <b>LGY</b><span>· Index Card · v5</span>
+<div class="concepts">
+
+  <!-- ===== 시안 A ===== -->
+  <div class="concept">
+    <div class="concept-header">
+      <span class="concept-num">시안 A</span>
+      <span class="concept-name">스프링 노트 — 구조적 정돈</span>
+      <div class="concept-tags">
+        <span>스프링 바인딩</span>
+        <span>줄노트</span>
+        <span>빨간 마진선</span>
+        <span>견출지</span>
+      </div>
+    </div>
+    <div class="concept-body">
+      <div class="concept-preview preview-a">
+        <div class="spiral"></div>
+        <div class="page-content">
+          <div class="tape-deco"></div>
+          <div class="hero-title">이건영</div>
+          <div class="hero-sub">Lee Geon Yeong · Developer & Innovator</div>
+          <div class="handnote">← 이윤보다 혁신을 추구하는 기업가</div>
+          <div class="postit">
+            <strong>20+</strong> 프로젝트<br>
+            <strong>3</strong> 수상 · <strong>Top 1.3%</strong>
+          </div>
+          <p style="margin-top:16px; font-size:0.88rem; color:#6b6453; line-height:1.8;">
+            줄 노트 위에 깔끔하게 정리된 느낌.<br>
+            좌측 스프링 + 빨간 마진선이 구조를 잡아주고,<br>
+            견출지 탭으로 섹션을 구분합니다.
+          </p>
+          <div class="skill-cards">
+            <div class="skill-chip">Python · C++</div>
+            <div class="skill-chip">AI · ML</div>
+            <div class="skill-chip">웹 · 앱</div>
+          </div>
+        </div>
+      </div>
+      <div class="concept-sidebar">
+        <div class="sidebar-section">
+          <h4>// 핵심 컨셉</h4>
+          <p>대학 노트를 그대로 옮긴 느낌. 좌측 스프링 바인딩이 페이지 전체를 관통하고, 빨간 마진선 안쪽에 콘텐츠가 정돈됩니다.</p>
+        </div>
+        <div class="sidebar-section">
+          <h4>// 추가 요소</h4>
+          <ul>
+            <li>좌측 스프링 고리 장식</li>
+            <li>줄 간격에 맞춘 텍스트</li>
+            <li>섹션별 색깔 견출지 탭</li>
+            <li>상단 와시테이프 (고정 느낌)</li>
+            <li>마진 영역 손글씨 주석</li>
+            <li>포스트잇 (핵심 숫자)</li>
+          </ul>
+        </div>
+        <div class="sidebar-section">
+          <h4>// 장단점</h4>
+          <div class="pros-cons">
+            <div class="pro">+ 정돈됨 · 읽기 편함</div>
+            <div class="pro">+ 현재 디자인과 자연스럽게 호환</div>
+            <div class="pro">+ 구조감이 강해서 정보 전달 유리</div>
+            <div class="con">- 기존 사이트와 큰 차이 안 느껴질 수 있음</div>
+            <div class="con">- 장식이 절제되어 임팩트 약함</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="links">
-    <a href="#hero">profile</a>
-    <a href="#about">about</a>
-    <a href="#skills">skills</a>
-    <a href="#awards">awards</a>
-    <a href="#works">works</a>
-    <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer">github ↗</a>
+
+  <!-- ===== 시안 B ===== -->
+  <div class="concept">
+    <div class="concept-header">
+      <span class="concept-num">시안 B</span>
+      <span class="concept-name">스크랩북 — 자유로운 콜라주</span>
+      <div class="concept-tags">
+        <span>마스킹테이프</span>
+        <span>포스트잇</span>
+        <span>페이퍼클립</span>
+        <span>스티커</span>
+        <span>사진</span>
+      </div>
+    </div>
+    <div class="concept-body">
+      <div class="concept-preview preview-b">
+        <div class="scrap-tape t1"></div>
+        <div class="scrap-tape t2"></div>
+        <div class="scrap-tape t3"></div>
+        <div class="main-card">
+          <div class="clip"></div>
+          <div class="hero-title">이건영</div>
+          <div class="hero-sub">"아이디어를 현실로 만드는 혁신가"</div>
+          <div class="photo-area">📷 photo</div>
+        </div>
+        <div class="washi-divider"></div>
+        <div class="postit-stack">
+          <div class="postit-item"><strong>목표</strong><br>월 100만명 유저</div>
+          <div class="postit-item"><strong>수상</strong><br>3회 · Top 1.3%</div>
+          <div class="postit-item"><strong>프로젝트</strong><br>20+ 완성</div>
+        </div>
+        <div class="sticker">GOOD!</div>
+      </div>
+      <div class="concept-sidebar">
+        <div class="sidebar-section">
+          <h4>// 핵심 컨셉</h4>
+          <p>스크랩북에 사진, 메모, 스티커를 자유롭게 붙여놓은 느낌. 요소들이 약간 비뚤어지고, 테이프로 고정하고, 클립으로 물리는 콜라주 스타일.</p>
+        </div>
+        <div class="sidebar-section">
+          <h4>// 추가 요소</h4>
+          <ul>
+            <li>다양한 색상 마스킹테이프 (찢어진 가장자리)</li>
+            <li>포스트잇 여러 색 (노랑/민트/주황)</li>
+            <li>페이퍼 클립 장식</li>
+            <li>카드가 약간 비스듬히 배치</li>
+            <li>원형 스티커 & 도장</li>
+            <li>와시테이프 구분선</li>
+            <li>사진 프레임 느낌 요소</li>
+          </ul>
+        </div>
+        <div class="sidebar-section">
+          <h4>// 장단점</h4>
+          <div class="pros-cons">
+            <div class="pro">+ 시각적 임팩트 강함</div>
+            <div class="pro">+ 개성 있고 기억에 남음</div>
+            <div class="pro">+ 장식 요소 많아서 재미 있음</div>
+            <div class="con">- 정보 전달이 상대적으로 약함</div>
+            <div class="con">- 과하면 산만해질 수 있음</div>
+            <div class="con">- 반응형 처리 복잡</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</nav>
 
-<main>
-
-  <!-- ============ HERO CARD ============ -->
-  <article class="card hero-card" id="hero" data-aos="fade-up">
-    <span class="tape tl"></span>
-    <span class="tape tr"></span>
-    <span class="tab red">№ 0001 · PROFILE</span>
-    <div class="lines"></div>
-    <div class="holes"><span></span><span></span><span></span><span></span><span></span></div>
-    <span class="stamp">FILED<small>2026.05.21</small></span>
-    <span class="scribble s2">← me</span>
-
-    <div class="head">
-      <span>CARD · <b>№ 0001</b></span>
-      <span>SUBJECT · <b>profile</b></span>
-      <span class="red">REV. A.2</span>
-    </div>
-    <div class="body">
-      <div class="meta-row"><span class="dot"></span><span><b>2026.05.21</b> · Thursday · Daejeon, KR</span></div>
-      <h1 class="name"><span>Lee</span><span>Geon</span><span><em>Yeong</em>.</span></h1>
-      <span class="scribble s1">★ 26 maker</span>
-      <span class="scribble s3">made by hand —</span>
-      <div class="rows">
-        <div class="li"><span class="bullet">·</span><span class="desc"><b>한국기술교육대학교</b> · 26학번 · maker · 기획자</span></div>
-        <div class="li"><span class="bullet">·</span><span class="desc">이윤을 넘어 <b>혁신</b>을 추구하는 기업가를 꿈꿉니다.</span></div>
-        <div class="li"><span class="bullet">·</span><span class="desc">목표 — <mark>월 100만 명</mark>이 사용하는 서비스</span></div>
-        <div class="li"><span class="bullet">·</span><span class="desc">github · <b>@pachir1su</b> · email · capybara@koreatech.ac.kr</span></div>
-      </div>
-      <div class="quote-row">혁신의 <em>기업가</em> &amp; <span id="typed"></span><span class="caret"></span></div>
-
-      <div class="stat-grid">
-        <div class="stat"><div class="l">// works</div><div class="v">18</div><div class="s">12 shipped · 6 wip</div></div>
-        <div class="stat"><div class="l">// awards</div><div class="v">03</div><div class="s">2024 cohort</div></div>
-        <div class="stat"><div class="l">// sfpc</div><div class="v">1.3<small>%</small></div><div class="s">581팀 · 8위</div></div>
-        <div class="stat"><div class="l">// goal</div><div class="v">1<small>M</small></div><div class="s">월간 사용자</div></div>
-      </div>
-
-      <div class="cta-row">
-        <a href="#works" class="btn red"><i class="fas fa-folder-open"></i> 프로젝트 보기 →</a>
-        <a href="mailto:capybara@koreatech.ac.kr" class="btn"><i class="fas fa-envelope"></i> email</a>
-        <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" class="btn"><i class="fab fa-github"></i> github ↗</a>
+  <!-- ===== 시안 C ===== -->
+  <div class="concept">
+    <div class="concept-header">
+      <span class="concept-num">시안 C</span>
+      <span class="concept-name">학생 필기 — 손글씨 & 형광펜</span>
+      <div class="concept-tags">
+        <span>손글씨</span>
+        <span>형광펜</span>
+        <span>마진 낙서</span>
+        <span>체크박스</span>
+        <span>도장</span>
       </div>
     </div>
-  </article>
-
-  <!-- ============ ABOUT CARD ============ -->
-  <article class="card" id="about" data-aos="fade-up">
-    <span class="tape tr"></span>
-    <span class="tab">№ 0002 · ABOUT</span>
-    <div class="lines"></div>
-    <div class="holes"><span></span><span></span><span></span><span></span><span></span></div>
-
-    <div class="head">
-      <span>CARD · <b>№ 0002</b></span>
-      <span>SUBJECT · <b>about / vision</b></span>
-      <span class="red">— manifesto</span>
-    </div>
-    <div class="body">
-      <div class="meta-row"><span class="dot"></span><span><b>// 01 · 비전</b> — 아이디어를 현실로</span></div>
-      <div class="quote-mark">아이디어를 현실로 만드는 혁신가</div>
-      <p class="narrative">안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고 만드는 <b>이건영</b>입니다. 저는 <span class="pen">사업가가 아닌 기업가</span>를 지향합니다. 단순히 이윤을 쫓기보다 기술을 통해 <em>세상에 없던 가치</em>를 창출하고 혁신을 일으키고 싶습니다.</p>
-      <p class="narrative">떠오르는 아이디어가 있을 때마다 구체화하여 기록하고 있으며 이를 실현하기 위해 <b>AI, 웹/앱 개발, 임베디드 하드웨어</b> 등 분야를 가리지 않고 기술을 익히고 있습니다.</p>
-      <div class="chips">
-        <span class="chip"><i class="fas fa-rocket"></i> <b>목표</b> 월 100만명 유저 서비스</span>
-        <span class="chip"><i class="fas fa-lightbulb"></i> 아이디어 뱅크</span>
-        <span class="chip"><i class="fas fa-users"></i> 팀장 경험 多</span>
+    <div class="concept-body">
+      <div class="concept-preview preview-c">
+        <div class="ruled-bg"></div>
+        <div class="tape-corner"></div>
+        <div class="margin-note n1">2026.06</div>
+        <div class="margin-note n2">★ important</div>
+        <div class="margin-note n3">skills →</div>
+        <div class="page-content">
+          <div class="title-line"><span class="underline-hand">이건영</span></div>
+          <div class="sub-hand">Developer & Innovator · 한국기술교육대학교</div>
+          <div class="doodle-arrow">← 이 사람 !</div>
+          <p style="font-size:0.9rem; line-height:28px; margin-top:12px;">
+            이윤을 넘어 <span class="highlight-box">혁신</span>을 추구하는 기업가를 꿈꿉니다.<br>
+            <span class="highlight-box">월 100만 명</span>이 사용하는 서비스를 만드는 것이 목표입니다.
+          </p>
+          <ul class="bullet-list">
+            <li>AI · 통신 · 웹/앱 개발</li>
+            <li>임베디드 · 하드웨어 · IoT</li>
+            <li>정보보안 · DB · 기획</li>
+          </ul>
+          <div class="pencil-box">
+            <h4>Skills</h4>
+            <span class="tech-tag">Python</span>
+            <span class="tech-tag">C/C++</span>
+            <span class="tech-tag">React</span>
+            <span class="tech-tag">Arduino</span>
+            <span class="tech-tag">AI/ML</span>
+          </div>
+          <div class="postit-small">TODO: 포폴 완성하기!<br>화이팅 💪</div>
+          <div class="stamp-circle">APPROVED<br>2026</div>
+        </div>
       </div>
-      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" class="gh-cta"><i class="fab fa-github"></i> GitHub 활동 보러가기 ↗</a>
-    </div>
-  </article>
-
-  <!-- ============ SKILLS CARD ============ -->
-  <article class="card" id="skills" data-aos="fade-up">
-    <span class="tape tl"></span>
-    <span class="tab">№ 0003 · SKILLS</span>
-    <div class="lines"></div>
-    <div class="holes"><span></span><span></span><span></span><span></span><span></span></div>
-
-    <div class="head">
-      <span>CARD · <b>№ 0003</b></span>
-      <span>SUBJECT · <b>skills</b></span>
-      <span class="red">— 07 rows</span>
-    </div>
-    <div class="body">
-      <div class="meta-row"><span class="dot"></span><span><b>// 02 · 역량</b> — seven sharp edges</span></div>
-      <div class="rows skill-grid">
-        <div class="li">
-          <span class="tag">A.01</span>
-          <i class="fas fa-code skicon"></i>
-          <span class="desc"><b>핵심 언어</b> — Python · C/C++ · Java · JavaScript · Processing</span>
+      <div class="concept-sidebar">
+        <div class="sidebar-section">
+          <h4>// 핵심 컨셉</h4>
+          <p>수업 중 필기한 공책을 그대로 보는 느낌. 손글씨(Caveat)를 주로 쓰고, 형광펜·체크 마크·마진 메모·낙서가 자연스럽게 어우러집니다.</p>
         </div>
-        <div class="li">
-          <span class="tag">A.02</span>
-          <i class="fas fa-brain skicon"></i>
-          <span class="desc"><b>AI &amp; 데이터</b> — LLM · Scikit-learn · Keras · Orange3 · 머신러닝 · 딥러닝 · NLP</span>
+        <div class="sidebar-section">
+          <h4>// 추가 요소</h4>
+          <ul>
+            <li>제목/강조 = 손글씨(Caveat)</li>
+            <li>형광펜 하이라이트 (노란/분홍)</li>
+            <li>마진 세로 메모 (날짜, 중요 표시)</li>
+            <li>연필 밑줄 & 체크 표시</li>
+            <li>모서리 테이프로 고정</li>
+            <li>도장/스탬프 (APPROVED 등)</li>
+            <li>포스트잇 TODO 메모</li>
+            <li>화살표·별 등 손 낙서</li>
+          </ul>
         </div>
-        <div class="li">
-          <span class="tag">A.03</span>
-          <i class="fas fa-laptop-code skicon"></i>
-          <span class="desc"><b>웹 &amp; 앱 개발</b> — React · HTML/CSS · Flask · Flutter · Figma · Discord 봇</span>
-        </div>
-        <div class="li">
-          <span class="tag">A.04</span>
-          <i class="fas fa-microchip skicon"></i>
-          <span class="desc"><b>하드웨어 &amp; 메이커</b> — 아두이노 · 라즈베리파이 · 3D 프린팅 · 레이저 커팅 · IoT · 용접/납땜</span>
-        </div>
-        <div class="li">
-          <span class="tag">A.05</span>
-          <i class="fas fa-file-alt skicon"></i>
-          <span class="desc"><b>문서화 &amp; 협업</b> — Notion · 보고서 작성 · 자료 정리 · 기술 문서 작성</span>
-        </div>
-        <div class="li">
-          <span class="tag">A.06</span>
-          <i class="fas fa-crown skicon"></i>
-          <span class="desc"><b>리더십 &amp; 커뮤니케이션</b> — 프로젝트 총괄 · 팀 리딩 · 발표 · 프레젠테이션</span>
-        </div>
-        <div class="li">
-          <span class="tag">A.07</span>
-          <i class="fas fa-photo-video skicon"></i>
-          <span class="desc"><b>미디어 &amp; 프레젠테이션</b> — 영상 편집 · 버츄얼(VTuber) 기술</span>
+        <div class="sidebar-section">
+          <h4>// 장단점</h4>
+          <div class="pros-cons">
+            <div class="pro">+ 인간미 · 친근함 최대</div>
+            <div class="pro">+ 학생 포트폴리오에 찰떡</div>
+            <div class="pro">+ 포스트잇/형광펜으로 강조 자유로움</div>
+            <div class="con">- 전문적인 느낌 약할 수 있음</div>
+            <div class="con">- 영문 폰트는 괜찮지만 한글 손글씨 폰트 한계</div>
+            <div class="con">- 정보량 많으면 가독성 떨어질 수 있음</div>
+          </div>
         </div>
       </div>
     </div>
-  </article>
+  </div>
 
-  <!-- ============ AWARDS CARD ============ -->
-  <article class="card" id="awards" data-aos="fade-up">
-    <span class="tape tr"></span>
-    <span class="tab red">№ 0004 · HONORS</span>
-    <div class="lines"></div>
-    <div class="holes"><span></span><span></span><span></span><span></span><span></span></div>
+</div>
 
-    <div class="head">
-      <span>CARD · <b>№ 0004</b></span>
-      <span>SUBJECT · <b>honors</b></span>
-      <span class="red">— 2024 · 3 awards</span>
-    </div>
-    <div class="body">
-      <div class="meta-row"><span class="dot"></span><span><b>// 03 · 수상</b> — three times won</span></div>
-      <div class="rows">
-        <div class="li">
-          <span class="tag">01</span>
-          <i class="fas fa-trophy skicon"></i>
-          <span class="desc"><b>2024 SFPC</b> — 전체 8위 · 총 581팀 / 1,661명 참가 · 알고리즘 및 문제해결 능력 입증</span>
-          <span class="red">TOP 1.3%</span>
-        </div>
-        <div class="li">
-          <span class="tag">02</span>
-          <i class="fas fa-award skicon"></i>
-          <span class="desc"><b>2024 디지털새싹 인공지능 메이커톤</b> — 산불 조기 감지 알림 시스템 · Raspberry Pi &amp; OpenCV</span>
-          <span class="red">AI 어벤져스</span>
-        </div>
-        <div class="li">
-          <span class="tag">03</span>
-          <i class="fas fa-medal skicon"></i>
-          <span class="desc"><b>2024 제 5회 천안 학생 로봇 대회</b> — 해커톤 분야 · 총 97팀 참가</span>
-          <span class="red">동상</span>
-        </div>
-      </div>
-    </div>
-  </article>
+<div style="text-align:center; margin-top:56px; color:var(--muted); font-size:0.85rem; font-family:'JetBrains Mono',monospace;">
+  <p>어떤 방향이 마음에 드시나요? 조합도 가능합니다.</p>
+  <p style="margin-top:8px; font-size:0.75rem;">예: "A의 스프링 + C의 형광펜 + B의 포스트잇"</p>
+</div>
 
-  <!-- ============ WORKS CARD ============ -->
-  <article class="card" id="works" data-aos="fade-up">
-    <span class="tape tl"></span>
-    <span class="tape br"></span>
-    <span class="tab">№ 0005 · WORKS</span>
-    <div class="lines"></div>
-    <div class="holes"><span></span><span></span><span></span><span></span><span></span></div>
-
-    <div class="head">
-      <span>CARD · <b>№ 0005</b></span>
-      <span>SUBJECT · <b>works · 18</b></span>
-      <span class="red">— 12 shipped · 6 wip</span>
-    </div>
-    <div class="body">
-      <div class="meta-row"><span class="dot"></span><span><b>// 04 · 프로젝트</b> — eighteen small machines</span></div>
-
-      <div class="works-divider"><span>SHIPPED · 12</span></div>
-      <div class="works-grid">
-
-        <div class="wmini award">
-          <span class="seal">★</span>
-          <div class="wmini-top">
-            <span class="tag">№ 01</span>
-            <i class="fas fa-fire-extinguisher ico"></i>
-            <span class="status r">AWARD · 2024</span>
-          </div>
-          <h4>산불 조기 감지 알림 시스템</h4>
-          <p>2024 디지털새싹 <b>'AI 어벤져스상'</b> 수상작 · 라즈베리파이와 OpenCV로 산불을 실시간 감지합니다.</p>
-          <div class="wmini-bot">
-            <span class="tech">Raspberry Pi · OpenCV · AI</span>
-            <span class="links">
-              <a href="projects/nonofire/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/chae03yb/hstree-makerthon" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini award">
-          <span class="seal">★</span>
-          <div class="wmini-top">
-            <span class="tag">№ 02</span>
-            <i class="fas fa-laptop-code ico"></i>
-            <span class="status r">TOP 1.3% · 2024</span>
-          </div>
-          <h4>2024 SFPC</h4>
-          <p>총 <b>581팀 중 8위</b>를 기록한 알고리즘 대회 코드 아카이브.</p>
-          <div class="wmini-bot">
-            <span class="tech">Algorithm · Problem Solving · C++/Python</span>
-            <span class="links">
-              <a href="projects/2024_SFPC/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/2024_SFPC" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini award">
-          <span class="seal">★</span>
-          <div class="wmini-top">
-            <span class="tag">№ 03</span>
-            <i class="fas fa-robot ico"></i>
-            <span class="status r">동상 · 2024</span>
-          </div>
-          <h4>졸음 방지 시스템</h4>
-          <p>2024 제 5회 천안학생로봇대회 <b>동상</b> 수상 · 허스키렌즈를 이용한 실시간 졸음 감지 시스템.</p>
-          <div class="wmini-bot">
-            <span class="tech">Robot · Embedded · HuskyLens</span>
-            <span class="links">
-              <a href="projects/2024_5th_CSRC/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/2024_5th_CSRC" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini">
-          <div class="wmini-top">
-            <span class="tag">№ 04</span>
-            <i class="fas fa-hammer ico"></i>
-            <span class="status">2024</span>
-          </div>
-          <h4>비밀번호 도어락</h4>
-          <p>2024 마스터 크리에이터 챌린지 참가 · 4x4 매트릭스 키패드를 활용한 도어락 시스템.</p>
-          <div class="wmini-bot">
-            <span class="tech">Maker · Creative · Challenge</span>
-            <span class="links">
-              <a href="projects/Master_Creator_Challenge/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/Master_Creator_Challenge" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini">
-          <div class="wmini-top">
-            <span class="tag">№ 05</span>
-            <i class="fas fa-water ico"></i>
-            <span class="status">2024</span>
-          </div>
-          <h4>해안 장벽 · Wall Sina</h4>
-          <p>2024 지속 가능한 발전 프로젝트 · 해수면 상승에 대비한 해안 장벽 MVP.</p>
-          <div class="wmini-bot">
-            <span class="tech">Engineering · Environment · Modeling</span>
-            <span class="links">
-              <a href="projects/Wall_Sina/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/Wall_Sina" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini">
-          <div class="wmini-top">
-            <span class="tag">№ 06</span>
-            <i class="fab fa-discord ico"></i>
-            <span class="status">2024</span>
-          </div>
-          <h4>면진봇 · MZ_bot</h4>
-          <p>디스코드 경제 게임 봇.</p>
-          <div class="wmini-bot">
-            <span class="tech">Python · Discord.py</span>
-            <span class="links">
-              <a href="projects/MZ_bot/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/MZ_bot" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini">
-          <div class="wmini-top">
-            <span class="tag">№ 07</span>
-            <i class="fas fa-robot ico"></i>
-            <span class="status">2024</span>
-          </div>
-          <h4>공감 봇 &amp; 레시피 AI</h4>
-          <p>감정 공감 챗봇과 보유 식재료 기반 요리 레시피 추천 AI 서비스.</p>
-          <div class="wmini-bot">
-            <span class="tech">AI · Gemini API · Flask</span>
-            <span class="links">
-              <a href="projects/Legend_SakSak_GongGam_AI/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/Legend_SakSak_GongGam_AI" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini">
-          <div class="wmini-top">
-            <span class="tag">№ 08</span>
-            <i class="fas fa-id-card ico"></i>
-            <span class="status">2025</span>
-          </div>
-          <h4>NFC 출석 · BerryIno</h4>
-          <p>NFC 태그를 활용한 효율적인 출석 체크 시스템 · 아두이노와 라즈베리파이 연동.</p>
-          <div class="wmini-bot">
-            <span class="tech">Arduino · Raspberry Pi · IoT</span>
-            <span class="links">
-              <a href="projects/BerryIno/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/BerryIno" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini">
-          <div class="wmini-top">
-            <span class="tag">№ 09</span>
-            <i class="fas fa-leaf ico"></i>
-            <span class="status">2025</span>
-          </div>
-          <h4>식물 타이머 · PlantClock</h4>
-          <p>2025 선후배와 함께하는 코딩 페스티벌 해커톤 · 식물 관리 스마트 타이머.</p>
-          <div class="wmini-bot">
-            <span class="tech">IoT · Hackathon</span>
-            <span class="links">
-              <a href="projects/PlantClock/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/PlantClock" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini">
-          <div class="wmini-top">
-            <span class="tag">№ 10</span>
-            <i class="fas fa-heartbeat ico"></i>
-            <span class="status">2025</span>
-          </div>
-          <h4>헬스 케어 시스템</h4>
-          <p>사용자 맞춤형 헬스케어 시스템 · 건강 데이터 기록 및 모니터링.</p>
-          <div class="wmini-bot">
-            <span class="tech">Healthcare · Data</span>
-            <span class="links">
-              <a href="projects/HEALTH_CHECK_PROJECT/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/HEALTH_CHECK_PROJECT" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini">
-          <div class="wmini-top">
-            <span class="tag">№ 11</span>
-            <i class="fas fa-book-open ico"></i>
-            <span class="status">2026</span>
-          </div>
-          <h4>한기대 26학번 신입생 가이드</h4>
-          <p>한기대 26학번 신입생을 위한 노션 사이트.</p>
-          <div class="wmini-bot">
-            <span class="tech">Notion · Documentation</span>
-            <span class="links">
-              <a href="projects/koreatech_noob_guide/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://capybaracute.notion.site/26-2fca8de5ee5f806db9e9e64464a9ac78" target="_blank" rel="noopener noreferrer" title="Notion"><i class="fas fa-external-link-alt"></i></a>
-              <a href="https://github.com/pachir1su/koreatech_noob_guide" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini">
-          <div class="wmini-top">
-            <span class="tag">№ 12</span>
-            <i class="fas fa-file-code ico"></i>
-            <span class="status">2025</span>
-          </div>
-          <h4>File Swordmaster</h4>
-          <p>PDF와 오디오 파일을 편집하는 다기능 스크립트.</p>
-          <div class="wmini-bot">
-            <span class="tech">Python · Gradio · PyPDF</span>
-            <span class="links">
-              <a href="projects/swordmaster/file_swordmaster.html" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://huggingface.co/spaces/capybaranice/file_swordmaster" target="_blank" rel="noopener noreferrer" title="바로가기"><i class="fas fa-external-link-alt"></i></a>
-              <a href="https://github.com/pachir1su/file_swordmaster" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="works-divider wip"><span>WORK IN PROGRESS · 6</span></div>
-      <div class="works-grid">
-
-        <div class="wmini wip">
-          <span class="pin"></span>
-          <div class="wmini-top">
-            <span class="tag">№ 13</span>
-            <i class="fas fa-map-marked-alt ico"></i>
-            <span class="status r">진행 예정</span>
-          </div>
-          <h4>한맵 · Koreatech Map</h4>
-          <p>한기대 캠퍼스 지도 서비스 · 건물 내부 지도 및 호실 정보를 담은 웹 인터랙티브 지도.</p>
-          <div class="wmini-bot">
-            <span class="tech">Web · Interactive Map · Animation</span>
-            <span class="links">
-              <a href="projects/Koreatech_map/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/Koreatech_Map" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini wip">
-          <span class="pin"></span>
-          <div class="wmini-top">
-            <span class="tag">№ 14</span>
-            <i class="fab fa-discord ico"></i>
-            <span class="status r">개발 중</span>
-          </div>
-          <h4>승기봇 · SG_bot</h4>
-          <p>기존 면진봇의 개편 버전 · 라이어게임 · 양세찬게임 · 마피아게임 등의 미니게임 봇.</p>
-          <div class="wmini-bot">
-            <span class="tech">Python · Discord.py</span>
-            <span class="links">
-              <a href="projects/SG_bot/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/SG_bot" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini wip">
-          <span class="pin"></span>
-          <div class="wmini-top">
-            <span class="tag">№ 15</span>
-            <i class="fas fa-wine-glass-alt ico"></i>
-            <span class="status r">진행 예정</span>
-          </div>
-          <h4>온라인술담</h4>
-          <p>온라인담타를 벤치마킹한 술담 사이트 · GitHub Pages로 배포 예정.</p>
-          <div class="wmini-bot">
-            <span class="tech">HTML/CSS/JS · GitHub Pages</span>
-            <span class="links">
-              <a href="projects/Sibal_Life_Smoking/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/Sibal_Life_Smoking" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini wip">
-          <span class="pin"></span>
-          <div class="wmini-top">
-            <span class="tag">№ 16</span>
-            <i class="fas fa-code ico"></i>
-            <span class="status r">개발 중</span>
-          </div>
-          <h4>HTML Viewer</h4>
-          <p>HTML 코드를 붙여넣으면 실시간으로 결과물을 보여주는 웹 뷰어.</p>
-          <div class="wmini-bot">
-            <span class="tech">HTML · CSS · JavaScript</span>
-            <span class="links">
-              <a href="projects/HTML_Viewer/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/HTML_Viewer" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini wip">
-          <span class="pin"></span>
-          <div class="wmini-top">
-            <span class="tag">№ 17</span>
-            <i class="fas fa-flask ico"></i>
-            <span class="status r">개발 중</span>
-          </div>
-          <h4>CentrifugeAI</h4>
-          <p>가상 실험 장치(원심분리기·현미경·가속기 등)에 재료를 넣고 Gemini AI로 결과를 예측·시각화하는 실험 시뮬레이터.</p>
-          <div class="wmini-bot">
-            <span class="tech">Python · Flask · Gemini · SQLite · Matplotlib</span>
-            <span class="links">
-              <a href="projects/CentrifugeAI/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-              <a href="https://github.com/pachir1su/CentrifugeAI" target="_blank" rel="noopener noreferrer" title="GitHub"><i class="fab fa-github"></i></a>
-            </span>
-          </div>
-        </div>
-
-        <div class="wmini wip">
-          <span class="pin"></span>
-          <div class="wmini-top">
-            <span class="tag">№ 18</span>
-            <i class="fas fa-hat-wizard ico"></i>
-            <span class="status r">진행 예정</span>
-          </div>
-          <h4>마법 아카데미</h4>
-          <p>원소를 조합해 마법을 만들고 시각화하는 인터랙티브 시뮬레이션.</p>
-          <div class="wmini-bot">
-            <span class="tech">Python (예정) · p5.js (예정)</span>
-            <span class="links">
-              <a href="projects/Magic_Academy/" title="자세히"><i class="fas fa-arrow-right"></i></a>
-            </span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </article>
-
-  <footer class="foot">
-    <div>
-      <div class="mk">L<span class="r">G</span>Y<br/><small>INDEX CARD · 2026 · preview</small></div>
-    </div>
-    <div>
-      <h4>// site</h4>
-      <ul>
-        <li><a href="#about">about</a></li>
-        <li><a href="#skills">skills</a></li>
-        <li><a href="#awards">awards</a></li>
-        <li><a href="#works">works</a></li>
-      </ul>
-    </div>
-    <div>
-      <h4>// contact</h4>
-      <ul>
-        <li><a href="mailto:capybara@koreatech.ac.kr">email ↗</a></li>
-        <li><a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer">github ↗</a></li>
-        <li><a href="index.html">main site ↗</a></li>
-      </ul>
-    </div>
-    <div class="foot-bot">
-      <span>© 2026 Lee Geon Yeong · All rights reserved.</span>
-      <span>v5 · prototype</span>
-    </div>
-  </footer>
-
-</main>
-
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script>
-  if (typeof AOS !== 'undefined') {
-    AOS.init({ once: true, duration: 600, easing: 'ease-out-cubic' });
-  }
-
-  (function(){
-    const typed = document.getElementById('typed');
-    if (!typed) return;
-    const words = ['풀스택 개발자','메이커','아이디어 뱅크','팀 리더','엔지니어'];
-    let wi = 0, ci = 0, del = false;
-    function step(){
-      const w = words[wi];
-      typed.textContent = del ? w.slice(0, ci - 1) : w.slice(0, ci + 1);
-      del ? ci-- : ci++;
-      let s = del ? 50 : 100;
-      if (!del && ci === w.length) { del = true; s = 1800; }
-      else if (del && ci === 0) { del = false; wi = (wi + 1) % words.length; s = 480; }
-      setTimeout(step, s);
-    }
-    step();
-  })();
-
-  (function(){
-    const bar = document.getElementById('myBar');
-    const btn = document.getElementById('btn-back-to-top');
-    function onScroll(){
-      const ht = document.documentElement;
-      const sc = ht.scrollTop || document.body.scrollTop;
-      const max = (ht.scrollHeight - ht.clientHeight) || 1;
-      if (bar) bar.style.width = (sc / max * 100) + '%';
-      if (btn) btn.classList.toggle('show', sc > 200);
-    }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    if (btn) btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-    onScroll();
-  })();
-</script>
 </body>
 </html>
