@@ -302,24 +302,6 @@
           "tech": ["Python", "Discord.py"]
         },
         {
-          "comment": "온라인술담",
-          "category": "web",
-          "icon": "fas fa-wine-glass-alt",
-          "detail": "projects/Sibal_Life_Smoking/",
-          "links": [
-            { "href": "https://github.com/pachir1su/Sibal_Life_Smoking", "title": "GitHub", "icon": "fab fa-github" }
-          ],
-          "badge": { "en": "Planned", "ko": "진행 예정" },
-          "title": { "en": "Online Suldam", "ko": "온라인술담" },
-          "subtitle": { "en": "Online Damta benchmarking website", "ko": "온라인담타 벤치마킹 웹사이트" },
-          "descHtml": {
-            "en": "A site benchmarking Online Damta<br />To be deployed via GitHub Pages",
-            "ko": "온라인담타를 벤치마킹한 사이트<br />GitHub Pages로 배포 예정"
-          },
-          "progress": 0,
-          "tech": ["HTML/CSS/JS", "GitHub Pages"]
-        },
-        {
           "comment": "HTML Viewer",
           "category": "web",
           "icon": "fas fa-code",
