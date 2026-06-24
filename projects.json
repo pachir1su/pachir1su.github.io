@@ -111,6 +111,22 @@
             "ko": "면진봇 후속작, 한글 슬래시 커맨드 지원<br />코인·도박·주식·강화·맞짱(PvP) 경제 시스템"
           },
           "tech": ["Python", "Discord.py", "SQLite"]
+        },
+        {
+          "comment": "한기대 공지 에이전트",
+          "category": "ai discord",
+          "icon": "fas fa-bell",
+          "detail": "projects/koreatechGongjiAgent/",
+          "links": [
+            { "href": "https://github.com/pachir1su/koreatechGongjiAgent", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "KOREATECH Notice Agent", "ko": "한기대 공지 에이전트" },
+          "subtitle": { "en": "Auto-crawls KOREATECH notices & alerts Discord in real time", "ko": "한기대 포털 공지 자동 수집 · 디스코드 실시간 알림" },
+          "descHtml": {
+            "en": "Dual-cycle crawler (quick 60s + full 30min) over multiple boards<br />Discord slash commands, FastAPI, schedule parsing, GUI dashboard &amp; Raspberry Pi support",
+            "ko": "이중 주기 크롤링(빠른 60초 + 전체 30분)으로 다중 게시판 감시<br />디스코드 슬래시 명령어 · FastAPI · 일정 파싱 · GUI 대시보드 · 라즈베리파이 지원"
+          },
+          "tech": ["Python", "Selenium", "Discord.py", "FastAPI", "PySide6"]
         }
       ]
     },
