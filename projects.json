@@ -95,6 +95,22 @@
             "ko": "델파이 기법을 이용한 일·직업과 삶의 미래 예측<br />AI 시뮬레이션 델파이 조사 · 발표 프로젝트"
           },
           "tech": ["Delphi Method", "Claude", "Gemini", "Chart.js"]
+        },
+        {
+          "comment": "성현봇 (면진봇2)",
+          "category": "discord",
+          "icon": "fab fa-discord",
+          "detail": "projects/SH_bot/",
+          "links": [
+            { "href": "https://github.com/pachir1su/SH_bot", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "SH Bot (MZ Bot 2)", "ko": "성현봇 (면진봇2)" },
+          "subtitle": { "en": "Discord economy bot — gambling, stocks, enhance & duel", "ko": "디스코드 경제 봇 — 도박·주식·강화·맞짱" },
+          "descHtml": {
+            "en": "MZ Bot successor with Korean slash commands<br />Coins, gambling, stocks, item enhancement and PvP duels",
+            "ko": "면진봇 후속작, 한글 슬래시 커맨드 지원<br />코인·도박·주식·강화·맞짱(PvP) 경제 시스템"
+          },
+          "tech": ["Python", "Discord.py", "SQLite"]
         }
       ]
     },
