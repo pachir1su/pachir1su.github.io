@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SH_bot | 이건영 포트폴리오</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../../style.css" />
+  </head>
+  <body>
+    <div class="progress-container">
+      <div class="progress-bar" id="myBar"></div>
+    </div>
+    <button type="button" id="btn-back-to-top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <nav class="navbar">
+      <div class="container nav-content">
+        <a href="../../index.html" class="logo"
+          ><span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span></a
+        >
+        <ul class="nav-links">
+          <li><a href="../../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
+          <li>
+            <a
+              href="https://github.com/pachir1su"
+              target="_blank" rel="noopener noreferrer"
+              class="nav-github"
+              ><i class="fab fa-github"></i
+            ></a>
+          </li>
+        </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon"></i> <span data-en="Dark Mode" data-ko="다크 모드">다크 모드</span>
+        </button>
+      </div>
+    </div>
+
+    <section class="detail-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="detail-hero-glow"></div>
+      <div class="container" style="position: relative; z-index: 1">
+        <div class="detail-breadcrumb">
+          <a href="../../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / SH_bot
+        </div>
+        <div class="detail-hero-icon"><i class="fab fa-discord"></i></div>
+        <h1 class="detail-title" data-aos="fade-up"><span data-en="SH Bot (MZ Bot 2)" data-ko="성현봇 (면진봇2)">성현봇 (면진봇2)</span></h1>
+        <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
+          <span class="detail-badge">Python</span
+          ><span class="detail-badge">Discord.py</span
+          ><span class="detail-badge">SQLite</span
+          ><span class="detail-badge" data-en="Personal Project" data-ko="개인 프로젝트">개인 프로젝트</span>
+        </div>
+        <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
+          <a
+            href="https://github.com/pachir1su/SH_bot"
+            target="_blank" rel="noopener noreferrer"
+            class="btn btn-primary"
+            ><i class="fab fa-github"></i> GitHub</a
+          >
+
+          <a href="../../index.html#projects" class="btn btn-ghost"
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-body">
+      <div class="container">
+        <div class="detail-grid">
+          <div class="detail-main">
+            <div class="detail-section" data-aos="fade-up">
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
+              <p data-en="SH Bot is the successor to MZ Bot — a Discord economy game bot. Users earn and spend virtual coins through gambling, stock/coin investment, weapon enhancement, and PvP duels. All commands are provided as Korean slash commands." data-ko="성현봇은 면진봇의 후속작인 디스코드 경제 게임 봇입니다. 사용자는 도박, 주식·코인 투자, 무기 강화, 맞짱(PvP)으로 가상 코인을 벌고 소비합니다. 모든 명령어는 한글 슬래시 커맨드로 제공됩니다.">
+                성현봇은 면진봇의 후속작인 디스코드 경제 게임 봇입니다. 사용자는
+                도박, 주식·코인 투자, 무기 강화, 맞짱(PvP)으로 가상 코인을 벌고
+                소비합니다. 모든 명령어는 한글 슬래시 커맨드로 제공됩니다.
+              </p>
+            </div>
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
+              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
+              <ul>
+                <li data-en="Coin income: 1,000 coins every 10 min (/성현돈줘) + daily check-in reset at midnight (/성현출첵)">코인 수입: 10분마다 1,000 코인(/성현돈줘) · 자정 초기화 출석(/성현출첵)</li>
+                <li data-en="Gambling with 30–60% random win rate, payout ±bet (/성현도박)">승률 30~60% 랜덤 도박, 결과는 ±베팅액(/성현도박)</li>
+                <li data-en="Virtual stock & coin investment with 3s reveal animation (/성현주식, /성현코인)">가상 주식·코인 투자, 3초 후 결과 공개(/성현주식, /성현코인)</li>
+                <li data-en="Weapon enhancement up to +30, escalating difficulty (/성현강화)">무기 강화(+30), 단계별 난이도 상승(/성현강화)</li>
+                <li data-en="PvP duel by weapon grade + randomness, equal-stake betting (/성현맞짱)">맞짱(PvP): 무기 등급+랜덤 승부, 동일 금액 베팅(/성현맞짱)</li>
+                <li data-en="Coin transfer between members & bankruptcy recovery (/성현송금, /성현파산)">멤버 간 송금·파산 복구(/성현송금, /성현파산)</li>
+                <li data-en="Profile, server rank, and admin menu (/성현프로필, /성현순위, /성현관리자)">프로필·서버 순위·관리자 메뉴(/성현프로필, /성현순위, /성현관리자)</li>
+                <li data-en="SQLite-based user data storage (db.py + models.sql)">SQLite 기반 사용자 데이터 저장(db.py + models.sql)</li>
+              </ul>
+            </div>
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
+              <p class="role-position">
+                <i class="fas fa-user-tag"></i> <span data-en="Solo Development" data-ko="1인 개발">1인 개발</span>
+              </p>
+              <ul>
+                <li data-en="Planning">기획</li>
+                <li data-en="Bot command & cog architecture">봇 명령어·Cog 구조 설계</li>
+                <li data-en="DB development">DB 개발</li>
+                <li data-en="QA &amp; Debugging">QA &amp; 디버깅</li>
+                <li data-en="And more">그 외 다수</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="detail-sidebar">
+            <div class="sidebar-card" data-aos="fade-left">
+              <h4 data-en="Tech Stack" data-ko="기술 스택">Tech Stack</h4>
+              <div class="sidebar-stack">
+                <span class="tech-stack"><span>Python</span></span
+                ><span class="tech-stack"><span>Discord.py</span></span
+                ><span class="tech-stack"><span>SQLite</span></span
+                ><span class="tech-stack"><span>asyncio</span></span>
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
+              <h4 data-en="Links" data-ko="링크">Links</h4>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <a
+                  href="https://github.com/pachir1su/SH_bot"
+                  target="_blank" rel="noopener noreferrer"
+                  class="github-activity-btn"
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
+                >
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
+              <p
+                style="
+                  color: var(--text-muted);
+                  font-size: 0.88rem;
+                  line-height: 1.6;
+                "
+                data-en="Discord bot" data-ko="Discord 봇"
+              >
+                Discord 봇
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">
+          <span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span>
+        </div>
+        <p class="footer-copy">
+          &copy; 2026 Lee Geon Yeong. All rights reserved.
+        </p>
+        <div class="social-links">
+          <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"
+            ><i class="fab fa-github"></i
+          ></a>
+          <a href="mailto:capybara@koreatech.ac.kr"
+            ><i class="fas fa-envelope"></i
+          ></a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="../../script.js"></script>
+  </body>
+</html>

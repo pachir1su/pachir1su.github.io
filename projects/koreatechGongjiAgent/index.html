@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>koreatechGongjiAgent | 이건영 포트폴리오</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../../style.css" />
+  </head>
+  <body>
+    <div class="progress-container">
+      <div class="progress-bar" id="myBar"></div>
+    </div>
+    <button type="button" id="btn-back-to-top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <nav class="navbar">
+      <div class="container nav-content">
+        <a href="../../index.html" class="logo"
+          ><span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span></a
+        >
+        <ul class="nav-links">
+          <li><a href="../../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
+          <li>
+            <a
+              href="https://github.com/pachir1su"
+              target="_blank" rel="noopener noreferrer"
+              class="nav-github"
+              ><i class="fab fa-github"></i
+            ></a>
+          </li>
+        </ul>
+              <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
+        <i class="fas fa-times"></i>
+      </button>
+      <a href="../../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
+          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
+        </button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
+          <i class="fas fa-moon"></i> <span data-en="Dark Mode" data-ko="다크 모드">다크 모드</span>
+        </button>
+      </div>
+    </div>
+
+    <section class="detail-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="detail-hero-glow"></div>
+      <div class="container" style="position: relative; z-index: 1">
+        <div class="detail-breadcrumb">
+          <a href="../../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+          <a href="../../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / koreatechGongjiAgent
+        </div>
+        <div class="detail-hero-icon"><i class="fas fa-bell"></i></div>
+        <h1 class="detail-title" data-aos="fade-up"><span data-en="KOREATECH Notice Agent" data-ko="한기대 공지 에이전트">한기대 공지 에이전트</span></h1>
+        <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
+          <span class="detail-badge">Python</span
+          ><span class="detail-badge">Selenium</span
+          ><span class="detail-badge">Discord.py</span
+          ><span class="detail-badge">FastAPI</span
+          ><span class="detail-badge" data-en="Personal Project" data-ko="개인 프로젝트">개인 프로젝트</span>
+        </div>
+        <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
+          <a
+            href="https://github.com/pachir1su/koreatechGongjiAgent"
+            target="_blank" rel="noopener noreferrer"
+            class="btn btn-primary"
+            ><i class="fab fa-github"></i> GitHub</a
+          >
+
+          <a href="../../index.html#projects" class="btn btn-ghost"
+            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-body">
+      <div class="container">
+        <div class="detail-grid">
+          <div class="detail-main">
+            <div class="detail-section" data-aos="fade-up">
+              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
+              <p data-en="An agent that automatically crawls notices from the KOREATECH portal and pushes new notices to a Discord channel in real time. It runs a dual-cycle watcher (a quick check + a full crawl) across multiple boards, and exposes the data through a Discord bot, an internal FastAPI, and a GUI dashboard." data-ko="한국기술교육대학교(KOREATECH) 포털 공지를 자동으로 수집해 새 공지가 올라오면 디스코드 채널에 실시간으로 알려주는 에이전트입니다. 이중 주기(빠른 체크 + 전체 크롤링)로 여러 게시판을 감시하고, 디스코드 봇·내부 FastAPI·GUI 대시보드로 데이터를 제공합니다.">
+                한국기술교육대학교(KOREATECH) 포털 공지를 자동으로 수집해 새
+                공지가 올라오면 디스코드 채널에 실시간으로 알려주는 에이전트입니다.
+                이중 주기(빠른 체크 + 전체 크롤링)로 여러 게시판을 감시하고,
+                디스코드 봇·내부 FastAPI·GUI 대시보드로 데이터를 제공합니다.
+              </p>
+            </div>
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
+              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
+              <ul>
+                <li data-en="Real-time detection via dual-cycle watch: quick check (default 60s) + full crawl (default 30min)">실시간 감지: 빠른 체크(기본 60초) + 전체 크롤링(기본 30분) 이중 주기</li>
+                <li data-en="Multiple boards with graceful skip — one failing board doesn't stop the rest">다중 게시판 + 장애 격리(한 게시판 실패 시 건너뛰고 계속)</li>
+                <li data-en="Discord slash commands: /공지 (board dropdown, paging, embed), keyword search, admin (/상태, /실행)">디스코드 슬래시 명령어: /공지(드롭다운·페이지·임베드), 키워드 검색, 관리(/상태, /실행)</li>
+                <li data-en="Internal FastAPI: /status, /notices, /config, /logs, /run, /crawl/quick">내부 FastAPI: /status, /notices, /config, /logs, /run, /crawl/quick</li>
+                <li data-en="Schedule parsing — extracts date, time, place, category from titles">일정 파싱 — 제목에서 날짜·시간·장소·카테고리 자동 추출</li>
+                <li data-en="Optional Ollama integration as a local-LLM fallback when regex parsing fails">정규식 파싱 실패 시 로컬 LLM(Ollama) 보조 분석(선택)</li>
+                <li data-en="PySide6 GUI dashboard + Raspberry Pi GPIO/display support">PySide6 GUI 대시보드 + 라즈베리파이 GPIO/디스플레이 지원</li>
+                <li data-en="JSON + CSV storage with auto-archive of old notices">JSON + CSV 저장, 오래된 공지 자동 아카이브</li>
+              </ul>
+            </div>
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
+              <p class="role-position">
+                <i class="fas fa-user-tag"></i> <span data-en="Solo Development" data-ko="1인 개발">1인 개발</span>
+              </p>
+              <ul>
+                <li data-en="Planning">기획</li>
+                <li data-en="Crawler & parser development">크롤러·파서 개발</li>
+                <li data-en="Discord bot & FastAPI development">디스코드 봇·FastAPI 개발</li>
+                <li data-en="GUI & Raspberry Pi integration">GUI·라즈베리파이 연동</li>
+                <li data-en="QA &amp; Debugging">QA &amp; 디버깅</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="detail-sidebar">
+            <div class="sidebar-card" data-aos="fade-left">
+              <h4 data-en="Tech Stack" data-ko="기술 스택">Tech Stack</h4>
+              <div class="sidebar-stack">
+                <span class="tech-stack"><span>Python</span></span
+                ><span class="tech-stack"><span>Selenium</span></span
+                ><span class="tech-stack"><span>Discord.py</span></span
+                ><span class="tech-stack"><span>FastAPI</span></span
+                ><span class="tech-stack"><span>PySide6</span></span>
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
+              <h4 data-en="Links" data-ko="링크">Links</h4>
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <a
+                  href="https://github.com/pachir1su/koreatechGongjiAgent"
+                  target="_blank" rel="noopener noreferrer"
+                  class="github-activity-btn"
+                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
+                >
+              </div>
+            </div>
+            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
+              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
+              <p
+                style="
+                  color: var(--text-muted);
+                  font-size: 0.88rem;
+                  line-height: 1.6;
+                "
+                data-en="Crawler / Discord bot / API agent" data-ko="크롤러 / 디스코드 봇 / API 에이전트"
+              >
+                크롤러 / 디스코드 봇 / API 에이전트
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">
+          <span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span>
+        </div>
+        <p class="footer-copy">
+          &copy; 2026 Lee Geon Yeong. All rights reserved.
+        </p>
+        <div class="social-links">
+          <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"
+            ><i class="fab fa-github"></i
+          ></a>
+          <a href="mailto:capybara@koreatech.ac.kr"
+            ><i class="fas fa-envelope"></i
+          ></a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="../../script.js"></script>
+  </body>
+</html>

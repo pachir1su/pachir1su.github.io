@@ -2,232 +2,26 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
+    <!-- 검색엔진 색인 차단 (#92: 사이트 상 조회 불가) -->
+    <meta name="robots" content="noindex, nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>온라인술담 | 이건영 포트폴리오</title>
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
-    <link rel="stylesheet" href="../../style.css" />
+    <title>이건영 포트폴리오</title>
+    <!-- 자바스크립트 비활성 환경에서도 즉시 홈으로 이동 -->
+    <meta http-equiv="refresh" content="0; url=../../index.html" />
+    <link rel="canonical" href="https://pachir1su.github.io/" />
+    <script>
+      /* 직접 URL 접근 차단: 히스토리에 남기지 않고 홈으로 즉시 이동 (#92) */
+      try {
+        window.location.replace("../../index.html");
+      } catch (err) {
+        /* replace 실패 시 일반 이동으로 폴백 */
+        window.location.href = "../../index.html";
+      }
+    </script>
   </head>
   <body>
-    <div class="progress-container">
-      <div class="progress-bar" id="myBar"></div>
-    </div>
-    <button type="button" id="btn-back-to-top">
-      <i class="fas fa-arrow-up"></i>
-    </button>
-
-    <nav class="navbar">
-      <div class="container nav-content">
-        <a href="../../index.html" class="logo"
-          ><span class="logo-bracket">{</span> GY
-          <span class="logo-bracket">}</span></a
-        >
-        <ul class="nav-links">
-          <li><a href="../../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
-          <li>
-            <a
-              href="https://github.com/pachir1su"
-              target="_blank" rel="noopener noreferrer"
-              class="nav-github"
-              ><i class="fab fa-github"></i
-            ></a>
-          </li>
-        </ul>
-              <div class="nav-utils">
-          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
-            <span class="lang-label">EN</span>
-          </button>
-          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
-            <i class="fas fa-moon" id="themeIcon"></i>
-          </button>
-        </div>
-        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </nav>
-
-    <div class="mobile-menu" id="mobileMenu">
-      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
-        <i class="fas fa-times"></i>
-      </button>
-      <a href="../../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
-      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
-      <div class="sidebar-utils">
-        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
-          <i class="fas fa-language"></i> <span class="lang-label-mobile">English</span>
-        </button>
-        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환">
-          <i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span>
-        </button>
-      </div>
-    </div>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-
-    <section class="detail-hero">
-      <div class="hero-grid-bg"></div>
-      <div class="detail-hero-glow"></div>
-      <div class="container" style="position: relative; z-index: 1">
-        <div class="detail-breadcrumb">
-          <a href="../../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
-          <a href="../../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> / <span data-en="Online Suldam" data-ko="온라인술담">온라인술담</span>
-        </div>
-        <div class="detail-hero-icon">
-          <i class="fas fa-wine-glass-alt"></i>
-        </div>
-        <h1 class="detail-title" data-aos="fade-up"><span data-en="Online Suldam" data-ko="온라인술담">온라인술담</span></h1>
-        <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
-          <span class="detail-badge">HTML/CSS/JS</span>
-          <span class="detail-badge">GitHub Pages</span>
-          <span
-            class="detail-badge"
-            style="
-              border-color: rgba(124, 109, 245, 0.4);
-              color: var(--accent2);
-              background: rgba(124, 109, 245, 0.1);
-            "
-            data-en="Planned"
-            data-ko="진행 예정"
-            >진행 예정</span
-          >
-        </div>
-        <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
-          <a
-            href="https://github.com/pachir1su/Sibal_Life_Smoking"
-            target="_blank" rel="noopener noreferrer"
-            class="btn btn-primary"
-            ><i class="fab fa-github"></i> GitHub</a
-          >
-          <a href="../../index.html#projects" class="btn btn-ghost"
-            ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
-          >
-        </div>
-      </div>
-    </section>
-
-    <section class="detail-body">
-      <div class="container">
-        <div class="detail-grid">
-          <div class="detail-main">
-            <div class="detail-section" data-aos="fade-up">
-              <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
-              <p data-en="A 'Suldam' (drink + smoke) site planned by benchmarking the Online Damta site.">
-                온라인담타 사이트를 벤치마킹하여 기획한 술담(술 + 담배)
-                사이트입니다.
-              </p>
-              <p data-en="Since it will be deployed on GitHub Pages without a separate server, the goal is to implement as many features as possible using only pure HTML/CSS/JS and browser-based technologies.">
-                별도 서버 없이 GitHub Pages로 배포할 예정이므로 순수
-                HTML/CSS/JS와 브라우저 기반 기술만으로 최대한의 기능을 구현하는
-                것이 목표입니다.
-              </p>
-            </div>
-            <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
-              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
-              <ul>
-                <li data-en="Bold alcohol &amp; tobacco UI/UX design">야무진 술담배 UI/UX 디자인</li>
-                <li data-en="GitHub Pages static site deployment">GitHub Pages 정적 사이트 배포</li>
-                <li data-en="Online Damta benchmarking">온라인담타 벤치마킹 기반 기능 설계</li>
-                <li data-en="Frontend-only implementation, no server required">서버 없이 동작하는 프론트엔드 중심 구현</li>
-              </ul>
-            </div>
-            <div
-              class="detail-section"
-              data-aos="fade-up"
-              data-aos-delay="100"
-            ></div>
-          </div>
-
-          <div class="detail-sidebar">
-            <div class="sidebar-card" data-aos="fade-left">
-              <h4>Tech Stack</h4>
-              <div class="sidebar-stack">
-                <span class="tech-stack"><span>HTML</span></span>
-                <span class="tech-stack"><span>CSS</span></span>
-                <span class="tech-stack"><span>JavaScript</span></span>
-                <span class="tech-stack"><span>GitHub Pages</span></span>
-              </div>
-            </div>
-            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
-              <h4>Links</h4>
-              <div style="display: flex; flex-direction: column; gap: 10px">
-                <a
-                  href="https://github.com/pachir1su/Sibal_Life_Smoking"
-                  target="_blank" rel="noopener noreferrer"
-                  class="github-activity-btn"
-                  ><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a
-                >
-              </div>
-            </div>
-            <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
-              <p
-                style="
-                  color: var(--text-muted);
-                  font-size: 0.88rem;
-                  line-height: 1.6;
-                "
-                data-en-html="Personal concept project<br />Static website"
-              >
-                개인 기획 프로젝트<br />정적 웹사이트
-              </p>
-            </div>
-            <div
-              class="sidebar-card"
-              data-aos="fade-left"
-              data-aos-delay="200"
-              style="border-color: rgba(124, 109, 245, 0.3)"
-            >
-              <h4 style="color: var(--accent2)" data-en="Status" data-ko="진행 상태">진행 상태</h4>
-              <p
-                style="
-                  color: var(--text-muted);
-                  font-size: 0.88rem;
-                  line-height: 1.6;
-                "
-               data-en="Currently in planning phase.">
-                🔧 기획 단계
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <footer>
-      <div class="container footer-inner">
-        <div class="footer-logo">
-          <span class="logo-bracket">{</span> GY
-          <span class="logo-bracket">}</span>
-        </div>
-        <p class="footer-copy">
-          &copy; 2026 Lee Geon Yeong. All rights reserved.
-        </p>
-        <div class="social-links">
-          <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"
-            ><i class="fab fa-github"></i
-          ></a>
-          <a href="mailto:capybara@koreatech.ac.kr"
-            ><i class="fas fa-envelope"></i
-          ></a>
-        </div>
-      </div>
-    </footer>
-
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
-    <script src="../../script.js"></script>
+    <noscript>
+      <a href="../../index.html">홈으로 이동</a>
+    </noscript>
   </body>
 </html>
