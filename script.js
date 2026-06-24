@@ -1077,3 +1077,43 @@ window._updateProjectCount();
 
   sections.forEach(function (s) { obs.observe(s); });
 })();
+
+/* ------------------------------------------------------------- */
+/* 25. 개발자도구 단축키 차단 (#91)                                */
+/*    F12 / Ctrl+Shift+I,J,C / Ctrl+U(소스보기) / Cmd 조합 차단      */
+/*    macOS(Cmd+Opt+I 등)도 함께 차단. 입력 필드는 정상 동작 유지     */
+/* ------------------------------------------------------------- */
+(function initDevtoolsKeyGuard() {
+  /* 차단 대상 키 판별 — true면 개발자도구 관련 단축키 */
+  function isBlockedCombo(e) {
+    try {
+      const key = (e.key || '').toLowerCase();
+      // F12 단독
+      if (key === 'f12' || e.keyCode === 123) return true;
+      // 보기 소스: Ctrl+U / Cmd+U
+      if ((e.ctrlKey || e.metaKey) && key === 'u') return true;
+      // 개발자도구 토글: (Ctrl|Cmd)+Shift+ I / J / C
+      const withDevMod = (e.ctrlKey || e.metaKey) && (e.shiftKey || e.altKey);
+      if (withDevMod && (key === 'i' || key === 'j' || key === 'c')) return true;
+      return false;
+    } catch (err) {
+      // 키 판별 실패 시 차단하지 않음(사이트 기능 보호)
+      return false;
+    }
+  }
+
+  /* keydown 캡처 단계에서 선제 차단 */
+  document.addEventListener(
+    'keydown',
+    function (e) {
+      if (!isBlockedCombo(e)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      // 개발자도구 진입 시도 안내 오버레이 표시
+      if (typeof window.showDevtoolsBlock === 'function') {
+        window.showDevtoolsBlock();
+      }
+    },
+    true
+  );
+})();
