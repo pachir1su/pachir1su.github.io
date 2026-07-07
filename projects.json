@@ -118,7 +118,8 @@
           "icon": "fas fa-bell",
           "detail": "projects/koreatechGongjiAgent/",
           "links": [
-            { "href": "https://github.com/pachir1su/koreatechGongjiAgent", "title": "GitHub", "icon": "fab fa-github" }
+            { "href": "https://github.com/pachir1su/koreatechGongjiAgent", "title": "GitHub", "icon": "fab fa-github" },
+            { "href": "https://discord.com/oauth2/authorize?client_id=1518630779922546759", "title": "봇 초대", "icon": "fab fa-discord" }
           ],
           "title": { "en": "KOREATECH Unified Alert System", "ko": "코리아텍 통합 알림 시스템" },
           "subtitle": { "en": "Unified KOREATECH alerts — notices, mail & shuttle to Discord in real time", "ko": "코리아텍 공지·메일·셔틀을 디스코드로 실시간 통합 알림" },
