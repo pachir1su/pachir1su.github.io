@@ -113,20 +113,21 @@
           "tech": ["Python", "Discord.py", "SQLite"]
         },
         {
-          "comment": "한기대 공지 에이전트",
+          "comment": "코리아텍 통합 알림 시스템 (구 한기대 공지 에이전트)",
           "category": "ai discord",
           "icon": "fas fa-bell",
           "detail": "projects/koreatechGongjiAgent/",
           "links": [
-            { "href": "https://github.com/pachir1su/koreatechGongjiAgent", "title": "GitHub", "icon": "fab fa-github" }
+            { "href": "https://github.com/pachir1su/koreatechGongjiAgent", "title": "GitHub", "icon": "fab fa-github" },
+            { "href": "https://discord.com/oauth2/authorize?client_id=1518630779922546759", "title": "봇 초대", "icon": "fab fa-discord" }
           ],
-          "title": { "en": "KOREATECH Notice Agent", "ko": "한기대 공지 에이전트" },
-          "subtitle": { "en": "Auto-crawls KOREATECH notices & alerts Discord in real time", "ko": "한기대 포털 공지 자동 수집 · 디스코드 실시간 알림" },
+          "title": { "en": "KOREATECH Unified Alert System", "ko": "코리아텍 통합 알림 시스템" },
+          "subtitle": { "en": "Unified KOREATECH alerts — notices, mail & shuttle to Discord in real time", "ko": "코리아텍 공지·메일·셔틀을 디스코드로 실시간 통합 알림" },
           "descHtml": {
-            "en": "Dual-cycle crawler (quick 60s + full 30min) over multiple boards<br />Discord slash commands, FastAPI, schedule parsing, GUI dashboard &amp; Raspberry Pi support",
-            "ko": "이중 주기 크롤링(빠른 60초 + 전체 30분)으로 다중 게시판 감시<br />디스코드 슬래시 명령어 · FastAPI · 일정 파싱 · GUI 대시보드 · 라즈베리파이 지원"
+            "en": "Real-time notice detection (dual-cycle) + mail receive/read alerts<br />Discord slash & admin panel, web dashboard, shuttle timetable, FastAPI &amp; Raspberry Pi LED",
+            "ko": "포털·생활관 공지 실시간 감지(이중 주기) + 메일 수신·수신확인 알림<br />디스코드 슬래시·관리자 패널 · 웹 대시보드 · 셔틀 시간표 · 라즈베리파이 LED"
           },
-          "tech": ["Python", "Selenium", "Discord.py", "FastAPI", "PySide6"]
+          "tech": ["Python", "Selenium", "Discord.py", "FastAPI", "IMAP", "PySide6"]
         }
       ]
     },
