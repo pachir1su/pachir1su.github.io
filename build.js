@@ -129,6 +129,26 @@ function renderGroup(group) {
     group.kind === "wip" ? "wip" : group.kind === "failed" ? "failed" : group.year;
   const heading = group.kind === "year" ? group.year : group.heading;
   const cards = group.cards.map((c) => renderCard(c, group.kind)).join("\n\n");
+
+  /* 실패 그룹은 기본 접힘(collapsible) — 버튼 헤더로 펼침/접힘 (미니멀 지향).
+     i18n(script.js)이 '.year-group-failed .year-heading' 의 textContent 를 바꾸므로
+     제목은 h3 로 유지하고 토글 아이콘은 형제 요소로 둔다. */
+  if (group.kind === "failed") {
+    return [
+      `        <div class="year-group${cls}" data-year="${dataYear}">`,
+      `          <button class="failed-toggle" type="button" aria-expanded="false" aria-controls="failed-grid">`,
+      `            <h3 class="year-heading">${heading}</h3>`,
+      `            <i class="fas fa-chevron-down failed-toggle-icon" aria-hidden="true"></i>`,
+      `          </button>`,
+      `          <div class="projects-grid failed-grid is-collapsed" id="failed-grid">`,
+      ``,
+      cards,
+      ``,
+      `          </div>`,
+      `        </div>`,
+    ].join("\n");
+  }
+
   return [
     `        <div class="year-group${cls}" data-year="${dataYear}">`,
     `          <h3 class="year-heading">${heading}</h3>`,

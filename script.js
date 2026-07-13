@@ -670,6 +670,37 @@ window._updateProjectCount();
 })();
 
 /* ------------------------------------------------------------- */
+/* 24-b. 실패한 프로젝트 접기/펼치기 — 기본 접힘(미니멀)           */
+/*    · 헤더 버튼 클릭으로 토글                                   */
+/*    · 'all' 외 카테고리 필터 선택 시 자동 펼침(결과가 안 보이는  */
+/*      문제 방지), 'all' 로 돌아오면 다시 접음                    */
+/* ------------------------------------------------------------- */
+(function initFailedCollapse() {
+  const toggle = document.querySelector('.failed-toggle');
+  const grid = document.getElementById('failed-grid');
+  if (!toggle || !grid) return; // 실패 그룹이 없으면 무시(예외 안전)
+
+  /* 접힘/펼침 상태를 aria-expanded 와 grid 클래스에 동기화 */
+  function setExpanded(expanded) {
+    toggle.setAttribute('aria-expanded', String(expanded));
+    grid.classList.toggle('is-collapsed', !expanded);
+  }
+
+  /* 헤더 버튼 클릭 — 현재 상태 반전 */
+  toggle.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    setExpanded(!expanded);
+  });
+
+  /* 카테고리 필터와 연동 — 특정 필터는 펼치고, 전체(all)는 접음 */
+  document.querySelectorAll('.pfilter').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      setExpanded(btn.dataset.filter !== 'all');
+    });
+  });
+})();
+
+/* ------------------------------------------------------------- */
 /* 25. 다크 모드 토글 (#68)                                        */
 /*    localStorage로 상태 유지, 시스템 다크 모드 감지 지원           */
 /* ------------------------------------------------------------- */
@@ -1041,7 +1072,7 @@ window._updateProjectCount();
   const sectionIds = [
     'home', 'about', 'mbti-section', 'github-section',
     'skills', 'awards', 'cert-section',
-    'featured-section', 'mindmap-section', 'all-projects-section'
+    'featured-section', 'all-projects-section'
   ];
   const sections = sectionIds
     .map(function (id) { return document.getElementById(id); })

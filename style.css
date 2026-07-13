@@ -2481,6 +2481,45 @@ html {
 }
 .year-group-wip .year-heading::after { border-top-color: var(--line); }
 
+/* 실패한 프로젝트 — 기본 접힘(collapsible) 토글 헤더 (미니멀 지향) */
+.year-group-failed .failed-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 18px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+}
+.year-group-failed .failed-toggle .year-heading {
+  flex: 1;
+  margin-bottom: 0;
+}
+.failed-toggle-icon {
+  flex-shrink: 0;
+  color: var(--red);
+  font-size: 0.95rem;
+  transition: transform 0.25s ease;
+}
+.failed-toggle[aria-expanded="true"] .failed-toggle-icon {
+  transform: rotate(180deg);
+}
+.year-group-failed .failed-toggle:hover .failed-toggle-icon {
+  transform: translateY(2px);
+}
+.year-group-failed .failed-toggle[aria-expanded="true"]:hover .failed-toggle-icon {
+  transform: rotate(180deg) translateY(2px);
+}
+/* 접힘 상태 — 카드 그리드 숨김 */
+.failed-grid.is-collapsed {
+  display: none;
+}
+
 /* --- 프로젝트 카드 서브제목 (#31) --- */
 .project-subtitle {
   font-family: var(--font-hand);
@@ -3491,6 +3530,7 @@ html {
   display: flex;
   gap: 20px;
   align-items: stretch;
+  justify-content: center;
 }
 .mbti-layout .mbti-card {
   flex: 0 0 420px;
