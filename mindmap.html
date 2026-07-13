@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>프로젝트 마인드맵 (보존) | 이건영 포트폴리오</title>
+    <!-- 본 사이트(index.html)에는 노출하지 않는 아카이브 페이지 — 직접 URL로만 접근 -->
+    <meta name="robots" content="noindex" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="progress-container">
+      <div class="progress-bar" id="myBar"></div>
+    </div>
+    <button type="button" id="btn-back-to-top">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <nav class="navbar">
+      <div class="container nav-content">
+        <a href="index.html" class="logo"
+          ><span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span></a
+        >
+        <ul class="nav-links">
+          <li><a href="index.html" data-en="← Home" data-ko="← 홈">← 홈</a></li>
+          <li>
+            <a
+              href="https://github.com/pachir1su"
+              target="_blank" rel="noopener noreferrer"
+              class="nav-github"
+              ><i class="fab fa-github"></i
+            ></a>
+          </li>
+        </ul>
+        <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+            <span class="lang-label">EN</span>
+          </button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
+            <i class="fas fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <section class="detail-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="detail-hero-glow"></div>
+      <div class="container" style="position: relative; z-index: 1">
+        <div class="detail-breadcrumb">
+          <a href="index.html"><span data-en="Home" data-ko="홈">홈</span></a> / <span data-en="Project Mindmap (Archived)" data-ko="프로젝트 마인드맵 (보존)">프로젝트 마인드맵 (보존)</span>
+        </div>
+        <h1 class="detail-title" data-aos="fade-up"><span data-en="Project Mindmap" data-ko="프로젝트 마인드맵">프로젝트 마인드맵</span></h1>
+      </div>
+    </section>
+
+    <section class="detail-body">
+      <div class="container">
+        <!-- ===== 프로젝트 마인드맵 (#58) — 카테고리별 시각화 (index.html 에서 이관·보존) ===== -->
+        <div class="mindmap-block" id="mindmap-section" data-aos="fade-up">
+          <div class="subsection-label">
+            <i class="fas fa-project-diagram"></i> 프로젝트 마인드맵
+          </div>
+          <div class="mindmap-container">
+            <div class="mindmap-center" data-en="Projects" data-ko="프로젝트">프로젝트</div>
+            <div class="mindmap-branches-wrap">
+              <div class="mindmap-branch mindmap-ai">
+                <div class="mindmap-node mindmap-cat">AI · ML</div>
+                <div class="mindmap-leaves">
+                  <span class="mindmap-leaf">MultiMind</span>
+                  <span class="mindmap-leaf" data-en="Daily Report AI" data-ko="데일리 리포트 AI">데일리 리포트 AI</span>
+                  <span class="mindmap-leaf" data-en="Empathy Bot &amp; Recipe AI" data-ko="공감 봇 &amp; 레시피 AI">공감 봇 & 레시피 AI</span>
+                  <span class="mindmap-leaf" data-en="Tech &amp; Society" data-ko="기술과사회">기술과사회</span>
+                  <span class="mindmap-leaf">CentrifugeAI</span>
+                  <span class="mindmap-leaf">DelphiRec</span>
+                  <span class="mindmap-leaf" data-en="Wildfire Detection" data-ko="산불 조기 감지 시스템">산불 조기 감지 시스템</span>
+                </div>
+              </div>
+              <div class="mindmap-branch mindmap-hw">
+                <div class="mindmap-node mindmap-cat" data-en="Hardware" data-ko="하드웨어">하드웨어</div>
+                <div class="mindmap-leaves">
+                  <span class="mindmap-leaf" data-en="NFC Attendance System" data-ko="NFC 출석 체크 시스템">NFC 출석 체크 시스템</span>
+                  <span class="mindmap-leaf" data-en="Plant Timer" data-ko="식물 타이머">식물 타이머</span>
+                  <span class="mindmap-leaf" data-en="Password Door Lock" data-ko="비밀번호 도어락">비밀번호 도어락</span>
+                  <span class="mindmap-leaf" data-en="Coastal Barrier Project" data-ko="해안 장벽 프로젝트">해안 장벽 프로젝트</span>
+                  <span class="mindmap-leaf" data-en="Drowsiness Prevention" data-ko="졸음 방지 시스템">졸음 방지 시스템</span>
+                </div>
+              </div>
+              <div class="mindmap-branch mindmap-web">
+                <div class="mindmap-node mindmap-cat" data-en="Web" data-ko="웹">웹</div>
+                <div class="mindmap-leaves">
+                  <span class="mindmap-leaf">GitHub Rank Insight</span>
+                  <span class="mindmap-leaf">Swordmaster</span>
+                  <span class="mindmap-leaf" data-en="Freshman Guide" data-ko="신입생 가이드">신입생 가이드</span>
+                  <span class="mindmap-leaf" data-en="Health Care System" data-ko="헬스 케어 시스템">헬스 케어 시스템</span>
+                  <span class="mindmap-leaf">HTML Viewer</span>
+                  <span class="mindmap-leaf" data-en="HanMap" data-ko="한맵">한맵</span>
+                  <span class="mindmap-leaf" data-en="Magic Academy" data-ko="마법 아카데미">마법 아카데미</span>
+                </div>
+              </div>
+              <div class="mindmap-branch mindmap-discord">
+                <div class="mindmap-node mindmap-cat" data-en="Discord Bot" data-ko="Discord 봇">Discord 봇</div>
+                <div class="mindmap-leaves">
+                  <span class="mindmap-leaf" data-en="MZ Bot" data-ko="면진봇">면진봇</span>
+                  <span class="mindmap-leaf" data-en="SG Bot" data-ko="승기봇">승기봇</span>
+                  <span class="mindmap-leaf" data-en="SH Bot" data-ko="성현봇">성현봇</span>
+                  <span class="mindmap-leaf" data-en="Alert System" data-ko="통합 알림 시스템">통합 알림 시스템</span>
+                </div>
+              </div>
+              <div class="mindmap-branch mindmap-contest">
+                <div class="mindmap-node mindmap-cat" data-en="Contest" data-ko="대회">대회</div>
+                <div class="mindmap-leaves">
+                  <span class="mindmap-leaf">2024 SFPC</span>
+                  <span class="mindmap-leaf" data-en="Digital Saessak Makerthon" data-ko="디지털새싹 메이커톤">디지털새싹 메이커톤</span>
+                  <span class="mindmap-leaf" data-en="Cheonan Student Robot Contest" data-ko="천안 학생 로봇 대회">천안 학생 로봇 대회</span>
+                  <span class="mindmap-leaf" data-en="Master Creator Challenge" data-ko="마스터 크리에이터 챌린지">마스터 크리에이터 챌린지</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo">
+          <span class="logo-bracket">{</span> GY
+          <span class="logo-bracket">}</span>
+        </div>
+        <p class="footer-copy">
+          &copy; 2026 Lee Geon Yeong. All rights reserved.
+        </p>
+        <div class="social-links">
+          <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"
+            ><i class="fab fa-github"></i
+          ></a>
+          <a href="mailto:capybara@koreatech.ac.kr"
+            ><i class="fas fa-envelope"></i
+          ></a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
