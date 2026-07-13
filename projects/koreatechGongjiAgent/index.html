@@ -120,11 +120,12 @@
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
               <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
-              <p data-en="A unified alert system for KOREATECH. It automatically crawls portal & dormitory notices and pushes new ones to Discord in real time, and it also watches mail (new mail + read-receipts of sent mail) and shuttle-bus timetables. The data is served through a Discord bot with an admin panel, personal DM subscriptions, a web dashboard, an internal FastAPI, and a Raspberry Pi build with GPIO LED status." data-ko="한국기술교육대학교(KOREATECH)를 위한 통합 알림 시스템입니다. 포털·생활관 공지를 자동 수집해 새 공지를 디스코드로 실시간 알리고, 메일(신규 수신 + 보낸 메일 수신확인)과 셔틀버스 시간표까지 함께 감시합니다. 디스코드 봇·관리자 패널·개인 DM 구독·웹 대시보드·내부 FastAPI, 그리고 GPIO LED 상태 표시가 있는 라즈베리파이 빌드로 데이터를 제공합니다.">
+              <p data-en="A unified alert system for KOREATECH. It automatically crawls portal & dormitory notices and pushes new ones to Discord in real time, and it also watches mail (new mail + read-receipts of sent mail) and serves campus info — library reading-room seats, shuttle-bus timetables, and the cafeteria menu. The data is served through a Discord bot with an admin panel, personal DM subscriptions, a web dashboard, an internal FastAPI, and a Raspberry Pi build with GPIO LED status." data-ko="한국기술교육대학교(KOREATECH)를 위한 통합 알림 시스템입니다. 포털·생활관 공지를 자동 수집해 새 공지를 디스코드로 실시간 알리고, 메일(신규 수신 + 보낸 메일 수신확인)을 함께 감시하고, 도서관 열람실 좌석·셔틀버스 시간표·학식 메뉴 같은 캠퍼스 정보까지 제공합니다. 디스코드 봇·관리자 패널·개인 DM 구독·웹 대시보드·내부 FastAPI, 그리고 GPIO LED 상태 표시가 있는 라즈베리파이 빌드로 데이터를 제공합니다.">
                 한국기술교육대학교(KOREATECH)를 위한 통합 알림 시스템입니다.
                 포털·생활관 공지를 자동 수집해 새 공지를 디스코드로 실시간
-                알리고, 메일(신규 수신 + 보낸 메일 수신확인)과 셔틀버스
-                시간표까지 함께 감시합니다. 디스코드 봇·관리자 패널·개인 DM
+                알리고, 메일(신규 수신 + 보낸 메일 수신확인)을 함께 감시하고,
+                도서관 열람실 좌석·셔틀버스 시간표·학식 메뉴 같은 캠퍼스
+                정보까지 제공합니다. 디스코드 봇·관리자 패널·개인 DM
                 구독·웹 대시보드·내부 FastAPI, 그리고 GPIO LED 상태 표시가 있는
                 라즈베리파이 빌드로 데이터를 제공합니다.
               </p>
@@ -136,7 +137,7 @@
                 <li data-en="Discord bot: /공지 (board dropdown, paging, embed), keyword search, and a button-based admin panel (/관리자 — status, manual crawl, restart, Pi screen/LED control, shutdown)">디스코드 봇: /공지(드롭다운·페이지·임베드), 키워드 검색, 버튼식 통합 관리자 패널(/관리자 — 상태·수동 크롤링·재시작·Pi 화면/LED 조작·종료)</li>
                 <li data-en="Personal DM subscriptions (/구독) — instant DM on new notices or a daily digest, per board/keyword, with pause/resume">개인 DM 구독(/구독) — 게시판·키워드별 새 공지 즉시 DM 또는 매일 요약, 일시정지/재개</li>
                 <li data-en="Mail alerts (IMAP) — polls KOREATECH mail for new mail + read-receipts of sent mail and DMs them (admin single account, encrypted credentials, off by default)">메일 알림(IMAP) — 코리아텍 메일을 폴링해 신규 수신 메일과 보낸 메일 수신확인을 개인 DM 알림(관리자 단일 계정, 자격증명 암호화, 기본 비활성)</li>
-                <li data-en="Shuttle-bus timetable (/셔틀) with a Kakao Map live-location link">셔틀버스 시간표(/셔틀) — 카카오맵 버스 위치 링크 제공</li>
+                <li data-en="Campus info commands — library reading-room live seats (/도서관), real-time shuttle timetable with remaining seats (/셔틀), and cafeteria menu (학식)">캠퍼스 정보 명령 — 다산정보관 열람실 실시간 좌석(/도서관), 실시간 셔틀 시간표·잔여 좌석(/셔틀), 학식 메뉴</li>
                 <li data-en="Read-only web dashboard (/web) with optional Cloudflare Quick Tunnel for external access">사용자용 읽기 전용 웹 대시보드(/web) + Cloudflare Quick Tunnel 외부 공개(선택)</li>
                 <li data-en="Schedule parsing (date/time/place/category) with optional local-LLM (Ollama) fallback">일정 파싱(날짜·시간·장소·카테고리) + 로컬 LLM(Ollama) 보조 분석(선택)</li>
                 <li data-en="PySide6 GUI dashboard + Raspberry Pi: GPIO RGB LED status, 7-inch touch Pi mode, systemd auto-run, release auto-update">PySide6 GUI 대시보드 + 라즈베리파이: GPIO RGB LED 상태 표시, 7인치 터치 Pi 모드, systemd 자동 실행, 릴리즈 자동 업데이트</li>
@@ -195,9 +196,9 @@
                   font-size: 0.88rem;
                   line-height: 1.6;
                 "
-                data-en="Crawler / Discord bot / Mail & shuttle alerts / Web dashboard / Raspberry Pi" data-ko="크롤러 / 디스코드 봇 / 메일·셔틀 알림 / 웹 대시보드 / 라즈베리파이"
+                data-en="Crawler / Discord bot / Mail alerts / Campus info (library·shuttle·cafeteria) / Web dashboard / Raspberry Pi" data-ko="크롤러 / 디스코드 봇 / 메일 알림 / 캠퍼스 정보(도서관·셔틀·학식) / 웹 대시보드 / 라즈베리파이"
               >
-                크롤러 / 디스코드 봇 / 메일·셔틀 알림 / 웹 대시보드 / 라즈베리파이
+                크롤러 / 디스코드 봇 / 메일 알림 / 캠퍼스 정보(도서관·셔틀·학식) / 웹 대시보드 / 라즈베리파이
               </p>
             </div>
           </div>
