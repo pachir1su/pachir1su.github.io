@@ -6,7 +6,7 @@ Claude Code 작업 지침입니다. 이 저장소(**이건영 포트폴리오**,
 ## 프로젝트
 
 - **개인 포트폴리오 정적 사이트**입니다. GitHub Pages로 배포되는 순수 HTML/CSS/JS이며,
-  번들러·프레임워크 없이 **Node 내장 모듈만** 사용합니다(`.env`, `package.json` 없음).
+  번들러·프레임워크 없이 **Node 내장 모듈만** 사용합니다.
 - 프로젝트 카드 목록은 **`projects.json`이 단일 소스**입니다. `node build.js`가 이 데이터로
   `index.html`의 `BUILD:PROJECTS:START ~ END` 마커 사이를 생성합니다. **이 영역은 직접 수정하지
   말고**, `projects.json`을 고친 뒤 `node build.js`를 실행합니다.
