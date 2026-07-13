@@ -3,277 +3,258 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>미니멀 재설계 시안 (preview) | 이건영 포트폴리오</title>
+<title>정돈된 노트 시안 (preview) | 이건영 포트폴리오</title>
 <meta name="robots" content="noindex, nofollow" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
 /* =====================================================================
-   미니멀 재설계 시안 (preview.html) — 실사이트(index.html) 아님, noindex
-   · 좁은 에디토리얼 레이아웃 / 중립 배경 + 포인트 1색 / 8px 간격 스케일
-   · 절제된 모션(IntersectionObserver, prefers-reduced-motion 존중)
-   · 라이트·다크 모드 대응(prefers-color-scheme)
+   "정돈된 노트" 시안 (preview.html) — 실사이트 아님, noindex
+   · 기존 노트 컨셉(종이·빨간 여백선·포스트잇·손글씨 Caveat)은 유지
+   · 밀도만 덜어냄: 섹션 6개로 압축, 여백 확대, 장식 최소
+   · 라이트/다크 대응, 절제된 스크롤 리빌(reduced-motion 존중)
    ===================================================================== */
 
-/* --- 디자인 토큰 --- */
+/* --- 노트 팔레트 토큰(실사이트 style.css 와 동일 계열) --- */
 :root {
-  --bg: #f7f4ee;
-  --surface: #fffdf9;
-  --ink: #1b1a17;
-  --muted: #6f6a5e;
-  --line: rgba(27, 26, 23, 0.12);
-  --accent: #c0392b;
-  --accent-soft: rgba(192, 57, 43, 0.08);
-  --radius: 12px;
-  --maxw: 880px;
-  --font-sans: 'Noto Sans KR', system-ui, sans-serif;
-  --font-mono: 'Space Mono', ui-monospace, monospace;
+  --paper: #faf7ee;
+  --paper-2: #f4efe1;
+  --card: #fffdf6;
+  --ink: #1f1c14;
+  --muted: #6b6453;
+  --red: #c63b3b;
+  --red-margin: rgba(198, 59, 59, 0.32);
+  --cyan: #2b8a93;
+  --gold: #b88a1a;
+  --bronze: #b3712a;
+  --tape: rgba(230, 200, 120, 0.6);
+  --postit: #fff7a8;
+  --line: rgba(31, 28, 20, 0.18);
+  --rule: rgba(31, 28, 20, 0.06);
+  --shadow-soft: 0 6px 18px rgba(31, 28, 20, 0.08);
+  --shadow-lift: 0 12px 28px rgba(31, 28, 20, 0.14);
+  --radius: 4px;
+  --maxw: 900px;
+  --margin-x: 64px;
+  --font-main: "Noto Sans KR", sans-serif;
+  --font-mono: "Space Mono", monospace;
+  --font-hand: "Caveat", cursive;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #16150f;
-    --surface: #1e1c15;
-    --ink: #efe9dc;
-    --muted: #9c9484;
-    --line: rgba(239, 233, 220, 0.14);
-    --accent: #e06a4e;
-    --accent-soft: rgba(224, 106, 78, 0.12);
+    --paper: #1a1813;
+    --paper-2: #201d16;
+    --card: #232019;
+    --ink: #efe7d6;
+    --muted: #a49a85;
+    --red: #e0705d;
+    --red-margin: rgba(224, 112, 93, 0.34);
+    --cyan: #57b3bc;
+    --gold: #d0a63f;
+    --bronze: #cf8b4a;
+    --tape: rgba(224, 190, 120, 0.28);
+    --postit: #4a4620;
+    --line: rgba(239, 231, 214, 0.16);
+    --rule: rgba(239, 231, 214, 0.05);
   }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  font-family: var(--font-sans);
-  background: var(--bg);
+  font-family: var(--font-main);
   color: var(--ink);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+  /* 노트 종이: 색 + 아주 옅은 가로 괘선(텍스처) */
+  background-color: var(--paper);
+  background-image: repeating-linear-gradient(transparent 0 33px, var(--rule) 33px 34px);
 }
 a { color: inherit; text-decoration: none; }
 
-/* --- preview 안내 바 --- */
+/* --- preview 안내 바(테이프 느낌) --- */
 .preview-flag {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; flex-wrap: wrap;
   padding: 8px 16px;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
-  color: #fff;
-  background: var(--accent);
+  font-size: 0.72rem; letter-spacing: 0.04em;
+  color: #fff; background: var(--red);
 }
-.preview-flag a {
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  opacity: 0.92;
+.preview-flag a { text-decoration: underline; text-underline-offset: 2px; opacity: 0.92; }
+
+/* --- 레이아웃: 노트 페이지(왼쪽 빨간 여백선 + 바인더 홀) --- */
+.wrap { max-width: var(--maxw); margin: 0 auto; position: relative; }
+.page {
+  position: relative;
+  padding-left: var(--margin-x);
+  padding-right: 28px;
+}
+/* 왼쪽 빨간 세로 여백선 */
+.page::before {
+  content: "";
+  position: absolute;
+  left: var(--margin-x); top: 0; bottom: 0;
+  width: 1.5px;
+  background: var(--red-margin);
+}
+/* 바인더 구멍(왼쪽 여백 안) — 장식 최소화해 3개만 은은하게 */
+.page::after {
+  content: "";
+  position: absolute;
+  left: 26px; top: 0; bottom: 0; width: 10px;
+  background-image: radial-gradient(circle 5px at 5px 90px, var(--paper-2) 98%, transparent 100%),
+                    radial-gradient(circle 5px at 5px 50%, var(--paper-2) 98%, transparent 100%),
+                    radial-gradient(circle 5px at 5px calc(100% - 90px), var(--paper-2) 98%, transparent 100%);
+  background-repeat: no-repeat;
+  box-shadow: none;
+  opacity: 0.9;
+}
+@media (max-width: 620px) {
+  :root { --margin-x: 40px; }
+  .page::after { display: none; }
 }
 
-/* --- 레이아웃 --- */
-.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
-section { padding: 104px 0; border-top: 1px solid var(--line); }
-section:first-of-type { border-top: none; }
+section { padding: 88px 0; }
+section + section { border-top: 1px dashed var(--red-margin); }
+
+/* 손글씨 섹션 라벨 */
 .eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 22px;
+  font-family: var(--font-hand);
+  font-size: 2rem; font-weight: 700;
+  color: var(--red);
+  line-height: 1; margin-bottom: 24px;
 }
+.eyebrow.cyan { color: var(--cyan); }
+.eyebrow.gold { color: var(--gold); }
+.eyebrow.bronze { color: var(--bronze); }
 
 /* --- Hero --- */
-.hero { padding: 128px 0 96px; }
-.hero-eyebrow {
+.hero { padding: 96px 0 84px; }
+.hero .tag-mono {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.24em;
-  color: var(--muted);
-  margin-bottom: 26px;
+  font-size: 0.76rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 22px;
 }
 .hero h1 {
-  font-size: clamp(3rem, 9vw, 5.4rem);
-  font-weight: 900;
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  margin-bottom: 8px;
+  font-size: clamp(2.8rem, 8vw, 4.8rem);
+  font-weight: 900; line-height: 1.05; letter-spacing: -0.02em;
 }
 .hero h1 .en {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: clamp(0.9rem, 2.4vw, 1.15rem);
-  font-weight: 400;
-  letter-spacing: 0.14em;
-  color: var(--muted);
-  margin-top: 14px;
+  display: block; font-family: var(--font-mono);
+  font-size: clamp(0.85rem, 2.2vw, 1.05rem); font-weight: 400;
+  letter-spacing: 0.14em; color: var(--muted); margin-top: 14px;
 }
-.hero .lead {
-  font-size: clamp(1.1rem, 2.6vw, 1.4rem);
-  font-weight: 500;
-  margin: 28px 0 14px;
-  max-width: 34ch;
-}
-.hero .lead b { color: var(--accent); font-weight: 700; }
+.hero .lead { font-size: clamp(1.1rem, 2.6vw, 1.4rem); font-weight: 500; margin: 26px 0 12px; max-width: 34ch; }
+.hero .lead b { color: var(--red); font-weight: 700; }
 .hero .sub { color: var(--muted); font-size: 1rem; max-width: 46ch; }
-.cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 36px; }
+.cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 34px; }
 .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
-  border-radius: 8px;
-  font-size: 0.92rem;
-  font-weight: 700;
-  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 22px; border-radius: var(--radius);
+  font-size: 0.92rem; font-weight: 700;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
-.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary { background: var(--red); color: #fff; box-shadow: var(--shadow-soft); }
 .btn-primary:hover { transform: translateY(-2px); }
-.btn-ghost { border: 1px solid var(--line); color: var(--ink); }
-.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-.hero-stats {
-  display: flex;
-  gap: 30px;
-  flex-wrap: wrap;
-  margin-top: 48px;
-  font-size: 0.9rem;
-  color: var(--muted);
+.btn-ghost { border: 1.5px solid var(--line); color: var(--ink); }
+.btn-ghost:hover { border-color: var(--red); color: var(--red); }
+
+/* 포스트잇 스탯(테이프로 붙인 느낌 · 살짝만 기울임) */
+.postit-row { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 52px; }
+.postit {
+  position: relative;
+  background: var(--postit);
+  color: var(--ink);
+  padding: 18px 22px 16px;
+  min-width: 108px;
+  box-shadow: var(--shadow-soft);
+  border-radius: 2px;
 }
-.hero-stats b { color: var(--ink); font-family: var(--font-mono); font-weight: 700; }
+.postit:nth-child(1) { transform: rotate(-2deg); }
+.postit:nth-child(2) { transform: rotate(1.5deg); background: #d7efe9; }
+.postit:nth-child(3) { transform: rotate(-1deg); background: #f6e6c4; }
+.postit::before { /* 테이프 */
+  content: ""; position: absolute; top: -9px; left: 50%; transform: translateX(-50%) rotate(-3deg);
+  width: 46px; height: 18px; background: var(--tape);
+  box-shadow: 0 1px 2px rgba(31,28,20,0.12);
+}
+.postit .num { font-family: var(--font-mono); font-weight: 700; font-size: 1.5rem; line-height: 1; }
+.postit .lbl { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
 
 /* --- About --- */
 .about p { font-size: 1.12rem; max-width: 60ch; }
-.about p + p { margin-top: 18px; color: var(--muted); font-size: 1rem; }
-.about-meta {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-top: 34px;
-}
+.about p + p { margin-top: 16px; color: var(--muted); font-size: 1rem; }
+.about-meta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 30px; }
 .meta-chip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 12px 18px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--surface);
+  display: inline-flex; align-items: baseline; gap: 8px;
+  padding: 11px 18px; border: 1.5px solid var(--line);
+  border-radius: var(--radius); background: var(--card);
 }
-.meta-chip .k {
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.meta-chip .v { font-family: var(--font-mono); font-weight: 700; font-size: 1.05rem; }
+.meta-chip .k { font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.meta-chip .v { font-family: var(--font-mono); font-weight: 700; font-size: 1.02rem; }
 .meta-chip .v small { font-size: 0.72rem; color: var(--muted); font-weight: 400; }
 
 /* --- Skills --- */
-.skill-groups { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px 40px; }
+.skill-groups { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px 40px; }
 @media (max-width: 640px) { .skill-groups { grid-template-columns: 1fr; } }
-.skill-group h3 {
-  font-size: 0.92rem;
-  font-weight: 700;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.skill-group h3 i { color: var(--accent); font-size: 0.9rem; width: 18px; text-align: center; }
+.skill-group h3 { font-size: 0.92rem; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+.skill-group h3 i { color: var(--red); font-size: 0.9rem; width: 18px; text-align: center; }
 .tags { display: flex; flex-wrap: wrap; gap: 8px; }
-.tags span {
-  font-size: 0.82rem;
-  padding: 5px 12px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--muted);
-}
+.tags span { font-size: 0.82rem; padding: 5px 12px; border: 1.5px solid var(--line); border-radius: 999px; color: var(--muted); background: var(--card); }
 
-/* --- Selected Work --- */
-.work-list { display: flex; flex-direction: column; }
+/* --- Selected Work (밑줄 그은 노트 목록) --- */
 .work-item {
-  display: grid;
-  grid-template-columns: 40px 1fr auto;
-  gap: 20px;
-  align-items: baseline;
-  padding: 26px 4px;
-  border-top: 1px solid var(--line);
+  display: grid; grid-template-columns: 40px 1fr auto; gap: 20px; align-items: baseline;
+  padding: 24px 4px;
+  border-bottom: 1.5px dashed var(--line);
   transition: padding-left 0.18s ease;
 }
+.work-item:first-child { border-top: 1.5px dashed var(--line); }
 .work-item:hover { padding-left: 14px; }
-.work-item:last-child { border-bottom: 1px solid var(--line); }
-.work-idx { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
-.work-main h3 { font-size: 1.28rem; font-weight: 800; letter-spacing: -0.01em; }
-.work-main p { color: var(--muted); font-size: 0.95rem; margin: 6px 0 12px; }
+.work-idx { font-family: var(--font-mono); font-size: 0.8rem; color: var(--red); }
+.work-main h3 { font-size: 1.24rem; font-weight: 800; letter-spacing: -0.01em; }
+.work-main p { color: var(--muted); font-size: 0.94rem; margin: 6px 0 12px; }
 .work-tech { display: flex; flex-wrap: wrap; gap: 6px; }
-.work-tech span {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  color: var(--muted);
-  padding: 2px 8px;
-  background: var(--accent-soft);
-  border-radius: 4px;
-}
-.work-arrow {
-  color: var(--muted);
-  font-size: 1rem;
-  transition: transform 0.18s ease, color 0.18s ease;
-}
-.work-item:hover .work-arrow { transform: translate(4px, -4px); color: var(--accent); }
-.work-more { margin-top: 34px; }
-.work-more a {
-  font-family: var(--font-mono);
-  font-size: 0.86rem;
-  font-weight: 700;
-  color: var(--accent);
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.15s ease;
-}
-.work-more a:hover { border-color: var(--accent); }
+.work-tech span { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); padding: 2px 8px; background: var(--red-margin); border-radius: 3px; }
+.work-arrow { color: var(--muted); font-size: 1rem; transition: transform 0.18s ease, color 0.18s ease; }
+.work-item:hover .work-arrow { transform: translate(4px, -4px); color: var(--red); }
+.work-more { margin-top: 30px; }
+.work-more a { font-family: var(--font-hand); font-size: 1.5rem; font-weight: 700; color: var(--red); }
+.work-more a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-/* --- Recognition --- */
-.rec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+/* --- Recognition (핀으로 꽂은 카드) --- */
+.rec-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
 @media (max-width: 640px) { .rec-grid { grid-template-columns: 1fr; } }
 .rec-item {
-  padding: 20px 22px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface);
+  position: relative;
+  padding: 22px 22px 18px; border: 1.5px solid var(--line);
+  border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow-soft);
 }
-.rec-item .rec-title { font-weight: 700; font-size: 1rem; }
-.rec-item .rec-title .badge {
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  color: var(--accent);
-  margin-left: 8px;
+.rec-item::before { /* 핀 */
+  content: ""; position: absolute; top: 12px; right: 14px;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, #ff8a8a 0%, var(--red) 60%, #6e1a1a 100%);
+  box-shadow: 0 2px 3px rgba(31,28,20,0.25);
 }
+.rec-item .rec-title { font-weight: 700; font-size: 1rem; padding-right: 18px; }
+.rec-item .rec-title .badge { font-family: var(--font-mono); font-size: 0.66rem; color: var(--red); margin-left: 6px; }
 .rec-item .rec-desc { color: var(--muted); font-size: 0.86rem; margin-top: 6px; }
 
 /* --- Footer --- */
-footer {
-  border-top: 1px solid var(--line);
-  padding: 48px 0;
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-.footer-logo { font-family: var(--font-mono); font-weight: 700; color: var(--ink); margin-bottom: 10px; }
-.footer-social { display: flex; gap: 18px; justify-content: center; margin-top: 14px; font-size: 1.1rem; }
+footer { border-top: 1.5px dashed var(--red-margin); padding: 44px 0; text-align: center; color: var(--muted); font-size: 0.85rem; }
+.footer-logo { font-family: var(--font-mono); font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.footer-hand { font-family: var(--font-hand); font-size: 1.4rem; color: var(--red); margin-bottom: 6px; }
+.footer-social { display: flex; gap: 18px; justify-content: center; margin-top: 12px; font-size: 1.1rem; }
 .footer-social a { color: var(--muted); transition: color 0.15s ease; }
-.footer-social a:hover { color: var(--accent); }
+.footer-social a:hover { color: var(--red); }
 
-/* --- 스크롤 리빌(절제된 모션) --- */
-.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
+/* --- 스크롤 리빌 --- */
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .reveal.in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
@@ -282,75 +263,69 @@ footer {
 </style>
 </head>
 <body>
-  <!-- preview 안내: 실사이트가 아님을 명시하고 비교 링크 제공 -->
   <div class="preview-flag">
-    <span>◆ 미니멀 재설계 시안 · preview (실제 사이트 아님)</span>
+    <span>◆ 정돈된 노트 시안 · preview (실제 사이트 아님)</span>
     <a href="index.html">현재 사이트와 비교 →</a>
   </div>
 
-  <!-- ===== Hero ===== -->
-  <header class="hero">
-    <div class="wrap">
-      <div class="hero-eyebrow reveal">PORTFOLIO — 2026</div>
-      <h1 class="reveal">이건영<span class="en">LEE GEON YEONG</span></h1>
-      <p class="lead reveal">이윤을 넘어 <b>혁신</b>을 추구하는<br />풀스택 개발자 · 아이디어 뱅크</p>
-      <p class="sub reveal">AI · 하드웨어 · 웹/앱 · 정보보안을 넘나들며 아이디어를 실제 제품으로 만듭니다.</p>
-      <div class="cta-row reveal">
-        <a href="#work" class="btn btn-primary"><i class="fas fa-arrow-down"></i> 프로젝트 보기</a>
-        <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" class="btn btn-ghost"><i class="fab fa-github"></i> GitHub</a>
-      </div>
-      <div class="hero-stats reveal">
-        <span><b>20+</b> 프로젝트</span>
-        <span><b>3</b> 수상</span>
-        <span>GitHub Rank <b>8위</b></span>
-      </div>
-    </div>
-  </header>
+  <div class="wrap">
+    <div class="page">
 
-  <!-- ===== About (비전 + MBTI + GitHub 핵심지표 통합) ===== -->
-  <section class="about" id="about">
-    <div class="wrap">
-      <div class="eyebrow reveal">About</div>
-      <p class="reveal">문제를 발견하면 직접 만들어 해결합니다. 학교 공지 알림 봇, 라즈베리파이 서버, LLM 오케스트레이터까지 — 필요를 느낀 순간이 곧 프로젝트의 시작이었습니다.</p>
-      <p class="reveal">기획부터 개발·배포·운영까지 혼자 끝까지 끌고 가는 걸 좋아합니다.</p>
-      <div class="about-meta">
-        <div class="meta-chip reveal"><span class="k">MBTI</span><span class="v">ENTJ-A</span></div>
-        <div class="meta-chip reveal"><span class="k">GitHub Rank</span><span class="v">8위 <small>Top 1.3%</small></span></div>
-        <div class="meta-chip reveal"><span class="k">Since</span><span class="v">2024</span></div>
-      </div>
-    </div>
-  </section>
+      <!-- ===== Hero ===== -->
+      <header class="hero">
+        <div class="tag-mono reveal">PORTFOLIO — 2026</div>
+        <h1 class="reveal">이건영<span class="en">LEE GEON YEONG</span></h1>
+        <p class="lead reveal">이윤을 넘어 <b>혁신</b>을 추구하는<br />풀스택 개발자 · 아이디어 뱅크</p>
+        <p class="sub reveal">AI · 하드웨어 · 웹/앱 · 정보보안을 넘나들며 아이디어를 실제 제품으로 만듭니다.</p>
+        <div class="cta-row reveal">
+          <a href="#work" class="btn btn-primary"><i class="fas fa-arrow-down"></i> 프로젝트 보기</a>
+          <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" class="btn btn-ghost"><i class="fab fa-github"></i> GitHub</a>
+        </div>
+        <div class="postit-row reveal">
+          <div class="postit"><div class="num">20+</div><div class="lbl">프로젝트</div></div>
+          <div class="postit"><div class="num">3</div><div class="lbl">수상</div></div>
+          <div class="postit"><div class="num">8위</div><div class="lbl">GitHub Rank</div></div>
+        </div>
+      </header>
 
-  <!-- ===== Skills (4개 그룹으로 압축) ===== -->
-  <section class="skills" id="skills">
-    <div class="wrap">
-      <div class="eyebrow reveal">Skills</div>
-      <div class="skill-groups">
-        <div class="skill-group reveal">
-          <h3><i class="fas fa-code"></i> 언어 &amp; 웹</h3>
-          <div class="tags"><span>Python</span><span>JavaScript</span><span>Java</span><span>C/C++</span><span>HTML/CSS</span><span>React</span><span>Flask</span></div>
+      <!-- ===== About ===== -->
+      <section class="about" id="about">
+        <div class="eyebrow reveal">About me</div>
+        <p class="reveal">문제를 발견하면 직접 만들어 해결합니다. 학교 공지 알림 봇, 라즈베리파이 서버, LLM 오케스트레이터까지 — 필요를 느낀 순간이 곧 프로젝트의 시작이었습니다.</p>
+        <p class="reveal">기획부터 개발·배포·운영까지 혼자 끝까지 끌고 가는 걸 좋아합니다.</p>
+        <div class="about-meta">
+          <div class="meta-chip reveal"><span class="k">MBTI</span><span class="v">ENTJ-A</span></div>
+          <div class="meta-chip reveal"><span class="k">GitHub Rank</span><span class="v">8위 <small>Top 1.3%</small></span></div>
+          <div class="meta-chip reveal"><span class="k">Since</span><span class="v">2024</span></div>
         </div>
-        <div class="skill-group reveal">
-          <h3><i class="fas fa-robot"></i> AI &amp; 데이터</h3>
-          <div class="tags"><span>LLM 활용</span><span>머신러닝·딥러닝</span><span>NLP</span><span>Discord 봇</span></div>
-        </div>
-        <div class="skill-group reveal">
-          <h3><i class="fas fa-microchip"></i> 하드웨어 &amp; 메이커</h3>
-          <div class="tags"><span>Arduino</span><span>Raspberry Pi</span><span>3D 프린팅</span><span>레이저 커팅</span><span>IoT</span><span>납땜·용접</span></div>
-        </div>
-        <div class="skill-group reveal">
-          <h3><i class="fas fa-users"></i> 협업 &amp; 커뮤니케이션</h3>
-          <div class="tags"><span>기술 문서화</span><span>프로젝트 총괄</span><span>팀 리딩</span><span>발표·프레젠테이션</span><span>영상 편집</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- ===== Selected Work (대표작 4개만 큐레이션) ===== -->
-  <section class="work" id="work">
-    <div class="wrap">
-      <div class="eyebrow reveal">Selected Work</div>
-      <div class="work-list">
+      <!-- ===== Skills ===== -->
+      <section class="skills" id="skills">
+        <div class="eyebrow cyan reveal">Skills</div>
+        <div class="skill-groups">
+          <div class="skill-group reveal">
+            <h3><i class="fas fa-code"></i> 언어 &amp; 웹</h3>
+            <div class="tags"><span>Python</span><span>JavaScript</span><span>Java</span><span>C/C++</span><span>HTML/CSS</span><span>React</span><span>Flask</span></div>
+          </div>
+          <div class="skill-group reveal">
+            <h3><i class="fas fa-robot"></i> AI &amp; 데이터</h3>
+            <div class="tags"><span>LLM 활용</span><span>머신러닝·딥러닝</span><span>NLP</span><span>Discord 봇</span></div>
+          </div>
+          <div class="skill-group reveal">
+            <h3><i class="fas fa-microchip"></i> 하드웨어 &amp; 메이커</h3>
+            <div class="tags"><span>Arduino</span><span>Raspberry Pi</span><span>3D 프린팅</span><span>레이저 커팅</span><span>IoT</span><span>납땜·용접</span></div>
+          </div>
+          <div class="skill-group reveal">
+            <h3><i class="fas fa-users"></i> 협업 &amp; 커뮤니케이션</h3>
+            <div class="tags"><span>기술 문서화</span><span>프로젝트 총괄</span><span>팀 리딩</span><span>발표·프레젠테이션</span><span>영상 편집</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Selected Work ===== -->
+      <section class="work" id="work">
+        <div class="eyebrow gold reveal">Selected work</div>
         <a class="work-item reveal" href="projects/koreatechGongjiAgent/">
           <span class="work-idx">01</span>
           <div class="work-main">
@@ -387,62 +362,53 @@ footer {
           </div>
           <i class="fas fa-arrow-up work-arrow" style="transform: rotate(45deg);"></i>
         </a>
-      </div>
-      <div class="work-more reveal">
-        <a href="index.html#all-projects-section">전체 20+ 프로젝트 보기 →</a>
-      </div>
-    </div>
-  </section>
+        <div class="work-more reveal"><a href="index.html#all-projects-section">전체 20+ 프로젝트 보기 →</a></div>
+      </section>
 
-  <!-- ===== Recognition (수상·자격증 압축) ===== -->
-  <section class="recognition" id="recognition">
-    <div class="wrap">
-      <div class="eyebrow reveal">Recognition</div>
-      <div class="rec-grid">
-        <div class="rec-item reveal">
-          <div class="rec-title">백준 알고리즘 <span class="badge">TOP 1.3%</span></div>
-          <div class="rec-desc">전체 8위 · 총 581팀 / 1661명 참가</div>
+      <!-- ===== Recognition ===== -->
+      <section class="recognition" id="recognition">
+        <div class="eyebrow bronze reveal">Recognition</div>
+        <div class="rec-grid">
+          <div class="rec-item reveal">
+            <div class="rec-title">백준 알고리즘 <span class="badge">TOP 1.3%</span></div>
+            <div class="rec-desc">전체 8위 · 총 581팀 / 1661명 참가</div>
+          </div>
+          <div class="rec-item reveal">
+            <div class="rec-title">디지털새싹 AI 메이커톤 <span class="badge">AI 어벤져스상</span></div>
+            <div class="rec-desc">산불 조기 감지 알림 시스템 · Raspberry Pi &amp; OpenCV</div>
+          </div>
+          <div class="rec-item reveal">
+            <div class="rec-title">천안 학생 로봇 대회 <span class="badge">동상</span></div>
+            <div class="rec-desc">2024 제5회 · 해커톤 분야 총 97팀 참가</div>
+          </div>
+          <div class="rec-item reveal">
+            <div class="rec-title">드론 조종 자격 <span class="badge">4종</span></div>
+            <div class="rec-desc">무인멀티콥터 4종 조종 자격 보유</div>
+          </div>
         </div>
-        <div class="rec-item reveal">
-          <div class="rec-title">디지털새싹 AI 메이커톤 <span class="badge">AI 어벤져스상</span></div>
-          <div class="rec-desc">산불 조기 감지 알림 시스템 · Raspberry Pi &amp; OpenCV</div>
-        </div>
-        <div class="rec-item reveal">
-          <div class="rec-title">천안 학생 로봇 대회 <span class="badge">동상</span></div>
-          <div class="rec-desc">2024 제5회 · 해커톤 분야 총 97팀 참가</div>
-        </div>
-        <div class="rec-item reveal">
-          <div class="rec-title">드론 조종 자격 <span class="badge">4종</span></div>
-          <div class="rec-desc">무인멀티콥터 4종 조종 자격 보유</div>
-        </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- ===== Footer ===== -->
-  <footer>
-    <div class="wrap">
-      <div class="footer-logo">{ GY }</div>
-      <div>&copy; 2026 Lee Geon Yeong</div>
-      <div class="footer-social">
-        <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
-        <a href="mailto:capybara@koreatech.ac.kr" aria-label="Email"><i class="fas fa-envelope"></i></a>
-      </div>
+      <!-- ===== Footer ===== -->
+      <footer>
+        <div class="footer-hand">Thanks for scrolling :)</div>
+        <div class="footer-logo">{ GY }</div>
+        <div>&copy; 2026 Lee Geon Yeong</div>
+        <div class="footer-social">
+          <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+          <a href="mailto:capybara@koreatech.ac.kr" aria-label="Email"><i class="fas fa-envelope"></i></a>
+        </div>
+      </footer>
+
     </div>
-  </footer>
+  </div>
 
   <script>
-  /* 스크롤 리빌 — 절제된 페이드인 (IntersectionObserver) */
+  /* 스크롤 리빌 — 절제된 페이드인 */
   (function () {
     var els = document.querySelectorAll('.reveal');
-    if (!('IntersectionObserver' in window)) {
-      els.forEach(function (el) { el.classList.add('in'); });
-      return;
-    }
+    if (!('IntersectionObserver' in window)) { els.forEach(function (el) { el.classList.add('in'); }); return; }
     var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-      });
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
     els.forEach(function (el) { io.observe(el); });
   })();
