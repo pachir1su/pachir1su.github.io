@@ -122,12 +122,12 @@
             { "href": "https://discord.com/oauth2/authorize?client_id=1518630779922546759", "title": "봇 초대", "icon": "fab fa-discord" }
           ],
           "title": { "en": "KOREATECH Unified Alert System", "ko": "코리아텍 통합 알림 시스템" },
-          "subtitle": { "en": "Unified KOREATECH alerts — notices, mail, shuttle & library to Discord in real time", "ko": "코리아텍 공지·메일·셔틀·도서관을 디스코드로 실시간 통합 알림" },
+          "subtitle": { "en": "Unified KOREATECH alerts — notices, personal mail, shuttle, cafeteria & library", "ko": "코리아텍 공지·개인 메일·셔틀·학식·도서관 통합 알림" },
           "descHtml": {
-            "en": "Real-time notice detection (dual-cycle) + mail receive/read alerts<br />Campus info (library seats · shuttle · cafeteria), Discord admin panel, web dashboard, FastAPI &amp; Raspberry Pi LED",
-            "ko": "포털·생활관 공지 실시간 감지(이중 주기) + 메일 수신·수신확인 알림<br />캠퍼스 정보(도서관 좌석·셔틀·학식) · 디스코드 관리자 패널 · 웹 대시보드 · FastAPI · 라즈베리파이 LED"
+            "en": "Unified Discord subscriptions and queries for notices, personal mail and campus life<br />Live shuttle map · optional SQLite storage · web/GUI dashboards · Raspberry Pi operations",
+            "ko": "공지·개인 메일·캠퍼스 생활을 묶은 디스코드 통합 구독·조회<br />실시간 셔틀 지도 · 선택형 SQLite 저장소 · 웹/GUI 대시보드 · 라즈베리파이 운영"
           },
-          "tech": ["Python", "Selenium", "Discord.py", "FastAPI", "IMAP", "PySide6"]
+          "tech": ["Python", "Selenium", "Discord.py", "FastAPI", "SQLite", "PySide6"]
         },
 
         {
@@ -139,12 +139,28 @@
             { "href": "https://github.com/pachir1su/raspi-mc-server", "title": "GitHub", "icon": "fab fa-github" }
           ],
           "title": { "en": "raspi-mc-server", "ko": "라즈베리파이 마인크래프트 서버" },
-          "subtitle": { "en": "Friends-only PaperMC on a Raspberry Pi 4B, remote-managed from Discord", "ko": "라즈베리파이 4B에서 돌리는 친구용 PaperMC 서버 · 디스코드 원격 관리" },
+          "subtitle": { "en": "Friends-only Java/Bedrock PaperMC server remotely managed from Discord", "ko": "디스코드로 원격 관리하는 친구용 Java·Bedrock PaperMC 서버" },
           "descHtml": {
-            "en": "PaperMC tuned for a Pi 4B (owner-only cheats) + Discord admin bot<br />Slash-command control, 30-min HDD backups, SSH+RCON &amp; optional Cloudflare Tunnel",
-            "ko": "Pi 4B 튜닝 PaperMC(오너 전용 치트) + 디스코드 관리봇<br />슬래시 명령 원격 제어 · 30분 주기 HDD 백업 · SSH+RCON · Cloudflare 터널(선택)"
+            "en": "Pi 4B PaperMC with optional Geyser/Floodgate crossplay and owner-only administration<br />Friend portal · verified HDD backups · recovery tools · custom Paper plugins",
+            "ko": "Pi 4B PaperMC + 선택형 Geyser/Floodgate 크로스플레이와 오너 전용 관리<br />친구 포털 · 검증형 HDD 백업 · 복구 도구 · 자체 Paper 플러그인"
           },
-          "tech": ["Python", "Discord.py", "PaperMC", "RCON", "systemd", "Bash"]
+          "tech": ["Python", "Java", "Discord.py", "PaperMC", "Geyser", "RCON"]
+        },
+        {
+          "comment": "2026 U-CAST 무단횡단 방지 시스템 (5팀 멘토링)",
+          "category": "hardware contest",
+          "icon": "fas fa-traffic-light",
+          "detail": "projects/2026_U-CAST/",
+          "links": [
+            { "href": "https://github.com/pachir1su/2026_U-CAST", "title": "GitHub", "icon": "fab fa-github" }
+          ],
+          "title": { "en": "2026 U-CAST Pedestrian Warning System", "ko": "2026 U-CAST 무단횡단 방지 시스템" },
+          "subtitle": { "en": "Mentoring an Arduino safety prototype for Cheonan Jungang Market", "ko": "천안중앙시장 보행 안전을 위한 아두이노 시제품 멘토링" },
+          "descHtml": {
+            "en": "Bidirectional curb-side IR detection with NeoPixel, LED and siren warnings<br />Mentored Team 5 through requirements, state-machine design, debugging and demonstration preparation",
+            "ko": "양쪽 연석 IR 감지와 네오픽셀·LED·사이렌 경고 시스템<br />5팀의 요구사항 정리 · 상태 머신 설계 · 디버깅 · 시연 준비 멘토링"
+          },
+          "tech": ["Arduino", "C++", "IR Sensor", "NeoPixel", "Mentoring"]
         }
       ]
     },
