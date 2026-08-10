@@ -36,23 +36,13 @@
   --border: var(--line);
 }
 
-/* 2. Reset + 좌클릭 드래그/선택 전역 차단 */
+/* 2. Reset */
 *,
 *::before,
 *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -webkit-user-drag: none;
-  -webkit-touch-callout: none;
-}
-img {
-  -webkit-user-drag: none;
-  pointer-events: none;
 }
 html {
   scroll-behavior: smooth;
@@ -1204,7 +1194,6 @@ p {
     transform: scaleY(1.1);
   }
 }
-
 /* 사이드바 네비게이션 — 태블릿+모바일 (#66) */
 @media (max-width: 1024px) {
   .nav-links {
@@ -3613,52 +3602,3 @@ html {
   }
 }
 
-/* ============================================================= */
-/* 개발자도구 차단 오버레이 (#91)                                 */
-/*  - 기본 숨김, .show 시 전체화면 표시                            */
-/* ============================================================= */
-.devtools-block {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: var(--bg);
-  background: color-mix(in srgb, var(--bg) 96%, #000 4%);
-}
-.devtools-block.show {
-  display: flex;
-}
-.devtools-block-inner {
-  max-width: 480px;
-  width: 100%;
-  text-align: center;
-  background: var(--bg-card);
-  border: 2px solid var(--border);
-  border-radius: 16px;
-  padding: 40px 28px;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
-}
-.devtools-block-icon {
-  font-size: 2.6rem;
-  color: var(--accent);
-  margin-bottom: 14px;
-}
-.devtools-block-inner h2 {
-  margin: 0 0 10px;
-  font-size: 1.4rem;
-  color: var(--text);
-}
-.devtools-block-inner p {
-  margin: 0 0 22px;
-  color: var(--text-muted);
-  line-height: 1.6;
-  font-size: 0.96rem;
-}
-.devtools-block-reload {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
