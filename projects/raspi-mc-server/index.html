@@ -87,9 +87,10 @@
         <h1 class="detail-title" data-aos="fade-up"><span data-en="raspi-mc-server" data-ko="라즈베리파이 마인크래프트 서버">라즈베리파이 마인크래프트 서버</span></h1>
         <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
           <span class="detail-badge">Python</span
+          ><span class="detail-badge">Java</span
           ><span class="detail-badge">Discord.py</span
           ><span class="detail-badge">PaperMC</span
-          ><span class="detail-badge">RCON</span
+          ><span class="detail-badge">Geyser</span
           ><span class="detail-badge" data-en="Personal Project" data-ko="개인 프로젝트">개인 프로젝트</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
@@ -113,27 +114,27 @@
           <div class="detail-main">
             <div class="detail-section" data-aos="fade-up">
               <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
-              <p data-en="A friends-only Minecraft (Java / PaperMC) server built for a Raspberry Pi 4B (4GB) and 3–4 players. Only the owner can cheat: commands are gated by operator level, so nobody else can cheat in-game while I always can — remotely, through any admin channel. The server is managed three ways: a Discord bot with admin-only slash commands (primary), SSH + RCON as the baseline console, and an optional Cloudflare Tunnel for access with no port forwarding. Docs are written in both English and Korean." data-ko="라즈베리파이 4B(4GB)와 3~4명 규모에 맞춘 친구 전용 마인크래프트(Java / PaperMC) 서버입니다. 치트는 오너만 사용할 수 있습니다. 명령어가 운영자(op) 레벨로 제한되어, 다른 사람은 게임 안에서 치트를 못 쓰고 저는 어느 관리 채널로든 원격으로 항상 쓸 수 있습니다. 서버는 세 가지 방식으로 관리합니다. 관리자 전용 슬래시 명령을 제공하는 디스코드 봇(메인), 기본 콘솔인 SSH + RCON, 포트 포워딩 없이 접근하는 Cloudflare 터널(선택)입니다. 문서는 영어와 한국어로 함께 작성했습니다.">
+              <p data-en="A friends-only Minecraft server designed for a Raspberry Pi 4B (4GB) and 3–4 players. One PaperMC world supports Java players and optional Bedrock crossplay through Geyser and Floodgate. An owner-only Discord control plane combines server administration, friend onboarding, recovery, world storage and custom Paper plugins while SSH and RCON remain the operational baseline." data-ko="라즈베리파이 4B(4GB)와 3~4명 규모에 맞춘 친구 전용 마인크래프트 서버입니다. 하나의 PaperMC 월드에서 Java 플레이어와 Geyser·Floodgate를 통한 선택형 Bedrock 크로스플레이를 지원합니다. 오너 전용 디스코드 제어판에 서버 관리·친구 온보딩·복구·월드 저장소·자체 Paper 플러그인을 통합하고, SSH와 RCON은 기본 운영 경로로 유지합니다.">
                 라즈베리파이 4B(4GB)와 3~4명 규모에 맞춘 친구 전용
-                마인크래프트(Java / PaperMC) 서버입니다. 치트는 오너만 사용할 수
-                있습니다. 명령어가 운영자(op) 레벨로 제한되어, 다른 사람은 게임
-                안에서 치트를 못 쓰고 저는 어느 관리 채널로든 원격으로 항상 쓸 수
-                있습니다. 서버는 세 가지 방식으로 관리합니다. 관리자 전용 슬래시
-                명령을 제공하는 디스코드 봇(메인), 기본 콘솔인 SSH + RCON, 포트
-                포워딩 없이 접근하는 Cloudflare 터널(선택)입니다. 문서는 영어와
-                한국어로 함께 작성했습니다.
+                마인크래프트 서버입니다. 하나의 PaperMC 월드에서 Java 플레이어와
+                Geyser·Floodgate를 통한 선택형 Bedrock 크로스플레이를 지원합니다.
+                오너 전용 디스코드 제어판에 서버 관리·친구 온보딩·복구·월드
+                저장소·자체 Paper 플러그인을 통합하고, SSH와 RCON은 기본 운영
+                경로로 유지합니다.
               </p>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
               <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
                 <li data-en="PaperMC tuned for a Pi 4B 4GB (Aikar GC flags, Pi-friendly view/simulation distance) on a 32GB microSD + 500GB USB HDD">Pi 4B 4GB에 맞춰 튜닝한 PaperMC(Aikar GC 플래그, Pi에 맞춘 view/simulation distance), 32GB microSD + 500GB USB HDD 구성</li>
-                <li data-en="Whitelist-only, no mods — a small private world for a few friends">화이트리스트 전용·모드 없음 — 친구 몇 명을 위한 작은 사설 월드</li>
+                <li data-en="Optional Java/Bedrock crossplay on one Paper world through Geyser + Floodgate, with a simple saved-address flow for friends">Geyser + Floodgate 선택형 Java·Bedrock 크로스플레이 — 친구는 주소를 한 번 저장해 같은 Paper 월드에 접속</li>
                 <li data-en="Owner-only cheats via operator level: console / RCON / Discord bot / SSH always run at op level 4, so only the owner can cheat, remotely">운영자 레벨 기반 오너 전용 치트: 콘솔·RCON·디스코드 봇·SSH는 항상 op 레벨 4로 동작 — 오너만, 원격으로 치트 가능</li>
-                <li data-en="Discord admin bot (primary): admin-only slash commands, a button-first dashboard, loading animation for slow actions, log-file attachments">디스코드 관리봇(메인): 관리자 전용 슬래시 명령, 버튼 중심 대시보드, 느린 작업용 로딩 애니메이션, 로그 파일 첨부</li>
+                <li data-en="Discord control plane: admin and public panels, friend account links, quick commands, loading feedback, cooldowns, audit logs and health scoring">디스코드 제어판: 관리자·공개 패널, 친구 계정 연동, 빠른 명령, 로딩 피드백, 쿨다운, 감사 로그, 건강 점수</li>
                 <li data-en="Remote access: SSH + RCON console baseline, with an optional Cloudflare Tunnel (no port forwarding)">원격 접속: 기본 SSH + RCON 콘솔, 선택적으로 Cloudflare 터널(포트 포워딩 불필요)</li>
-                <li data-en="30-minute HDD backups with SHA-256 verification, Discord restore / map upload / switching, and backup timelines">30분 주기 HDD 백업 + SHA-256 검증, 디스코드 복원·맵 업로드·전환, 백업 타임라인</li>
-                <li data-en="Ops helpers: automatic performance alerts, tuning reports, one-click incident helpers, live-player inventory inspection, health checks, rotating audit logs">운영 도구: 자동 성능 경고, 튜닝 리포트, 원클릭 장애 대응 헬퍼, 접속자 인벤토리 조회, 헬스 체크, 순환 감사 로그</li>
+                <li data-en="30-minute HDD backups with SHA-256 verification, offline-safe restore, Discord map upload/switching, backup policy controls and timelines">30분 주기 HDD 백업 + SHA-256 검증, 오프라인 안전 복원, 디스코드 맵 업로드·전환, 백업 정책 설정과 타임라인</li>
+                <li data-en="Bundled Paper plugins: protected Death Boxes plus operations helpers for container locks, enchantments, spawn protection and summons">번들 Paper 플러그인: 보호형 Death Box와 컨테이너 잠금·인챈트·스폰 보호·소환 운영 기능</li>
+                <li data-en="Friend-facing tools: player links, public status, rescue actions, places, diaries and localized command guidance">친구용 도구: 플레이어 연동, 공개 상태, 구조 기능, 장소, 일지, 다국어 명령 안내</li>
+                <li data-en="Ops helpers: automatic performance alerts, tuning reports, one-click incident response, live-player inspection, rotating audit logs and update management">운영 도구: 자동 성능 경고, 튜닝 리포트, 원클릭 장애 대응, 접속자 조회, 순환 감사 로그, 업데이트 관리</li>
                 <li data-en="systemd auto-start, a one-shot provisioning script, and optional Raspberry Pi cluster guidance">systemd 자동 실행, 원샷 프로비저닝 스크립트, 선택적 라즈베리파이 클러스터 가이드</li>
                 <li data-en="Full documentation in both English and Korean">영어·한국어 이중 문서 제공</li>
               </ul>
@@ -146,6 +147,7 @@
               <ul>
                 <li data-en="Server configuration & tuning (PaperMC, ops)">서버 설정·튜닝(PaperMC, 운영자)</li>
                 <li data-en="Discord admin bot development (RCON control)">디스코드 관리봇 개발(RCON 제어)</li>
+                <li data-en="Paper plugin development (Death Box and server operations)">Paper 플러그인 개발(Death Box·서버 운영 기능)</li>
                 <li data-en="Deploy & provisioning scripts (Bash, systemd)">배포·프로비저닝 스크립트(Bash, systemd)</li>
                 <li data-en="Backup & remote-access setup (SSH/RCON, Cloudflare Tunnel)">백업·원격 접속 구성(SSH/RCON, Cloudflare 터널)</li>
                 <li data-en="Bilingual documentation (EN / KO)">영어·한국어 문서화</li>
@@ -158,11 +160,11 @@
               <h4 data-en="Tech Stack" data-ko="기술 스택">Tech Stack</h4>
               <div class="sidebar-stack">
                 <span class="tech-stack"><span>Python</span></span
+                ><span class="tech-stack"><span>Java</span></span
                 ><span class="tech-stack"><span>Discord.py</span></span
                 ><span class="tech-stack"><span>PaperMC</span></span
-                ><span class="tech-stack"><span>RCON</span></span
-                ><span class="tech-stack"><span>systemd</span></span
-                ><span class="tech-stack"><span>Bash</span></span>
+                ><span class="tech-stack"><span>Geyser</span></span
+                ><span class="tech-stack"><span>RCON</span></span>
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
@@ -184,9 +186,9 @@
                   font-size: 0.88rem;
                   line-height: 1.6;
                 "
-                data-en="Minecraft server (PaperMC) / Discord admin bot / Raspberry Pi / Remote administration" data-ko="마인크래프트 서버(PaperMC) / 디스코드 관리봇 / 라즈베리파이 / 원격 관리"
+                data-en="Java/Bedrock Minecraft server / Discord control plane / Custom Paper plugins / Raspberry Pi operations" data-ko="Java·Bedrock 마인크래프트 서버 / 디스코드 제어판 / 자체 Paper 플러그인 / 라즈베리파이 운영"
               >
-                마인크래프트 서버(PaperMC) / 디스코드 관리봇 / 라즈베리파이 / 원격 관리
+                Java·Bedrock 마인크래프트 서버 / 디스코드 제어판 / 자체 Paper 플러그인 / 라즈베리파이 운영
               </p>
             </div>
           </div>
