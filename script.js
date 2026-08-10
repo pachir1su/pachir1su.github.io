@@ -1,7 +1,7 @@
 /* =============================================================
    pachir1su.github.io — 노트 테마 인터랙션 스크립트
    기존 기능: AOS / 커스텀 커서 / 프로그레스 / 타이핑 / 햄버거 /
-             back-to-top / 우클릭·드래그·선택 차단
+             back-to-top
    추가 기능: 잉크 트레일 / 형광펜 sweep / 도장 클릭 / 스티커 드래그 /
              스탯 카운트업 / floatUp 패럴랙스 / 키보드 단축키 /
              콘솔 이스터에그 / 카드 깊이 그림자 / 텍스트 선택 시 형광펜
@@ -92,21 +92,6 @@ function closeMobile() {
   if (sidebarOverlay) sidebarOverlay.classList.remove('active');
   document.body.style.overflow = '';
 }
-
-/* ------------------------------------------------------------- */
-/* 6. 우클릭/드래그/선택 차단 (강화)                              */
-/*    좌클릭 드래그 자체를 mousedown 단계에서 차단                  */
-/*    interactive 요소(.fi 포함)는 예외로 둬서 클릭/드래그 살림      */
-/* ------------------------------------------------------------- */
-const INTERACTIVE = 'a, button, input, textarea, select, label, .fi';
-document.addEventListener('contextmenu', (e) => e.preventDefault());
-document.addEventListener('dragstart', (e) => e.preventDefault());
-document.addEventListener('selectstart', (e) => e.preventDefault());
-document.addEventListener('mousedown', (e) => {
-  if (e.button !== 0) return; // 좌클릭만
-  if (e.target.closest(INTERACTIVE)) return;
-  e.preventDefault();
-});
 
 /* ------------------------------------------------------------- */
 /* 7. 도장 클릭 효과 (신규) — .btn / .plink / .chip / .wip-badge   */
@@ -455,7 +440,7 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
 
 /* ------------------------------------------------------------- */
 /* 19. 이메일 클릭 복사 (#30)                                      */
-/*    전역 selectstart 차단 때문에 클릭-복사 방식으로 제공          */
+/*    버튼 한 번으로 주소를 복사하고 Clipboard 실패 시 폴백          */
 /* ------------------------------------------------------------- */
 
 (function initEmailCopy() {
@@ -1107,134 +1092,4 @@ window._updateProjectCount();
   });
 
   sections.forEach(function (s) { obs.observe(s); });
-})();
-
-/* ------------------------------------------------------------- */
-/* 25. 개발자도구 단축키 차단 (#91)                                */
-/*    F12 / Ctrl+Shift+I,J,C / Ctrl+U(소스보기) / Cmd 조합 차단      */
-/*    macOS(Cmd+Opt+I 등)도 함께 차단. 입력 필드는 정상 동작 유지     */
-/* ------------------------------------------------------------- */
-(function initDevtoolsKeyGuard() {
-  /* 차단 대상 키 판별 — true면 개발자도구 관련 단축키 */
-  function isBlockedCombo(e) {
-    try {
-      const key = (e.key || '').toLowerCase();
-      // F12 단독
-      if (key === 'f12' || e.keyCode === 123) return true;
-      // 보기 소스: Ctrl+U / Cmd+U
-      if ((e.ctrlKey || e.metaKey) && key === 'u') return true;
-      // 개발자도구 토글: (Ctrl|Cmd)+Shift+ I / J / C
-      const withDevMod = (e.ctrlKey || e.metaKey) && (e.shiftKey || e.altKey);
-      if (withDevMod && (key === 'i' || key === 'j' || key === 'c')) return true;
-      return false;
-    } catch (err) {
-      // 키 판별 실패 시 차단하지 않음(사이트 기능 보호)
-      return false;
-    }
-  }
-
-  /* keydown 캡처 단계에서 선제 차단 */
-  document.addEventListener(
-    'keydown',
-    function (e) {
-      if (!isBlockedCombo(e)) return;
-      e.preventDefault();
-      e.stopPropagation();
-      // 개발자도구 진입 시도 안내 오버레이 표시
-      if (typeof window.showDevtoolsBlock === 'function') {
-        window.showDevtoolsBlock();
-      }
-    },
-    true
-  );
-})();
-
-/* ------------------------------------------------------------- */
-/* 26. 개발자도구 감지 + 전체화면 차단 오버레이 (#91)               */
-/*    브라우저 메뉴(도구 더 보기 → 개발자 도구)로 연 경우도 감지     */
-/*    창 크기 차이(docked devtools) 기반 휴리스틱 + 단축키 트리거     */
-/* ------------------------------------------------------------- */
-(function initDevtoolsBlocker() {
-  var overlayEl = null;          // 오버레이 DOM 캐시
-  var isBlocked = false;         // 현재 차단 상태 플래그
-  var SIZE_THRESHOLD = 170;      // 개발자도구 패널 추정 임계값(px)
-
-  /* 오버레이 DOM 1회 생성 — 모든 페이지에서 동적 주입 */
-  function buildOverlay() {
-    try {
-      if (overlayEl) return overlayEl;
-      var el = document.createElement('div');
-      el.className = 'devtools-block';
-      el.setAttribute('role', 'alertdialog');
-      el.setAttribute('aria-live', 'assertive');
-      el.innerHTML =
-        '<div class="devtools-block-inner">' +
-        '<div class="devtools-block-icon"><i class="fas fa-shield-halved"></i></div>' +
-        '<h2 data-en="Access Restricted" data-ko="접근이 제한되었습니다">접근이 제한되었습니다</h2>' +
-        '<p data-en="Developer tools have been detected. Please close them to continue." ' +
-        'data-ko="개발자 도구 사용이 감지되었습니다. 도구를 닫아 주세요.">' +
-        '개발자 도구 사용이 감지되었습니다. 도구를 닫아 주세요.</p>' +
-        '<button type="button" class="btn btn-primary devtools-block-reload">' +
-        '<i class="fas fa-rotate-right"></i> ' +
-        '<span data-en="Reload" data-ko="새로고침">새로고침</span></button>' +
-        '</div>';
-      // 새로고침 버튼 — 도구를 닫은 뒤 정상 복귀용
-      el.querySelector('.devtools-block-reload').addEventListener('click', function () {
-        try { window.location.reload(); } catch (err) { /* noop */ }
-      });
-      document.body.appendChild(el);
-      overlayEl = el;
-      return el;
-    } catch (err) {
-      // 생성 실패 시 null 반환(사이트 동작은 유지)
-      return null;
-    }
-  }
-
-  /* 오버레이 표시 — 외부(키 가드)에서도 호출 가능하도록 전역 노출 */
-  function showBlock() {
-    var el = buildOverlay();
-    if (!el) return;
-    isBlocked = true;
-    el.classList.add('show');
-    try { document.body.style.overflow = 'hidden'; } catch (err) { /* noop */ }
-  }
-
-  /* 오버레이 숨김 — 개발자도구가 닫힌 것으로 판단될 때 */
-  function hideBlock() {
-    if (!overlayEl) return;
-    isBlocked = false;
-    overlayEl.classList.remove('show');
-    try { document.body.style.overflow = ''; } catch (err) { /* noop */ }
-  }
-
-  /* 창 크기 차이로 docked 개발자도구 추정 */
-  function isDevtoolsOpenBySize() {
-    try {
-      var widthGap = window.outerWidth - window.innerWidth;
-      var heightGap = window.outerHeight - window.innerHeight;
-      return widthGap > SIZE_THRESHOLD || heightGap > SIZE_THRESHOLD;
-    } catch (err) {
-      return false;
-    }
-  }
-
-  /* 주기적 감지 — 열림/닫힘에 따라 오버레이 토글 */
-  function detectLoop() {
-    var open = isDevtoolsOpenBySize();
-    if (open && !isBlocked) {
-      showBlock();
-    } else if (!open && isBlocked) {
-      hideBlock();
-    }
-  }
-
-  // 키 가드(모듈 25)에서 직접 호출할 수 있도록 전역 등록
-  window.showDevtoolsBlock = showBlock;
-
-  // 0.8초 주기 폴링 + 리사이즈 즉시 감지
-  setInterval(detectLoop, 800);
-  window.addEventListener('resize', detectLoop);
-  // 초기 1회 검사
-  detectLoop();
 })();

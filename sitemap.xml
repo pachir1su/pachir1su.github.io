@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://pachir1su.github.io/</loc>
-    <lastmod>2026-07-13</lastmod>
+    <lastmod>2026-08-10</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -12,8 +12,9 @@
   <url><loc>https://pachir1su.github.io/projects/computingSAGO/</loc><lastmod>2026-05-29</lastmod><priority>0.6</priority></url>
   <url><loc>https://pachir1su.github.io/projects/tech_and_society/</loc><lastmod>2026-05-29</lastmod><priority>0.6</priority></url>
   <url><loc>https://pachir1su.github.io/projects/SH_bot/</loc><lastmod>2026-06-24</lastmod><priority>0.6</priority></url>
-  <url><loc>https://pachir1su.github.io/projects/koreatechGongjiAgent/</loc><lastmod>2026-07-13</lastmod><priority>0.6</priority></url>
-  <url><loc>https://pachir1su.github.io/projects/raspi-mc-server/</loc><lastmod>2026-07-13</lastmod><priority>0.6</priority></url>
+  <url><loc>https://pachir1su.github.io/projects/koreatechGongjiAgent/</loc><lastmod>2026-08-10</lastmod><priority>0.6</priority></url>
+  <url><loc>https://pachir1su.github.io/projects/raspi-mc-server/</loc><lastmod>2026-08-10</lastmod><priority>0.6</priority></url>
+  <url><loc>https://pachir1su.github.io/projects/2026_U-CAST/</loc><lastmod>2026-08-10</lastmod><priority>0.6</priority></url>
   <url><loc>https://pachir1su.github.io/projects/swordmaster/</loc><lastmod>2026-06-17</lastmod><priority>0.6</priority></url>
   <url><loc>https://pachir1su.github.io/projects/swordmaster/file_swordmaster.html</loc><lastmod>2026-06-17</lastmod><priority>0.6</priority></url>
   <url><loc>https://pachir1su.github.io/projects/swordmaster/media_swordmaster.html</loc><lastmod>2026-06-17</lastmod><priority>0.6</priority></url>
