@@ -124,8 +124,8 @@
           "title": { "en": "KOREATECH Unified Alert System", "ko": "코리아텍 통합 알림 시스템" },
           "subtitle": { "en": "Unified KOREATECH alerts — notices, personal mail, shuttle, cafeteria & library", "ko": "코리아텍 공지·개인 메일·셔틀·학식·도서관 통합 알림" },
           "descHtml": {
-            "en": "Unified Discord subscriptions and queries for notices, personal mail and campus life<br />Live shuttle map · optional SQLite storage · web/GUI dashboards · Raspberry Pi operations",
-            "ko": "공지·개인 메일·캠퍼스 생활을 묶은 디스코드 통합 구독·조회<br />실시간 셔틀 지도 · 선택형 SQLite 저장소 · 웹/GUI 대시보드 · 라즈베리파이 운영"
+            "en": "Unified Discord subscriptions and queries for notices, personal mail and campus life<br />Live shuttle map · SQLite storage with live diagnostics · web/GUI dashboards · Raspberry Pi operations",
+            "ko": "공지·개인 메일·캠퍼스 생활을 묶은 디스코드 통합 구독·조회<br />실시간 셔틀 지도 · 실시간 진단 지원 SQLite 저장소 · 웹/GUI 대시보드 · 라즈베리파이 운영"
           },
           "tech": ["Python", "Selenium", "Discord.py", "FastAPI", "SQLite", "PySide6"]
         },
@@ -147,20 +147,20 @@
           "tech": ["Python", "Java", "Discord.py", "PaperMC", "Geyser", "RCON"]
         },
         {
-          "comment": "2026 U-CAST 무단횡단 방지 시스템 (5팀 멘토링)",
+          "comment": "2026 U-CAST 돌발 보행자 감지 경고 시스템 「멈춰 !」 (5팀 멘토링, 이슈 #6·#18 재설계)",
           "category": "hardware contest",
           "icon": "fas fa-traffic-light",
           "detail": "projects/2026_U-CAST/",
           "links": [
             { "href": "https://github.com/pachir1su/2026_U-CAST", "title": "GitHub", "icon": "fab fa-github" }
           ],
-          "title": { "en": "2026 U-CAST Pedestrian Warning System", "ko": "2026 U-CAST 무단횡단 방지 시스템" },
-          "subtitle": { "en": "Mentoring an Arduino safety prototype for Cheonan Jungang Market", "ko": "천안중앙시장 보행 안전을 위한 아두이노 시제품 멘토링" },
+          "title": { "en": "\"Stop!\" Pedestrian Alert System (2026 U-CAST)", "ko": "멈춰 ! — 2026 U-CAST 돌발 보행자 감지 경고 시스템" },
+          "subtitle": { "en": "Mentoring an independent-channel Arduino safety prototype for Cheonan Jungang Market", "ko": "천안중앙시장 보행 안전을 위한 채널 독립형 아두이노 시제품 멘토링" },
           "descHtml": {
-            "en": "Bidirectional curb-side IR detection with NeoPixel, LED and siren warnings<br />Mentored Team 5 through requirements, state-machine design, debugging and demonstration preparation",
-            "ko": "양쪽 연석 IR 감지와 네오픽셀·LED·사이렌 경고 시스템<br />5팀의 요구사항 정리 · 상태 머신 설계 · 디버깅 · 시연 준비 멘토링"
+            "en": "Each curb pairs a start/end IR sensor with its own NeoPixel strip as one independent channel<br />Mentored Team 5 through requirements, per-channel state design, wiring debugging and siren-buzzer demo prep",
+            "ko": "구간마다 시작·끝 IR 센서와 네오픽셀 스트립을 하나로 묶은 독립 채널 구조<br />5팀의 요구사항 정리 · 채널별 상태 설계 · 배선 디버깅 · 사이렌 부저 시연 준비 멘토링"
           },
-          "tech": ["Arduino", "C++", "IR Sensor", "NeoPixel", "Mentoring"]
+          "tech": ["Arduino", "C++", "IR Sensor", "NeoPixel", "Passive Buzzer", "Mentoring"]
         }
       ]
     },
