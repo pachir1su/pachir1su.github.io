@@ -69,14 +69,14 @@
               <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
               <p data-en="A hardware prototype named &quot;Stop!&quot;, built by Team 5 for the Cheonan Youth Urban Regeneration Challenge (U-CAST). Each curb section pairs a start/end IR sensor with its own NeoPixel strip as one independent channel: when a pedestrian steps toward the road, that channel's strip blinks red, a shared driver-facing LED blinks, and a passive buzzer sounds a rising/falling siren, all continuing until that same channel's end IR confirms the pedestrian has cleared it. It is a secondary-accident-prevention device — it does not physically block jaywalking, but warns drivers and pedestrians faster once someone has already entered the road (issue #6)." data-ko="천안시 청소년 도시재생 챌린지(U-CAST) 5팀이 만든 하드웨어형 시제품 「멈춰 !」입니다. 구간마다 시작·끝 IR 센서와 네오픽셀 스트립을 하나로 묶어 독립 채널로 삼습니다. 보행자가 도로 쪽으로 들어서면 그 채널의 스트립이 빨간색으로 점멸하고, 공용 운전자 경고 LED가 점멸하며, 수동 부저가 사이렌을 내고, 같은 채널의 끝 IR이 보행자의 통과를 확인할 때까지 유지됩니다. 무단횡단을 물리적으로 막지는 않지만 이미 도로에 진입한 보행자를 운전자·보행자에게 더 빨리 알리는 2차 사고 예방 장치입니다(이슈 #6).">
                 천안시 청소년 도시재생 챌린지(U-CAST) 5팀이 만든 하드웨어형
-                시제품 「멈춰 !」입니다. 구간마다 시작·끝 IR 센서와 네오픽셀
-                스트립을 하나로 묶어 독립 채널로 삼습니다. 보행자가 도로
-                쪽으로 들어서면 그 채널의 스트립이 빨간색으로 점멸하고, 공용
-                운전자 경고 LED가 점멸하며, 수동 부저가 사이렌을 내고, 같은
-                채널의 끝 IR이 보행자의 통과를 확인할 때까지 유지됩니다.
+                시제품 「멈춰 !」입니다. 구간마다 시작 · 끝 IR 센서와 네오픽셀
+                스트립을 하나로 묶었습니다. 보행자가 도로
+                쪽으로 들어서면 그 채널의 LED 스트립이 빨간색으로 점멸하고 공용
+                운전자 경고 LED가 점멸하며 수동 부저가 사이렌을 내고 같은
+                채널의 끝 IR이 보행자의 통과를 확인할 때까지 시스템 작동이 유지됩니다.
                 무단횡단을 물리적으로 막지는 않지만 이미 도로에 진입한
-                보행자를 운전자·보행자에게 더 빨리 알리는 2차 사고 예방
-                장치입니다(이슈 #6).
+                보행자를 운전자 · 보행자에게 더 빨리 알리는 2차 사고 예방
+                장치입니다.
               </p>
             </div>
 
@@ -85,7 +85,7 @@
               <h2 data-en="Award" data-ko="수상">수상</h2>
               <p data-en-html="Team 5's &quot;Stop!&quot; received the &lt;strong&gt;Local Impact Award&lt;/strong&gt; at the 2026 Cheonan Youth Urban Regeneration Challenge (U-CAST), which recognizes work that addresses a problem rooted in the local community." data-ko-html="5팀의 「멈춰 !」는 2026 천안시 청소년 도시재생 챌린지(U-CAST)에서 지역 사회의 문제를 다룬 작품에 주는 &lt;strong&gt;로컬임팩트상&lt;/strong&gt;을 수상했습니다.">
                 5팀의 「멈춰 !」는 2026 천안시 청소년 도시재생
-                챌린지(U-CAST)에서 지역 사회의 문제를 다룬 작품에 주는
+                챌린지(U-CAST)에서 지역 사회의 문제를 가장 잘 다룬 작품에 주는
                 <strong>로컬임팩트상</strong>을 수상했습니다.
               </p>
               <ul>
@@ -97,11 +97,11 @@
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
               <h2 data-en="System Design" data-ko="시스템 설계">시스템 설계</h2>
               <ul>
-                <li data-en="Each channel pairs a start IR + NeoPixel strip + end IR and runs fully independently — a global crossing state is not merged across channels (issue #18)">시작 IR + 네오픽셀 스트립 + 끝 IR을 한 채널로 묶어 서로 완전히 독립적으로 동작(전역 횡단 상태로 합치지 않음, 이슈 #18)</li>
-                <li data-en="A channel's start IR blinks only that channel's strip; the same channel's end IR ends only that channel, even while other channels stay active">한 채널의 시작 IR은 그 채널의 스트립만 점멸시키고, 같은 채널의 끝 IR만 그 채널을 종료(다른 채널은 계속 활성 유지 가능)</li>
-                <li data-en="A shared driver-facing red LED and a passive buzzer siren (800–1800Hz sweep) stay on as long as one or more channels are active">채널이 하나 이상 활성인 동안 공용 운전자 경고 LED와 수동 부저 사이렌(800~1800Hz 오르내림)이 유지</li>
-                <li data-en="Red and green buttons provide deterministic manual start/stop for all channels during demonstrations">빨간·초록 버튼으로 모든 채널을 한 번에 수동 시작·종료(시연용)</li>
-                <li data-en="Timing uses millis() instead of delay(), so sensing, blinking and the siren continue concurrently across channels">delay() 대신 millis()를 사용해 채널별 센서 판정·점멸·사이렌을 동시에 유지</li>
+                <li data-en="Each channel pairs a start IR + NeoPixel strip + end IR and runs fully independently — a global crossing state is not merged across channels (issue #18)">시작 IR + 네오픽셀 스트립 + 끝 IR을 한 채널로 묶어 서로 완전히 독립적으로 동작(전역 횡단 상태로 합치지 않음)</li>
+                <li data-en="A channel's start IR blinks only that channel's strip; the same channel's end IR ends only that channel, even while other channels stay active">한 채널의 시작 IR은 그 채널의 스트립만 점멸시키고 같은 채널의 끝 IR만 그 채널을 종료(다른 채널은 계속 활성 유지 가능)</li>
+                <li data-en="A shared driver-facing red LED and a passive buzzer siren (800–1800Hz sweep) stay on as long as one or more channels are active">채널이 하나 이상 활성인 동안 공용 운전자 경고 LED와 부저 사이렌이 유지</li>
+                <li data-en="Red and green buttons provide deterministic manual start/stop for all channels during demonstrations">빨강 · 초록 버튼으로 모든 채널을 한 번에 시작 · 종료(시연용)</li>
+                <li data-en="Timing uses millis() instead of delay(), so sensing, blinking and the siren continue concurrently across channels">delay() 대신 millis()를 사용해 채널별 센서 판정 · 점멸 · 사이렌을 동시에 유지</li>
               </ul>
             </div>
 
@@ -111,11 +111,11 @@
               <div class="detail-gallery">
                 <figure class="detail-figure">
                   <img src="../../assets/2026-u-cast-prototype.webp" width="1080" height="1440" loading="lazy" decoding="async" alt="천안중앙시장 거리를 재현한 「멈춰 !」 시연 모형. 도로 양쪽 연석에 설치된 네오픽셀 스트립이 빨간색으로 점멸하고 보행 신호등 모형이 함께 놓여 있다." />
-                  <figcaption data-en="Demo diorama recreating a Cheonan Jungang Market street — the NeoPixel strips embedded in the curb blink red while a channel is active." data-ko="천안중앙시장 거리를 재현한 시연 모형 — 채널이 활성인 동안 연석에 심은 네오픽셀 스트립이 빨간색으로 점멸합니다.">천안중앙시장 거리를 재현한 시연 모형 — 채널이 활성인 동안 연석에 심은 네오픽셀 스트립이 빨간색으로 점멸합니다.</figcaption>
+                  <figcaption data-en="Demo diorama recreating a Cheonan Jungang Market street — the NeoPixel strips embedded in the curb blink red while a channel is active." data-ko="천안중앙시장 거리를 재현한 시연 모형 — 채널이 활성인 동안 연석에 심은 네오픽셀 스트립이 빨간색으로 점멸합니다.">천안중앙시장 거리를 재현한 시연 모형 — 채널이 활성인 동안 도로에 심은 네오픽셀 스트립이 빨간색으로 점멸합니다.</figcaption>
                 </figure>
                 <figure class="detail-figure">
                   <img src="../../assets/2026-u-cast-circuit.png" width="1919" height="822" loading="lazy" decoding="async" alt="Arduino Uno와 브레드보드 배선도. 네오픽셀 스트립, 운전자 경고 LED, 수동 부저, 센서 입력, 시연용 버튼이 연결되어 있다." />
-                  <figcaption data-en="Breadboard wiring plan — Arduino Uno driving the NeoPixel strip, driver-facing LED, passive buzzer, sensor inputs and the manual demo buttons." data-ko="브레드보드 배선도 — Arduino Uno에 네오픽셀 스트립, 운전자 경고 LED, 수동 부저, 센서 입력, 시연용 수동 버튼을 연결한 구성입니다.">브레드보드 배선도 — Arduino Uno에 네오픽셀 스트립, 운전자 경고 LED, 수동 부저, 센서 입력, 시연용 수동 버튼을 연결한 구성입니다.</figcaption>
+                  <figcaption data-en="Breadboard wiring plan — Arduino Uno driving the NeoPixel strip, driver-facing LED, passive buzzer, sensor inputs and the manual demo buttons." data-ko="브레드보드 배선도 — Arduino Uno에 네오픽셀 스트립, 운전자 경고 LED, 수동 부저, 센서 입력, 시연용 수동 버튼을 연결한 구성입니다.">브레드보드 배선도 — Arduino Uno에 네오픽셀 스트립, 운전자 경고 LED, 부저, 센서 입력, 시연용 버튼을 연결한 구성입니다.</figcaption>
                 </figure>
               </div>
             </div>
@@ -125,9 +125,9 @@
               <p class="role-position"><i class="fas fa-user-tag"></i> <span data-en="Team Mentor" data-ko="5팀 멘토">5팀 멘토</span></p>
               <ul>
                 <li data-en="Refined the problem statement, final naming (&quot;Stop!&quot;) and MVP scope">문제 정의, 최종 명칭(「멈춰 !」)과 MVP 범위 구체화</li>
-                <li data-en="Guided the redesign from a merged bidirectional state to independent per-channel state machines">병합된 양방향 상태에서 채널별 독립 상태 머신으로의 재설계 지도(이슈 #18)</li>
-                <li data-en="Supported wiring review, debugging and safer configuration boundaries">배선 검토·디버깅·안전한 설정 경계 구성 지원</li>
-                <li data-en="Prepared assembly, troubleshooting and presentation materials with the team">조립·문제 해결·발표 시연 자료 준비 지원</li>
+                <li data-en="Guided the redesign from a merged bidirectional state to independent per-channel state machines">병합된 양방향 상태에서 채널별 독립 상태 머신으로의 재설계 지도</li>
+                <li data-en="Supported wiring review, debugging and safer configuration boundaries">배선 검토 · 디버깅 · 안전한 설계 지원</li>
+                <li data-en="Prepared assembly, troubleshooting and presentation materials with the team">조립 · 문제 해결 · 발표 시연 자료 준비 지원</li>
               </ul>
             </div>
           </div>
