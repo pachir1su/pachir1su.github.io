@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>멈춰 ! — 2026 U-CAST 돌발 보행자 감지 경고 시스템 | 이건영 포트폴리오</title>
+    <title>멈춰 ! — 2026 U-CAST 돌발 보행자 감지 경고 시스템 (로컬임팩트상) | 이건영 포트폴리오</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐔</text></svg>" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
@@ -52,7 +52,7 @@
         <div class="detail-hero-icon"><i class="fas fa-traffic-light"></i></div>
         <h1 class="detail-title" data-aos="fade-up"><span data-en="&quot;Stop!&quot; Pedestrian Alert System (2026 U-CAST)" data-ko="멈춰 ! — 2026 U-CAST 돌발 보행자 감지 경고 시스템">멈춰 ! — 2026 U-CAST 돌발 보행자 감지 경고 시스템</span></h1>
         <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
-          <span class="detail-badge">Arduino</span><span class="detail-badge">C++</span><span class="detail-badge">NeoPixel</span><span class="detail-badge">Passive Buzzer</span><span class="detail-badge" data-en="Team Mentor" data-ko="팀 멘토">팀 멘토</span>
+          <span class="detail-badge">Arduino</span><span class="detail-badge">C++</span><span class="detail-badge">NeoPixel</span><span class="detail-badge">Passive Buzzer</span><span class="detail-badge" data-en="Team Mentor" data-ko="팀 멘토">팀 멘토</span><span class="detail-badge" data-en="Local Impact Award" data-ko="로컬임팩트상">로컬임팩트상</span>
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a href="https://github.com/pachir1su/2026_U-CAST" target="_blank" rel="noopener noreferrer" class="btn btn-primary"><i class="fab fa-github"></i> GitHub</a>
@@ -80,6 +80,20 @@
               </p>
             </div>
 
+            <!-- 수상 (이슈 #109) — 로컬임팩트상 수상 및 언론 보도 -->
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="25">
+              <h2 data-en="Award" data-ko="수상">수상</h2>
+              <p data-en-html="Team 5's &quot;Stop!&quot; received the &lt;strong&gt;Local Impact Award&lt;/strong&gt; at the 2026 Cheonan Youth Urban Regeneration Challenge (U-CAST), which recognizes work that addresses a problem rooted in the local community." data-ko-html="5팀의 「멈춰 !」는 2026 천안시 청소년 도시재생 챌린지(U-CAST)에서 지역 사회의 문제를 다룬 작품에 주는 &lt;strong&gt;로컬임팩트상&lt;/strong&gt;을 수상했습니다.">
+                5팀의 「멈춰 !」는 2026 천안시 청소년 도시재생
+                챌린지(U-CAST)에서 지역 사회의 문제를 다룬 작품에 주는
+                <strong>로컬임팩트상</strong>을 수상했습니다.
+              </p>
+              <ul>
+                <li data-en-html="Press coverage: &lt;a href=&quot;https://press.mtime.co.kr/newsRead.php?no=1040617&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;press.mtime.co.kr&lt;/a&gt;" data-ko-html="언론 보도: &lt;a href=&quot;https://press.mtime.co.kr/newsRead.php?no=1040617&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;press.mtime.co.kr&lt;/a&gt;">언론 보도: <a href="https://press.mtime.co.kr/newsRead.php?no=1040617" target="_blank" rel="noopener noreferrer">press.mtime.co.kr</a></li>
+                <li data-en-html="Press coverage: &lt;a href=&quot;https://dstv.kr/bbs/board.php?bo_table=21&amp;amp;wr_id=1891&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;dstv.kr&lt;/a&gt;" data-ko-html="언론 보도: &lt;a href=&quot;https://dstv.kr/bbs/board.php?bo_table=21&amp;amp;wr_id=1891&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;dstv.kr&lt;/a&gt;">언론 보도: <a href="https://dstv.kr/bbs/board.php?bo_table=21&amp;wr_id=1891" target="_blank" rel="noopener noreferrer">dstv.kr</a></li>
+              </ul>
+            </div>
+
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
               <h2 data-en="System Design" data-ko="시스템 설계">시스템 설계</h2>
               <ul>
@@ -89,6 +103,21 @@
                 <li data-en="Red and green buttons provide deterministic manual start/stop for all channels during demonstrations">빨간·초록 버튼으로 모든 채널을 한 번에 수동 시작·종료(시연용)</li>
                 <li data-en="Timing uses millis() instead of delay(), so sensing, blinking and the siren continue concurrently across channels">delay() 대신 millis()를 사용해 채널별 센서 판정·점멸·사이렌을 동시에 유지</li>
               </ul>
+            </div>
+
+            <!-- 시제품 사진 (이슈 #109) — 시연 모형과 배선도 -->
+            <div class="detail-section" data-aos="fade-up" data-aos-delay="75">
+              <h2 data-en="Prototype Photos" data-ko="시제품 사진">시제품 사진</h2>
+              <div class="detail-gallery">
+                <figure class="detail-figure">
+                  <img src="../../assets/2026-u-cast-prototype.webp" width="1080" height="1440" loading="lazy" decoding="async" alt="천안중앙시장 거리를 재현한 「멈춰 !」 시연 모형. 도로 양쪽 연석에 설치된 네오픽셀 스트립이 빨간색으로 점멸하고 보행 신호등 모형이 함께 놓여 있다." />
+                  <figcaption data-en="Demo diorama recreating a Cheonan Jungang Market street — the NeoPixel strips embedded in the curb blink red while a channel is active." data-ko="천안중앙시장 거리를 재현한 시연 모형 — 채널이 활성인 동안 연석에 심은 네오픽셀 스트립이 빨간색으로 점멸합니다.">천안중앙시장 거리를 재현한 시연 모형 — 채널이 활성인 동안 연석에 심은 네오픽셀 스트립이 빨간색으로 점멸합니다.</figcaption>
+                </figure>
+                <figure class="detail-figure">
+                  <img src="../../assets/2026-u-cast-circuit.png" width="1919" height="822" loading="lazy" decoding="async" alt="Arduino Uno와 브레드보드 배선도. 네오픽셀 스트립, 운전자 경고 LED, 수동 부저, 센서 입력, 시연용 버튼이 연결되어 있다." />
+                  <figcaption data-en="Breadboard wiring plan — Arduino Uno driving the NeoPixel strip, driver-facing LED, passive buzzer, sensor inputs and the manual demo buttons." data-ko="브레드보드 배선도 — Arduino Uno에 네오픽셀 스트립, 운전자 경고 LED, 수동 부저, 센서 입력, 시연용 수동 버튼을 연결한 구성입니다.">브레드보드 배선도 — Arduino Uno에 네오픽셀 스트립, 운전자 경고 LED, 수동 부저, 센서 입력, 시연용 수동 버튼을 연결한 구성입니다.</figcaption>
+                </figure>
+              </div>
             </div>
 
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
@@ -116,7 +145,7 @@
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
               <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
-              <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6" data-en="Youth urban-regeneration challenge / Independent-channel Arduino safety prototype / Team mentoring" data-ko="청소년 도시재생 챌린지 / 채널 독립형 아두이노 안전 시제품 / 팀 멘토링">청소년 도시재생 챌린지 / 채널 독립형 아두이노 안전 시제품 / 팀 멘토링</p>
+              <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6" data-en="Youth urban-regeneration challenge / Independent-channel Arduino safety prototype / Team mentoring / Local Impact Award" data-ko="청소년 도시재생 챌린지 / 채널 독립형 아두이노 안전 시제품 / 팀 멘토링 / 로컬임팩트상 수상">청소년 도시재생 챌린지 / 채널 독립형 아두이노 안전 시제품 / 팀 멘토링 / 로컬임팩트상 수상</p>
             </div>
           </div>
         </div>
