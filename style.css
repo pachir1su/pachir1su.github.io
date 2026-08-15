@@ -970,6 +970,19 @@ p {
   color: var(--text-muted);
   line-height: 1.7;
 }
+/* 수상 카드 하단 상세 링크 (#109) — .flink 스타일을 재사용 */
+.award-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* 카드 전체 클릭 (#109) — script.js #28이 data-card-href로 이동시킨다.
+   포인터만 바꾸고 텍스트 선택·우클릭은 막지 않는다. */
+[data-card-href] {
+  cursor: pointer;
+}
 
 /* 14. Projects */
 .projects-grid {
