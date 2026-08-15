@@ -934,6 +934,10 @@ p {
 .award-bronze .award-icon {
   color: var(--bronze);
 }
+/* award-red (#109) — 지역·임팩트 계열 특별상 */
+.award-red .award-icon {
+  color: var(--red);
+}
 .award-info h3 {
   font-size: 1.05rem;
   font-weight: 700;
@@ -956,6 +960,10 @@ p {
 .award-bronze .award-prize {
   color: var(--bronze);
   background: rgba(179, 113, 42, 0.12);
+}
+.award-red .award-prize {
+  color: var(--red);
+  background: var(--red-soft);
 }
 .award-desc {
   font-size: 0.88rem;
@@ -1444,6 +1452,36 @@ p {
 .detail-section a {
   color: var(--red);
   border-bottom: 1px dashed var(--red-margin);
+}
+
+/* 상세 페이지 사진 갤러리 (#109) — 폴라로이드풍 사진 카드
+   figure 하나가 사진 + 캡션이며, 이미지가 없으면 alt 텍스트로 폴백 */
+.detail-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 14px;
+}
+.detail-figure {
+  margin: 0;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 10px 0;
+  box-shadow: var(--shadow-soft);
+}
+.detail-figure img {
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+  background: var(--card);
+}
+.detail-figure figcaption {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  padding: 10px 4px 12px;
 }
 
 .detail-sidebar {
