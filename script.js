@@ -1093,3 +1093,26 @@ window._updateProjectCount();
 
   sections.forEach(function (s) { obs.observe(s); });
 })();
+
+/* ------------------------------------------------------------- */
+/* 28. 카드 전체 클릭 → 상세 페이지 이동 (#109)                    */
+/*    수상 카드 / 대표 프로젝트 카드의 빈 영역을 눌러도 이동한다.   */
+/*    카드 안의 실제 링크(a·button)와 텍스트 드래그 선택은 그대로   */
+/*    두므로 우클릭·복사·선택을 막지 않는다. JS가 없어도 카드 안의  */
+/*    "자세히" 링크로 같은 페이지에 도달할 수 있다.                 */
+/* ------------------------------------------------------------- */
+(function initCardLinks() {
+  const cards = document.querySelectorAll('[data-card-href]');
+  if (!cards.length) return;
+
+  cards.forEach(function (card) {
+    card.addEventListener('click', function (e) {
+      /* 카드 안의 링크·버튼을 눌렀으면 그쪽 동작을 우선한다 */
+      if (e.target.closest('a, button')) return;
+      /* 텍스트를 드래그해 선택한 직후의 클릭은 이동으로 보지 않는다 */
+      const selection = window.getSelection();
+      if (selection && selection.toString().trim()) return;
+      window.location.href = card.dataset.cardHref;
+    });
+  });
+})();
