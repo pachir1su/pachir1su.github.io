@@ -550,6 +550,8 @@
          수상 섹션 — 수상 이력 4개 (금/청록/동/빨강 색상 구분)
          award-gold: 1위급 금색 / award-cyan: 특별상 / award-bronze: 3위급
          award-red: 지역·임팩트 계열 특별상 (#109)
+         카드 클릭: data-card-href로 해당 프로젝트 상세 페이지 이동 (script.js #28)
+                    JS 없이도 카드 안 "자세히" 링크로 같은 페이지에 도달 (#109)
          ============================================================ -->
     <!-- AWARDS -->
     <section id="awards" class="section">
@@ -559,7 +561,7 @@
           <h2 class="section-title">수상</h2>
         </div>
         <div class="awards-grid">
-          <div class="award-card award-gold" data-tilt data-aos="zoom-in">
+          <div class="award-card award-gold" data-tilt data-aos="zoom-in" data-card-href="projects/2024_SFPC/">
             <div class="award-rank">01</div>
             <div class="award-icon"><i class="fas fa-trophy"></i></div>
             <div class="award-info">
@@ -568,6 +570,9 @@
               <p class="award-desc" data-en="581 teams / 1,661 participants · Proven algorithm &amp; problem-solving skills" data-ko="총 581팀 / 1661명 참가 · 알고리즘 및 문제해결 능력 입증">
                 총 581팀 / 1661명 참가 · 알고리즘 및 문제해결 능력 입증
               </p>
+              <div class="award-links">
+                <a href="projects/2024_SFPC/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
+              </div>
             </div>
           </div>
           <div
@@ -575,6 +580,7 @@
             data-tilt
             data-aos="zoom-in"
             data-aos-delay="100"
+            data-card-href="projects/nonofire/"
           >
             <div class="award-rank">02</div>
             <div class="award-icon"><i class="fas fa-award"></i></div>
@@ -584,6 +590,9 @@
               <p class="award-desc" data-en="Wildfire early detection system · Raspberry Pi &amp; OpenCV" data-ko="산불 조기 감지 알림 시스템 개발 · Raspberry Pi &amp; OpenCV 활용">
                 산불 조기 감지 알림 시스템 개발 · Raspberry Pi & OpenCV 활용
               </p>
+              <div class="award-links">
+                <a href="projects/nonofire/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
+              </div>
             </div>
           </div>
           <div
@@ -591,6 +600,7 @@
             data-tilt
             data-aos="zoom-in"
             data-aos-delay="200"
+            data-card-href="projects/2024_5th_CSRC/"
           >
             <div class="award-rank">03</div>
             <div class="award-icon"><i class="fas fa-medal"></i></div>
@@ -598,6 +608,9 @@
               <h3 data-en="2024 5th Cheonan Student Robot Contest" data-ko="2024 제 5회 천안 학생 로봇 대회">2024 제 5회 천안 학생 로봇 대회</h3>
               <p class="award-prize" data-en="Bronze Award" data-ko="동상 수상">동상 수상</p>
               <p class="award-desc" data-en="Hackathon category, 97 teams participated" data-ko="해커톤 분야, 총 97팀 참가">해커톤 분야, 총 97팀 참가</p>
+              <div class="award-links">
+                <a href="projects/2024_5th_CSRC/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
+              </div>
             </div>
           </div>
           <!-- 로컬임팩트상 (#109) — 상세 페이지는 projects/2026_U-CAST/ -->
@@ -606,6 +619,7 @@
             data-tilt
             data-aos="zoom-in"
             data-aos-delay="300"
+            data-card-href="projects/2026_U-CAST/"
           >
             <div class="award-rank">04</div>
             <div class="award-icon"><i class="fas fa-star"></i></div>
@@ -615,6 +629,9 @@
               <p class="award-desc" data-en="&quot;Stop!&quot; pedestrian alert system · Arduino &amp; NeoPixel · Team 5 mentor" data-ko="돌발 보행자 감지 경고 시스템 「멈춰 !」 · Arduino &amp; NeoPixel · 5팀 멘토">
                 돌발 보행자 감지 경고 시스템 「멈춰 !」 · Arduino & NeoPixel · 5팀 멘토
               </p>
+              <div class="award-links">
+                <a href="projects/2026_U-CAST/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
+              </div>
             </div>
           </div>
         </div>
@@ -652,13 +669,15 @@
           <h2 class="section-title">프로젝트</h2>
         </div>
 
-        <!-- ===== 대표 프로젝트 (Featured · #29) — 성과가 뚜렷한 프로젝트 선정 ===== -->
+        <!-- ===== 대표 프로젝트 (Featured · #29) — 성과가 뚜렷한 프로젝트 선정 =====
+             카드 클릭: data-card-href로 상세 페이지 이동 (script.js #28)
+                        카드 안 GitHub·영상 링크는 각자 동작을 유지 (#109) ===== -->
         <div id="featured-section">
         <div class="subsection-label" data-aos="fade-up">
           <i class="fas fa-star"></i> 대표 프로젝트
         </div>
         <div class="featured-grid">
-          <article class="featured-card">
+          <article class="featured-card" data-card-href="projects/nonofire/">
             <div class="featured-top">
               <i class="fas fa-fire-extinguisher featured-icon"></i>
               <span class="featured-badge" data-en="2024 · Award Winner" data-ko="2024 · 수상작">2024 · 수상작</span>
@@ -682,7 +701,7 @@
             </div>
           </article>
 
-          <article class="featured-card">
+          <article class="featured-card" data-card-href="projects/MultiMind/">
             <div class="featured-top">
               <i class="fas fa-brain featured-icon"></i>
               <span class="featured-badge" data-en="2025 · Solo Project" data-ko="2025 · 개인 개발">2025 · 개인 개발</span>
@@ -705,7 +724,7 @@
             </div>
           </article>
 
-          <article class="featured-card">
+          <article class="featured-card" data-card-href="projects/Wall_Sina/">
             <div class="featured-top">
               <i class="fas fa-house-flood-water featured-icon"></i>
               <span class="featured-badge" data-en="2024 · Sustainable Dev" data-ko="2024 · 지속 가능한 발전 프로젝트">2024 · 지속 가능한 발전 프로젝트</span>
@@ -719,9 +738,12 @@
               <dt data-en="Category" data-ko="분류">분류</dt>
               <dd data-en-html="A <strong>2024 Sustainable Development (Jigabal)</strong> project." data-ko-html="<strong>2024 지속 가능한 발전</strong> 출품 프로젝트.">2024 <strong>지속 가능한 발전</strong> 출품 프로젝트.</dd>
             </dl>
+            <div class="featured-links">
+              <a href="projects/Wall_Sina/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
+            </div>
           </article>
 
-          <article class="featured-card">
+          <article class="featured-card" data-card-href="projects/HEALTH_CHECK_PROJECT/">
             <div class="featured-top">
               <i class="fas fa-heart-pulse featured-icon"></i>
               <span class="featured-badge" data-en="2025 · Sustainable Dev" data-ko="2025 · 지속 가능한 발전 프로젝트">2025 · 지속 가능한 발전 프로젝트</span>
@@ -735,9 +757,12 @@
               <dt data-en="Category" data-ko="분류">분류</dt>
               <dd data-en-html="A <strong>2025 Sustainable Development (Jigabal)</strong> project." data-ko-html="<strong>2025 지속 가능한 발전</strong> 출품 프로젝트.">2025 <strong>지속 가능한 발전</strong> 출품 프로젝트.</dd>
             </dl>
+            <div class="featured-links">
+              <a href="projects/HEALTH_CHECK_PROJECT/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
+            </div>
           </article>
 
-          <article class="featured-card">
+          <article class="featured-card" data-card-href="projects/koreatechGongjiAgent/">
             <div class="featured-top">
               <i class="fas fa-bell featured-icon"></i>
               <span class="featured-badge" data-en="2026 · Solo Project" data-ko="2026 · 개인 개발">2026 · 개인 개발</span>
