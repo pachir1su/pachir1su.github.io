@@ -4,6 +4,8 @@
 ## 버전 기록
 ~ v1.1.10 : 한국기술교육대학교 26학번 온라인중점강좌 "오픈소스 및 생성형 AI활용" 과제 - github page에 내 홈페이지 만들기
 <br>v2.0.0 ~ : 디자인 변경
+<br>v2.1.0 : 노트 컨셉 유지 + 정보 전달력 · UIUX · 성능 개선 (#106, #113, #114)
+<br>v3.0.0 ~ (예정) : 디자인 컨셉 변경 — [docs/design-concept-v3.md](docs/design-concept-v3.md)
 
 👉 **[실행](https://pachir1su.github.io)**
 
@@ -28,7 +30,8 @@
 | `links` | 외부 링크 배열 `{ href, title, icon }` |
 | `title` / `subtitle` | 문자열 또는 `{ en, ko }` |
 | `desc` / `descHtml` | 본문. `descHtml`은 `<br />` 등 HTML 허용 |
+| `role` | 역할 한 줄. 상세 페이지 「나의 역할」 표기와 같은 값 (예: `팀장 · 4인 팀`) |
 | `badge` | (wip/failed) `{ en, ko }` |
-| `progress` | (wip) 0~100 정수 |
+| `status` | (wip) 진행 단계 라벨 `{ en, ko }` (예: `기획 단계`). v2.1.0에서 `progress` 숫자를 대체 |
 | `failedReason` | (failed) `{ en, ko }` HTML 허용 |
 | `tech` | 기술 스택 배열. 항목은 문자열 또는 `{ en, ko }` |
