@@ -48,8 +48,12 @@ function renderCard(card, kind) {
   const lines = [];
 
   if (card.comment) lines.push(`            <!-- ${card.comment} -->`);
+  /* 상세 페이지가 있으면 카드 전체를 클릭 영역으로 만든다 (#114).
+     실제 이동은 script.js #28이 처리하고, JS가 없어도 카드 안 "자세히"
+     링크로 같은 페이지에 도달하므로 접근 경로가 사라지지 않는다. */
+  const cardHref = card.detail ? ` data-card-href="${esc(card.detail)}"` : "";
   lines.push(
-    `            <div class="project-card${extraClass}" data-category="${card.category}" data-tilt>`
+    `            <div class="project-card${extraClass}" data-category="${card.category}"${cardHref} data-tilt>`
   );
   lines.push(`${I}<span class="project-num"></span>`);
   lines.push(`${I}<div class="project-top">`);
@@ -85,6 +89,15 @@ function renderCard(card, kind) {
   const subtitle = i18nText(card.subtitle);
   lines.push(`${I}<p class="project-subtitle"${subtitle.attrs}>${subtitle.inner}</p>`);
 
+  /* 역할 한 줄 — 상세 페이지의 「나의 역할」과 같은 표기를 카드에 노출 (#114).
+     role이 없는 카드(상세 페이지에 역할 표기가 없는 항목)는 이 줄을 생략한다. */
+  if (card.role) {
+    const role = i18nText(card.role);
+    lines.push(
+      `${I}<p class="project-role"${role.attrs}><i class="fas fa-user-tag"></i> ${role.inner}</p>`
+    );
+  }
+
   if (card.descHtml) {
     const d = i18nHtml(card.descHtml);
     lines.push(`${I}<p${d.attrs}>${d.inner}</p>`);
@@ -93,10 +106,10 @@ function renderCard(card, kind) {
     lines.push(`${I}<p${d.attrs}>${d.inner}</p>`);
   }
 
-  if (card.progress != null) {
-    lines.push(
-      `${I}<div class="progress-bar-wrap"><div class="progress-fill" data-progress="${card.progress}"><span class="progress-text">${card.progress}%</span></div></div>`
-    );
+  /* 진행 상태 — 자기신고 %(0% · 5%는 빈 막대) 대신 상태 라벨 한 줄 (#114) */
+  if (card.status) {
+    const status = i18nText(card.status);
+    lines.push(`${I}<div class="wip-status"${status.attrs}>${status.inner}</div>`);
   }
 
   if (card.failedReason) {
