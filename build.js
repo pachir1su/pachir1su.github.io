@@ -55,7 +55,6 @@ function renderCard(card, kind) {
   lines.push(
     `            <div class="project-card${extraClass}" data-category="${card.category}"${cardHref} data-tilt>`
   );
-  lines.push(`${I}<span class="project-num"></span>`);
   lines.push(`${I}<div class="project-top">`);
   lines.push(`                <i class="${card.icon} project-icon"></i>`);
   lines.push(`                <div class="project-links">`);
