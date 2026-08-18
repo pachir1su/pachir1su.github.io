@@ -23,10 +23,19 @@
   --postit: #fff7a8;
   --shadow-soft: 0 6px 18px rgba(31, 28, 20, 0.08);
   --shadow-lift: 0 12px 28px rgba(31, 28, 20, 0.14);
+  /* 텍스트 대비 전용 변형 — 라이트 배경(#fffdf6/#faf7ee/#f4efe1)에서 AA 4.5:1 */
+  --red-text: #b63333;
+  --cyan-text: #24757e;
+  --gold-text: #8b660e;
+  --bronze-text: #975e23;
   --radius: 4px;
   --font-main: "Noto Sans KR", sans-serif;
   --font-mono: "Space Mono", monospace;
   --font-hand: "Caveat", cursive;
+  /* 모션 커브 — emilkowalski/skills STANDARDS.md 권장값
+     진입·퇴장은 ease-out, 화면 내 이동은 ease-in-out */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   /* Back-compat aliases for sub-page inline styles */
   --text: var(--ink);
   --accent: var(--red);
@@ -106,11 +115,15 @@ p {
   z-index: 2000;
   background: transparent;
 }
+/* width 대신 scaleX — layout 없이 compositor에서 처리하고
+   38번의 will-change: transform 힌트와도 일치시킨다 (성능 감사 P3-4) */
 .progress-bar {
   height: 3px;
   background: var(--red);
-  width: 0%;
-  transition: width 0.1s ease;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.1s ease;
 }
 
 /* 5. Back to top */
@@ -122,7 +135,7 @@ p {
   height: 44px;
   border-radius: 50%;
   background: var(--card);
-  color: var(--red);
+  color: var(--red-text);
   font-size: 1rem;
   display: none;
   align-items: center;
@@ -157,11 +170,11 @@ p {
   font-family: var(--font-mono);
   font-size: 1rem;
   font-weight: 700;
-  color: var(--red);
+  color: var(--red-text);
   letter-spacing: 0.04em;
 }
 .logo-bracket {
-  color: var(--cyan);
+  color: var(--cyan-text);
 }
 .nav-links {
   display: flex;
@@ -253,7 +266,7 @@ p {
 }
 .mobile-menu a:hover {
   background: rgba(198, 59, 59, 0.06);
-  color: var(--red);
+  color: var(--red-text);
 }
 .mobile-menu a i {
   width: 18px;
@@ -263,7 +276,7 @@ p {
   transition: color 0.2s;
 }
 .mobile-menu a:hover i {
-  color: var(--red);
+  color: var(--red-text);
 }
 .sidebar-close {
   position: absolute;
@@ -279,7 +292,7 @@ p {
   transition: color 0.2s, background 0.2s;
 }
 .sidebar-close:hover {
-  color: var(--red);
+  color: var(--red-text);
   background: rgba(198, 59, 59, 0.06);
 }
 .sidebar-overlay {
@@ -346,26 +359,26 @@ p {
   height: 72px;
   border-radius: 50%;
   border: 2px solid currentColor;
-  color: var(--red);
+  color: var(--red-text);
   box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 5px currentColor;
   opacity: 0.7;
   transform: rotate(-4deg);
   pointer-events: none;
 }
 #about .section-header::after {
-  color: var(--cyan);
+  color: var(--cyan-text);
   transform: rotate(3deg);
 }
 #skills .section-header::after {
-  color: var(--gold);
+  color: var(--gold-text);
   transform: rotate(-5deg);
 }
 #awards .section-header::after {
-  color: var(--bronze);
+  color: var(--bronze-text);
   transform: rotate(2deg);
 }
 #projects .section-header::after {
-  color: var(--red);
+  color: var(--red-text);
   transform: rotate(-3deg);
 }
 
@@ -431,28 +444,28 @@ p {
   background: var(--card);
   border: 2px solid currentColor;
   box-shadow: inset 0 0 0 2px var(--card), inset 0 0 0 3px currentColor;
-  color: var(--red);
+  color: var(--red-text);
   opacity: 0.85;
   pointer-events: none;
 }
 .skill-card:nth-child(5n + 1)::after,
 .award-card:nth-child(5n + 1)::after {
-  color: var(--red);
+  color: var(--red-text);
   transform: rotate(-4deg);
 }
 .skill-card:nth-child(5n + 2)::after,
 .award-card:nth-child(5n + 2)::after {
-  color: var(--cyan);
+  color: var(--cyan-text);
   transform: rotate(3deg);
 }
 .skill-card:nth-child(5n + 3)::after,
 .award-card:nth-child(5n + 3)::after {
-  color: var(--gold);
+  color: var(--gold-text);
   transform: rotate(-2deg);
 }
 .skill-card:nth-child(5n + 4)::after,
 .award-card:nth-child(5n + 4)::after {
-  color: var(--bronze);
+  color: var(--bronze-text);
   transform: rotate(4deg);
 }
 .skill-card:nth-child(5n + 5)::after,
@@ -519,25 +532,25 @@ p {
 .fi-1 {
   top: 15%;
   left: 8%;
-  color: var(--red);
+  color: var(--red-text);
   animation-delay: 0s;
 }
 .fi-2 {
   top: 22%;
   right: 12%;
-  color: var(--cyan);
+  color: var(--cyan-text);
   animation-delay: 1.5s;
 }
 .fi-3 {
   bottom: 26%;
   left: 14%;
-  color: var(--gold);
+  color: var(--gold-text);
   animation-delay: 3s;
 }
 .fi-4 {
   bottom: 16%;
   right: 9%;
-  color: var(--bronze);
+  color: var(--bronze-text);
   animation-delay: 4.5s;
 }
 .fi-5 {
@@ -556,7 +569,7 @@ p {
   display: inline-block;
   font-family: var(--font-mono);
   font-size: 0.82rem;
-  color: var(--red);
+  color: var(--red-text);
   letter-spacing: 0.1em;
   padding: 5px 14px;
   border: 1.5px dashed var(--red-margin);
@@ -603,7 +616,7 @@ p {
   font-weight: 500;
 }
 .typing-wrap {
-  color: var(--red);
+  color: var(--red-text);
   font-weight: 700;
 }
 .typing-cursor {
@@ -651,7 +664,7 @@ p {
 }
 .btn-ghost {
   background: var(--card);
-  color: var(--red);
+  color: var(--red-text);
   border: 1.5px dashed var(--red-margin);
 }
 .btn-ghost:hover {
@@ -691,7 +704,7 @@ p {
   font-family: var(--font-hand);
   font-size: 2rem;
   font-weight: 700;
-  color: var(--red);
+  color: var(--red-text);
   line-height: 1;
 }
 .stat-label {
@@ -734,7 +747,7 @@ p {
 .about-quote {
   font-family: var(--font-hand);
   font-size: clamp(1.5rem, 2.6vw, 1.95rem);
-  color: var(--red);
+  color: var(--red-text);
   line-height: 1.4;
   margin-bottom: 22px;
   transform: rotate(-0.5deg);
@@ -795,7 +808,7 @@ p {
   gap: 8px;
   font-family: var(--font-mono);
   font-size: 0.88rem;
-  color: var(--red);
+  color: var(--red-text);
   border-bottom: 1.5px dashed var(--red-margin);
   padding-bottom: 2px;
   transition: color 0.2s;
@@ -856,7 +869,7 @@ p {
 }
 .skill-icon {
   font-size: 1.9rem;
-  color: var(--red);
+  color: var(--red-text);
   margin-bottom: 12px;
   line-height: 1;
 }
@@ -894,7 +907,7 @@ p {
   content: "·";
   position: absolute;
   left: 4px;
-  color: var(--red);
+  color: var(--red-text);
   font-weight: 700;
 }
 
@@ -914,7 +927,7 @@ p {
   font-family: var(--font-hand);
   font-size: 3.6rem;
   font-weight: 700;
-  color: var(--red);
+  color: var(--red-text);
   opacity: 0.16;
   transform: rotate(-6deg);
   line-height: 1;
@@ -926,17 +939,17 @@ p {
   line-height: 1;
 }
 .award-gold .award-icon {
-  color: var(--gold);
+  color: var(--gold-text);
 }
 .award-cyan .award-icon {
-  color: var(--cyan);
+  color: var(--cyan-text);
 }
 .award-bronze .award-icon {
-  color: var(--bronze);
+  color: var(--bronze-text);
 }
 /* award-red (#109) — 지역·임팩트 계열 특별상 */
 .award-red .award-icon {
-  color: var(--red);
+  color: var(--red-text);
 }
 .award-info h3 {
   font-size: 1.05rem;
@@ -947,22 +960,22 @@ p {
   display: inline-block;
   font-family: var(--font-mono);
   font-size: 0.78rem;
-  color: var(--gold);
+  color: var(--gold-text);
   padding: 3px 10px;
   background: rgba(184, 138, 26, 0.12);
   border-radius: 2px;
   margin-bottom: 10px;
 }
 .award-cyan .award-prize {
-  color: var(--cyan);
+  color: var(--cyan-text);
   background: rgba(43, 138, 147, 0.12);
 }
 .award-bronze .award-prize {
-  color: var(--bronze);
+  color: var(--bronze-text);
   background: rgba(179, 113, 42, 0.12);
 }
 .award-red .award-prize {
-  color: var(--red);
+  color: var(--red-text);
   background: var(--red-soft);
 }
 .award-desc {
@@ -1016,7 +1029,7 @@ p {
 }
 .project-icon {
   font-size: 1.8rem;
-  color: var(--red);
+  color: var(--red-text);
   line-height: 1;
 }
 .project-links {
@@ -1036,9 +1049,21 @@ p {
   border: 1.5px solid var(--line);
   color: var(--ink);
 }
+/* 터치 기기에서는 권장 최소 히트 영역 44×44px 확보 (#114).
+   정밀 포인터에서는 카드 상단 밀도를 지키기 위해 32px를 유지한다. */
+@media (pointer: coarse) {
+  .plink {
+    width: 44px;
+    height: 44px;
+    font-size: 0.95rem;
+  }
+  .project-links {
+    gap: 8px;
+  }
+}
 .plink-detail {
   border-color: var(--red-margin);
-  color: var(--red);
+  color: var(--red-text);
 }
 .plink-detail:hover {
   background: var(--red);
@@ -1157,7 +1182,7 @@ p {
 .footer-logo {
   font-family: var(--font-mono);
   font-weight: 700;
-  color: var(--red);
+  color: var(--red-text);
 }
 .footer-copy {
   font-family: var(--font-mono);
@@ -1181,7 +1206,7 @@ p {
   transition: color 0.2s, background 0.2s, transform 0.2s;
 }
 .social-links a:hover {
-  color: var(--red);
+  color: var(--red-text);
   transform: translateY(-2px);
 }
 
@@ -1316,7 +1341,7 @@ p {
   margin-bottom: 18px;
 }
 .detail-breadcrumb a {
-  color: var(--red);
+  color: var(--red-text);
   transition: color 0.2s;
 }
 .detail-breadcrumb a:hover {
@@ -1324,7 +1349,7 @@ p {
 }
 .detail-hero-icon {
   font-size: 2.4rem;
-  color: var(--red);
+  color: var(--red-text);
   margin-bottom: 14px;
   line-height: 1;
 }
@@ -1364,7 +1389,7 @@ p {
   font-size: 0.74rem;
   padding: 4px 12px;
   background: var(--card);
-  color: var(--red);
+  color: var(--red-text);
   border: 1px dashed var(--red-margin);
   border-radius: 999px;
   letter-spacing: 0.04em;
@@ -1455,7 +1480,7 @@ p {
   content: "·";
   position: absolute;
   left: 8px;
-  color: var(--red);
+  color: var(--red-text);
   font-weight: 700;
 }
 .detail-section strong {
@@ -1463,7 +1488,7 @@ p {
   font-weight: 700;
 }
 .detail-section a {
-  color: var(--red);
+  color: var(--red-text);
   border-bottom: 1px dashed var(--red-margin);
 }
 
@@ -1512,7 +1537,7 @@ p {
 .sidebar-card h4 {
   font-family: var(--font-mono);
   font-size: 0.82rem;
-  color: var(--red);
+  color: var(--red-text);
   margin-bottom: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1553,7 +1578,7 @@ p {
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 0.95rem;
-  color: var(--red);
+  color: var(--red-text);
   border: 2.5px solid var(--red);
   padding: 6px 14px;
   background: rgba(255, 253, 246, 0.85);
@@ -1563,7 +1588,7 @@ p {
   --stamp-rot: -12deg;
   transform: translate(-50%, -50%) rotate(var(--stamp-rot)) scale(0);
   opacity: 0;
-  animation: stamp-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: stamp-pop 0.45s var(--ease-out) forwards;
   text-shadow: 0 0 1px var(--red);
 }
 .stamp-pop::before,
@@ -1650,46 +1675,6 @@ p {
 .fi-4 { animation-name: floatD; animation-duration: 8.5s; }
 .fi-5 { animation-name: floatE; animation-duration: 11s; }
 
-@keyframes floatA {
-  0%, 100% {
-    transform: translate(calc(var(--drag-x, 0px)), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(-3deg);
-  }
-  50% {
-    transform: translate(calc(var(--drag-x, 0px) + 6px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 11px)) rotate(1deg);
-  }
-}
-@keyframes floatB {
-  0%, 100% {
-    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(2deg);
-  }
-  50% {
-    transform: translate(calc(var(--drag-x, 0px) - 9px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 8px)) rotate(-1.5deg);
-  }
-}
-@keyframes floatC {
-  0%, 100% {
-    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(-1.5deg);
-  }
-  50% {
-    transform: translate(calc(var(--drag-x, 0px) + 4px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 13px)) rotate(2.5deg);
-  }
-}
-@keyframes floatD {
-  0%, 100% {
-    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(2.5deg);
-  }
-  50% {
-    transform: translate(calc(var(--drag-x, 0px) - 5px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 10px)) rotate(-2deg);
-  }
-}
-@keyframes floatE {
-  0%, 100% {
-    transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px))) rotate(-2deg);
-  }
-  50% {
-    transform: translate(calc(var(--drag-x, 0px) + 7px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px) - 9px)) rotate(1.5deg);
-  }
-}
 
 /* ==========================================================================
    21. 형광펜 sweep — 호버 시 좌→우로 그어지는 효과
@@ -1799,27 +1784,17 @@ p {
 .project-card .project-icon,
 .skill-card .skill-icon,
 .award-card .award-icon {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.2s var(--ease-out);
 }
 .project-card.taped .project-icon,
 .skill-card.taped .skill-icon,
 .award-card.taped .award-icon {
-  animation: icon-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: icon-pop 0.35s var(--ease-out);
 }
 @keyframes icon-pop {
   0% { transform: scale(0.8) rotate(-6deg); opacity: 0; }
   60% { transform: scale(1.08) rotate(3deg); opacity: 1; }
   100% { transform: scale(1) rotate(0); opacity: 1; }
-}
-
-/* 카드 호버 시 푸시핀 살짝 흔들 */
-.project-card:hover::before {
-  animation: pin-wobble 0.3s ease-in-out;
-}
-@keyframes pin-wobble {
-  0%, 100% { transform: rotate(0); }
-  25% { transform: rotate(-4deg); }
-  75% { transform: rotate(4deg); }
 }
 
 /* WIP 배지 호버 시 살짝 떨림 */
@@ -1835,36 +1810,19 @@ p {
 }
 
 /* ==========================================================================
-   24. 로고 wobble (클릭 시)
+   24. 로고 — 클릭 wobble은 제거했다 (#112 Remove P2-7).
+       강제 layout(void offsetWidth)까지 쓰면서 정보는 0이었다.
    ========================================================================== */
 
 .logo,
 .footer-logo {
   display: inline-block;
 }
-.logo.wobble,
-.footer-logo.wobble {
-  animation: logo-wobble 0.3s ease-in-out;
-}
-@keyframes logo-wobble {
-  0%, 100% { transform: rotate(0); }
-  20% { transform: rotate(-3deg) scale(1.02); }
-  50% { transform: rotate(2.5deg); }
-  80% { transform: rotate(-1deg); }
-}
 
 /* ==========================================================================
    25. 페이지 진입 (한 번만)
    ========================================================================== */
 
-body.page-entry {
-  animation: page-land 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes page-land {
-  0% { opacity: 0.4; transform: translateY(-6px); }
-  60% { opacity: 1; transform: translateY(1px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
 
 /* ==========================================================================
    26. Back-to-top 가시성 토글 (.visible 클래스 기반)
@@ -1947,7 +1905,7 @@ body::before {
   top: -14px;
   font-family: var(--font-hand);
   font-size: 4rem;
-  color: var(--red);
+  color: var(--red-text);
   opacity: 0.25;
   line-height: 1;
   pointer-events: none;
@@ -2017,7 +1975,7 @@ body::before {
 /* 섹션 헤더의 section-tag — 약간 손글씨 느낌 */
 .section-tag::before {
   content: "✎ ";
-  color: var(--red);
+  color: var(--red-text);
   font-size: 0.85em;
   margin-right: 4px;
 }
@@ -2028,7 +1986,7 @@ body::before {
 
 html {
   scrollbar-width: thin;
-  scrollbar-color: var(--red) var(--paper-2);
+  scrollbar-color: var(--red-text) var(--paper-2);
 }
 ::-webkit-scrollbar {
   width: 10px;
@@ -2072,7 +2030,7 @@ html {
    ========================================================================== */
 
 .stat-item {
-  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+  transition: transform 0.15s var(--ease-out), box-shadow 0.15s ease;
 }
 .stat-item:hover {
   box-shadow: 2px 5px 10px rgba(31, 28, 20, 0.14);
@@ -2188,11 +2146,11 @@ html {
 }
 
 /* 섹션마다 다른 견출지 색 */
-#home .section-tag { border-color: var(--red); color: var(--red); }
-#about .section-tag { border-color: var(--cyan); color: var(--cyan); }
-#skills .section-tag { border-color: var(--gold); color: var(--gold); }
-#awards .section-tag { border-color: var(--bronze); color: var(--bronze); }
-#projects .section-tag { border-color: var(--red); color: var(--red); }
+#home .section-tag { border-color: var(--red-text); color: var(--red-text); }
+#about .section-tag { border-color: var(--cyan-text); color: var(--cyan-text); }
+#skills .section-tag { border-color: var(--gold-text); color: var(--gold-text); }
+#awards .section-tag { border-color: var(--bronze-text); color: var(--bronze-text); }
+#projects .section-tag { border-color: var(--red-text); color: var(--red-text); }
 
 /* section-header 아래 가로 밑줄 (노트 페이지 구분선처럼) */
 .section-header {
@@ -2266,7 +2224,7 @@ html {
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: var(--red);
+  color: var(--red-text);
   opacity: 0.5;
   z-index: 2;
   pointer-events: none;
@@ -2292,7 +2250,7 @@ html {
   padding: 7px 14px;
   margin: 4px 0 14px;
 }
-.role-position i { color: var(--red); }
+.role-position i { color: var(--red-text); }
 
 /* ==========================================================================
    45. 소형 모바일(~480px) 추가 보정 — Issue #16
@@ -2326,20 +2284,22 @@ html {
   .skill-card,
   .award-card,
   .project-card {
-    padding: 28px 16px 18px 44px;
+    /* 좌측 노트 마진선 폭을 44 → 32px로 줄여 좁은 화면의 본문 폭을 확보한다.
+       마진선(장식)은 유지하되 360px에서 한글 2줄이 3줄로 깨지던 것을 막는다 (#114) */
+    padding: 28px 16px 18px 32px;
     background-position:
       10px -6px,
-      38px 0,
+      26px 0,
       0 0, 0 0, 0 0, 0 0;
   }
   .project-wip {
     background-position:
       10px -6px,
-      38px 0,
+      26px 0,
       0 0, 0 0, 0 0, 0 0, 0 0;
   }
   .project-card::after {
-    left: 44px;
+    left: 32px;
   }
   .skills-grid,
   .projects-grid {
@@ -2374,7 +2334,7 @@ html {
   align-items: center;
   gap: 9px;
 }
-.subsection-label i { color: var(--red); }
+.subsection-label i { color: var(--red-text); }
 
 /* --- 대표 프로젝트 (Featured) --- */
 .featured-grid {
@@ -2400,7 +2360,7 @@ html {
   top: -11px;
   right: 16px;
   font-size: 0.78rem;
-  color: var(--gold);
+  color: var(--gold-text);
   background: var(--card);
   width: 24px;
   height: 24px;
@@ -2412,7 +2372,7 @@ html {
   transform: rotate(-12deg);
 }
 .featured-top { display: flex; align-items: center; gap: 12px; }
-.featured-icon { font-size: 1.7rem; color: var(--red); line-height: 1; }
+.featured-icon { font-size: 1.7rem; color: var(--red-text); line-height: 1; }
 .featured-badge {
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -2427,9 +2387,9 @@ html {
 .featured-detail { display: flex; flex-direction: column; gap: 6px; flex: 1; }
 .featured-detail dt {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--red);
+  color: var(--red-text);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-top: 5px;
@@ -2457,8 +2417,8 @@ html {
   transition: transform 0.2s, background 0.2s, color 0.2s, border-color 0.2s;
 }
 .flink:hover { transform: translateY(-2px); border-color: var(--ink); }
-.flink-primary { border-color: var(--red-margin); color: var(--red); }
-.flink-primary:hover { background: var(--red); color: var(--card); border-color: var(--red); }
+.flink-primary { border-color: var(--red-margin); color: var(--red-text); }
+.flink-primary:hover { background: var(--red); color: var(--card); border-color: var(--red-text); }
 
 /* --- 카테고리 필터 바 --- */
 .project-filters {
@@ -2485,7 +2445,7 @@ html {
   background: var(--red);
   color: var(--card);
   border-style: solid;
-  border-color: var(--red);
+  border-color: var(--red-text);
   box-shadow: 1px 2px 5px rgba(198, 59, 59, 0.25);
 }
 
@@ -2515,7 +2475,7 @@ html {
   flex: 1;
   border-top: 1px dashed var(--red-margin);
 }
-.year-group-wip .year-heading { color: var(--bronze); }
+.year-group-wip .year-heading { color: var(--bronze-text); }
 .year-group-wip .year-heading::before {
   background: var(--tape-solid);
 }
@@ -2542,7 +2502,7 @@ html {
 }
 .failed-toggle-icon {
   flex-shrink: 0;
-  color: var(--red);
+  color: var(--red-text);
   font-size: 0.95rem;
   transition: transform 0.25s ease;
 }
@@ -2565,9 +2525,26 @@ html {
   font-family: var(--font-hand);
   font-size: 1.05rem;
   line-height: 1.3;
-  color: var(--red);
+  color: var(--red-text);
   margin-top: -6px;
   flex: none !important;
+}
+
+/* 카드 역할 한 줄 (#114) — 상세 페이지에만 있던 「나의 역할」을 카드로 끌어올린다.
+   projects.json에 role이 있는 카드에만 렌더된다. */
+.project-role {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  flex: none !important;
+}
+.project-role i {
+  font-size: 0.7rem;
+  color: var(--red-text);
 }
 
 /* --- 푸터 이메일 텍스트 + 복사 (#30) --- */
@@ -2586,18 +2563,18 @@ html {
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s, transform 0.2s;
 }
-.contact-email i { color: var(--red); }
-.contact-email:hover { color: var(--red); border-color: var(--red-margin); }
+.contact-email i { color: var(--red-text); }
+.contact-email:hover { color: var(--red-text); border-color: var(--red-margin); }
 .contact-email .copy-hint {
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   border-left: 1px dashed var(--line);
   padding-left: 8px;
 }
-.contact-email.copied { border-color: var(--cyan); color: var(--cyan); }
-.contact-email.copied i { color: var(--cyan); }
-.contact-email.copied .copy-hint { color: var(--cyan); }
+.contact-email.copied { border-color: var(--cyan-text); color: var(--cyan-text); }
+.contact-email.copied i { color: var(--cyan-text); }
+.contact-email.copied .copy-hint { color: var(--cyan-text); }
 
 /* --- 총 프로젝트 수 배지 (#20) — subsection-label 안에 인라인으로 표시 --- */
 .project-count-badge {
@@ -2607,7 +2584,7 @@ html {
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--red);
+  color: var(--red-text);
   background: var(--red-soft);
   border: 1px dashed var(--red-margin);
   border-radius: 2px;
@@ -2624,7 +2601,7 @@ html {
   .project-filters { gap: 6px; }
   .pfilter { font-size: 0.72rem; padding: 6px 10px; }
   .year-heading { font-size: 1.02rem; }
-  .project-count-badge { font-size: 0.66rem; padding: 2px 8px; }
+  .project-count-badge { font-size: 0.7rem; padding: 2px 8px; }
 }
 
 /* ==========================================================================
@@ -2664,8 +2641,10 @@ html {
   box-shadow: var(--shadow-lift);
 }
 /* Stats/Streak: 480px 고정, filter 없이 원본 SVG 그대로 표시 */
-.gh-card-stats  { width: 480px; border-radius: 8px; }
-.gh-card-streak { width: 480px; }
+/* lazy 외부 SVG의 공간을 미리 잡아 CLS를 막는다 (#113 P2-4).
+   실제 비율이 달라도 object-fit: contain이라 찌그러지지 않고 여백만 남는다. */
+.gh-card-stats  { width: 480px; border-radius: 8px; aspect-ratio: 495 / 195; object-fit: contain; }
+.gh-card-streak { width: 480px; aspect-ratio: 495 / 195; object-fit: contain; }
 .gh-card-metrics { width: 100%; max-width: 480px; }
 
 /* ==========================================================================
@@ -2694,7 +2673,7 @@ html {
 }
 .cert-icon {
   font-size: 26px;
-  color: var(--red);
+  color: var(--red-text);
   flex-shrink: 0;
 }
 .cert-info h3 {
@@ -2744,7 +2723,7 @@ html {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease,
-    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform 0.35s var(--ease-out);
 }
 .egg-toast.show {
   opacity: 1;
@@ -2819,7 +2798,7 @@ html {
   font-family: var(--font-mono);
   font-size: 1rem;
   font-weight: 900;
-  color: var(--red);
+  color: var(--red-text);
   text-align: center;
   margin-bottom: 10px;
   letter-spacing: 0.2em;
@@ -2836,7 +2815,7 @@ html {
 }
 .mbti-label {
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   color: var(--ink);
   min-width: 50px;
   white-space: nowrap;
@@ -2854,13 +2833,13 @@ html {
   font-style: normal;
 }
 .mbti-right .mbti-dim {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 500;
 }
 .mbti-pct {
   font-weight: 400;
   color: var(--text-muted);
-  font-size: 0.58rem;
+  font-size: 0.7rem;
 }
 .mbti-left .mbti-pct {
   color: var(--ink);
@@ -2888,54 +2867,45 @@ html {
 .mbti-bar-fill {
   height: 100%;
   border-radius: 3px 0 0 3px;
-  transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
-  width: 0%;
+  /* width 대신 scaleX — layout 없이 compositor에서 처리 */
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 1s var(--ease-out);
 }
 .mbti-row:nth-child(1) .mbti-bar-fill { background: linear-gradient(90deg, #2471a3, #5dade2); }
 .mbti-row:nth-child(2) .mbti-bar-fill { background: linear-gradient(90deg, #6c3483, #a569bd); }
 .mbti-row:nth-child(3) .mbti-bar-fill { background: linear-gradient(90deg, var(--bronze), #d4853a); }
 .mbti-row:nth-child(4) .mbti-bar-fill { background: linear-gradient(90deg, var(--red), #e05050); }
 .mbti-row:nth-child(5) .mbti-bar-fill { background: linear-gradient(90deg, #1a7a4a, #27ae60); }
-.mbti-bar-fill.animated {
-  width: attr(data-pct %) !important;
-}
 
 /* ==========================================================================
-   51. 프로젝트 진행률 바 (#61)
+   51. 진행 중 프로젝트 상태 라벨 (#61 진행률 바 → #114 상태 라벨)
+   자기신고 %(0% · 5%)는 빈 막대를 게시하게 되어 상태 한 줄로 대체했다.
    ========================================================================== */
 
-.progress-bar-wrap {
-  width: 100%;
-  height: 18px;
-  background: var(--paper-2);
+.wip-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 3px 10px;
   border: 1px dashed var(--line);
   border-radius: 2px;
-  position: relative;
-  overflow: hidden;
-  margin-top: 4px;
-}
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--gold), #d4a825);
-  border-radius: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 6px;
-  transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
-  width: 0%;
-  min-width: fit-content;
-}
-.progress-text {
+  background: var(--paper-2);
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--text-muted);
   white-space: nowrap;
 }
-.progress-fill[data-progress="0"] {
-  background: var(--line);
-  min-width: 28px;
+.wip-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -2993,7 +2963,7 @@ html {
 .failed-reason {
   font-family: var(--font-mono);
   font-size: 0.78rem;
-  color: var(--red);
+  color: var(--red-text);
   padding: 6px 10px;
   background: rgba(198, 59, 59, 0.08);
   border-left: 3px solid var(--red);
@@ -3074,11 +3044,11 @@ html {
   border-left: 2.5px solid;
   padding-left: 14px;
 }
-.mindmap-ai   { border-left-color: var(--cyan); }
-.mindmap-hw   { border-left-color: var(--bronze); }
-.mindmap-web  { border-left-color: var(--gold); }
+.mindmap-ai   { border-left-color: var(--cyan-text); }
+.mindmap-hw   { border-left-color: var(--bronze-text); }
+.mindmap-web  { border-left-color: var(--gold-text); }
 .mindmap-discord { border-left-color: #5865F2; }
-.mindmap-contest { border-left-color: var(--red); }
+.mindmap-contest { border-left-color: var(--red-text); }
 
 /* 카테고리 노드 뱃지 — 그림자와 둥근 모서리 (#58) */
 .mindmap-cat {
@@ -3112,7 +3082,7 @@ html {
 /* 잎 노드 — 카테고리별 왼쪽 색상 보더 (#58) */
 .mindmap-leaf {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   padding: 3px 10px;
   background: var(--paper-2);
   border: 1px dashed var(--line);
@@ -3262,6 +3232,11 @@ html {
   --postit: #2d2a1f;
   --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.25);
   --shadow-lift: 0 12px 28px rgba(0, 0, 0, 0.35);
+  /* 다크 배경(#1f2937/#1a1a2e/#16213e)에서 AA 4.5:1 — cyan·gold·bronze는 이미 통과 */
+  --red-text: #e56b6b;
+  --cyan-text: var(--cyan);
+  --gold-text: var(--gold);
+  --bronze-text: var(--bronze);
 }
 [data-theme="dark"] body {
   background-image:
@@ -3316,11 +3291,8 @@ html {
 [data-theme="dark"] .sidebar-overlay {
   background: rgba(0, 0, 0, 0.55);
 }
-[data-theme="dark"] .progress-fill[data-progress="0"] {
-  background: var(--line);
-}
 [data-theme="dark"] html {
-  scrollbar-color: var(--red) var(--paper-2);
+  scrollbar-color: var(--red-text) var(--paper-2);
 }
 
 /* ==========================================================================
@@ -3350,12 +3322,12 @@ html {
   transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.15s;
 }
 .nav-util-btn:hover {
-  color: var(--red);
+  color: var(--red-text);
   border-color: var(--red-margin);
   transform: translateY(-1px);
 }
 .nav-util-btn .lang-label {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   letter-spacing: 0.02em;
 }
 .nav-util-btn i {
@@ -3387,7 +3359,7 @@ html {
 }
 .sidebar-util-btn:hover {
   background: rgba(198, 59, 59, 0.06);
-  color: var(--red);
+  color: var(--red-text);
 }
 .sidebar-util-btn i {
   width: 18px;
@@ -3397,7 +3369,7 @@ html {
   transition: color 0.2s;
 }
 .sidebar-util-btn:hover i {
-  color: var(--red);
+  color: var(--red-text);
 }
 
 /* ==========================================================================
@@ -3462,7 +3434,7 @@ html {
 /* 활성 섹션 — 주황색(빨간) 포인트 */
 .section-nav-item.active {
   background: var(--red-soft);
-  border-color: var(--red);
+  border-color: var(--red-text);
   box-shadow: -2px 2px 10px rgba(198, 59, 59, 0.15);
 }
 .section-nav-item.active .nav-bookmark-dot {
@@ -3470,7 +3442,7 @@ html {
   box-shadow: 0 0 6px rgba(198, 59, 59, 0.4);
 }
 .section-nav-item.active .nav-bookmark-label {
-  color: var(--red);
+  color: var(--red-text);
   font-weight: 700;
 }
 
@@ -3483,7 +3455,7 @@ html {
   height: 6px;
 }
 .section-nav-item.nav-sub .nav-bookmark-label {
-  font-size: 0.62rem;
+  font-size: 0.7rem;
 }
 
 /* 섹션별 dot 컬러 */
@@ -3516,8 +3488,13 @@ html {
     border-top: 1px solid var(--line);
     box-shadow: 0 -2px 8px rgba(31, 28, 20, 0.08);
     padding: 6px 4px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    /* 항목이 5개로 줄어 가로 스크롤이 필요 없다 */
+    overflow-x: visible;
+  }
+  /* 하위 섹션(MBTI · GitHub · 자격증 · 대표)은 모바일 최상위 네비에서 제외 —
+     9개가 48px ellipsis로 잘리며 가로 스크롤이 생기던 문제 해소 (#114) */
+  .section-nav-item.nav-sub {
+    display: none;
   }
   .section-nav-item {
     transform: none;
@@ -3529,21 +3506,13 @@ html {
     flex-direction: column;
     gap: 3px;
     min-width: 0;
-    flex-shrink: 0;
-  }
-  .section-nav-item.nav-sub {
-    padding-left: 6px;
+    flex: 1 1 0;
   }
   .nav-bookmark-label {
-    font-size: 0.5rem;
+    font-size: 0.7rem;
     opacity: 1;
-    max-width: 48px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    max-width: none;
     text-align: center;
-  }
-  .section-nav-item.nav-sub .nav-bookmark-label {
-    font-size: 0.48rem;
   }
   .nav-bookmark-dot {
     width: 6px;
@@ -3606,7 +3575,7 @@ html {
   font-family: var(--font-hand);
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--red);
+  color: var(--red-text);
   line-height: 1.2;
 }
 .mbti-traits-sub {
@@ -3636,8 +3605,8 @@ html {
   transition: transform 0.15s, background 0.15s;
 }
 .mbti-tag i {
-  font-size: 0.68rem;
-  color: var(--red);
+  font-size: 0.7rem;
+  color: var(--red-text);
 }
 .mbti-tag:hover {
   transform: translateY(-1px);

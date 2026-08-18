@@ -14,6 +14,7 @@
           ],
           "title": { "en": "GitHub Rank Insight", "ko": "GitHub Rank Insight" },
           "subtitle": { "en": "GitHub Stats rank analyzer & next-grade advisor", "ko": "GitHub Stats 등급 분석기" },
+          "role": { "en": "Solo Dev · Full Process", "ko": "1인 개발 · 전 과정" },
           "descHtml": {
             "en": "Username one input → instant rank analysis<br />Auto/manual mode, per-metric chart &amp; next-grade tips",
             "ko": "username 입력하면 즉시 등급 분석<br />자동/수동 모드 · 지표별 기여도 차트"
@@ -31,7 +32,8 @@
           ],
           "title": { "en": "KOREATECH Freshman Guide '26", "ko": "한기대 26학번 신입생 가이드" },
           "subtitle": { "en": "Notion guide for KOREATECH freshmen '26", "ko": "한기대 26학번 신입생용 노션 가이드" },
-          "desc": { "en": "A Notion site for KOREATECH class of '26 freshmen", "ko": "한기대 26학번 신입생을 위한 노션 사이트" },
+          "role": { "en": "Solo Development", "ko": "1인 개발" },
+          "desc": { "en": "Online core course guide, assignment criteria, and an FAQ collection", "ko": "온라인중점강좌 안내 · 과제 평가 기준 · FAQ 모음" },
           "tech": ["Notion", "Documentation"]
         },
         {
@@ -40,10 +42,13 @@
           "icon": "fas fa-wand-magic-sparkles",
           "detail": "projects/swordmaster/",
           "links": [
-            { "href": "https://github.com/pachir1su", "title": "GitHub", "icon": "fab fa-github" }
+            { "href": "https://huggingface.co/spaces/capybaranice/file_swordmaster", "title": "File Swordmaster 데모", "icon": "fas fa-external-link-alt" },
+            { "href": "https://huggingface.co/spaces/capybaranice/media_swordmaster", "title": "Media Swordmaster 데모", "icon": "fas fa-external-link-alt" },
+            { "href": "https://github.com/pachir1su/file_swordmaster", "title": "GitHub", "icon": "fab fa-github" }
           ],
           "title": "Swordmaster",
           "subtitle": { "en": "File & Media processing web tool collection", "ko": "파일·미디어 처리 다기능 웹 툴 모음" },
+          "role": { "en": "Solo Development", "ko": "1인 개발" },
           "descHtml": {
             "en": "Two Gradio web tools in one<br />File Swordmaster (PDF·Audio) · Media Swordmaster (Image·Video)",
             "ko": "두 개의 Gradio 웹 툴을 하나로<br />File Swordmaster(PDF·오디오) · Media Swordmaster(이미지·영상)"
@@ -60,6 +65,7 @@
           ],
           "title": { "en": "Daily Report AI", "ko": "데일리 리포트 AI" },
           "subtitle": { "en": "Gemini-based Discord morning briefing bot", "ko": "Gemini 기반 디스코드 아침 브리핑 봇" },
+          "role": { "en": "Team Lead · 3-person Team", "ko": "팀장 · 3인 팀" },
           "descHtml": {
             "en": "Gemini compiles weather, news, and air quality daily<br />and auto-briefs via Discord at a set time",
             "ko": "매일 정해진 시간에 Gemini가 날씨·뉴스·미세먼지를 종합해<br />Discord로 자동 브리핑"
@@ -76,6 +82,7 @@
           ],
           "title": "MultiMind",
           "subtitle": { "en": "Orchestrator controlling multiple LLMs without API", "ko": "API 없이 여러 LLM을 동시 조작하는 오케스트레이터" },
+          "role": { "en": "Solo Development", "ko": "1인 개발" },
           "descHtml": {
             "en": "Controls multiple LLMs simultaneously via pyautogui without API<br />Head LLM aggregates results as a multi-LLM orchestrator",
             "ko": "API 없이 pyautogui로 여러 LLM을 동시에 조작<br />Head LLM이 결과를 종합하는 멀티 LLM 오케스트레이터"
@@ -90,6 +97,7 @@
           "links": [],
           "title": { "en": "Tech & Society", "ko": "기술과사회" },
           "subtitle": { "en": "AI Delphi method future prediction project", "ko": "AI 델파이 기법 미래 예측 발표 프로젝트" },
+          "role": { "en": "Team Lead · 5-person Team", "ko": "팀장 · 5인 팀" },
           "descHtml": {
             "en": "Predicting the future of work, jobs, and life using the Delphi method<br />AI simulation Delphi survey & presentation project",
             "ko": "델파이 기법을 이용한 일·직업과 삶의 미래 예측<br />AI 시뮬레이션 델파이 조사 · 발표 프로젝트"
@@ -106,6 +114,7 @@
           ],
           "title": { "en": "SH Bot (MZ Bot 2)", "ko": "성현봇 (면진봇2)" },
           "subtitle": { "en": "Discord economy bot — gambling, stocks, enhance & duel", "ko": "디스코드 경제 봇 — 도박·주식·강화·맞짱" },
+          "role": { "en": "Solo Development", "ko": "1인 개발" },
           "descHtml": {
             "en": "MZ Bot successor with Korean slash commands<br />Coins, gambling, stocks, item enhancement and PvP duels",
             "ko": "면진봇 후속작, 한글 슬래시 커맨드 지원<br />코인·도박·주식·강화·맞짱(PvP) 경제 시스템"
@@ -123,6 +132,7 @@
           ],
           "title": { "en": "KOREATECH Unified Alert System", "ko": "코리아텍 통합 알림 시스템" },
           "subtitle": { "en": "Unified KOREATECH alerts — notices, personal mail, shuttle, cafeteria & library", "ko": "코리아텍 공지·개인 메일·셔틀·학식·도서관 통합 알림" },
+          "role": { "en": "Solo Development", "ko": "1인 개발" },
           "descHtml": {
             "en": "Unified Discord subscriptions and queries for notices, personal mail and campus life<br />Live shuttle map · SQLite storage with live diagnostics · web/GUI dashboards · Raspberry Pi operations",
             "ko": "공지·개인 메일·캠퍼스 생활을 묶은 디스코드 통합 구독·조회<br />실시간 셔틀 지도 · 실시간 진단 지원 SQLite 저장소 · 웹/GUI 대시보드 · 라즈베리파이 운영"
@@ -140,6 +150,7 @@
           ],
           "title": { "en": "raspi-mc-server", "ko": "라즈베리파이 마인크래프트 서버" },
           "subtitle": { "en": "Friends-only Java/Bedrock PaperMC server remotely managed from Discord", "ko": "디스코드로 원격 관리하는 친구용 Java·Bedrock PaperMC 서버" },
+          "role": { "en": "Solo Development", "ko": "1인 개발" },
           "descHtml": {
             "en": "Pi 4B PaperMC with optional Geyser/Floodgate crossplay and owner-only administration<br />Friend portal · verified HDD backups · recovery tools · custom Paper plugins",
             "ko": "Pi 4B PaperMC + 선택형 Geyser/Floodgate 크로스플레이와 오너 전용 관리<br />친구 포털 · 검증형 HDD 백업 · 복구 도구 · 자체 Paper 플러그인"
@@ -156,6 +167,7 @@
           ],
           "title": { "en": "\"Stop!\" Pedestrian Alert System (2026 U-CAST)", "ko": "멈춰 ! — 2026 U-CAST 돌발 보행자 감지 경고 시스템" },
           "subtitle": { "en": "Mentoring an independent-channel Arduino safety prototype for Cheonan Jungang Market", "ko": "천안중앙시장 보행 안전을 위한 채널 독립형 아두이노 시제품 멘토링" },
+          "role": { "en": "Team 5 Mentor", "ko": "5팀 멘토" },
           "descHtml": {
             "en": "Each curb pairs a start/end IR sensor with its own NeoPixel strip as one independent channel<br />Mentored Team 5 through requirements, per-channel state design, wiring debugging and siren-buzzer demo prep<br /><strong>Local Impact Award</strong> at the 2026 Cheonan Youth Urban Regeneration Challenge",
             "ko": "구간마다 시작·끝 IR 센서와 네오픽셀 스트립을 하나로 묶은 독립 채널 구조<br />5팀의 요구사항 정리 · 채널별 상태 설계 · 배선 디버깅 · 사이렌 부저 시연 준비 멘토링<br />2026 천안시 청소년 도시재생 챌린지 <strong>로컬임팩트상 수상</strong>"
@@ -178,6 +190,7 @@
           ],
           "title": { "en": "NFC Attendance System", "ko": "NFC 출석 체크 시스템" },
           "subtitle": { "en": "NFC tag-based auto attendance IoT", "ko": "NFC 태그 기반 자동 출석 체크 IoT" },
+          "role": { "en": "Team Lead · 6-person Team", "ko": "팀장 · 6인 팀" },
           "descHtml": {
             "en": "NFC tag-based efficient attendance system<br />Arduino and Raspberry Pi integration for data processing",
             "ko": "NFC 태그를 활용한 효율적인 출석 체크 시스템<br />아두이노와 라즈베리파이 연동으로 데이터 처리"
@@ -194,6 +207,7 @@
           ],
           "title": { "en": "Plant Timer", "ko": "식물 타이머" },
           "subtitle": { "en": "Smart plant care timer (hackathon entry)", "ko": "식물 관리 스마트 타이머 (해커톤 참가작)" },
+          "role": { "en": "Solo Development", "ko": "1인 개발" },
           "descHtml": {
             "en": "2025 Coding Festival hackathon entry<br />Smart timer system for plant care",
             "ko": "2025 선후배와 함께하는 코딩 페스티벌 해커톤 참가작<br />식물 관리를 돕는 스마트 타이머 시스템"
@@ -210,6 +224,7 @@
           ],
           "title": { "en": "Health Care System", "ko": "헬스 케어 시스템" },
           "subtitle": { "en": "Health data logging & monitoring system", "ko": "건강 데이터 기록·모니터링 시스템" },
+          "role": { "en": "Team Lead · 4-person Team", "ko": "팀장 · 4인 팀" },
           "descHtml": {
             "en": "Personalized healthcare system<br />Health data logging and monitoring features",
             "ko": "사용자 맞춤형 헬스케어 시스템<br />건강 데이터를 기록하고 모니터링하는 기능 구현"
@@ -226,7 +241,8 @@
           ],
           "title": { "en": "MZ Bot", "ko": "면진봇" },
           "subtitle": { "en": "Discord economy simulation bot", "ko": "디스코드 경제 시뮬레이션 봇" },
-          "desc": { "en": "Discord economy game bot", "ko": "디스코드 경제 게임 봇" },
+          "role": { "en": "Solo Development", "ko": "1인 개발" },
+          "desc": { "en": "Coins, gambling, transfers, shop and leaderboard on SQLite", "ko": "주화 · 도박 · 송금 · 상점 · 순위표를 SQLite로 관리" },
           "tech": ["Python", "Discord.py"]
         },
         {
@@ -239,6 +255,7 @@
           ],
           "title": { "en": "Empathy Bot & Recipe AI", "ko": "공감 봇 & 레시피 AI" },
           "subtitle": { "en": "Emotional empathy chatbot + ingredient recipe AI", "ko": "감정 공감 챗봇 + 식재료 레시피 추천 AI" },
+          "role": { "en": "Team Lead · 4-person Team", "ko": "팀장 · 4인 팀" },
           "desc": { "en": "Emotional empathy chatbot and ingredient-based recipe recommendation AI service", "ko": "감정 공감 챗봇과 보유 식재료 기반 요리 레시피 추천 AI 서비스" },
           "tech": ["AI", "Gemini API", "Flask"]
         }
@@ -258,6 +275,7 @@
           ],
           "title": { "en": "Password Door Lock", "ko": "비밀번호 도어락" },
           "subtitle": { "en": "4x4 keypad-based password door lock", "ko": "4x4 키패드 기반 비밀번호 도어락" },
+          "role": { "en": "Team Lead · 4-person Team", "ko": "팀장 · 4인 팀" },
           "descHtml": {
             "en": "2024 Master Creator Challenge entry<br />Door lock system using 4x4 matrix keypad",
             "ko": "2024 마스터 크리에이터 챌린지 참가 프로젝트<br />4x4 매트릭스 키패드를 활용한 도어락 시스템"
@@ -274,6 +292,7 @@
           ],
           "title": { "en": "Coastal Barrier Project", "ko": "해안 장벽 프로젝트" },
           "subtitle": { "en": "Coastal barrier MVP for sea level rise", "ko": "해수면 상승 대비 해안 장벽 MVP" },
+          "role": { "en": "Team Member (Arduino Dev Lead) · 4-person Team", "ko": "팀원 (아두이노 개발 총괄) · 4인 팀" },
           "descHtml": {
             "en": "2024 Sustainable Development Project<br />Coastal barrier MVP for rising sea levels",
             "ko": "2024 지속 가능한 발전 프로젝트<br />해수면 상승에 대비한 해안 장벽 MVP"
@@ -290,6 +309,7 @@
           ],
           "title": { "en": "Wildfire Early Detection Alert System", "ko": "산불 조기 감지 알림 시스템" },
           "subtitle": { "en": "Raspberry Pi & OpenCV real-time wildfire detection (award winner)", "ko": "라즈베리파이·OpenCV 실시간 산불 감지 (수상작)" },
+          "role": { "en": "Team Member (Engineer) · 4-person Team", "ko": "팀원 (엔지니어) · 4인 팀" },
           "descHtml": {
             "en": "2024 Digital Saessak 'AI Avengers Award' winner<br />Real-time wildfire detection using Raspberry Pi and OpenCV",
             "ko": "2024 디지털새싹 'AI 어벤져스상' 수상작<br />라즈베리파이와 OpenCV로 산불을 실시간 감지합니다."
@@ -306,6 +326,7 @@
           ],
           "title": "2024 SFPC",
           "subtitle": { "en": "8th place out of 581 teams in algorithm contest (Top 1.3%)", "ko": "전국 581팀 중 8위 알고리즘 대회 (Top 1.3%)" },
+          "role": { "en": "Team Member · 4-person Team", "ko": "팀원 · 4인 팀" },
           "desc": { "en": "Code archive from the algorithm contest, ranked 8th out of 581 teams.", "ko": "총 581팀 중 8위를 기록한 알고리즘 대회 코드 아카이브." },
           "tech": ["Algorithm", "Problem Solving", "C++ / Python"]
         },
@@ -319,6 +340,7 @@
           ],
           "title": { "en": "Drowsiness Prevention System", "ko": "졸음 방지 시스템" },
           "subtitle": { "en": "HuskyLens real-time drowsiness detection (robot contest bronze)", "ko": "허스키렌즈 실시간 졸음 감지 (로봇대회 동상)" },
+          "role": { "en": "Arduino Dev · 2-person Team", "ko": "아두이노 개발 · 2인 팀" },
           "descHtml": {
             "en": "2024 5th Cheonan Student Robot Contest bronze award project<br />Real-time drowsiness detection system using HuskyLens",
             "ko": "2024 제 5회 천안학생로봇대회 동상 수상 프로젝트<br />허스키렌즈를 이용한 실시간 졸음 감지 시스템"
@@ -346,7 +368,7 @@
             "en": "KOREATECH campus map service<br />Interactive web map with building floor plans and room info",
             "ko": "한기대 캠퍼스 지도 서비스<br />건물 내부 지도 및 호실 정보 등의 모든 정보를 담은 웹 인터랙티브 지도"
           },
-          "progress": 5,
+          "status": { "en": "Planning", "ko": "기획 단계" },
           "tech": ["Web", "Interactive Map", "Animation"]
         },
         {
@@ -360,11 +382,12 @@
           "badge": { "en": "In Dev", "ko": "개발 중" },
           "title": { "en": "SG Bot", "ko": "승기봇" },
           "subtitle": { "en": "Revamped MZ Bot — mini-game Discord bot", "ko": "면진봇 개편판 — 미니게임 디스코드 봇" },
+          "role": { "en": "Solo Development", "ko": "1인 개발" },
           "descHtml": {
             "en": "Revamped version of MZ Bot<br />Mini-game bot featuring Liar Game, Mafia, and more",
             "ko": "기존 면진봇의 개편 버전<br />라이어게임, 양세찬게임, 마피아게임 등의 미니게임 봇"
           },
-          "progress": 70,
+          "status": { "en": "Core system redesign in progress", "ko": "핵심 시스템 재설계 중" },
           "tech": ["Python", "Discord.py"]
         },
         {
@@ -378,11 +401,12 @@
           "badge": { "en": "In Dev", "ko": "개발 중" },
           "title": "HTML Viewer",
           "subtitle": { "en": "HTML real-time preview web viewer", "ko": "HTML 실시간 미리보기 웹 뷰어" },
+          "role": { "en": "Solo Development", "ko": "1인 개발" },
           "descHtml": {
             "en": "Paste HTML code and<br />see the result in real time",
             "ko": "HTML 코드를 붙여넣으면<br />실시간으로 결과물을 보여주는 웹 뷰어"
           },
-          "progress": 45,
+          "status": { "en": "In development · not deployed", "ko": "개발 진행 중 · 미배포" },
           "tech": ["HTML", "CSS", "JavaScript"]
         },
         {
@@ -396,11 +420,12 @@
           "badge": { "en": "In Dev", "ko": "개발 중" },
           "title": "CentrifugeAI",
           "subtitle": { "en": "Gemini virtual science lab", "ko": "Gemini 가상 과학 실험실" },
+          "role": { "en": "Solo Development", "ko": "1인 개발" },
           "descHtml": {
             "en": "Put materials into virtual lab equipment (centrifuge, microscope, accelerator, etc.)<br />and predict & visualize results with Gemini AI",
             "ko": "가상 실험 장치(원심분리기·현미경·가속기 등)에<br />재료를 넣고 Gemini AI로 결과를 예측·시각화하는 실험 시뮬레이터"
           },
-          "progress": 80,
+          "status": { "en": "Finalizing", "ko": "마무리 단계" },
           "tech": ["Python", "Flask", "SQLite", "Gemini API", "Discord.py", "Matplotlib"]
         },
         {
@@ -416,7 +441,7 @@
             "en": "Combine elements to create magic and<br />visualize with interactive simulation",
             "ko": "원소를 조합해 마법을 만들고<br />시각화하는 인터랙티브 시뮬레이션"
           },
-          "progress": 0,
+          "status": { "en": "Planning · repository not yet created", "ko": "기획 단계 · 저장소 준비 중" },
           "tech": [
             { "en": "Python (Planned)", "ko": "Python (예정)" },
             { "en": "p5.js (Planned)", "ko": "p5.js (예정)" }
@@ -430,14 +455,14 @@
           "links": [
             { "href": "https://github.com/pachir1su/DelphiRec", "title": "GitHub", "icon": "fab fa-github" }
           ],
-          "badge": { "en": "Planned", "ko": "개발 예정" },
+          "badge": { "en": "Planned", "ko": "진행 예정" },
           "title": "DelphiRec",
           "subtitle": { "en": "Student record analysis & Q&A multi-agent AI", "ko": "생기부 분석·질의응답 멀티 에이전트 AI" },
           "descHtml": {
             "en": "Student record analysis &amp; Q&amp;A AI<br />In-depth analysis using multi-expert personas and Delphi method",
             "ko": "생기부 분석 &amp; 질의응답 AI<br />멀티 전문가 페르소나와 델파이 기법으로 생기부를 심층 분석"
           },
-          "progress": 20,
+          "status": { "en": "Design stage · MVP scope defined", "ko": "설계 단계 · MVP 범위 확정" },
           "tech": ["Claude API", "FastAPI", "React", "Multi-Agent"]
         }
       ]

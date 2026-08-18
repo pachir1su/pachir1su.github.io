@@ -7,8 +7,18 @@
              콘솔 이스터에그 / 카드 깊이 그림자 / 텍스트 선택 시 형광펜
    ============================================================= */
 
-const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+/* device 판정 (#114) — CSS 네비게이션은 1024px부터 모바일 구조로 바뀌는데
+   JS는 768px까지만 모바일로 봐서 769~1024px 태블릿에 데스크톱 마우스 동작이
+   설치됐다. 마우스 상호작용은 화면 폭이 아니라 포인터 능력으로 판정한다. */
+const finePointerQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
+const hasFinePointer = () => finePointerQuery.matches;
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* matchMedia change 구독 — Safari 14 미만은 addEventListener 미지원이라 폴백 */
+function onMediaChange(query, handler) {
+  if (typeof query.addEventListener === 'function') query.addEventListener('change', handler);
+  else if (typeof query.addListener === 'function') query.addListener(handler);
+}
 
 /* ------------------------------------------------------------- */
 /* 1. AOS (기존)                                                  */
@@ -36,7 +46,9 @@ if (backBtn) {
 /* ------------------------------------------------------------- */
 /* 타이핑 효과 — 언어 전환 시에도 재시작 가능하도록 전역 참조 */
 (function initTyping() {
-  const defaultWords = ['풀스택 개발자', '메이커', '아이디어 뱅크', '팀 리더', '엔지니어'];
+  /* '풀스택 개발자'는 .hero-role 고정 문구로 올라갔고(#114), 근거 없는
+     자기평가('아이디어 뱅크')는 뺐다(#106). 타이핑은 보조 정보만 담는다. */
+  const defaultWords = ['메이커', '엔지니어', '팀 리더'];
   let wordIndex = 0, charIndex = 0, isDeleting = false, typeSpeed = 100;
   let timerId = null;
   function type() {
@@ -145,38 +157,57 @@ function closeMobile() {
     };
   });
 
-  // 드래그 핸들러 (모바일/reduce-motion 제외)
-  const allowDrag = !isMobile() && !prefersReducedMotion;
-  if (allowDrag) {
+  // 드래그 핸들러 — 정밀 포인터에서만 설치하고, 포인터 능력이 바뀌면 해제한다
+  function onStickerDown(e) {
+    const s = e.currentTarget._stickerState;
+    if (!s) return;
+    e.preventDefault();
+    s.dragging = true;
+    s.moved = false;
+    s.startX = e.clientX;
+    s.startY = e.clientY;
+    s.baseDX = s.dx;
+    s.baseDY = s.dy;
+    s.el.classList.add('grabbing');
+  }
+  function onDocMove(e) {
     states.forEach((s) => {
-      s.el.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        s.dragging = true;
-        s.moved = false;
-        s.startX = e.clientX;
-        s.startY = e.clientY;
-        s.baseDX = s.dx;
-        s.baseDY = s.dy;
-        s.el.classList.add('grabbing');
-      });
-    });
-    document.addEventListener('mousemove', (e) => {
-      states.forEach((s) => {
-        if (!s.dragging) return;
-        s.dx = s.baseDX + (e.clientX - s.startX);
-        s.dy = s.baseDY + (e.clientY - s.startY);
-        if (Math.abs(e.clientX - s.startX) + Math.abs(e.clientY - s.startY) > 4) s.moved = true;
-      });
-    });
-    document.addEventListener('mouseup', () => {
-      states.forEach((s) => {
-        if (!s.dragging) return;
-        s.dragging = false;
-        s.el.classList.remove('grabbing');
-        if (s.moved) s.el.classList.add('settled');
-      });
+      if (!s.dragging) return;
+      s.dx = s.baseDX + (e.clientX - s.startX);
+      s.dy = s.baseDY + (e.clientY - s.startY);
+      if (Math.abs(e.clientX - s.startX) + Math.abs(e.clientY - s.startY) > 4) s.moved = true;
     });
   }
+  function onDocUp() {
+    states.forEach((s) => {
+      if (!s.dragging) return;
+      s.dragging = false;
+      s.el.classList.remove('grabbing');
+      if (s.moved) s.el.classList.add('settled');
+    });
+  }
+
+  let dragInstalled = false;
+  function syncDrag() {
+    const allowDrag = hasFinePointer() && !prefersReducedMotion;
+    if (allowDrag === dragInstalled) return;
+    dragInstalled = allowDrag;
+    if (allowDrag) {
+      states.forEach((s) => {
+        s.el._stickerState = s;
+        s.el.addEventListener('mousedown', onStickerDown);
+      });
+      document.addEventListener('mousemove', onDocMove);
+      document.addEventListener('mouseup', onDocUp);
+    } else {
+      states.forEach((s) => s.el.removeEventListener('mousedown', onStickerDown));
+      document.removeEventListener('mousemove', onDocMove);
+      document.removeEventListener('mouseup', onDocUp);
+      onDocUp(); // 설치 해제 시점에 잡고 있던 스티커는 놓은 것으로 처리
+    }
+  }
+  syncDrag();
+  onMediaChange(finePointerQuery, syncDrag);
 
   // 스크롤 패럴랙스
   function updateScroll() {
@@ -186,8 +217,12 @@ function closeMobile() {
   window.addEventListener('scroll', updateScroll, { passive: true });
   updateScroll();
 
-  // rAF 루프: 각 스티커의 transform 갱신
-  function loop(t) {
+  /* rAF 루프 — Hero가 화면 밖이거나 탭이 숨겨지면 예약 자체를 멈춘다.
+     reduced-motion에서는 부유가 없으므로 한 번만 그리고 루프를 돌리지 않는다. */
+  let rafId = null;
+  let heroVisible = true;
+
+  function draw(t) {
     states.forEach((s) => {
       // float 부분 (드래그 안 했을 때만 — 옮긴 자리 유지)
       let fx = 0, fy = 0, fr = 0;
@@ -202,9 +237,38 @@ function closeMobile() {
       const rot = s.rotBase + fr;
       s.el.style.transform = `translate(${tx}px, ${ty}px) rotate(${rot}deg)`;
     });
-    requestAnimationFrame(loop);
   }
-  requestAnimationFrame(loop);
+
+  function loop(t) {
+    draw(t);
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function shouldRun() {
+    return heroVisible && !document.hidden && !prefersReducedMotion;
+  }
+  function syncLoop() {
+    if (shouldRun()) {
+      if (rafId === null) rafId = requestAnimationFrame(loop);
+    } else if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+      draw(performance.now()); // 멈춘 프레임을 마지막 상태로 고정
+    }
+  }
+
+  /* Hero 가시성 — IntersectionObserver 미지원 환경은 항상 보이는 것으로 둔다 */
+  const hero = document.querySelector('.hero');
+  if (hero && typeof IntersectionObserver !== 'undefined') {
+    new IntersectionObserver((entries) => {
+      heroVisible = entries.some((entry) => entry.isIntersecting);
+      syncLoop();
+    }, { threshold: 0 }).observe(hero);
+  }
+  document.addEventListener('visibilitychange', syncLoop);
+
+  draw(performance.now()); // 초기 위치는 루프 실행 여부와 무관하게 한 번 반영
+  syncLoop();
 })();
 
 /* ------------------------------------------------------------- */
@@ -265,7 +329,8 @@ function closeMobile() {
       const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
       const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       const ratio = height > 0 ? (winScroll / height) : 0;
-      if (myBar) myBar.style.width = (ratio * 100) + '%';
+      /* width 대신 transform — layout 없이 compositor에서 처리 (성능 감사 P3-4) */
+      if (myBar) myBar.style.transform = 'scaleX(' + ratio.toFixed(4) + ')';
       if (backBtn) {
         if (winScroll > 300) backBtn.classList.add('visible');
         else backBtn.classList.remove('visible');
@@ -284,25 +349,85 @@ function closeMobile() {
 /*     transform 회전은 안 함 (사용자가 tilt 싫어함)              */
 /*     단, 그림자 방향만 마우스 반대편으로 길어짐                 */
 /* ------------------------------------------------------------- */
+/*     40개가 넘는 카드마다 mousemove에서 getBoundingClientRect()를 읽던 것을     */
+/*     enter 시 1회 측정 + rAF 1프레임 1회 write로 줄였다 (성능 감사 P2-1)      */
 (function initShadowFollow() {
-  if (isMobile() || prefersReducedMotion) return;
-  const cards = document.querySelectorAll('.skill-card, .project-card, .award-card, .about-card');
-  cards.forEach((card) => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      // 마우스 반대편으로 그림자 (최대 ±10px)
-      const sx = -x * 7;
-      const sy = -y * 7 + 4;
-      card.style.setProperty('--shadow-x', sx + 'px');
-      card.style.setProperty('--shadow-y', sy + 'px');
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.setProperty('--shadow-x', '0px');
-      card.style.setProperty('--shadow-y', '6px');
-    });
-  });
+  if (prefersReducedMotion) return;
+  const cards = Array.from(
+    document.querySelectorAll('.skill-card, .project-card, .award-card, .about-card')
+  );
+  if (!cards.length) return;
+
+  let activeCard = null;
+  let activeRect = null;
+  let pointerX = 0, pointerY = 0;
+  let frame = null;
+
+  /* rAF 1회당 custom property write 1회 — 이동 중 style recalculation을 줄인다 */
+  function flush() {
+    frame = null;
+    if (!activeCard || !activeRect) return;
+    const x = (pointerX - activeRect.left) / activeRect.width - 0.5;
+    const y = (pointerY - activeRect.top) / activeRect.height - 0.5;
+    // 마우스 반대편으로 그림자 (최대 ±10px)
+    activeCard.style.setProperty('--shadow-x', (-x * 7) + 'px');
+    activeCard.style.setProperty('--shadow-y', (-y * 7 + 4) + 'px');
+  }
+
+  function activate(card) {
+    activeCard = card;
+    activeRect = card.getBoundingClientRect(); // 진입 시 1회만 측정
+  }
+  function onEnter(e) {
+    activate(e.currentTarget);
+  }
+  function onMove(e) {
+    /* mouseenter를 놓친 경우(요소가 커서 아래로 이동 등)에도 여기서 잡는다 */
+    if (e.currentTarget !== activeCard) activate(e.currentTarget);
+    pointerX = e.clientX;
+    pointerY = e.clientY;
+    if (frame === null) frame = requestAnimationFrame(flush);
+  }
+  function onLeave(e) {
+    const card = e.currentTarget;
+    card.style.setProperty('--shadow-x', '0px');
+    card.style.setProperty('--shadow-y', '6px');
+    if (card === activeCard) { activeCard = null; activeRect = null; }
+  }
+
+  /* 카드 위치는 scroll·resize·필터로 바뀌므로 캐시를 버리고 다음 enter에서 다시 잰다 */
+  function invalidateRect() {
+    if (activeCard) activeRect = activeCard.getBoundingClientRect();
+  }
+
+  let installed = false;
+  function syncShadowFollow() {
+    const enable = hasFinePointer();
+    if (enable === installed) return;
+    installed = enable;
+    if (enable) {
+      cards.forEach((card) => {
+        card.addEventListener('mouseenter', onEnter);
+        card.addEventListener('mousemove', onMove);
+        card.addEventListener('mouseleave', onLeave);
+      });
+      window.addEventListener('scroll', invalidateRect, { passive: true });
+      window.addEventListener('resize', invalidateRect);
+    } else {
+      cards.forEach((card) => {
+        card.removeEventListener('mouseenter', onEnter);
+        card.removeEventListener('mousemove', onMove);
+        card.removeEventListener('mouseleave', onLeave);
+        card.style.setProperty('--shadow-x', '0px');
+        card.style.setProperty('--shadow-y', '6px');
+      });
+      window.removeEventListener('scroll', invalidateRect);
+      window.removeEventListener('resize', invalidateRect);
+      activeCard = null; activeRect = null;
+    }
+  }
+  syncShadowFollow();
+  onMediaChange(finePointerQuery, syncShadowFollow);
 })();
 
 /* ------------------------------------------------------------- */
@@ -361,24 +486,9 @@ function closeMobile() {
 })();
 
 /* ------------------------------------------------------------- */
-/* 15. 로고 클릭 시 흔들리는 효과                                  */
-/* ------------------------------------------------------------- */
-document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
-  el.addEventListener('click', (e) => {
-    el.classList.remove('wobble');
-    void el.offsetWidth;
-    el.classList.add('wobble');
-  });
-});
-
-/* ------------------------------------------------------------- */
-/* 16. 진입 시 페이지 살짝 떨림 (한 번만)                          */
-/* ------------------------------------------------------------- */
-(function initPageEntry() {
-  if (prefersReducedMotion) return;
-  document.body.classList.add('page-entry');
-  setTimeout(() => document.body.classList.remove('page-entry'), 450);
-})();
+/* 15~16. 로고 클릭 wobble과 진입 페이지 떨림은 제거했다 (#112 Remove P2-7).   */
+/*    로고 wobble은 재시작을 위해 void offsetWidth로 강제 layout까지 썼고        */
+/*    (#113 P3-3), 진입 떨림은 LCP 후보가 있는 첫 화면에서 정보와 경쟁했다.      */
 
 /* ------------------------------------------------------------- */
 /* 17. 콘솔 이스터에그                                            */
@@ -403,37 +513,54 @@ document.querySelectorAll('.logo, .footer-logo').forEach((el) => {
 })();
 
 /* ------------------------------------------------------------- */
-/* 18. 프로젝트 카테고리 필터 (#28)                                */
+/* 18. 프로젝트 카테고리 필터 (#28, #60 실패 필터 통합)             */
 /*    연도 그룹 단위로 카드 표시/숨김, 빈 그룹은 헤더까지 숨김       */
+/*    클릭 한 번에 handler 세 개가 돌며 카드를 두 번 순회하던 것을   */
+/*    단일 handler로 합쳤다 (성능 감사 P2-2)                        */
 /* ------------------------------------------------------------- */
 (function initProjectFilter() {
   const btns = document.querySelectorAll('.pfilter');
   const groups = document.querySelectorAll('.year-group');
   if (!btns.length || !groups.length) return;
 
+  /* 실패 그룹 접힘 상태 — 필터 결과가 접힌 채로 가려지는 것을 막는다 */
+  const failedToggle = document.querySelector('.failed-toggle');
+  const failedGrid = document.getElementById('failed-grid');
+  function setFailedExpanded(expanded) {
+    if (!failedToggle || !failedGrid) return; // 실패 그룹이 없으면 무시(예외 안전)
+    failedToggle.setAttribute('aria-expanded', String(expanded));
+    failedGrid.classList.toggle('is-collapsed', !expanded);
+  }
+
+  function applyFilter(filter) {
+    /* 그룹별로 카드 필터링 후 빈 그룹 숨김 — 카드 순회는 클릭당 한 번 */
+    groups.forEach((group) => {
+      let visibleCount = 0;
+      group.querySelectorAll('.project-card').forEach((card) => {
+        const cats = (card.dataset.category || '').split(' ');
+        const isWip = card.classList.contains('project-wip');
+        const isFailed = card.classList.contains('project-failed');
+        const show =
+          filter === 'all' ||
+          (filter === 'wip' && isWip) ||
+          (filter === 'failed' && isFailed) ||
+          cats.includes(filter);
+        card.style.display = show ? '' : 'none';
+        if (show) visibleCount++;
+      });
+      group.style.display = visibleCount ? '' : 'none';
+    });
+
+    /* 전체(all)에서는 실패 그룹을 접고, 그 외 필터에서는 펼친다 */
+    setFailedExpanded(filter !== 'all');
+  }
+
   btns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      const filter = btn.dataset.filter;
-
       /* active 표시 이동 */
       btns.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
-
-      /* 그룹별로 카드 필터링 후 빈 그룹 숨김 */
-      groups.forEach((group) => {
-        let visibleCount = 0;
-        group.querySelectorAll('.project-card').forEach((card) => {
-          const cats = (card.dataset.category || '').split(' ');
-          const isWip = card.classList.contains('project-wip');
-          const show =
-            filter === 'all' ||
-            (filter === 'wip' && isWip) ||
-            cats.includes(filter);
-          card.style.display = show ? '' : 'none';
-          if (show) visibleCount++;
-        });
-        group.style.display = visibleCount ? '' : 'none';
-      });
+      applyFilter(btn.dataset.filter);
     });
   });
 })();
@@ -587,22 +714,9 @@ window._updateProjectCount();
   }
 })();
 
-/* ------------------------------------------------------------- */
-/* 22. 진행률 바 애니메이션 (#61) — 스크롤 진입 시 width 전환      */
-/* ------------------------------------------------------------- */
-(function initProgressBars() {
-  const bars = document.querySelectorAll('.progress-fill');
-  if (!bars.length) return;
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      const pct = entry.target.dataset.progress || '0';
-      entry.target.style.width = pct + '%';
-      obs.unobserve(entry.target);
-    });
-  }, { threshold: 0.3 });
-  bars.forEach((bar) => obs.observe(bar));
-})();
+/* 22. 진행률 바(#61)는 상태 라벨로 대체됐다 (#114).                */
+/*     자기신고 %는 0%·5% 같은 빈 막대를 게시하게 되어, 정적 라벨   */
+/*     한 줄(.wip-status)로 바꾸고 관련 IntersectionObserver를 제거. */
 
 /* ------------------------------------------------------------- */
 /* 23. MBTI 바 애니메이션 (#62) — 스크롤 진입 시 width 전환        */
@@ -610,12 +724,13 @@ window._updateProjectCount();
 (function initMbtiBars() {
   const fills = document.querySelectorAll('.mbti-bar-fill');
   if (!fills.length) return;
-  fills.forEach((f) => { f.style.width = '0%'; });
+  fills.forEach((f) => { f.style.transform = 'scaleX(0)'; });
   const obs = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
-      const pct = entry.target.dataset.pct || '0';
-      entry.target.style.width = pct + '%';
+      const pct = parseFloat(entry.target.dataset.pct || '0');
+      /* width 대신 scaleX — layout 없이 compositor에서 처리 */
+      entry.target.style.transform = 'scaleX(' + (pct / 100).toFixed(4) + ')';
       obs.unobserve(entry.target);
     });
   }, { threshold: 0.3 });
@@ -623,65 +738,20 @@ window._updateProjectCount();
 })();
 
 /* ------------------------------------------------------------- */
-/* 24. 프로젝트 필터 — 실패 카테고리 지원 (#60)                    */
-/*    기존 #18 필터에 'failed' 필터 추가 (project-failed 클래스)   */
-/* ------------------------------------------------------------- */
-(function patchFailedFilter() {
-  const btns = document.querySelectorAll('.pfilter');
-  const groups = document.querySelectorAll('.year-group');
-  if (!btns.length || !groups.length) return;
-
-  btns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const filter = btn.dataset.filter;
-      groups.forEach((group) => {
-        let visibleCount = 0;
-        group.querySelectorAll('.project-card').forEach((card) => {
-          const cats = (card.dataset.category || '').split(' ');
-          const isWip = card.classList.contains('project-wip');
-          const isFailed = card.classList.contains('project-failed');
-          const show =
-            filter === 'all' ||
-            (filter === 'wip' && isWip) ||
-            (filter === 'failed' && isFailed) ||
-            cats.includes(filter);
-          card.style.display = show ? '' : 'none';
-          if (show) visibleCount++;
-        });
-        group.style.display = visibleCount ? '' : 'none';
-      });
-    });
-  });
-})();
-
-/* ------------------------------------------------------------- */
-/* 24-b. 실패한 프로젝트 접기/펼치기 — 기본 접힘(미니멀)           */
+/* 24. 실패한 프로젝트 접기/펼치기 — 기본 접힘(미니멀)             */
 /*    · 헤더 버튼 클릭으로 토글                                   */
-/*    · 'all' 외 카테고리 필터 선택 시 자동 펼침(결과가 안 보이는  */
-/*      문제 방지), 'all' 로 돌아오면 다시 접음                    */
+/*    · 필터 연동(특정 필터에서 자동 펼침)은 #18 단일 handler로 이동 */
 /* ------------------------------------------------------------- */
 (function initFailedCollapse() {
   const toggle = document.querySelector('.failed-toggle');
   const grid = document.getElementById('failed-grid');
   if (!toggle || !grid) return; // 실패 그룹이 없으면 무시(예외 안전)
 
-  /* 접힘/펼침 상태를 aria-expanded 와 grid 클래스에 동기화 */
-  function setExpanded(expanded) {
-    toggle.setAttribute('aria-expanded', String(expanded));
-    grid.classList.toggle('is-collapsed', !expanded);
-  }
-
   /* 헤더 버튼 클릭 — 현재 상태 반전 */
   toggle.addEventListener('click', () => {
     const expanded = toggle.getAttribute('aria-expanded') === 'true';
-    setExpanded(!expanded);
-  });
-
-  /* 카테고리 필터와 연동 — 특정 필터는 펼치고, 전체(all)는 접음 */
-  document.querySelectorAll('.pfilter').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      setExpanded(btn.dataset.filter !== 'all');
-    });
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    grid.classList.toggle('is-collapsed', expanded);
   });
 })();
 
@@ -760,8 +830,8 @@ window._updateProjectCount();
       '.mobile-menu a:nth-of-type(6)': ' GitHub',
       /* 히어로 */
       '.hero-tag': 'Hello',
-      '.hero-role': { html: 'Innovator &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>' },
-      '.hero-desc': { html: 'I dream of being an entrepreneur who pursues <strong>innovation</strong> beyond profit.<br /><strong>1 million monthly users</strong> — that\'s my goal.' },
+      '.hero-role': { html: 'Full-Stack Developer &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>' },
+      '.hero-desc': { html: 'I build things that actually run — a <strong>campus notification bot</strong>, a <strong>multi-LLM desktop tool</strong>, a <strong>Raspberry Pi server</strong>.<br />Long term, I aim to be an entrepreneur pursuing innovation beyond profit.' },
       '.btn-primary': { html: '<i class="fas fa-folder-open"></i> Projects' },
       '.stat-label': ['Projects', 'Awards', 'out of 581'],
       /* 섹션 헤더 */
@@ -771,22 +841,18 @@ window._updateProjectCount();
       '#projects .section-title': 'Projects',
       /* About */
       '.about-quote': '"An innovator who turns ideas into reality"',
-      '.about-body': { html: '<p>Hello, I\'m <strong>Lee Geon Yeong</strong>, someone who goes beyond simple development to plan and create services that can change the world. I aspire to be an <strong>entrepreneur</strong>, not just a businessman — creating unprecedented value and driving innovation through technology.</p><p>Whenever an idea strikes, I document and refine it. To make these ideas a reality, I study <strong>AI, Communications, Web/App Development, Embedded, Hardware, Information Security, Hacking, DB, and Planning</strong> — with no boundaries on the field.</p>' },
+      '.about-body': { html: '<p>Hello, I\'m <strong>Lee Geon Yeong</strong>, someone who goes beyond simple development to plan and create services that can change the world. I aspire to be an <strong>entrepreneur</strong>, not just a businessman — creating value that did not exist before through technology.</p><p>Whenever an idea strikes, I write it down and then build it, mostly across three areas: <strong>AI automation, embedded &amp; IoT, and web backends</strong>.</p>' },
       '.chip:nth-child(1)': { html: '<i class="fas fa-rocket"></i> Goal: 1M Monthly Users' },
-      '.chip:nth-child(2)': { html: '<i class="fas fa-lightbulb"></i> Idea Bank' },
-      '.chip:nth-child(3)': { html: '<i class="fas fa-users"></i> Team Lead Experience' },
+      '.chip:nth-child(2)': { html: '<i class="fas fa-users"></i> Team Lead on 6 Projects' },
       '.edu-school': 'Korea University of Technology and Education',
-      '.edu-sub': 'KOREATECH · Enrolled',
+      '.edu-sub': 'KOREATECH · Class of 2026, enrolled',
       '.github-activity-btn': { html: '<i class="fab fa-github"></i> GitHub Activity' },
       /* MBTI */
-      '.mbti-traits-header': 'Bold Commander',
-      '.mbti-tag': ['Leadership', 'Efficiency', 'Strategic', 'Confidence', 'Challenger', 'Planner'],
       /* 하위 라벨 */
       '.mbti-block .subsection-label': { html: '<i class="fas fa-brain"></i> MBTI' },
       '.github-activity .subsection-label': { html: '<i class="fab fa-github"></i> GitHub Activity' },
       '.cert-block .subsection-label': { html: '<i class="fas fa-certificate"></i> Certifications' },
       '#featured-section > .subsection-label': { html: '<i class="fas fa-star"></i> Featured Projects' },
-      '.mindmap-block .subsection-label': { html: '<i class="fas fa-project-diagram"></i> Project Mindmap' },
       '#all-projects-section': { html: '<i class="fas fa-folder-open"></i> All Projects <span id="projectTotalCount" class="project-count-badge"></span>' },
       /* 필터 */
       '.pfilter[data-filter="all"]': 'All',
@@ -812,7 +878,6 @@ window._updateProjectCount();
       '[data-nav-section="awards"] .nav-bookmark-label': 'Awards',
       '[data-nav-section="cert-section"] .nav-bookmark-label': 'Certs',
       '[data-nav-section="featured-section"] .nav-bookmark-label': 'Featured',
-      '[data-nav-section="mindmap-section"] .nav-bookmark-label': 'Map',
       '[data-nav-section="all-projects-section"] .nav-bookmark-label': 'All',
       /* 맨 위로 */
       '#btn-back-to-top': { attr: { title: 'Back to top', 'aria-label': 'Back to top' } },
@@ -831,8 +896,8 @@ window._updateProjectCount();
       '.mobile-menu a:nth-of-type(5)': ' 프로젝트',
       '.mobile-menu a:nth-of-type(6)': ' GitHub',
       '.hero-tag': '안녕하세요',
-      '.hero-role': { html: '혁신의 기업가 &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>' },
-      '.hero-desc': { html: '이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br /><strong>월 100만 명</strong>이 사용하는 서비스를 만드는 것이 목표입니다.' },
+      '.hero-role': { html: '풀스택 개발자 &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>' },
+      '.hero-desc': { html: '<strong>공지 알림 봇</strong> · <strong>멀티 LLM 도구</strong> · <strong>라즈베리파이 서버</strong>처럼 실제로 돌아가는 것을 만듭니다.<br />길게는 이윤을 넘어 혁신을 추구하는 기업가를 목표로 합니다.' },
       '.btn-primary': { html: '<i class="fas fa-folder-open"></i> 프로젝트 보기' },
       '.stat-label': ['프로젝트', '수상 경력', '581 팀 중'],
       '#about .section-title': '비전',
@@ -840,20 +905,16 @@ window._updateProjectCount();
       '#awards .section-title': '수상',
       '#projects .section-title': '프로젝트',
       '.about-quote': '"아이디어를 현실로 만드는 혁신가"',
-      '.about-body': { html: '<p>안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고 만드는 <strong>이건영</strong>입니다. 저는 사업가가 아닌 <strong>기업가</strong>를 지향합니다. 이윤을 쫓기보다 기술을 통해 세상에 없던 가치를 창출하고 혁신을 일으키고 싶습니다.</p><p>떠오르는 아이디어가 있을 때마다 구체화하여 기록하고 있으며 이를 실현하기 위해 <strong>AI, 통신, 웹/앱 개발, 임베디드, 하드웨어, 정보보안, 해킹, DB, 기획</strong> 등 분야를 가리지 않고 기술을 익히고 있습니다.</p>' },
+      '.about-body': { html: '<p>안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고 만드는 <strong>이건영</strong>입니다. 저는 사업가가 아닌 <strong>기업가</strong>를 지향합니다. 이윤을 쫓기보다 기술로 세상에 없던 가치를 만들고 싶습니다.</p><p>떠오르는 아이디어는 기록해 두고 직접 만들어 확인합니다. 지금까지 만든 것은 대부분 <strong>AI 자동화, 임베디드·IoT, 웹 백엔드</strong> 세 갈래에 있습니다.</p>' },
       '.chip:nth-child(1)': { html: '<i class="fas fa-rocket"></i> 목표 : 월 100만명 유저 서비스' },
-      '.chip:nth-child(2)': { html: '<i class="fas fa-lightbulb"></i> 아이디어 뱅크' },
-      '.chip:nth-child(3)': { html: '<i class="fas fa-users"></i> 팀장 경험 多' },
+      '.chip:nth-child(2)': { html: '<i class="fas fa-users"></i> 팀장으로 참여한 프로젝트 6개' },
       '.edu-school': '한국기술교육대학교',
-      '.edu-sub': 'KOREATECH · 재학 중',
+      '.edu-sub': 'KOREATECH · 26학번 재학 중',
       '.github-activity-btn': { html: '<i class="fab fa-github"></i> GitHub 활동 보러가기' },
-      '.mbti-traits-header': '대담한 통솔자',
-      '.mbti-tag': ['리더십', '효율성', '전략적 사고', '자신감', '도전 정신', '계획적'],
       '.mbti-block .subsection-label': { html: '<i class="fas fa-brain"></i> MBTI' },
       '.github-activity .subsection-label': { html: '<i class="fab fa-github"></i> GitHub 활동' },
       '.cert-block .subsection-label': { html: '<i class="fas fa-certificate"></i> 자격증' },
       '#featured-section > .subsection-label': { html: '<i class="fas fa-star"></i> 대표 프로젝트' },
-      '.mindmap-block .subsection-label': { html: '<i class="fas fa-project-diagram"></i> 프로젝트 마인드맵' },
       '#all-projects-section': { html: '<i class="fas fa-folder-open"></i> 전체 프로젝트 <span id="projectTotalCount" class="project-count-badge"></span>' },
       '.pfilter[data-filter="all"]': '전체',
       '.pfilter[data-filter="ai"]': 'AI · ML',
@@ -875,7 +936,6 @@ window._updateProjectCount();
       '[data-nav-section="awards"] .nav-bookmark-label': '수상',
       '[data-nav-section="cert-section"] .nav-bookmark-label': '자격증',
       '[data-nav-section="featured-section"] .nav-bookmark-label': '대표',
-      '[data-nav-section="mindmap-section"] .nav-bookmark-label': '마인드맵',
       '[data-nav-section="all-projects-section"] .nav-bookmark-label': '전체',
       '#btn-back-to-top': { attr: { title: '맨 위로', 'aria-label': '맨 위로' } },
       '.scroll-hint span': '스크롤',
@@ -883,8 +943,8 @@ window._updateProjectCount();
   };
 
   /* 영어 타이핑 단어 목록 */
-  const typingWordsEN = ['Full-Stack Dev', 'Maker', 'Idea Bank', 'Team Leader', 'Engineer'];
-  const typingWordsKO = ['풀스택 개발자', '메이커', '아이디어 뱅크', '팀 리더', '엔지니어'];
+  const typingWordsEN = ['Maker', 'Engineer', 'Team Leader'];
+  const typingWordsKO = ['메이커', '엔지니어', '팀 리더'];
 
   let currentLang = localStorage.getItem('lang') || 'ko';
 
@@ -925,17 +985,6 @@ window._updateProjectCount();
       const el = document.querySelector(selector);
       if (el) el.textContent = value;
     });
-
-    /* MBTI 태그 — 아이콘 포함이므로 별도 처리 */
-    const tagIcons = ['fa-crown', 'fa-bullseye', 'fa-chess', 'fa-bolt', 'fa-mountain', 'fa-calendar-check'];
-    const tagTexts = translations[lang]['.mbti-tag'];
-    if (tagTexts) {
-      document.querySelectorAll('.mbti-tag').forEach((el, i) => {
-        if (i < tagTexts.length) {
-          el.innerHTML = '<i class="fas ' + tagIcons[i] + '"></i> ' + tagTexts[i];
-        }
-      });
-    }
 
     /* 모바일 메뉴 — 아이콘 보존 */
     const mobileIcons = ['fa-home', 'fa-user', 'fa-code', 'fa-trophy', 'fa-folder-open', 'fa-github'];
