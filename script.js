@@ -1,32 +1,116 @@
 /* =============================================================
-   pachir1su.github.io — 노트/인덱스 카드 인터랙션
-
-   v2.6.0 정리 원칙
-   - 정보 탐색에 필요한 인터랙션만 유지
-   - 홈의 부유/드래그 프로그래밍 언어 장식 제거 (#119)
-   - 치킨 모드 제거 (#119)
-   - 위치(nth-child)에 기대는 내비게이션 번역 제거 (#122)
-   - prefers-reduced-motion 및 포인터 능력 존중
+   pachir1su.github.io — v2.6.0 interactions
+   정보 탐색에 필요한 동작만 유지하고 오래된 장식/중복 내비게이션은 제거한다.
    ============================================================= */
 
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const finePointerQuery = window.matchMedia('(hover: hover) and (pointer: fine)');
 const hasFinePointer = () => finePointerQuery.matches;
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function onMediaChange(query, handler) {
   if (typeof query.addEventListener === 'function') query.addEventListener('change', handler);
   else if (typeof query.addListener === 'function') query.addListener(handler);
 }
 
+function scrollBehavior() {
+  return prefersReducedMotion ? 'auto' : 'smooth';
+}
+
 /* ------------------------------------------------------------- */
-/* 1. AOS                                                        */
+/* 1. v2.6 DOM normalization                                     */
+/* ------------------------------------------------------------- */
+(function normalizeV26Markup() {
+  document.getElementById('mbti-section')?.remove();
+  document.querySelector('.floating-icons')?.remove();
+  document.getElementById('sectionNav')?.remove();
+
+  document.querySelector('.nav-links a[href="#home"]')?.closest('li')?.remove();
+  document.querySelector('.mobile-menu > a[href="#home"]')?.remove();
+
+  const navLabels = {
+    '#projects': ['프로젝트', 'Projects'],
+    '#skills': ['역량', 'Skills'],
+    '#awards': ['수상', 'Awards'],
+    '#about': ['비전', 'Vision'],
+  };
+  Object.entries(navLabels).forEach(([href, labels]) => {
+    document.querySelectorAll(`a[href="${href}"]`).forEach((link) => {
+      if (!link.closest('.nav-links, .mobile-menu')) return;
+      link.dataset.ko = labels[0];
+      link.dataset.en = labels[1];
+    });
+  });
+
+  const personSchema = document.querySelector('script[type="application/ld+json"]');
+  if (personSchema) {
+    try {
+      const data = JSON.parse(personSchema.textContent);
+      if (data && data['@type'] === 'Person') {
+        delete data.alumniOf;
+        data.affiliation = {
+          '@type': 'CollegeOrUniversity',
+          name: '한국기술교육대학교',
+        };
+        personSchema.textContent = JSON.stringify(data, null, 2);
+      }
+    } catch (error) {
+      console.warn('JSON-LD normalization skipped:', error);
+    }
+  }
+
+  const education = document.querySelector('.about-edu');
+  if (education) education.setAttribute('aria-label', '한국기술교육대학교 26학번');
+
+  const school = document.querySelector('.edu-school');
+  if (school) {
+    school.dataset.ko = '한국기술교육대학교 26학번';
+    school.dataset.en = 'KOREATECH · Class of 2026';
+    school.textContent = school.dataset.ko;
+  }
+  const schoolSub = document.querySelector('.edu-sub');
+  if (schoolSub) schoolSub.remove();
+
+  const heroButtons = document.querySelector('.hero-btns');
+  if (heroButtons && !heroButtons.querySelector('.hero-email')) {
+    const emailButton = document.createElement('button');
+    emailButton.type = 'button';
+    emailButton.className = 'btn btn-ghost contact-email hero-email';
+    emailButton.title = '클릭하면 복사됩니다';
+    emailButton.innerHTML = '<i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span><span class="copy-hint sr-only">복사</span>';
+    heroButtons.appendChild(emailButton);
+  }
+
+  if (!document.getElementById('v26-runtime-layout')) {
+    const style = document.createElement('style');
+    style.id = 'v26-runtime-layout';
+    style.textContent = `
+      .hero-btns { flex-wrap: wrap; }
+      .hero-email { max-width: 100%; }
+      .hero-email .email-addr { overflow-wrap: anywhere; }
+      .sr-only { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; }
+      @media (max-width: 1024px) {
+        .container { padding-left: clamp(16px, 4vw, 24px); padding-right: clamp(16px, 4vw, 24px); }
+        .hero-content { grid-template-columns: minmax(0, 1fr); }
+        .hero-main, .hero-stats { min-width: 0; }
+      }
+      @media (max-width: 640px) {
+        .hero-btns > * { width: 100%; justify-content: center; }
+        .hero-email { font-size: .78rem; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+})();
+
+/* ------------------------------------------------------------- */
+/* 2. AOS                                                        */
 /* ------------------------------------------------------------- */
 if (typeof AOS !== 'undefined') {
   AOS.init({ once: true, duration: 400, easing: 'ease-out-cubic' });
 }
 
 /* ------------------------------------------------------------- */
-/* 2. Back-to-top                                                */
+/* 3. Back-to-top + scroll progress                              */
 /* ------------------------------------------------------------- */
 const backBtn = document.getElementById('btn-back-to-top');
 const myBar = document.getElementById('myBar');
@@ -34,82 +118,92 @@ const myBar = document.getElementById('myBar');
 if (backBtn) {
   backBtn.style.alignItems = 'center';
   backBtn.style.justifyContent = 'center';
-  backBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
-  });
+  backBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: scrollBehavior() }));
 }
 
+(function initScroll() {
+  let ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const top = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const ratio = height > 0 ? top / height : 0;
+      if (myBar) myBar.style.transform = `scaleX(${ratio.toFixed(4)})`;
+      if (backBtn) backBtn.classList.toggle('visible', top > 300);
+      document.documentElement.style.setProperty('--scroll-progress', ratio.toFixed(3));
+      ticking = false;
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+
 /* ------------------------------------------------------------- */
-/* 3. 타이핑 효과                                                */
+/* 4. Typing                                                    */
 /* ------------------------------------------------------------- */
 (function initTyping() {
-  const defaultWords = ['메이커', '엔지니어', '팀 리더'];
+  const defaults = ['메이커', '엔지니어', '팀 리더'];
   let wordIndex = 0;
   let charIndex = 0;
-  let isDeleting = false;
-  let timerId = null;
+  let deleting = false;
+  let timer = null;
 
   function type() {
     const el = document.getElementById('typing-text');
-    if (!el) {
-      timerId = setTimeout(type, 250);
-      return;
-    }
-
-    const words = window._typingWords || defaultWords;
-    const currentWord = words[wordIndex % words.length];
+    if (!el) return;
+    const words = window._typingWords || defaults;
+    const word = words[wordIndex % words.length];
 
     if (prefersReducedMotion) {
-      el.textContent = currentWord;
+      el.textContent = word;
       return;
     }
 
-    el.textContent = isDeleting
-      ? currentWord.substring(0, Math.max(0, charIndex - 1))
-      : currentWord.substring(0, charIndex + 1);
+    el.textContent = deleting
+      ? word.substring(0, Math.max(0, charIndex - 1))
+      : word.substring(0, charIndex + 1);
+    deleting ? charIndex-- : charIndex++;
 
-    isDeleting ? charIndex-- : charIndex++;
-    let typeSpeed = isDeleting ? 50 : 100;
-
-    if (!isDeleting && charIndex === currentWord.length) {
-      isDeleting = true;
-      typeSpeed = 2000;
-    } else if (isDeleting && charIndex === 0) {
-      isDeleting = false;
+    let delay = deleting ? 50 : 100;
+    if (!deleting && charIndex === word.length) {
+      deleting = true;
+      delay = 2000;
+    } else if (deleting && charIndex === 0) {
+      deleting = false;
       wordIndex = (wordIndex + 1) % words.length;
-      typeSpeed = 500;
+      delay = 500;
     }
-
-    timerId = setTimeout(type, typeSpeed);
+    timer = setTimeout(type, delay);
   }
 
   window._restartTyping = function () {
-    clearTimeout(timerId);
+    clearTimeout(timer);
     wordIndex = 0;
     charIndex = 0;
-    isDeleting = false;
+    deleting = false;
     const el = document.getElementById('typing-text');
     if (el) el.textContent = '';
     type();
   };
-
   type();
 })();
 
 /* ------------------------------------------------------------- */
-/* 4. 모바일 메뉴                                                */
+/* 5. Mobile menu                                               */
 /* ------------------------------------------------------------- */
 const hamburger = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
 
 function closeMobile() {
-  if (mobileMenu) mobileMenu.classList.remove('open');
+  mobileMenu?.classList.remove('open');
   if (hamburger) {
     hamburger.classList.remove('open');
     hamburger.setAttribute('aria-expanded', 'false');
   }
-  if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+  sidebarOverlay?.classList.remove('active');
   document.body.style.overflow = '';
 }
 
@@ -118,29 +212,27 @@ if (hamburger && mobileMenu) {
     const open = mobileMenu.classList.toggle('open');
     hamburger.classList.toggle('open', open);
     hamburger.setAttribute('aria-expanded', String(open));
-    if (sidebarOverlay) sidebarOverlay.classList.toggle('active', open);
+    sidebarOverlay?.classList.toggle('active', open);
     document.body.style.overflow = open ? 'hidden' : '';
   });
 }
-
-if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeMobile);
+sidebarOverlay?.addEventListener('click', closeMobile);
+mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMobile));
 
 /* ------------------------------------------------------------- */
-/* 5. 도장 클릭 효과                                             */
+/* 6. Stamp feedback                                            */
 /* ------------------------------------------------------------- */
 (function initStampClick() {
   if (prefersReducedMotion) return;
-  const stampWords = ['확인', 'OK', '!!', '@@', 'GOOD', '체크'];
-  const targets = '.btn, .plink, .chip, .wip-badge, .stat-item, .nav-github, #btn-back-to-top';
-
-  document.querySelectorAll(targets).forEach((el) => {
-    el.addEventListener('click', (e) => {
+  const words = ['확인', 'OK', '!!', '@@', 'GOOD', '체크'];
+  document.querySelectorAll('.btn, .plink, .chip, .wip-badge, .stat-item, .nav-github, #btn-back-to-top').forEach((el) => {
+    el.addEventListener('click', (event) => {
       const stamp = document.createElement('div');
       stamp.className = 'stamp-pop';
-      stamp.textContent = stampWords[Math.floor(Math.random() * stampWords.length)];
-      stamp.style.setProperty('--stamp-rot', (-8 + Math.random() * 16) + 'deg');
-      stamp.style.left = e.clientX + 'px';
-      stamp.style.top = e.clientY + 'px';
+      stamp.textContent = words[Math.floor(Math.random() * words.length)];
+      stamp.style.setProperty('--stamp-rot', `${-8 + Math.random() * 16}deg`);
+      stamp.style.left = `${event.clientX}px`;
+      stamp.style.top = `${event.clientY}px`;
       document.body.appendChild(stamp);
       setTimeout(() => stamp.remove(), 500);
     });
@@ -148,27 +240,28 @@ if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeMobile);
 })();
 
 /* ------------------------------------------------------------- */
-/* 6. 히어로 통계 카운트업                                      */
+/* 7. Hero stat counter                                         */
 /* ------------------------------------------------------------- */
 (function initStatCounter() {
   const stats = document.querySelectorAll('.stat-num');
   if (!stats.length) return;
+  const lang = localStorage.getItem('lang') || 'ko';
 
-  const statLang = localStorage.getItem('lang') || 'ko';
   stats.forEach((el) => {
     const match = el.textContent.trim().match(/^(\d+)(.*)$/);
     if (!match) return;
     el.dataset.target = match[1];
     if (el.dataset.suffixKo === undefined) el.dataset.suffixKo = match[2];
     if (el.dataset.suffixEn === undefined) el.dataset.suffixEn = match[2];
-    el.dataset.suffix = statLang === 'en' ? el.dataset.suffixEn : el.dataset.suffixKo;
-    el.textContent = '0' + el.dataset.suffix;
+    el.dataset.suffix = lang === 'en' ? el.dataset.suffixEn : el.dataset.suffixKo;
+    el.textContent = `0${el.dataset.suffix}`;
   });
 
-  if (typeof IntersectionObserver === 'undefined') {
-    stats.forEach((el) => {
-      if (el.dataset.target) el.textContent = el.dataset.target + (el.dataset.suffix || '');
-    });
+  const finish = (el) => {
+    if (el.dataset.target) el.textContent = `${el.dataset.target}${el.dataset.suffix || ''}`;
+  };
+  if (prefersReducedMotion || typeof IntersectionObserver === 'undefined') {
+    stats.forEach(finish);
     return;
   }
 
@@ -176,188 +269,85 @@ if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeMobile);
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
       const el = entry.target;
-      const target = parseInt(el.dataset.target, 10);
-      const suffix = el.dataset.suffix || '';
+      const target = Number.parseInt(el.dataset.target, 10);
       if (Number.isNaN(target)) return;
-
-      if (prefersReducedMotion) {
-        el.textContent = target + suffix;
-        obs.unobserve(el);
-        return;
-      }
-
-      const duration = 500;
+      const suffix = el.dataset.suffix || '';
       const start = performance.now();
-      function tick(t) {
-        const progress = Math.min(1, (t - start) / duration);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.round(target * eased) + suffix;
-        if (progress < 1) requestAnimationFrame(tick);
-        else el.textContent = target + suffix;
-      }
+      const tick = (now) => {
+        const p = Math.min(1, (now - start) / 500);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = `${Math.round(target * eased)}${suffix}`;
+        if (p < 1) requestAnimationFrame(tick);
+        else finish(el);
+      };
       requestAnimationFrame(tick);
       obs.unobserve(el);
     });
   }, { threshold: 0.5 });
-
   stats.forEach((el) => obs.observe(el));
 })();
 
 /* ------------------------------------------------------------- */
-/* 7. 통합 스크롤 핸들러                                         */
-/* ------------------------------------------------------------- */
-(function initScroll() {
-  let ticking = false;
-
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const ratio = height > 0 ? winScroll / height : 0;
-
-      if (myBar) myBar.style.transform = 'scaleX(' + ratio.toFixed(4) + ')';
-      if (backBtn) backBtn.classList.toggle('visible', winScroll > 300);
-      document.documentElement.style.setProperty('--scroll-progress', ratio.toFixed(3));
-      ticking = false;
-    });
-  }
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-})();
-
-/* ------------------------------------------------------------- */
-/* 8. 카드 그림자 포인터 추적                                    */
+/* 8. Card shadow follow                                        */
 /* ------------------------------------------------------------- */
 (function initShadowFollow() {
   if (prefersReducedMotion) return;
-  const cards = Array.from(
-    document.querySelectorAll('.skill-card, .project-card, .award-card, .about-card')
-  );
+  const cards = [...document.querySelectorAll('.skill-card, .project-card, .award-card, .about-card')];
   if (!cards.length) return;
+  let installed = false;
 
-  let activeCard = null;
-  let activeRect = null;
-  let pointerX = 0;
-  let pointerY = 0;
-  let frame = null;
-
-  function flush() {
-    frame = null;
-    if (!activeCard || !activeRect) return;
-    const x = (pointerX - activeRect.left) / activeRect.width - 0.5;
-    const y = (pointerY - activeRect.top) / activeRect.height - 0.5;
-    activeCard.style.setProperty('--shadow-x', (-x * 7) + 'px');
-    activeCard.style.setProperty('--shadow-y', (-y * 7 + 4) + 'px');
+  function enter(event) {
+    event.currentTarget._v26Rect = event.currentTarget.getBoundingClientRect();
   }
-
-  function activate(card) {
-    activeCard = card;
-    activeRect = card.getBoundingClientRect();
+  function move(event) {
+    const card = event.currentTarget;
+    const rect = card._v26Rect || card.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - 0.5;
+    const y = (event.clientY - rect.top) / rect.height - 0.5;
+    card.style.setProperty('--shadow-x', `${-x * 7}px`);
+    card.style.setProperty('--shadow-y', `${-y * 7 + 4}px`);
   }
-
-  function onEnter(e) {
-    activate(e.currentTarget);
-  }
-
-  function onMove(e) {
-    if (e.currentTarget !== activeCard) activate(e.currentTarget);
-    pointerX = e.clientX;
-    pointerY = e.clientY;
-    if (frame === null) frame = requestAnimationFrame(flush);
-  }
-
-  function onLeave(e) {
-    const card = e.currentTarget;
+  function leave(event) {
+    const card = event.currentTarget;
+    delete card._v26Rect;
     card.style.setProperty('--shadow-x', '0px');
     card.style.setProperty('--shadow-y', '6px');
-    if (card === activeCard) {
-      activeCard = null;
-      activeRect = null;
-    }
   }
-
-  function invalidateRect() {
-    if (activeCard) activeRect = activeCard.getBoundingClientRect();
-  }
-
-  let installed = false;
-  function syncShadowFollow() {
+  function sync() {
     const enable = hasFinePointer();
     if (enable === installed) return;
     installed = enable;
-
-    if (enable) {
-      cards.forEach((card) => {
-        card.addEventListener('mouseenter', onEnter);
-        card.addEventListener('mousemove', onMove);
-        card.addEventListener('mouseleave', onLeave);
-      });
-      window.addEventListener('scroll', invalidateRect, { passive: true });
-      window.addEventListener('resize', invalidateRect);
-    } else {
-      cards.forEach((card) => {
-        card.removeEventListener('mouseenter', onEnter);
-        card.removeEventListener('mousemove', onMove);
-        card.removeEventListener('mouseleave', onLeave);
-        card.style.setProperty('--shadow-x', '0px');
-        card.style.setProperty('--shadow-y', '6px');
-      });
-      window.removeEventListener('scroll', invalidateRect);
-      window.removeEventListener('resize', invalidateRect);
-      activeCard = null;
-      activeRect = null;
-    }
+    cards.forEach((card) => {
+      const method = enable ? 'addEventListener' : 'removeEventListener';
+      card[method]('mouseenter', enter);
+      card[method]('mousemove', move);
+      card[method]('mouseleave', leave);
+      if (!enable) leave({ currentTarget: card });
+    });
   }
-
-  syncShadowFollow();
-  onMediaChange(finePointerQuery, syncShadowFollow);
+  sync();
+  onMediaChange(finePointerQuery, sync);
 })();
 
 /* ------------------------------------------------------------- */
-/* 9. 키보드 단축키                                              */
+/* 9. Keyboard shortcuts                                        */
 /* ------------------------------------------------------------- */
 (function initShortcuts() {
   const sections = ['#home', '#projects', '#skills', '#awards', '#about'];
-
-  document.addEventListener('keydown', (e) => {
-    if (e.target && e.target.matches('input, textarea, select, [contenteditable="true"]')) return;
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-
-    const key = e.key.toLowerCase();
+  document.addEventListener('keydown', (event) => {
+    if (event.target?.matches('input, textarea, select, [contenteditable="true"]')) return;
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    const key = event.key.toLowerCase();
     if (key >= '1' && key <= '5') {
-      const selector = sections[parseInt(key, 10) - 1];
-      const target = document.querySelector(selector);
-      if (target) {
-        target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
-        flashHint(selector.slice(1).toUpperCase());
-      }
-    } else if (key === 'escape') {
-      closeMobile();
-    } else if (key === 't') {
-      window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
-      flashHint('TOP');
-    } else if (key === 'g') {
-      flashHint('OPEN GITHUB');
-      setTimeout(() => window.open('https://github.com/pachir1su', '_blank', 'noopener'), 200);
-    }
+      document.querySelector(sections[Number.parseInt(key, 10) - 1])?.scrollIntoView({ behavior: scrollBehavior() });
+    } else if (key === 'escape') closeMobile();
+    else if (key === 't') window.scrollTo({ top: 0, behavior: scrollBehavior() });
+    else if (key === 'g') window.open('https://github.com/pachir1su', '_blank', 'noopener');
   });
-
-  function flashHint(text) {
-    const hint = document.createElement('div');
-    hint.className = 'key-hint';
-    hint.textContent = text;
-    document.body.appendChild(hint);
-    requestAnimationFrame(() => hint.classList.add('show'));
-    setTimeout(() => hint.classList.remove('show'), 400);
-    setTimeout(() => hint.remove(), 650);
-  }
 })();
 
 /* ------------------------------------------------------------- */
-/* 10. 카드 진입 효과                                            */
+/* 10. Card entry                                               */
 /* ------------------------------------------------------------- */
 (function initCardEntry() {
   if (prefersReducedMotion || typeof IntersectionObserver === 'undefined') return;
@@ -373,33 +363,17 @@ if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeMobile);
 })();
 
 /* ------------------------------------------------------------- */
-/* 11. 콘솔 이스터에그                                           */
+/* 11. Console egg — lightweight only                           */
 /* ------------------------------------------------------------- */
-(function consoleEgg() {
-  const lines = [
-    '%c┌─────────────────────────────────────────────┐',
-    '│  안녕, 종이 너머에서 코드를 읽는 사람.     │',
-    '│  이 페이지는 노트입니다.                    │',
-    '│                                             │',
-    '│  단축키:                                    │',
-    '│    1~5 → 섹션 점프                          │',
-    '│    T   → 맨 위로                            │',
-    '│    G   → GitHub                             │',
-    '│    Esc → 모바일 메뉴 닫기                   │',
-    '└─────────────────────────────────────────────┘',
-  ];
-  const style = 'color:#c63b3b; font-family:monospace; font-size:12px; line-height:1.4;';
-  console.log(lines.join('\n'), style);
-})();
+console.log('%c{ GY } portfolio · 1~5 sections · T top · G GitHub', 'color:#c63b3b;font-family:monospace');
 
 /* ------------------------------------------------------------- */
-/* 12. 프로젝트 카테고리 필터                                    */
+/* 12. Project filter                                            */
 /* ------------------------------------------------------------- */
 (function initProjectFilter() {
   const buttons = document.querySelectorAll('.pfilter');
   const groups = document.querySelectorAll('.year-group');
   if (!buttons.length || !groups.length) return;
-
   const failedToggle = document.querySelector('.failed-toggle');
   const failedGrid = document.getElementById('failed-grid');
 
@@ -408,111 +382,83 @@ if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeMobile);
     failedToggle.setAttribute('aria-expanded', String(expanded));
     failedGrid.classList.toggle('is-collapsed', !expanded);
   }
-
   function applyFilter(filter) {
     groups.forEach((group) => {
-      let visibleCount = 0;
+      let visible = 0;
       group.querySelectorAll('.project-card').forEach((card) => {
         const categories = (card.dataset.category || '').split(' ');
-        const isWip = card.classList.contains('project-wip');
-        const isFailed = card.classList.contains('project-failed');
-        const show =
-          filter === 'all' ||
-          (filter === 'wip' && isWip) ||
-          (filter === 'failed' && isFailed) ||
-          categories.includes(filter);
-
+        const show = filter === 'all'
+          || (filter === 'wip' && card.classList.contains('project-wip'))
+          || (filter === 'failed' && card.classList.contains('project-failed'))
+          || categories.includes(filter);
         card.style.display = show ? '' : 'none';
-        if (show) visibleCount++;
+        if (show) visible++;
       });
-      group.style.display = visibleCount ? '' : 'none';
+      group.style.display = visible ? '' : 'none';
     });
-
     setFailedExpanded(filter !== 'all');
   }
-
-  buttons.forEach((button) => {
-    button.addEventListener('click', () => {
-      buttons.forEach((item) => item.classList.remove('active'));
-      button.classList.add('active');
-      applyFilter(button.dataset.filter || 'all');
-    });
-  });
+  buttons.forEach((button) => button.addEventListener('click', () => {
+    buttons.forEach((item) => item.classList.remove('active'));
+    button.classList.add('active');
+    applyFilter(button.dataset.filter || 'all');
+  }));
 })();
 
 /* ------------------------------------------------------------- */
-/* 13. 이메일 복사                                               */
+/* 13. Email copy                                                */
 /* ------------------------------------------------------------- */
 (function initEmailCopy() {
-  const buttons = document.querySelectorAll('.contact-email');
-  if (!buttons.length) return;
-
-  buttons.forEach((button) => {
+  document.querySelectorAll('.contact-email').forEach((button) => {
     const addr = button.querySelector('.email-addr');
     const hint = button.querySelector('.copy-hint');
-    const email = addr ? addr.textContent.trim() : 'capybara@koreatech.ac.kr';
-
+    const email = addr?.textContent.trim() || 'capybara@koreatech.ac.kr';
     button.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(email);
-      } catch (clipboardError) {
-        try {
-          const textarea = document.createElement('textarea');
-          textarea.value = email;
-          textarea.style.position = 'fixed';
-          textarea.style.opacity = '0';
-          document.body.appendChild(textarea);
-          textarea.focus();
-          textarea.select();
-          document.execCommand('copy');
-          textarea.remove();
-        } catch (fallbackError) {
-          return;
-        }
+      } catch (error) {
+        const textarea = document.createElement('textarea');
+        textarea.value = email;
+        textarea.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        textarea.remove();
       }
-
       if (hint) {
         const previous = hint.textContent;
-        button.classList.add('copied');
         hint.textContent = (localStorage.getItem('lang') || 'ko') === 'en' ? 'Copied!' : '복사됨!';
-        setTimeout(() => {
-          button.classList.remove('copied');
-          hint.textContent = previous;
-        }, 1500);
+        setTimeout(() => { hint.textContent = previous; }, 1500);
       }
     });
   });
 })();
 
 /* ------------------------------------------------------------- */
-/* 14. 프로젝트 수 배지                                          */
+/* 14. Project count                                             */
 /* ------------------------------------------------------------- */
 window._updateProjectCount = function () {
   const badge = document.getElementById('projectTotalCount');
   if (!badge) return;
-
   let done = 0;
   let wip = 0;
   document.querySelectorAll('.project-card').forEach((card) => {
     if (card.classList.contains('project-wip')) wip++;
     else if (!card.classList.contains('project-failed')) done++;
   });
-
-  const lang = localStorage.getItem('lang') || 'ko';
-  badge.textContent = lang === 'en'
-    ? done + ' done · ' + wip + ' upcoming'
-    : done + '개 완료 · ' + wip + '개 예정';
+  badge.textContent = (localStorage.getItem('lang') || 'ko') === 'en'
+    ? `${done} done · ${wip} upcoming`
+    : `${done}개 완료 · ${wip}개 예정`;
 };
 window._updateProjectCount();
 
 /* ------------------------------------------------------------- */
-/* 15. 실패 프로젝트 접기/펼치기                                 */
+/* 15. Failed project collapse                                   */
 /* ------------------------------------------------------------- */
 (function initFailedCollapse() {
   const toggle = document.querySelector('.failed-toggle');
   const grid = document.getElementById('failed-grid');
   if (!toggle || !grid) return;
-
   toggle.addEventListener('click', () => {
     const expanded = toggle.getAttribute('aria-expanded') === 'true';
     toggle.setAttribute('aria-expanded', String(!expanded));
@@ -521,86 +467,70 @@ window._updateProjectCount();
 })();
 
 /* ------------------------------------------------------------- */
-/* 16. 다크 모드                                                 */
+/* 16. Theme                                                     */
 /* ------------------------------------------------------------- */
-(function initDarkMode() {
-  const toggle = document.getElementById('themeToggle');
-  const toggleMobile = document.getElementById('themeToggleMobile');
-  const icon = document.getElementById('themeIcon');
-  const iconMobile = document.getElementById('themeIconMobile');
-  const labelMobile = document.querySelector('.theme-label-mobile');
+(function initTheme() {
+  const desktop = document.getElementById('themeToggle');
+  const mobile = document.getElementById('themeToggleMobile');
+  const desktopIcon = document.getElementById('themeIcon');
+  const mobileIcon = document.getElementById('themeIconMobile');
+  const mobileLabel = document.querySelector('.theme-label-mobile');
 
-  function getPreferred() {
-    const saved = localStorage.getItem('theme');
-    if (saved) return saved;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  function preferred() {
+    return localStorage.getItem('theme')
+      || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   }
-
   function apply(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.dataset.theme = theme;
     localStorage.setItem('theme', theme);
-    const isDark = theme === 'dark';
+    const dark = theme === 'dark';
     const lang = localStorage.getItem('lang') || 'ko';
-
-    if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-    if (iconMobile) iconMobile.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-    if (labelMobile) {
-      labelMobile.textContent = isDark
-        ? (lang === 'en' ? 'Light Mode' : '라이트 모드')
-        : (lang === 'en' ? 'Dark Mode' : '다크 모드');
-    }
-    if (toggle) {
-      toggle.title = isDark
-        ? (lang === 'en' ? 'Light Mode' : '라이트 모드')
-        : (lang === 'en' ? 'Dark Mode' : '다크 모드');
-    }
+    if (desktopIcon) desktopIcon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
+    if (mobileIcon) mobileIcon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
+    const label = dark
+      ? (lang === 'en' ? 'Light Mode' : '라이트 모드')
+      : (lang === 'en' ? 'Dark Mode' : '다크 모드');
+    if (mobileLabel) mobileLabel.textContent = label;
+    if (desktop) desktop.title = label;
   }
-
-  function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme') || 'light';
-    apply(current === 'dark' ? 'light' : 'dark');
+  function toggle() {
+    apply((document.documentElement.dataset.theme || 'light') === 'dark' ? 'light' : 'dark');
   }
-
-  apply(getPreferred());
-  if (toggle) toggle.addEventListener('click', toggleTheme);
-  if (toggleMobile) toggleMobile.addEventListener('click', toggleTheme);
+  apply(preferred());
+  desktop?.addEventListener('click', toggle);
+  mobile?.addEventListener('click', toggle);
 })();
 
 /* ------------------------------------------------------------- */
-/* 17. 영어/한국어 전환                                          */
+/* 17. Language                                                  */
 /* ------------------------------------------------------------- */
-(function initLangToggle() {
-  const toggle = document.getElementById('langToggle');
-  const toggleMobile = document.getElementById('langToggleMobile');
-  if (!toggle) return;
+(function initLanguage() {
+  const desktop = document.getElementById('langToggle');
+  const mobile = document.getElementById('langToggleMobile');
+  if (!desktop) return;
 
-  const translations = {
+  const map = {
     en: {
       '.hero-tag': 'Hello',
       '.hero-role': { html: 'Full-Stack Developer &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>' },
-      '.hero-desc': { html: 'I build things that actually run — a <strong>campus notification bot</strong>, a <strong>multi-LLM desktop tool</strong>, a <strong>Raspberry Pi server</strong>.<br />Long term, I aim to be an entrepreneur pursuing innovation beyond profit.' },
+      '.hero-desc': { html: 'I build things that actually run — a <strong>campus notification bot</strong>, a <strong>multi-LLM desktop tool</strong>, and a <strong>Raspberry Pi server</strong>.<br />Long term, I aim to be an entrepreneur pursuing innovation beyond profit.' },
       '.btn-primary': { html: '<i class="fas fa-folder-open"></i> Projects' },
       '.stat-label': ['Projects', 'Awards', 'out of 581'],
-      '#about .section-title': 'Vision',
+      '#projects .section-title': 'Projects',
       '#skills .section-title': 'Skills',
       '#awards .section-title': 'Awards',
-      '#projects .section-title': 'Projects',
+      '#about .section-title': 'Vision',
       '.about-quote': '"An innovator who turns ideas into reality"',
-      '.about-body': { html: '<p>Hello, I\'m <strong>Lee Geon Yeong</strong>, someone who goes beyond simple development to plan and create services that can change the world. I aspire to be an <strong>entrepreneur</strong>, not just a businessman — creating value that did not exist before through technology.</p><p>Whenever an idea strikes, I write it down and then build it, mostly across three areas: <strong>AI automation, embedded &amp; IoT, and web backends</strong>.</p>' },
-      '.chip:nth-child(1)': { html: '<i class="fas fa-rocket"></i> Goal: 1M Monthly Users' },
-      '.chip:nth-child(2)': { html: '<i class="fas fa-users"></i> Team Lead on 6 Projects' },
       '.github-activity-btn': { html: '<i class="fab fa-github"></i> GitHub Activity' },
       '.github-activity .subsection-label': { html: '<i class="fab fa-github"></i> GitHub Activity' },
       '.cert-block .subsection-label': { html: '<i class="fas fa-certificate"></i> Certifications' },
       '#featured-section > .subsection-label': { html: '<i class="fas fa-star"></i> Featured Projects' },
       '#all-projects-section': { html: '<i class="fas fa-folder-open"></i> All Projects <span id="projectTotalCount" class="project-count-badge"></span>' },
       '.pfilter[data-filter="all"]': 'All',
-      '.pfilter[data-filter="ai"]': 'AI · ML',
       '.pfilter[data-filter="hardware"]': 'Hardware',
       '.pfilter[data-filter="discord"]': 'Discord Bot',
       '.pfilter[data-filter="web"]': 'Web',
       '.pfilter[data-filter="contest"]': 'Contest',
-      '.pfilter[data-filter="wip"]': 'WIP',
       '.pfilter[data-filter="failed"]': 'Failed',
       '.year-group-wip .year-heading': 'In Progress / Planned',
       '.year-group-failed .year-heading': 'Failed Projects',
@@ -615,26 +545,21 @@ window._updateProjectCount();
       '.hero-desc': { html: '<strong>공지 알림 봇</strong> · <strong>멀티 LLM 도구</strong> · <strong>라즈베리파이 서버</strong>처럼 실제로 돌아가는 것을 만듭니다.<br />길게는 이윤을 넘어 혁신을 추구하는 기업가를 목표로 합니다.' },
       '.btn-primary': { html: '<i class="fas fa-folder-open"></i> 프로젝트 보기' },
       '.stat-label': ['프로젝트', '수상 경력', '581 팀 중'],
-      '#about .section-title': '비전',
+      '#projects .section-title': '프로젝트',
       '#skills .section-title': '역량',
       '#awards .section-title': '수상',
-      '#projects .section-title': '프로젝트',
+      '#about .section-title': '비전',
       '.about-quote': '"아이디어를 현실로 만드는 혁신가"',
-      '.about-body': { html: '<p>안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고 만드는 <strong>이건영</strong>입니다. 저는 사업가가 아닌 <strong>기업가</strong>를 지향합니다. 이윤을 쫓기보다 기술로 세상에 없던 가치를 만들고 싶습니다.</p><p>떠오르는 아이디어는 기록해 두고 직접 만들어 확인합니다. 지금까지 만든 것은 대부분 <strong>AI 자동화, 임베디드·IoT, 웹 백엔드</strong> 세 갈래에 있습니다.</p>' },
-      '.chip:nth-child(1)': { html: '<i class="fas fa-rocket"></i> 목표 : 월 100만명 유저 서비스' },
-      '.chip:nth-child(2)': { html: '<i class="fas fa-users"></i> 팀장으로 참여한 프로젝트 6개' },
       '.github-activity-btn': { html: '<i class="fab fa-github"></i> GitHub 활동 보러가기' },
       '.github-activity .subsection-label': { html: '<i class="fab fa-github"></i> GitHub 활동' },
       '.cert-block .subsection-label': { html: '<i class="fas fa-certificate"></i> 자격증' },
       '#featured-section > .subsection-label': { html: '<i class="fas fa-star"></i> 대표 프로젝트' },
       '#all-projects-section': { html: '<i class="fas fa-folder-open"></i> 전체 프로젝트 <span id="projectTotalCount" class="project-count-badge"></span>' },
       '.pfilter[data-filter="all"]': '전체',
-      '.pfilter[data-filter="ai"]': 'AI · ML',
       '.pfilter[data-filter="hardware"]': '하드웨어',
       '.pfilter[data-filter="discord"]': 'Discord 봇',
       '.pfilter[data-filter="web"]': '웹',
       '.pfilter[data-filter="contest"]': '대회',
-      '.pfilter[data-filter="wip"]': 'WIP',
       '.pfilter[data-filter="failed"]': '실패',
       '.year-group-wip .year-heading': '진행 중 · 예정',
       '.year-group-failed .year-heading': '실패한 프로젝트',
@@ -645,182 +570,83 @@ window._updateProjectCount();
     },
   };
 
-  const typingWordsEN = ['Maker', 'Engineer', 'Team Leader'];
-  const typingWordsKO = ['메이커', '엔지니어', '팀 리더'];
-  let currentLang = localStorage.getItem('lang') || 'ko';
+  const typingWords = {
+    ko: ['메이커', '엔지니어', '팀 리더'],
+    en: ['Maker', 'Engineer', 'Team Leader'],
+  };
+  let current = localStorage.getItem('lang') || 'ko';
 
-  function applyMappedTranslation(map) {
-    Object.entries(map).forEach(([selector, value]) => {
-      if (Array.isArray(value)) {
-        document.querySelectorAll(selector).forEach((el, index) => {
-          if (index < value.length) el.textContent = value[index];
-        });
-        return;
-      }
-
-      if (typeof value === 'object') {
-        const el = document.querySelector(selector);
-        if (!el) return;
-        if (value.html !== undefined) el.innerHTML = value.html;
-        if (value.attr) {
-          Object.entries(value.attr).forEach(([key, val]) => el.setAttribute(key, val));
-        }
-        return;
-      }
-
-      const el = document.querySelector(selector);
-      if (el) el.textContent = value;
-    });
+  function applyValue(selector, value) {
+    if (Array.isArray(value)) {
+      document.querySelectorAll(selector).forEach((el, index) => {
+        if (index < value.length) el.textContent = value[index];
+      });
+      return;
+    }
+    const el = document.querySelector(selector);
+    if (!el) return;
+    if (typeof value === 'object') {
+      if (value.html !== undefined) el.innerHTML = value.html;
+      if (value.attr) Object.entries(value.attr).forEach(([key, val]) => el.setAttribute(key, val));
+    } else el.textContent = value;
   }
 
   function applyDataTranslations(lang) {
-    document.querySelectorAll('[data-en]:not([data-ko])').forEach((el) => {
-      el.setAttribute('data-ko', el.textContent.trim());
-    });
-    document.querySelectorAll('[data-en-html]:not([data-ko-html])').forEach((el) => {
-      el.setAttribute('data-ko-html', el.innerHTML.trim());
-    });
-
     document.querySelectorAll('[data-en][data-ko]:not(meta)').forEach((el) => {
       const text = lang === 'en' ? el.dataset.en : el.dataset.ko;
-      const first = el.firstElementChild;
-      if (first && first.tagName === 'I') el.innerHTML = first.outerHTML + ' ' + text;
+      const icon = el.firstElementChild?.tagName === 'I' ? el.firstElementChild.outerHTML : '';
+      if (icon) el.innerHTML = `${icon} ${text}`;
       else el.textContent = text;
     });
-
     document.querySelectorAll('[data-en-html][data-ko-html]').forEach((el) => {
       el.innerHTML = lang === 'en' ? el.dataset.enHtml : el.dataset.koHtml;
     });
   }
 
-  function applyLang(lang) {
-    currentLang = lang;
+  function apply(lang) {
+    current = lang;
     localStorage.setItem('lang', lang);
-    const map = translations[lang];
-    if (!map) return;
-
-    applyMappedTranslation(map);
+    Object.entries(map[lang]).forEach(([selector, value]) => applyValue(selector, value));
     applyDataTranslations(lang);
-
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const themeLabel = document.querySelector('.theme-label-mobile');
-    const themeToggleButton = document.getElementById('themeToggle');
-    if (themeLabel) {
-      themeLabel.textContent = isDark
-        ? (lang === 'en' ? 'Light Mode' : '라이트 모드')
-        : (lang === 'en' ? 'Dark Mode' : '다크 모드');
-    }
-    if (themeToggleButton) {
-      themeToggleButton.title = isDark
-        ? (lang === 'en' ? 'Light Mode' : '라이트 모드')
-        : (lang === 'en' ? 'Dark Mode' : '다크 모드');
-    }
-
-    document.querySelectorAll('.contact-email').forEach((button) => {
-      button.title = lang === 'en' ? 'Click to copy' : '클릭하면 복사됩니다';
-    });
-
-    document.documentElement.setAttribute('lang', lang);
-
-    const titlePairs = [
-      ['이건영 포트폴리오', 'Lee Geon Yeong Portfolio'],
-      ['이건영 | Developer', 'Lee Geon Yeong | Developer'],
-    ];
-    let nextTitle = document.title;
-    titlePairs.forEach((pair) => {
-      nextTitle = lang === 'en'
-        ? nextTitle.split(pair[0]).join(pair[1])
-        : nextTitle.split(pair[1]).join(pair[0]);
-    });
-    document.title = nextTitle;
+    document.documentElement.lang = lang;
 
     document.querySelectorAll('meta[data-en][data-ko]').forEach((meta) => {
-      meta.setAttribute('content', lang === 'en' ? meta.dataset.en : meta.dataset.ko);
+      meta.content = lang === 'en' ? meta.dataset.en : meta.dataset.ko;
     });
-
     document.querySelectorAll('.stat-num[data-suffix-en]').forEach((el) => {
       const suffix = lang === 'en' ? el.dataset.suffixEn : el.dataset.suffixKo;
       el.dataset.suffix = suffix;
       const num = (el.textContent.match(/\d+/) || ['0'])[0];
-      el.textContent = num + suffix;
+      el.textContent = `${num}${suffix}`;
+    });
+    document.querySelectorAll('.contact-email').forEach((button) => {
+      button.title = lang === 'en' ? 'Click to copy' : '클릭하면 복사됩니다';
     });
 
-    if (typeof window._updateProjectCount === 'function') window._updateProjectCount();
+    window._typingWords = typingWords[lang];
+    window._restartTyping?.();
+    window._updateProjectCount?.();
 
-    window._typingWords = lang === 'en' ? typingWordsEN : typingWordsKO;
-    if (typeof window._restartTyping === 'function') window._restartTyping();
-
-    const langLabel = toggle.querySelector('.lang-label');
-    const langLabelMobile = document.querySelector('.lang-label-mobile');
-    if (langLabel) langLabel.textContent = lang === 'ko' ? 'EN' : 'KO';
-    if (langLabelMobile) langLabelMobile.textContent = lang === 'ko' ? 'English' : '한국어';
-    toggle.title = lang === 'ko' ? 'English' : '한국어';
+    desktop.querySelector('.lang-label').textContent = lang === 'ko' ? 'EN' : 'KO';
+    const mobileLabel = document.querySelector('.lang-label-mobile');
+    if (mobileLabel) mobileLabel.textContent = lang === 'ko' ? 'English' : '한국어';
+    desktop.title = lang === 'ko' ? 'English' : '한국어';
   }
 
-  function toggleLang() {
-    applyLang(currentLang === 'ko' ? 'en' : 'ko');
-  }
-
-  window._typingWords = currentLang === 'en' ? typingWordsEN : typingWordsKO;
-  if (currentLang !== 'ko') applyLang(currentLang);
-
-  toggle.addEventListener('click', toggleLang);
-  if (toggleMobile) toggleMobile.addEventListener('click', toggleLang);
+  window._typingWords = typingWords[current];
+  apply(current);
+  desktop.addEventListener('click', () => apply(current === 'ko' ? 'en' : 'ko'));
+  mobile?.addEventListener('click', () => apply(current === 'ko' ? 'en' : 'ko'));
 })();
 
 /* ------------------------------------------------------------- */
-/* 18. 우측 섹션 네비게이터                                      */
-/* ------------------------------------------------------------- */
-(function initSectionNav() {
-  const navItems = Array.from(document.querySelectorAll('.section-nav-item'));
-  if (!navItems.length || typeof IntersectionObserver === 'undefined') return;
-
-  const sectionMap = navItems
-    .map((item) => {
-      const href = item.getAttribute('href');
-      if (!href || !href.startsWith('#')) return null;
-      const section = document.querySelector(href);
-      return section ? { item, section } : null;
-    })
-    .filter(Boolean);
-
-  if (!sectionMap.length) return;
-
-  navItems.forEach((item) => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      const target = document.querySelector(item.getAttribute('href'));
-      if (target) target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
-    });
-  });
-
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      navItems.forEach((item) => {
-        item.classList.toggle('active', item.getAttribute('href') === '#' + entry.target.id);
-      });
-    });
-  }, {
-    threshold: 0,
-    rootMargin: '-20% 0px -70% 0px',
-  });
-
-  sectionMap.forEach(({ section }) => obs.observe(section));
-})();
-
-/* ------------------------------------------------------------- */
-/* 19. 카드 전체 클릭 → 상세 페이지 이동                         */
+/* 18. Card links                                                */
 /* ------------------------------------------------------------- */
 (function initCardLinks() {
-  const cards = document.querySelectorAll('[data-card-href]');
-  if (!cards.length) return;
-
-  cards.forEach((card) => {
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('a, button')) return;
-      const selection = window.getSelection();
-      if (selection && selection.toString().trim()) return;
+  document.querySelectorAll('[data-card-href]').forEach((card) => {
+    card.addEventListener('click', (event) => {
+      if (event.target.closest('a, button')) return;
+      if (window.getSelection()?.toString().trim()) return;
       window.location.href = card.dataset.cardHref;
     });
   });
