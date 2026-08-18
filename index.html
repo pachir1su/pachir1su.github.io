@@ -111,6 +111,12 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <!-- 좌측 바인딩 레일 — 노트 크롬(빨간 마진선 · 펀치홀)을 문서 전체에서
+         한 번만 그린다. 이전에는 카드 한 장마다 같은 장식을 반복해서
+         노트 페이지 30여 장이 겹쳐 보였다. 순수 장식이라 aria-hidden 이고,
+         컨테이너 좌우 여백이 남는 1280px 이상에서만 표시된다(style.css #9). -->
+    <div class="page-binding" aria-hidden="true"></div>
+
     <!-- 상단 스크롤 진행도 바 — 스크롤 위치를 퍼센트로 표시 (script.js #11) -->
     <div class="progress-container" aria-hidden="true">
       <div class="progress-bar" id="myBar"></div>
@@ -210,6 +216,10 @@
       </div>
 
       <div class="container hero-content">
+        <!-- 좌측 본문 열 — 우측 지표 열(.hero-stats)과 2단을 이룬다.
+             감싸는 요소가 없으면 지표 열이 그리드 행 전체에 걸쳐서
+             왼쪽 항목 사이가 지표 높이만큼 벌어진다(style.css #10). -->
+        <div class="hero-main">
         <div class="hero-tag">안녕하세요</div>
         <h1 class="hero-name">
           <span class="name-kr">이건영</span>
@@ -236,6 +246,7 @@
             class="btn btn-ghost"
             ><i class="fab fa-github"></i> GitHub</a
           >
+        </div>
         </div>
 
         <div class="hero-stats" data-aos="fade-up" data-aos-delay="160">
