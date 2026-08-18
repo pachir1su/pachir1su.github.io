@@ -297,6 +297,13 @@ function closeMobile() {
       const target = parseInt(el.dataset.target, 10);
       const suffix = el.dataset.suffix || '';
       if (isNaN(target)) return;
+      /* reduced-motion에서는 카운트업 없이 최종값을 바로 넣는다.
+         스티커 루프만 막고 이 rAF는 그대로 돌던 구멍이었다. */
+      if (prefersReducedMotion) {
+        el.textContent = target + suffix;
+        obs.unobserve(el);
+        return;
+      }
       let curr = 0;
       const duration = 500;
       const start = performance.now();
@@ -435,7 +442,7 @@ function closeMobile() {
 /*    1~5: 섹션 점프, Esc: 모바일 메뉴 닫기, t: top, g: GitHub    */
 /* ------------------------------------------------------------- */
 (function initShortcuts() {
-  const sections = ['#home', '#about', '#skills', '#awards', '#projects'];
+  const sections = ['#home', '#projects', '#skills', '#awards', '#about'];
   document.addEventListener('keydown', (e) => {
     if (e.target.matches('input, textarea')) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -718,24 +725,7 @@ window._updateProjectCount();
 /*     자기신고 %는 0%·5% 같은 빈 막대를 게시하게 되어, 정적 라벨   */
 /*     한 줄(.wip-status)로 바꾸고 관련 IntersectionObserver를 제거. */
 
-/* ------------------------------------------------------------- */
-/* 23. MBTI 바 애니메이션 (#62) — 스크롤 진입 시 width 전환        */
-/* ------------------------------------------------------------- */
-(function initMbtiBars() {
-  const fills = document.querySelectorAll('.mbti-bar-fill');
-  if (!fills.length) return;
-  fills.forEach((f) => { f.style.transform = 'scaleX(0)'; });
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      const pct = parseFloat(entry.target.dataset.pct || '0');
-      /* width 대신 scaleX — layout 없이 compositor에서 처리 */
-      entry.target.style.transform = 'scaleX(' + (pct / 100).toFixed(4) + ')';
-      obs.unobserve(entry.target);
-    });
-  }, { threshold: 0.3 });
-  fills.forEach((f) => obs.observe(f));
-})();
+/* 23. MBTI 5줄 막대(#62)는 About 한 줄 텍스트로 대체됐다 (#112 Remove P1-2). */
 
 /* ------------------------------------------------------------- */
 /* 24. 실패한 프로젝트 접기/펼치기 — 기본 접힘(미니멀)             */
@@ -817,16 +807,16 @@ window._updateProjectCount();
     en: {
       /* 네비게이션 */
       '.nav-links li:nth-child(1) a': 'Home',
-      '.nav-links li:nth-child(2) a': 'Vision',
+      '.nav-links li:nth-child(2) a': 'Projects',
       '.nav-links li:nth-child(3) a': 'Skills',
       '.nav-links li:nth-child(4) a': 'Awards',
-      '.nav-links li:nth-child(5) a': 'Projects',
+      '.nav-links li:nth-child(5) a': 'Vision',
       /* 모바일 메뉴 */
       '.mobile-menu a:nth-of-type(1)': ' Home',
-      '.mobile-menu a:nth-of-type(2)': ' Vision',
+      '.mobile-menu a:nth-of-type(2)': ' Projects',
       '.mobile-menu a:nth-of-type(3)': ' Skills',
       '.mobile-menu a:nth-of-type(4)': ' Awards',
-      '.mobile-menu a:nth-of-type(5)': ' Projects',
+      '.mobile-menu a:nth-of-type(5)': ' Vision',
       '.mobile-menu a:nth-of-type(6)': ' GitHub',
       /* 히어로 */
       '.hero-tag': 'Hello',
@@ -849,7 +839,6 @@ window._updateProjectCount();
       '.github-activity-btn': { html: '<i class="fab fa-github"></i> GitHub Activity' },
       /* MBTI */
       /* 하위 라벨 */
-      '.mbti-block .subsection-label': { html: '<i class="fas fa-brain"></i> MBTI' },
       '.github-activity .subsection-label': { html: '<i class="fab fa-github"></i> GitHub Activity' },
       '.cert-block .subsection-label': { html: '<i class="fas fa-certificate"></i> Certifications' },
       '#featured-section > .subsection-label': { html: '<i class="fas fa-star"></i> Featured Projects' },
@@ -871,29 +860,25 @@ window._updateProjectCount();
       '.copy-hint': 'Copy',
       /* 섹션 네비게이터 */
       '[data-nav-section="home"] .nav-bookmark-label': 'Home',
-      '[data-nav-section="about"] .nav-bookmark-label': 'Vision',
-      '[data-nav-section="mbti-section"] .nav-bookmark-label': 'MBTI',
-      '[data-nav-section="github-section"] .nav-bookmark-label': 'GitHub',
+      '[data-nav-section="projects"] .nav-bookmark-label': 'Projects',
       '[data-nav-section="skills"] .nav-bookmark-label': 'Skills',
       '[data-nav-section="awards"] .nav-bookmark-label': 'Awards',
-      '[data-nav-section="cert-section"] .nav-bookmark-label': 'Certs',
-      '[data-nav-section="featured-section"] .nav-bookmark-label': 'Featured',
-      '[data-nav-section="all-projects-section"] .nav-bookmark-label': 'All',
+      '[data-nav-section="about"] .nav-bookmark-label': 'Vision',
       /* 맨 위로 */
       '#btn-back-to-top': { attr: { title: 'Back to top', 'aria-label': 'Back to top' } },
       '.scroll-hint span': 'Scroll',
     },
     ko: {
       '.nav-links li:nth-child(1) a': '홈',
-      '.nav-links li:nth-child(2) a': '비전',
+      '.nav-links li:nth-child(2) a': '프로젝트',
       '.nav-links li:nth-child(3) a': '역량',
       '.nav-links li:nth-child(4) a': '수상',
-      '.nav-links li:nth-child(5) a': '프로젝트',
+      '.nav-links li:nth-child(5) a': '비전',
       '.mobile-menu a:nth-of-type(1)': ' 홈',
-      '.mobile-menu a:nth-of-type(2)': ' 비전',
+      '.mobile-menu a:nth-of-type(2)': ' 프로젝트',
       '.mobile-menu a:nth-of-type(3)': ' 역량',
       '.mobile-menu a:nth-of-type(4)': ' 수상',
-      '.mobile-menu a:nth-of-type(5)': ' 프로젝트',
+      '.mobile-menu a:nth-of-type(5)': ' 비전',
       '.mobile-menu a:nth-of-type(6)': ' GitHub',
       '.hero-tag': '안녕하세요',
       '.hero-role': { html: '풀스택 개발자 &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>' },
@@ -911,7 +896,6 @@ window._updateProjectCount();
       '.edu-school': '한국기술교육대학교',
       '.edu-sub': 'KOREATECH · 26학번 재학 중',
       '.github-activity-btn': { html: '<i class="fab fa-github"></i> GitHub 활동 보러가기' },
-      '.mbti-block .subsection-label': { html: '<i class="fas fa-brain"></i> MBTI' },
       '.github-activity .subsection-label': { html: '<i class="fab fa-github"></i> GitHub 활동' },
       '.cert-block .subsection-label': { html: '<i class="fas fa-certificate"></i> 자격증' },
       '#featured-section > .subsection-label': { html: '<i class="fas fa-star"></i> 대표 프로젝트' },
@@ -929,14 +913,10 @@ window._updateProjectCount();
       '.footer-copy': '© 2026 Lee Geon Yeong. All rights reserved.',
       '.copy-hint': '복사',
       '[data-nav-section="home"] .nav-bookmark-label': '홈',
-      '[data-nav-section="about"] .nav-bookmark-label': '비전',
-      '[data-nav-section="mbti-section"] .nav-bookmark-label': 'MBTI',
-      '[data-nav-section="github-section"] .nav-bookmark-label': 'GitHub',
+      '[data-nav-section="projects"] .nav-bookmark-label': '프로젝트',
       '[data-nav-section="skills"] .nav-bookmark-label': '역량',
       '[data-nav-section="awards"] .nav-bookmark-label': '수상',
-      '[data-nav-section="cert-section"] .nav-bookmark-label': '자격증',
-      '[data-nav-section="featured-section"] .nav-bookmark-label': '대표',
-      '[data-nav-section="all-projects-section"] .nav-bookmark-label': '전체',
+      '[data-nav-section="about"] .nav-bookmark-label': '비전',
       '#btn-back-to-top': { attr: { title: '맨 위로', 'aria-label': '맨 위로' } },
       '.scroll-hint span': '스크롤',
     }
@@ -987,10 +967,10 @@ window._updateProjectCount();
     });
 
     /* 모바일 메뉴 — 아이콘 보존 */
-    const mobileIcons = ['fa-home', 'fa-user', 'fa-code', 'fa-trophy', 'fa-folder-open', 'fa-github'];
+    const mobileIcons = ['fa-home', 'fa-folder-open', 'fa-code', 'fa-trophy', 'fa-user', 'fa-github'];
     const mobileLabels = lang === 'en'
-      ? ['Home', 'Vision', 'Skills', 'Awards', 'Projects', 'GitHub']
-      : ['홈', '비전', '역량', '수상', '프로젝트', 'GitHub'];
+      ? ['Home', 'Projects', 'Skills', 'Awards', 'Vision', 'GitHub']
+      : ['홈', '프로젝트', '역량', '수상', '비전', 'GitHub'];
     document.querySelectorAll('.mobile-menu > a').forEach((a, i) => {
       if (i < mobileIcons.length) {
         const iconClass = i === 5 ? 'fab' : 'fas';
@@ -1103,11 +1083,8 @@ window._updateProjectCount();
 /* ------------------------------------------------------------- */
 (function initSectionNav() {
   const navItems = document.querySelectorAll('.section-nav-item');
-  const sectionIds = [
-    'home', 'about', 'mbti-section', 'github-section',
-    'skills', 'awards', 'cert-section',
-    'featured-section', 'all-projects-section'
-  ];
+  /* 하위 섹션 책갈피는 제거했다 (#112 Remove P3-9) — 최상위 5개만 감시한다 */
+  const sectionIds = ['home', 'projects', 'skills', 'awards', 'about'];
   const sections = sectionIds
     .map(function (id) { return document.getElementById(id); })
     .filter(Boolean);

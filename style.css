@@ -920,19 +920,6 @@ p {
 .award-card {
   position: relative;
 }
-.award-rank {
-  position: absolute;
-  top: 14px;
-  right: 58px;
-  font-family: var(--font-hand);
-  font-size: 3.6rem;
-  font-weight: 700;
-  color: var(--red-text);
-  opacity: 0.16;
-  transform: rotate(-6deg);
-  line-height: 1;
-  pointer-events: none;
-}
 .award-icon {
   font-size: 2.1rem;
   margin-bottom: 12px;
@@ -1308,11 +1295,7 @@ p {
     min-width: 90px;
     padding: 10px 14px;
   }
-  .award-rank {
-    right: 40px;
-    font-size: 2.6rem;
   }
-}
 
 /* ==========================================================================
    18. 서브페이지 호환 shim — 기존 15개 /projects/*.html 가독성·동작 보존
@@ -2210,29 +2193,6 @@ html {
 .project-card:nth-child(5n+5)::after { background: var(--ink); opacity: 0.4; }
 
 /* ==========================================================================
-   43. 프로젝트 카드 넘버링 — 메모지 우측 하단 (Issue #20)
-   ========================================================================== */
-
-/* #projects 섹션 기준으로 카운터 1회 초기화 → 연도 그룹 구분 없이 전체 통합 번호 (#20) */
-#projects { counter-reset: pcard; }
-.project-card { counter-increment: pcard; }
-.project-num {
-  position: absolute;
-  right: 16px;
-  bottom: 9px;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--red-text);
-  opacity: 0.5;
-  z-index: 2;
-  pointer-events: none;
-}
-/* p.01, p.02 ... 형식 */
-.project-num::before { content: "p." counter(pcard, decimal-leading-zero); }
-
-/* ==========================================================================
    44. 나의 역할 — 직책 배지 (Issue #22)
    ========================================================================== */
 
@@ -2547,6 +2507,15 @@ html {
   color: var(--red-text);
 }
 
+/* MBTI 등 자기보고 항목 — 차트가 아니라 각주 한 줄로 (#112 Remove P1-2) */
+.about-note {
+  margin-top: 18px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
 /* --- 푸터 이메일 텍스트 + 복사 (#30) --- */
 .footer .social-links { align-items: center; }
 .contact-email {
@@ -2764,120 +2733,6 @@ html {
   .chicken-drop { animation-duration: 7s !important; }
 }
 
-/* ==========================================================================
-   50. MBTI 차트 (#62)
-   ========================================================================== */
-
-/* MBTI 섹션 — 컴팩트 (#62) */
-.mbti-block {
-  margin-top: 20px;
-}
-.mbti-card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 14px 18px;
-  box-shadow: var(--shadow-soft);
-  position: relative;
-  overflow: hidden;
-  max-width: 420px;
-}
-.mbti-card::before {
-  content: 'ENTJ';
-  position: absolute;
-  right: -2px;
-  bottom: -8px;
-  font-family: var(--font-mono);
-  font-size: 3rem;
-  font-weight: 900;
-  color: rgba(198, 59, 59, 0.05);
-  line-height: 1;
-  pointer-events: none;
-}
-.mbti-type {
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  font-weight: 900;
-  color: var(--red-text);
-  text-align: center;
-  margin-bottom: 10px;
-  letter-spacing: 0.2em;
-}
-.mbti-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.mbti-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.mbti-label {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--ink);
-  min-width: 50px;
-  white-space: nowrap;
-}
-.mbti-left {
-  text-align: right;
-}
-.mbti-right {
-  text-align: left;
-  color: var(--text-muted);
-}
-.mbti-dim {
-  font-size: 0.82rem;
-  font-weight: 900;
-  font-style: normal;
-}
-.mbti-right .mbti-dim {
-  font-size: 0.7rem;
-  font-weight: 500;
-}
-.mbti-pct {
-  font-weight: 400;
-  color: var(--text-muted);
-  font-size: 0.7rem;
-}
-.mbti-left .mbti-pct {
-  color: var(--ink);
-  font-weight: 600;
-}
-.mbti-bar-track {
-  flex: 1;
-  height: 10px;
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  border-radius: 3px;
-  position: relative;
-  overflow: hidden;
-}
-.mbti-bar-track::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 1px;
-  height: 100%;
-  background: rgba(31, 28, 20, 0.18);
-  z-index: 1;
-}
-.mbti-bar-fill {
-  height: 100%;
-  border-radius: 3px 0 0 3px;
-  /* width 대신 scaleX — layout 없이 compositor에서 처리 */
-  width: 100%;
-  transform: scaleX(0);
-  transform-origin: left center;
-  transition: transform 1s var(--ease-out);
-}
-.mbti-row:nth-child(1) .mbti-bar-fill { background: linear-gradient(90deg, #2471a3, #5dade2); }
-.mbti-row:nth-child(2) .mbti-bar-fill { background: linear-gradient(90deg, #6c3483, #a569bd); }
-.mbti-row:nth-child(3) .mbti-bar-fill { background: linear-gradient(90deg, var(--bronze), #d4853a); }
-.mbti-row:nth-child(4) .mbti-bar-fill { background: linear-gradient(90deg, var(--red), #e05050); }
-.mbti-row:nth-child(5) .mbti-bar-fill { background: linear-gradient(90deg, #1a7a4a, #27ae60); }
 
 /* ==========================================================================
    51. 진행 중 프로젝트 상태 라벨 (#61 진행률 바 → #114 상태 라벨)
@@ -3461,14 +3316,9 @@ html {
 /* 섹션별 dot 컬러 */
 .section-nav-item[data-nav-section="home"] .nav-bookmark-dot { background: var(--red); }
 .section-nav-item[data-nav-section="about"] .nav-bookmark-dot { background: var(--cyan); }
-.section-nav-item[data-nav-section="mbti-section"] .nav-bookmark-dot { background: var(--cyan); }
-.section-nav-item[data-nav-section="github-section"] .nav-bookmark-dot { background: var(--cyan); }
 .section-nav-item[data-nav-section="skills"] .nav-bookmark-dot { background: var(--gold); }
 .section-nav-item[data-nav-section="awards"] .nav-bookmark-dot { background: var(--bronze); }
-.section-nav-item[data-nav-section="cert-section"] .nav-bookmark-dot { background: var(--bronze); }
-.section-nav-item[data-nav-section="featured-section"] .nav-bookmark-dot { background: var(--red); }
-.section-nav-item[data-nav-section="mindmap-section"] .nav-bookmark-dot { background: var(--red); }
-.section-nav-item[data-nav-section="all-projects-section"] .nav-bookmark-dot { background: var(--red); }
+.section-nav-item[data-nav-section="projects"] .nav-bookmark-dot { background: var(--red); }
 .section-nav-item.active .nav-bookmark-dot { background: var(--red) !important; }
 
 /* 모바일: 하단 도트 네비게이션 */
@@ -3528,97 +3378,6 @@ html {
   }
   body {
     padding-bottom: 52px;
-  }
-}
-
-/* ==========================================================================
-   57. MBTI 2컬럼 레이아웃 + 성격 특성 카드 (#62)
-   ========================================================================== */
-
-.mbti-layout {
-  display: flex;
-  gap: 20px;
-  align-items: stretch;
-  justify-content: center;
-}
-.mbti-layout .mbti-card {
-  flex: 0 0 420px;
-}
-.mbti-traits {
-  flex: 1;
-  min-width: 0;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 18px 20px;
-  box-shadow: var(--shadow-soft);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-  position: relative;
-  overflow: hidden;
-}
-.mbti-traits::before {
-  content: 'ENTJ';
-  position: absolute;
-  right: -4px;
-  bottom: -10px;
-  font-family: var(--font-mono);
-  font-size: 4rem;
-  font-weight: 900;
-  color: rgba(198, 59, 59, 0.04);
-  line-height: 1;
-  pointer-events: none;
-}
-.mbti-traits-header {
-  font-family: var(--font-hand);
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--red-text);
-  line-height: 1.2;
-}
-.mbti-traits-sub {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-.mbti-traits-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 4px;
-}
-.mbti-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  padding: 5px 10px;
-  background: var(--paper-2);
-  border: 1px dashed var(--line);
-  border-radius: 3px;
-  color: var(--ink);
-  transition: transform 0.15s, background 0.15s;
-}
-.mbti-tag i {
-  font-size: 0.7rem;
-  color: var(--red-text);
-}
-.mbti-tag:hover {
-  transform: translateY(-1px);
-  background: var(--red-soft);
-}
-@media (max-width: 768px) {
-  .mbti-layout {
-    flex-direction: column;
-  }
-  .mbti-layout .mbti-card {
-    flex: none;
-    max-width: 100%;
   }
 }
 
