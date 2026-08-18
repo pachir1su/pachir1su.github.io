@@ -1,6 +1,6 @@
-/* ==========================================================================
+/* ========================================================================== 
    노트 / 인덱스 카드 — Notebook & Index Card Aesthetic
-   Tokens: 종이 크림, 빨간 마진, 줄 노트, 펀치 홀, 마스킹 테이프, 스티커
+   Tokens: 종이 크림, 빨간 마진, 줄 노트, 펀치 홀(문서 좌측 레일), 인덱스 카드
    ========================================================================== */
 
 /* 1. Tokens */
@@ -32,6 +32,37 @@
   --font-main: "Noto Sans KR", sans-serif;
   --font-mono: "Space Mono", monospace;
   --font-hand: "Caveat", cursive;
+
+  /* 타입 스케일 — 이전에는 각 컴포넌트가 0.78/0.82/0.88/1.05rem 을 제각기
+     선언해서 위계가 없었다. 여기 7단계로 고정하고 개별 선언은 이 값을 쓴다. */
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-md: 1.0625rem;
+  --fs-lg: 1.375rem;
+  --fs-xl: clamp(1.75rem, 3.2vw, 2.25rem);
+  --fs-display: clamp(2.25rem, 7vw, 3.5rem);
+
+  /* 본문 한 줄 길이 상한. 컨테이너가 1160px 라서 산문이 한 줄에 100자를
+     넘게 흐르던 문제(가독성 감사)를 문단 폭 자체로 막는다. */
+  --measure: 62ch;
+
+  /* 4px 배수 간격 스케일 */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+  --sp-9: 96px;
+
+  /* 카드 상단 색 띠의 역할 — nth-child(5n+k) 로 색을 돌려쓰던 방식을 버리고
+     의미에 고정한다. 빨강=대표/기본, 금색=진행 중, 회색=중단. */
+  --tab-default: var(--red);
+  --tab-wip: var(--gold);
+  --tab-failed: rgba(107, 100, 83, 0.55);
   /* 모션 커브 — emilkowalski/skills STANDARDS.md 권장값
      진입·퇴장은 ease-out, 화면 내 이동은 ease-in-out */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -168,7 +199,7 @@ p {
 }
 .logo {
   font-family: var(--font-mono);
-  font-size: 1rem;
+  font-size: var(--fs-base);
   font-weight: 700;
   color: var(--red-text);
   letter-spacing: 0.04em;
@@ -182,7 +213,7 @@ p {
   align-items: center;
 }
 .nav-links a {
-  font-size: 0.88rem;
+  font-size: var(--fs-sm);
   color: var(--text-muted);
   font-family: var(--font-mono);
   transition: color 0.2s;
@@ -313,26 +344,31 @@ p {
 
 /* 8. Section base */
 .section {
-  padding: 88px 0;
+  padding: var(--sp-9) 0;
   position: relative;
 }
 .section-alt {
   background: var(--paper-2);
 }
+/* 견출지(.section-tag)와 제목이 둘 다 inline-block 이라 한 줄에 나란히
+   흐르면서 서로 겹쳐 보였다. 견출지는 제목 위에 얹히는 탭이므로 세로로 쌓는다. */
 .section-header {
-  margin-bottom: 56px;
+  margin-bottom: var(--sp-7);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 .section-tag {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: var(--fs-xs);
   color: var(--text-muted);
   letter-spacing: 0.12em;
   margin-bottom: 12px;
 }
 .section-title {
-  font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+  font-size: var(--fs-xl);
   font-weight: 800;
   position: relative;
   display: inline-block;
@@ -341,87 +377,70 @@ p {
 .section-title::before {
   content: "";
   position: absolute;
-  left: -6px;
-  right: -6px;
-  bottom: 4px;
-  height: 14px;
-  background: var(--red-soft);
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 4px;
+  background: var(--red);
+  opacity: 0.8;
   z-index: -1;
-  transform: skewX(-2deg);
 }
-/* 섹션 헤더 우측 빈 원형 스티커 */
+/* 섹션 헤더 우측에는 지름 72px 짜리 빈 원 스티커가 있었다. 아무것도 담지
+   않는 순수 장식이라 스크린샷에서 로딩 스피너나 깨진 이미지처럼 읽혔다.
+   자리를 비우는 대신 섹션 제목 아래 가는 괘선 한 줄로 폭을 잡아준다. */
 .section-header::after {
   content: "";
   position: absolute;
-  top: -8px;
+  left: 0;
   right: 0;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  color: var(--red-text);
-  box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 5px currentColor;
-  opacity: 0.7;
-  transform: rotate(-4deg);
+  bottom: calc(var(--sp-5) * -1);
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    var(--line) 0,
+    var(--line) 120px,
+    var(--rule) 120px,
+    var(--rule) 100%
+  );
   pointer-events: none;
 }
-#about .section-header::after {
-  color: var(--cyan-text);
-  transform: rotate(3deg);
-}
-#skills .section-header::after {
-  color: var(--gold-text);
-  transform: rotate(-5deg);
-}
-#awards .section-header::after {
-  color: var(--bronze-text);
-  transform: rotate(2deg);
-}
-#projects .section-header::after {
-  color: var(--red-text);
-  transform: rotate(-3deg);
-}
 
-/* 9. Notebook card primitive
+/* 9. Index card primitive
    적용: .about-card, .skill-card, .award-card, .project-card
-*/
+
+   이전 버전은 카드 한 장마다 마스킹 테이프 · 빨간 마진선 · 펀치홀 3개 ·
+   괘선을 전부 그렸다. 카드가 곧 노트 페이지였다는 뜻인데, 한 화면에 카드가
+   30장 넘게 깔리면 "노트 페이지 30장이 겹쳐 있는 화면"이 되어 위계가 사라지고
+   펀치홀을 피하려고 좌측 패딩만 64px 를 버려야 했다.
+
+   노트 크롬은 문서 단위(.page-binding)로 한 번만 그리고, 카드는 그 노트에
+   꽂힌 인덱스 카드로 되돌린다. 카드가 가진 장식은 상단 색 띠 하나뿐이다. */
 .about-card,
 .skill-card,
 .award-card,
 .project-card {
   position: relative;
   background-color: var(--card);
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='28' viewBox='0 0 90 28'><g transform='rotate(-4 45 14)'><rect x='0' y='0' width='90' height='28' fill='%23e6c878' fill-opacity='0.55'/><rect x='0' y='0' width='90' height='2' fill='%23b88a1a' fill-opacity='0.15'/></g></svg>"),
-    linear-gradient(var(--red-margin), var(--red-margin)),
-    radial-gradient(circle 5px at 22px 44px, var(--paper-2) 99%, transparent 100%),
-    radial-gradient(circle 5px at 22px 50%, var(--paper-2) 99%, transparent 100%),
-    radial-gradient(circle 5px at 22px calc(100% - 44px), var(--paper-2) 99%, transparent 100%),
-    repeating-linear-gradient(transparent 0 31px, var(--rule) 31px 32px);
-  background-position:
-    18px -6px,
-    56px 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0;
-  background-size:
-    90px 28px,
-    1px 100%,
-    auto, auto, auto,
-    100% auto;
-  background-repeat:
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    repeat-y;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 38px 28px 28px 64px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  padding: var(--sp-5);
+  transition: transform 0.15s var(--ease-out), box-shadow 0.15s ease,
+    border-color 0.15s ease;
   box-shadow: var(--shadow-soft);
+}
+/* 상단 색 띠 — 카드 종류를 색 하나로 구분한다 */
+.about-card::before,
+.skill-card::before,
+.award-card::before,
+.project-card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  height: 3px;
+  background: var(--tab, var(--tab-default));
+  border-radius: var(--radius) var(--radius) 0 0;
 }
 .about-card:hover,
 .skill-card:hover,
@@ -429,49 +448,53 @@ p {
 .project-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lift);
+  border-color: var(--red-margin);
 }
 
-/* 카드 우측 상단 스티커 */
-.skill-card::after,
-.award-card::after {
+/* 카드 우측 상단에도 같은 빈 원 스티커가 있었고, 색은 nth-child(5n+k) 로
+   빨강·청록·금색·청동·잉크를 순서대로 돌려썼다. 다섯 번째 카드가 잉크색인
+   데에는 아무 의미가 없었다 — 위치가 정하는 색이었다. 스티커를 지우고,
+   색은 카드 상단 띠(--tab)에서 종류에 따라서만 쓴다.
+
+   문서 단위 노트 크롬 — 좌측 바인딩 레일.
+   컨테이너가 1160px 라 그보다 넓은 화면에는 좌우 여백이 남는다. 그 여백에만
+   레일을 놓으므로 본문 레이아웃은 밀리지 않고, 여백이 사라지는 폭에서는
+   레일 자체를 숨긴다. */
+.page-binding {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 46px;
+  background: var(--paper-2);
+  border-right: 1px solid var(--red-margin);
+  z-index: 800;
+  pointer-events: none;
+  display: none;
+}
+/* 펀치홀 — 카드마다 3개씩 찍던 것을 문서 전체에 한 줄로 */
+.page-binding::before {
   content: "";
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--card);
-  border: 2px solid currentColor;
-  box-shadow: inset 0 0 0 2px var(--card), inset 0 0 0 3px currentColor;
-  color: var(--red-text);
-  opacity: 0.85;
-  pointer-events: none;
+  inset: 0;
+  background-image: radial-gradient(
+    circle 5px at 23px 32px,
+    var(--paper) 99%,
+    transparent 100%
+  );
+  background-size: 100% 128px;
+  background-repeat: repeat-y;
+  box-shadow: inset -1px 0 0 var(--rule);
 }
-.skill-card:nth-child(5n + 1)::after,
-.award-card:nth-child(5n + 1)::after {
-  color: var(--red-text);
-  transform: rotate(-4deg);
+@media (min-width: 1280px) {
+  .page-binding {
+    display: block;
+  }
 }
-.skill-card:nth-child(5n + 2)::after,
-.award-card:nth-child(5n + 2)::after {
-  color: var(--cyan-text);
-  transform: rotate(3deg);
-}
-.skill-card:nth-child(5n + 3)::after,
-.award-card:nth-child(5n + 3)::after {
-  color: var(--gold-text);
-  transform: rotate(-2deg);
-}
-.skill-card:nth-child(5n + 4)::after,
-.award-card:nth-child(5n + 4)::after {
-  color: var(--bronze-text);
-  transform: rotate(4deg);
-}
-.skill-card:nth-child(5n + 5)::after,
-.award-card:nth-child(5n + 5)::after {
-  color: var(--ink);
-  transform: rotate(-3deg);
+@media (prefers-reduced-transparency: reduce) {
+  .page-binding {
+    display: none;
+  }
 }
 
 /* 10. Hero */
@@ -484,16 +507,17 @@ p {
   overflow: hidden;
   background: var(--paper);
 }
+/* 빨간 마진선은 좌측 바인딩 레일이 문서 전체에 이미 그리므로 여기서는
+   괘선만 남긴다(같은 선이 84px 와 레일 두 곳에 겹쳐 보이던 문제). */
 .hero-grid-bg {
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(var(--red-margin), var(--red-margin)),
-    repeating-linear-gradient(transparent 0 31px, var(--rule) 31px 32px);
-  background-position: 84px 0, 0 0;
-  background-size: 1px 100%, 100% auto;
-  background-repeat: no-repeat, repeat-y;
-  opacity: 0.7;
+  background-image: repeating-linear-gradient(
+    transparent 0 31px,
+    var(--rule) 31px 32px
+  );
+  background-repeat: repeat-y;
+  opacity: 0.55;
   pointer-events: none;
 }
 .hero-glow {
@@ -510,63 +534,83 @@ p {
   inset: 0;
   pointer-events: none;
 }
+/* 96px 짜리 이중 테두리 원 다섯 개가 히어로 글 주변에 흩어져 떠다녔다.
+   지름이 본문 글자 크기의 6배라 시선을 먼저 가져가고, 아이콘 폰트가 늦게
+   뜨면 그냥 빈 고리로 보인다. 지름을 절반으로 줄이고 테두리 한 겹만 남겨
+   배경 요소로 내린다. 위치도 본문 열을 피해 가장자리로 밀었다. */
 .fi {
   position: absolute;
-  width: 96px;
-  height: 96px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
+  font-size: 1.5rem;
   line-height: 1;
   background: var(--card);
-  border: 2px solid currentColor;
-  outline: 1.5px dashed currentColor;
-  outline-offset: -8px;
-  box-shadow: 0 6px 14px rgba(31, 28, 20, 0.1);
-  opacity: 0.85;
+  border: 1px solid currentColor;
+  box-shadow: var(--shadow-soft);
+  opacity: 0.5;
   animation: floatUp 8s ease-in-out infinite;
-  /* devicon ::before 글리프가 가운데 들어와 보이게 — color는 nth별로 cycle */
 }
 .fi-1 {
-  top: 15%;
-  left: 8%;
+  top: 18%;
+  left: 3%;
   color: var(--red-text);
   animation-delay: 0s;
 }
 .fi-2 {
-  top: 22%;
-  right: 12%;
+  top: 14%;
+  right: 5%;
   color: var(--cyan-text);
   animation-delay: 1.5s;
 }
 .fi-3 {
-  bottom: 26%;
-  left: 14%;
+  bottom: 30%;
+  left: 5%;
   color: var(--gold-text);
   animation-delay: 3s;
 }
 .fi-4 {
-  bottom: 16%;
-  right: 9%;
+  bottom: 20%;
+  right: 3%;
   color: var(--bronze-text);
   animation-delay: 4.5s;
 }
 .fi-5 {
-  top: 48%;
-  left: 4%;
+  top: 52%;
+  left: 1%;
   color: var(--ink);
   animation-delay: 6s;
 }
 
+/* 히어로는 max-width:820px 짜리 가운데 정렬 블록이라 본문 그리드와 어긋난
+   위치에서 시작하고, 1440px 화면에서는 오른쪽 절반이 통째로 비었다.
+   본문과 같은 컨테이너 폭을 쓰고 2단으로 나눠 오른쪽에 지표를 세운다. */
 .hero-content {
   position: relative;
   z-index: 1;
-  max-width: 820px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--sp-9);
+  align-items: start;
+}
+.hero-main {
+  min-width: 0;
+}
+/* 포스트잇 지표를 오른쪽 단으로 올려 세로로 쌓는다 */
+.hero-stats {
+  align-self: center;
+}
+@media (max-width: 1024px) {
+  .hero-content {
+    display: block;
+  }
 }
 .hero-tag {
   display: inline-block;
+  justify-self: start;
   font-family: var(--font-mono);
   font-size: 0.82rem;
   color: var(--red-text);
@@ -578,10 +622,11 @@ p {
   margin-bottom: 22px;
 }
 .hero-name {
-  font-size: clamp(2.6rem, 6vw, 4.4rem);
+  font-size: var(--fs-display);
   font-weight: 900;
   line-height: 1.05;
-  margin-bottom: 14px;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--sp-3);
 }
 .name-kr {
   display: inline-block;
@@ -589,16 +634,18 @@ p {
   z-index: 1;
   color: var(--ink);
 }
+/* 글자 뒤에 색 블록을 깔면 본문 대비가 떨어진다. 밑줄로 내려 글자는
+   종이 위에 그대로 두고 강조만 남긴다. */
 .name-kr::before {
   content: "";
   position: absolute;
-  left: -6px;
-  right: -6px;
-  bottom: 6px;
-  height: 18px;
-  background: var(--red-soft);
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 6px;
+  background: var(--red);
+  opacity: 0.85;
   z-index: -1;
-  transform: skewX(-3deg);
 }
 .name-en {
   display: block;
@@ -610,7 +657,7 @@ p {
   margin-top: 6px;
 }
 .hero-role {
-  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-size: var(--fs-lg);
   color: var(--ink);
   margin-bottom: 18px;
   font-weight: 500;
@@ -629,11 +676,11 @@ p {
   animation: blink 1s infinite;
 }
 .hero-desc {
-  font-size: 1rem;
-  color: var(--text-muted);
+  font-size: var(--fs-md);
+  color: var(--ink);
   line-height: 1.85;
-  max-width: 580px;
-  margin-bottom: 30px;
+  max-width: var(--measure);
+  margin-bottom: var(--sp-6);
 }
 .hero-btns {
   display: flex;
@@ -675,8 +722,18 @@ p {
 .hero-stats {
   display: flex;
   align-items: flex-start;
-  gap: 22px;
+  gap: var(--sp-5);
   flex-wrap: wrap;
+}
+@media (min-width: 1025px) {
+  .hero-stats {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--sp-4);
+  }
+  .stat-divider {
+    display: none;
+  }
 }
 /* 포스트잇 stat */
 .stat-item {
@@ -741,8 +798,11 @@ p {
 }
 
 /* 11. About */
+/* 본문이 --measure 로 묶이므로 카드가 컨테이너 폭(1160px)을 다 쓰면
+   오른쪽 절반이 빈 종이로 남는다. 카드도 글 폭에 맞춰 메모지처럼 세운다. */
 .about-card {
-  margin-top: 8px;
+  margin-top: var(--sp-2);
+  max-width: 780px;
 }
 .about-quote {
   font-family: var(--font-hand);
@@ -753,11 +813,14 @@ p {
   transform: rotate(-0.5deg);
   font-weight: 600;
 }
+/* 산문은 컨테이너 폭(1160px)을 그대로 채우면 1440px 화면에서 한 줄이 100자를
+   넘는다. 문단 자체에 상한을 걸어 줄 길이를 읽기 좋은 범위로 묶는다. */
 .about-body p {
-  font-size: 0.98rem;
+  font-size: var(--fs-md);
   color: var(--ink);
-  line-height: 2;
-  margin-bottom: 14px;
+  line-height: 1.9;
+  margin-bottom: var(--sp-4);
+  max-width: var(--measure);
 }
 .about-body strong {
   position: relative;
@@ -862,10 +925,13 @@ p {
 }
 
 /* 12. Skills */
+/* 역량 카드는 항목 수가 3~7개로 제각각이라 행 높이를 맞추면 짧은 카드
+   아래에 빈 종이가 크게 남는다. 내용 높이대로 두어 인덱스 카드처럼 보이게 한다. */
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 24px;
+  gap: var(--sp-5);
+  align-items: start;
 }
 .skill-icon {
   font-size: 1.9rem;
@@ -988,26 +1054,13 @@ p {
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 24px;
+  gap: var(--sp-5);
 }
 .project-card {
   padding-top: 32px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-/* 빨간 압정 (우상단) */
-.project-card::before {
-  content: "";
-  position: absolute;
-  top: -7px;
-  right: 22px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 32%, #ff8a8a 0%, var(--red) 55%, #6e1a1a 100%);
-  box-shadow: 0 3px 5px rgba(31, 28, 20, 0.28);
-  z-index: 2;
 }
 .project-top {
   display: flex;
@@ -1030,7 +1083,7 @@ p {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  font-size: 0.82rem;
+  font-size: var(--fs-sm);
   transition: transform 0.2s, background 0.2s, color 0.2s;
   background: var(--card);
   border: 1.5px solid var(--line);
@@ -1066,7 +1119,7 @@ p {
   transform: translateY(-1px);
 }
 .project-card h3 {
-  font-size: 1.05rem;
+  font-size: var(--fs-md);
   font-weight: 700;
   color: var(--ink);
   position: relative;
@@ -1084,7 +1137,7 @@ p {
   z-index: -1;
 }
 .project-card p {
-  font-size: 0.88rem;
+  font-size: var(--fs-base);
   color: var(--ink);
   line-height: 1.75;
   flex: 1;
@@ -1107,37 +1160,11 @@ p {
   border: 1px dashed var(--line);
 }
 
-/* WIP 카드 — 사선 줄무늬 + 금색 테이프 배지 */
+/* WIP 카드 — 금색 상단 띠 + 배지 */
 .project-wip {
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='28' viewBox='0 0 90 28'><g transform='rotate(-4 45 14)'><rect x='0' y='0' width='90' height='28' fill='%23e6c878' fill-opacity='0.55'/><rect x='0' y='0' width='90' height='2' fill='%23b88a1a' fill-opacity='0.15'/></g></svg>"),
-    linear-gradient(var(--red-margin), var(--red-margin)),
-    radial-gradient(circle 5px at 22px 44px, var(--paper-2) 99%, transparent 100%),
-    radial-gradient(circle 5px at 22px 50%, var(--paper-2) 99%, transparent 100%),
-    radial-gradient(circle 5px at 22px calc(100% - 44px), var(--paper-2) 99%, transparent 100%),
-    repeating-linear-gradient(45deg, transparent 0 12px, rgba(184, 138, 26, 0.07) 12px 24px),
-    repeating-linear-gradient(transparent 0 31px, var(--rule) 31px 32px);
-  background-position:
-    18px -6px,
-    56px 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0;
-  background-size:
-    90px 28px,
-    1px 100%,
-    auto, auto, auto,
-    auto, 100% auto;
-  background-repeat:
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    repeat,
-    repeat-y;
+  /* 진행 중 — 상단 띠를 금색으로. 이전에는 카드 배경 전체에 45도 사선
+     해칭을 깔아서 본문 대비를 깎아먹었다. */
+  --tab: var(--tab-wip);
 }
 .wip-badge {
   display: inline-block;
@@ -1243,30 +1270,13 @@ p {
     display: none;
   }
   .section {
-    padding: 64px 0;
+    padding: var(--sp-7) 0;
   }
   .about-card,
   .skill-card,
   .award-card,
   .project-card {
-    padding: 32px 22px 22px 52px;
-    background-position:
-      14px -6px,
-      44px 0,
-      0 0,
-      0 0,
-      0 0,
-      0 0;
-  }
-  .project-wip {
-    background-position:
-      14px -6px,
-      44px 0,
-      0 0,
-      0 0,
-      0 0,
-      0 0,
-      0 0;
+    padding: var(--sp-4);
   }
   .hero {
     padding: 88px 0 48px;
@@ -1275,18 +1285,10 @@ p {
   .hero-name {
     font-size: clamp(2rem, 8vw, 3rem);
   }
-  .section-header::after {
-    width: 56px;
-    height: 56px;
-    top: -4px;
-  }
   .fi {
-    width: 64px;
-    height: 64px;
-    font-size: 2rem;
-  }
-  .fi::before {
-    inset: 6px;
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
   }
   .hero-stats {
     gap: 14px;
@@ -1295,7 +1297,7 @@ p {
     min-width: 90px;
     padding: 10px 14px;
   }
-  }
+}
 
 /* ==========================================================================
    18. 서브페이지 호환 shim — 기존 15개 /projects/*.html 가독성·동작 보존
@@ -1629,7 +1631,7 @@ p {
 }
 
 /* ==========================================================================
-   20. 스티커 (.fi) — 5색 floatUp 변형 + 드래그 상태
+   20. 스티커 (.fi) — 드래그 상태
    ========================================================================== */
 
 .fi {
@@ -1650,14 +1652,6 @@ p {
 .fi.settled {
   animation: none !important;
 }
-
-/* nth-child별 다른 floatUp 패턴 */
-.fi-1 { animation-name: floatA; }
-.fi-2 { animation-name: floatB; animation-duration: 9s; }
-.fi-3 { animation-name: floatC; animation-duration: 10s; }
-.fi-4 { animation-name: floatD; animation-duration: 8.5s; }
-.fi-5 { animation-name: floatE; animation-duration: 11s; }
-
 
 /* ==========================================================================
    21. 형광펜 sweep — 호버 시 좌→우로 그어지는 효과
@@ -1761,7 +1755,7 @@ p {
 }
 
 /* ==========================================================================
-   23. 카드 진입 — 마스킹 테이프 sweep (.taped 클래스 추가 시)
+   23. 카드 진입 — 아이콘 pop (.taped 클래스 추가 시)
    ========================================================================== */
 
 .project-card .project-icon,
@@ -1899,7 +1893,7 @@ body::before {
 }
 
 /* ==========================================================================
-   29. 카드 마스킹 테이프 호버 시 살짝 떨어짐
+   29. 카드 배경 고정 방식
    ========================================================================== */
 
 .about-card,
@@ -1907,29 +1901,6 @@ body::before {
 .award-card,
 .project-card {
   background-attachment: scroll;
-}
-
-/* 카드 호버 시 테이프 살짝 떨어짐 */
-.skill-card:hover,
-.award-card:hover,
-.project-card:hover {
-  background-position:
-    24px -3px,
-    56px 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0;
-}
-.project-card.project-wip:hover {
-  background-position:
-    24px -3px,
-    56px 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0;
 }
 
 /* ==========================================================================
@@ -2135,12 +2106,6 @@ html {
 #awards .section-tag { border-color: var(--bronze-text); color: var(--bronze-text); }
 #projects .section-tag { border-color: var(--red-text); color: var(--red-text); }
 
-/* section-header 아래 가로 밑줄 (노트 페이지 구분선처럼) */
-.section-header {
-  border-bottom: 1.5px solid var(--line);
-  padding-bottom: 20px;
-}
-
 /* ==========================================================================
    40. 포스트잇 스티커 fold 모서리 효과 — stat-item
    ========================================================================== */
@@ -2165,32 +2130,23 @@ html {
    41. 메모지 스타일 card 변형 — about-card 헤더 라인 강화
    ========================================================================== */
 
+/* 카드 상단 색은 이제 --tab 하나로 정한다. 여기 있던
+   .skill-card:nth-child(4n+k) { border-top: 3px solid ... } 4색 순환은
+   #9 의 ::before 띠와 겹쳐 이중선으로 보였고, 색이 카드 순서로 정해져서
+   의미가 없었다. 색은 섹션 역할에 고정한다. */
 .about-card {
-  border-top: 3px solid var(--cyan);
+  --tab: var(--cyan);
 }
-.skill-card:nth-child(4n+1) { border-top: 3px solid var(--red); }
-.skill-card:nth-child(4n+2) { border-top: 3px solid var(--cyan); }
-.skill-card:nth-child(4n+3) { border-top: 3px solid var(--gold); }
-.skill-card:nth-child(4n+4) { border-top: 3px solid var(--bronze); }
+.skill-card {
+  --tab: var(--gold);
+}
+.award-card {
+  --tab: var(--bronze);
+}
 
 /* ==========================================================================
    42. 견출지 — 프로젝트 카드 상단 컬러 탭 (카드별 5색 순환)
    ========================================================================== */
-
-.project-card::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 64px;
-  right: 0;
-  height: 3px;
-  border-radius: 0 var(--radius) 0 0;
-}
-.project-card:nth-child(5n+1)::after { background: var(--red); }
-.project-card:nth-child(5n+2)::after { background: var(--cyan); }
-.project-card:nth-child(5n+3)::after { background: var(--gold); }
-.project-card:nth-child(5n+4)::after { background: var(--bronze); }
-.project-card:nth-child(5n+5)::after { background: var(--ink); opacity: 0.4; }
 
 /* ==========================================================================
    44. 나의 역할 — 직책 배지 (Issue #22)
@@ -2240,27 +2196,6 @@ html {
   .section {
     padding: 52px 0;
   }
-  .about-card,
-  .skill-card,
-  .award-card,
-  .project-card {
-    /* 좌측 노트 마진선 폭을 44 → 32px로 줄여 좁은 화면의 본문 폭을 확보한다.
-       마진선(장식)은 유지하되 360px에서 한글 2줄이 3줄로 깨지던 것을 막는다 (#114) */
-    padding: 28px 16px 18px 32px;
-    background-position:
-      10px -6px,
-      26px 0,
-      0 0, 0 0, 0 0, 0 0;
-  }
-  .project-wip {
-    background-position:
-      10px -6px,
-      26px 0,
-      0 0, 0 0, 0 0, 0 0, 0 0;
-  }
-  .project-card::after {
-    left: 32px;
-  }
   .skills-grid,
   .projects-grid {
     grid-template-columns: 1fr;
@@ -2270,11 +2205,6 @@ html {
   }
   .section-header::after {
     display: none;
-  }
-  .fi {
-    width: 52px;
-    height: 52px;
-    font-size: 1.6rem;
   }
 }
 
@@ -2729,10 +2659,6 @@ html {
   transform: translateY(2px);
   box-shadow: 1px 1px 0 var(--red);
 }
-@media (prefers-reduced-motion: reduce) {
-  .chicken-drop { animation-duration: 7s !important; }
-}
-
 
 /* ==========================================================================
    51. 진행 중 프로젝트 상태 라벨 (#61 진행률 바 → #114 상태 라벨)
@@ -2768,35 +2694,8 @@ html {
    ========================================================================== */
 
 .project-failed {
-  background-image:
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='28' viewBox='0 0 90 28'><g transform='rotate(-4 45 14)'><rect x='0' y='0' width='90' height='28' fill='%23e07070' fill-opacity='0.45'/><rect x='0' y='0' width='90' height='2' fill='%23c63b3b' fill-opacity='0.15'/></g></svg>"),
-    linear-gradient(var(--red-margin), var(--red-margin)),
-    radial-gradient(circle 5px at 22px 44px, var(--paper-2) 99%, transparent 100%),
-    radial-gradient(circle 5px at 22px 50%, var(--paper-2) 99%, transparent 100%),
-    radial-gradient(circle 5px at 22px calc(100% - 44px), var(--paper-2) 99%, transparent 100%),
-    repeating-linear-gradient(135deg, transparent 0 12px, rgba(198, 59, 59, 0.05) 12px 24px),
-    repeating-linear-gradient(transparent 0 31px, var(--rule) 31px 32px);
-  background-position:
-    18px -6px,
-    56px 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0,
-    0 0;
-  background-size:
-    90px 28px,
-    1px 100%,
-    auto, auto, auto,
-    auto, 100% auto;
-  background-repeat:
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    no-repeat,
-    repeat,
-    repeat-y;
+  /* 중단 — 상단 띠를 회색으로 낮춘다 */
+  --tab: var(--tab-failed);
   opacity: 0.85;
 }
 .project-failed:hover {
@@ -3074,9 +2973,9 @@ html {
   --card: #1f2937;
   --ink: #e5e5e5;
   --text-muted: #9ca3af;
-  --red: #e05050;
-  --red-soft: rgba(224, 80, 80, 0.18);
-  --red-margin: rgba(224, 80, 80, 0.35);
+  --red: #e56b6b;
+  --red-soft: rgba(229, 107, 107, 0.18);
+  --red-margin: rgba(229, 107, 107, 0.35);
   --cyan: #4dd0c8;
   --gold: #d4a825;
   --bronze: #d4853a;
@@ -3087,15 +2986,17 @@ html {
   --postit: #2d2a1f;
   --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.25);
   --shadow-lift: 0 12px 28px rgba(0, 0, 0, 0.35);
-  /* 다크 배경(#1f2937/#1a1a2e/#16213e)에서 AA 4.5:1 — cyan·gold·bronze는 이미 통과 */
+  /* 다크 배경(#1f2937/#1a1a2e/#16213e)에서 AA 4.5:1 */
   --red-text: #e56b6b;
   --cyan-text: var(--cyan);
   --gold-text: var(--gold);
   --bronze-text: var(--bronze);
+  /* 중단 카드 띠 — 라이트의 rgba(107,100,83,…)는 어두운 종이에서 보이지 않는다 */
+  --tab-failed: rgba(229, 229, 229, 0.28);
 }
 [data-theme="dark"] body {
   background-image:
-    radial-gradient(circle at 18% 22%, rgba(224, 80, 80, 0.04), transparent 40%),
+    radial-gradient(circle at 18% 22%, rgba(229, 107, 107, 0.04), transparent 40%),
     radial-gradient(circle at 82% 78%, rgba(77, 208, 200, 0.03), transparent 45%);
 }
 [data-theme="dark"] body::before {
@@ -3145,6 +3046,9 @@ html {
 }
 [data-theme="dark"] .sidebar-overlay {
   background: rgba(0, 0, 0, 0.55);
+}
+[data-theme="dark"] .mindmap-discord .mindmap-cat {
+  color: #fffdf6;
 }
 [data-theme="dark"] html {
   scrollbar-color: var(--red-text) var(--paper-2);
@@ -3380,4 +3284,3 @@ html {
     padding-bottom: 52px;
   }
 }
-
