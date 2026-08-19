@@ -13,7 +13,7 @@ permissions:
 jobs:
   repair:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,7 +35,6 @@ jobs:
           set -euo pipefail
           sudo apt-get update >/dev/null
           sudo apt-get install -y fonts-noto-cjk >/dev/null
-          fc-cache -f >/dev/null
           fc-match 'Noto Sans CJK KR'
           python3 -m pip install --quiet selenium pillow
           python3 - <<'PY'
@@ -43,22 +42,32 @@ jobs:
           import shutil, subprocess, time
           from PIL import Image
           from selenium import webdriver
+          from selenium.common.exceptions import TimeoutException
           from selenium.webdriver.chrome.options import Options
           from selenium.webdriver.chrome.service import Service
 
           root=Path.cwd()
           chrome=shutil.which('google-chrome') or shutil.which('chromium') or shutil.which('chromium-browser')
           driver_bin=shutil.which('chromedriver') or shutil.which('chromium-driver')
-          opts=Options(); opts.binary_location=chrome
+          opts=Options(); opts.binary_location=chrome; opts.page_load_strategy='eager'
           for arg in ['--headless=new','--no-sandbox','--disable-dev-shm-usage','--hide-scrollbars','--ignore-certificate-errors','--window-size=1440,1000','--lang=ko-KR']:
               opts.add_argument(arg)
           d=webdriver.Chrome(service=Service(driver_bin) if driver_bin else Service(),options=opts)
           d.set_window_size(1440,1000)
+          d.set_page_load_timeout(45)
           url='https://capybaracute.notion.site/2026-2fca8de5ee5f806db9e9e64464a9ac78'
-          d.get(url); time.sleep(10)
-          source=d.page_source
-          if '2026' not in source:
-              raise SystemExit('public freshman guide did not load')
+          try:
+              d.get(url)
+          except TimeoutException:
+              pass
+          deadline=time.time()+35
+          while time.time()<deadline:
+              source=d.page_source
+              if '2026' in source and d.execute_script('return document.body && document.body.innerText.length > 100'):
+                  break
+              time.sleep(1)
+          else:
+              raise SystemExit('public freshman guide did not load usable content')
           d.execute_script('''
             const s=document.createElement('style');
             s.textContent='html,body,body *{font-family:"Noto Sans CJK KR","Noto Sans KR",sans-serif !important;}';
@@ -67,7 +76,7 @@ jobs:
           font_ok=d.execute_script('return document.fonts.check("16px \\\"Noto Sans CJK KR\\\"")')
           if not font_ok:
               raise SystemExit('Noto Sans CJK KR not available to Chrome')
-          time.sleep(3)
+          time.sleep(4)
           png=Path('/tmp/freshman-guide.png')
           d.save_screenshot(str(png)); d.quit()
           if png.stat().st_size<40000:
