@@ -1,0 +1,46 @@
+name: v2.6 structure media follow-up runner
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-structure-media-followup.yml
+      - tools/v26_structure_media_followup.py
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v26-structure-media-runner
+          fetch-depth: 0
+
+      - name: Preserve runner and switch to target branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp tools/v26_structure_media_followup.py /tmp/v26_structure_media_followup.py
+          git fetch origin agent/v26-structure-media-followup
+          git switch -C agent/v26-structure-media-followup origin/agent/v26-structure-media-followup
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install capture dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg chromium chromium-driver || sudo apt-get install -y ffmpeg chromium-browser chromium-chromedriver
+          python3 -m pip install --quiet selenium flask python-dotenv google-generativeai
+
+      - name: Implement issues and remaining automatable media
+        shell: bash
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: python3 /tmp/v26_structure_media_followup.py
