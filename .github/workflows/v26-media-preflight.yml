@@ -1,0 +1,82 @@
+name: v2.6.x media preflight
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-media-preflight.yml
+
+permissions:
+  contents: read
+
+jobs:
+  prepare-media:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare optimized source media
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+
+          mkdir -p sources out/2024_5th_CSRC out/Master_Creator_Challenge out/Wall_Sina out/PlantClock out/BerryIno
+          git clone --depth 1 https://github.com/pachir1su/2024_5th_CSRC.git sources/2024_5th_CSRC
+          git clone --depth 1 https://github.com/pachir1su/Master_Creator_Challenge.git sources/Master_Creator_Challenge
+          git clone --depth 1 https://github.com/pachir1su/Wall_Sina.git sources/Wall_Sina
+          git clone --depth 1 https://github.com/pachir1su/PlantClock.git sources/PlantClock
+          git clone --depth 1 https://github.com/pachir1su/BerryIno.git sources/BerryIno
+
+          convert_image() {
+            src="$1"
+            dst="$2"
+            ffmpeg -hide_banner -loglevel error -y -i "$src" -vf "scale='min(1600,iw)':-2" -c:v libwebp -quality 82 -compression_level 6 "$dst"
+          }
+
+          convert_image sources/2024_5th_CSRC/media/CSRC_LED.jpg out/2024_5th_CSRC/csrc-led.webp
+          convert_image sources/2024_5th_CSRC/media/CSRC_LED2.jpg out/2024_5th_CSRC/csrc-led-2.webp
+          convert_image sources/2024_5th_CSRC/media/CSRC_SSAKSSAK.jpg out/2024_5th_CSRC/csrc-build-1.webp
+          convert_image sources/2024_5th_CSRC/media/CSRC_SSAKSSAK2.jpg out/2024_5th_CSRC/csrc-build-2.webp
+          convert_image sources/2024_5th_CSRC/media/CSRC_SSAKSSAK3.jpg out/2024_5th_CSRC/csrc-build-3.webp
+          convert_image sources/2024_5th_CSRC/media/CSRC_hall.jpg out/2024_5th_CSRC/csrc-hall.webp
+
+          convert_image sources/Master_Creator_Challenge/tray01.jpg out/Master_Creator_Challenge/doorlock-1.webp
+          convert_image sources/Master_Creator_Challenge/tray02.jpg out/Master_Creator_Challenge/doorlock-2.webp
+          convert_image sources/Master_Creator_Challenge/tray03.jpg out/Master_Creator_Challenge/doorlock-3.webp
+
+          convert_image sources/Wall_Sina/plan.png out/Wall_Sina/plan-1.webp
+          convert_image sources/Wall_Sina/plan2.jpg out/Wall_Sina/plan-2.webp
+          convert_image sources/Wall_Sina/plan3.png out/Wall_Sina/plan-3.webp
+          convert_image sources/Wall_Sina/tray.jpg out/Wall_Sina/prototype-1.webp
+          convert_image sources/Wall_Sina/tray2.jpg out/Wall_Sina/prototype-2.webp
+          convert_image sources/Wall_Sina/tray3.jpg out/Wall_Sina/prototype-3.webp
+
+          convert_image sources/PlantClock/media/2025PlantClock.jpg out/PlantClock/plantclock.webp
+
+          convert_image sources/BerryIno/img/LCD.png out/BerryIno/nfc-lcd.webp
+          convert_image sources/BerryIno/img/웹서버.png out/BerryIno/nfc-web-dashboard.webp
+          convert_image sources/BerryIno/img/tlqkf.jpeg out/BerryIno/nfc-photo-1.webp
+          convert_image sources/BerryIno/img/tlqkf2.jpeg out/BerryIno/nfc-photo-2.webp
+          convert_image sources/BerryIno/img/맞짱.jpeg out/BerryIno/nfc-photo-3.webp
+
+          {
+            echo '# v2.6.x media preflight manifest'
+            echo
+            find out -type f -name '*.webp' -print0 | sort -z | while IFS= read -r -d '' file; do
+              dims=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$file")
+              bytes=$(stat -c%s "$file")
+              printf '%s | %s | %s bytes\n' "$file" "$dims" "$bytes"
+            done
+          } > out/MANIFEST.md
+
+      - name: Upload preflight media
+        uses: actions/upload-artifact@v4
+        with:
+          name: v26-media-preflight
+          path: out
+          retention-days: 3
