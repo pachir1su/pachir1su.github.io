@@ -1,0 +1,162 @@
+name: v2.6 finalize structure media follow-up
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-finalize-followup.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v26-structure-media-runner
+          fetch-depth: 0
+
+      - name: Reconstruct target on latest main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main agent/v26-structure-media-followup
+          old_target=$(git rev-parse origin/agent/v26-structure-media-followup)
+          git switch -C agent/v26-structure-media-followup origin/agent/v26-structure-media-followup
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Bring in concurrent docs work from the latest main before rebuilding history.
+          git merge --no-edit origin/main
+
+          # #153 applies to every HTML page, including newly merged v3 prototype pages.
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path.cwd()
+          favicon = '<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />'
+          link_re = re.compile(r'<link\b(?:[^>"\']|"[^"]*"|\'[^\']*\')*>', re.I | re.S)
+          rel_icon = re.compile(r'\brel\s*=\s*(["\'])?(?:shortcut\s+)?icon\1', re.I)
+
+          def normalize(html: str) -> str:
+              matches = [m for m in link_re.finditer(html) if rel_icon.search(m.group(0))]
+              if matches:
+                  out, cursor, first = [], 0, True
+                  for m in matches:
+                      out.append(html[cursor:m.start()])
+                      if first:
+                          out.append(favicon)
+                          first = False
+                      cursor = m.end()
+                  out.append(html[cursor:])
+                  return ''.join(out)
+              title = re.search(r'</title\s*>', html, re.I)
+              if title:
+                  return html[:title.end()] + '\n    ' + favicon + html[title.end():]
+              head = re.search(r'<head\b[^>]*>', html, re.I)
+              if head:
+                  return html[:head.end()] + '\n    ' + favicon + html[head.end():]
+              return html
+
+          for path in sorted(root.rglob('*.html')):
+              if '.git' in path.parts or 'node_modules' in path.parts:
+                  continue
+              old = path.read_text(encoding='utf-8')
+              new = normalize(old)
+              if new != old:
+                  path.write_text(new, encoding='utf-8')
+          PY
+
+          # Keep the final worktree, but rebuild commits from the newest main.
+          git reset --mixed origin/main
+          git add -N -A -- . || true
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess
+
+          root = Path.cwd()
+
+          def git(*args, capture=False):
+              p = subprocess.run(['git', *args], check=True, cwd=root,
+                                 stdout=subprocess.PIPE if capture else None,
+                                 stderr=subprocess.STDOUT if capture else None)
+              return p.stdout if capture else b''
+
+          raw = git('diff', '--name-status', '-M', '-z', capture=True)
+          parts = raw.split(b'\0')
+          if parts and parts[-1] == b'':
+              parts.pop()
+          records = []
+          i = 0
+          while i < len(parts):
+              status = parts[i].decode(); i += 1
+              if status.startswith(('R','C')):
+                  old = parts[i].decode(); new = parts[i+1].decode(); i += 2
+                  records.append((status, old, new))
+              else:
+                  path = parts[i].decode(); i += 1
+                  records.append((status, path, None))
+
+          def msg(status, path, old=None):
+              p = Path(path)
+              if status.startswith('R'):
+                  return f'refactor: colocate {p.name} with project'
+              if path == 'style.css':
+                  return 'fix: stop project media cards from stretching'
+              if path == 'assets/favicon.svg':
+                  return 'fix: add shared chicken favicon'
+              if path == 'AGENTS.md':
+                  return 'docs: document project-local asset layout'
+              if path == 'assets/README.md':
+                  return 'docs: clarify global asset ownership'
+              if path == 'tools/verify-build.js':
+                  return 'chore: verify favicon and project-local assets'
+              if p.suffix.lower() in {'.webp','.png','.jpg','.jpeg','.mp4','.webm'} and 'projects' in p.parts:
+                  return f'feat: add {p.parent.parent.parent.name if len(p.parts) > 3 else p.stem} project media'
+              if p.suffix.lower() == '.html':
+                  if path.startswith('projects/'):
+                      text = (root / path).read_text(encoding='utf-8')
+                      if 'data-media-followup=' in text:
+                          return f'feat: update {p.parent.name} project media'
+                      if 'assets/images/' in text or 'assets/video/' in text:
+                          return f'refactor: update {p.parent.name} project asset paths'
+                  return f'fix: use shared favicon in {path}'
+              return f'chore: update {path}'
+
+          for status, path1, path2 in records:
+              if status.startswith(('R','C')):
+                  git('add', '-A', '--', path1, path2)
+                  message = msg(status, path2, path1)
+              elif status == 'D':
+                  git('add', '-u', '--', path1)
+                  message = msg(status, path1)
+              else:
+                  git('add', '-A', '--', path1)
+                  message = msg(status, path1)
+              staged = git('diff', '--cached', '--name-only', '-M', capture=True).decode().strip().splitlines()
+              if not staged:
+                  raise SystemExit(f'No staged path for {status} {path1} {path2 or ""}')
+              git('commit', '-m', message)
+
+          print('reconstructed records:', len(records))
+          PY
+
+          node --check script.js
+          node build.js
+          test -z "$(git status --porcelain index.html)"
+          node tools/verify-build.js
+          git diff --check origin/main...HEAD
+          test -z "$(git status --porcelain)"
+
+          changed=$(git diff --name-only -M origin/main...HEAD | wc -l)
+          commits=$(git rev-list --count origin/main..HEAD)
+          echo "FINAL changed=$changed commits=$commits"
+          test "$changed" -eq "$commits"
+
+          git push --force-with-lease="refs/heads/agent/v26-structure-media-followup:${old_target}" origin HEAD:agent/v26-structure-media-followup
