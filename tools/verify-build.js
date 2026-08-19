@@ -90,6 +90,46 @@ for (const group of data.groups) {
   }
 }
 
+
+/* --- 4) 공용 favicon 정합성 + 프로젝트 전용 미디어 위치 --- */
+function collectHtmlFiles(dir) {
+  const out = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === ".git" || entry.name === "node_modules") continue;
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...collectHtmlFiles(full));
+    else if (entry.isFile() && entry.name.endsWith(".html")) out.push(full);
+  }
+  return out;
+}
+
+for (const htmlFile of collectHtmlFiles(root)) {
+  const rel = path.relative(root, htmlFile).replaceAll("\\", "/");
+  const html = fs.readFileSync(htmlFile, "utf8");
+  check(
+    html.includes('href="/assets/favicon.svg"'),
+    `공용 닭 favicon 누락: ${rel}`
+  );
+}
+
+check(
+  !fs.existsSync(path.join(root, "assets", "media")),
+  "폐기된 assets/media 디렉터리가 남아 있습니다. 프로젝트 전용 미디어는 projects/<project>/assets/ 아래에 둡니다."
+);
+
+for (const group of data.groups) {
+  for (const card of group.cards) {
+    if (!card.detail) continue;
+    const detailDir = path.join(root, card.detail);
+    if (!fs.existsSync(detailDir)) continue;
+    const detailHtml = fs.readFileSync(path.join(detailDir, "index.html"), "utf8");
+    const localAssetRefs = [...detailHtml.matchAll(/(?:src|poster)="(assets\/[^"]+)"/g)].map((m) => m[1]);
+    for (const ref of localAssetRefs) {
+      check(fs.existsSync(path.join(detailDir, ref)), `프로젝트 로컬 자산 없음: ${card.detail}${ref}`);
+    }
+  }
+}
+
 if (failures.length === 0) {
   console.log(`✅ 검증 통과: 카드 ${actualCount}개, 재실행 idempotent, 상세 경로 정합.`);
   process.exit(0);
