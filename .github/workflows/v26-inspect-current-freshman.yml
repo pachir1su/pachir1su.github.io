@@ -1,0 +1,36 @@
+name: v2.6 inspect current freshman media
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-inspect-current-freshman.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v26-structure-media-followup
+      - name: Confirm exact target and media
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "TARGET_HEAD=$(git rev-parse HEAD)"
+          test -s projects/koreatech_noob_guide/assets/images/notion-guide.webp
+          file projects/koreatech_noob_guide/assets/images/notion-guide.webp
+          node --check script.js
+          node build.js
+          test -z "$(git status --porcelain index.html)"
+          node tools/verify-build.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: freshman-guide-current
+          path: projects/koreatech_noob_guide/assets/images/notion-guide.webp
+          retention-days: 1
