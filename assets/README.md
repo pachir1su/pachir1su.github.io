@@ -36,3 +36,12 @@
 
 > 두 이미지는 `.detail-gallery` / `.detail-figure` 스타일(`style.css`)로 표시되며
 > `loading="lazy"` 와 `width`·`height` 속성으로 레이아웃 이동을 막습니다.
+
+
+## 전역 자산 원칙
+
+`assets/`는 사이트 공용 자산 전용입니다. 프로젝트 하나에만 속하는 사진·영상·데이터는 `projects/<project>/assets/`에 둡니다.
+
+- 공용: `favicon.svg`, 사이트 로고, 여러 페이지에서 공유하는 통계/브랜드 자산
+- 프로젝트 전용: `projects/<project>/assets/images/`, `video/`, `data/`
+- 폐기된 구조: `assets/media/<project>/`
