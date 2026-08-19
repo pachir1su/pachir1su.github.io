@@ -28,7 +28,7 @@
     <section class="simulator" aria-labelledby="simulator-title">
       <header class="simulator-heading">
         <div><p class="section-kicker">INTERACTIVE DEFENSE MODEL</p><h2 id="simulator-title">수위 상승 시뮬레이터</h2></div>
-        <p>시스템을 켠 뒤 수위를 직접 움직이거나 자동 시뮬레이션을 실행해 보세요.</p>
+        <p>물이 센서 높이에 닿는 순간, 실제 110초 제어 흐름을 11초로 압축한 시퀀스가 시작됩니다.</p>
       </header>
       <div class="simulator-layout">
         <div class="tank" data-tank>
@@ -39,19 +39,29 @@
           <div class="water-sensor" data-water-sensor><span>SENSOR</span></div>
           <div class="traffic-light" data-traffic-light><i data-light="red"></i><i data-light="yellow"></i><i data-light="green"></i></div>
           <div class="alert-beacon" data-alert-beacon></div>
+          <div class="aux-led-bank" aria-label="보조 경고 LED"><i data-alert-led="red"></i><i data-alert-led="blue"></i></div>
         </div>
         <aside class="control-console">
           <div class="console-status"><span class="status-dot" data-status-dot></span><div><small>SYSTEM STATE</small><strong data-system-state>전원 꺼짐</strong></div></div>
+          <div class="tm-display" aria-label="TM1637 시간 표시기"><small>TM1637</small><output data-tm-display>----</output></div>
           <button class="system-switch" data-system-switch type="button" aria-pressed="false">시스템 전원 켜기</button>
           <label for="waterLevel">수위 <output data-water-output>0%</output></label>
           <input id="waterLevel" data-water-slider type="range" min="0" max="100" value="0" disabled>
-          <button class="simulation-run" data-simulation-run type="button" disabled>10초 자동 시뮬레이션</button>
+          <p class="sensor-threshold">센서 높이 <strong>24%</strong> · 한 번 감지되면 시스템을 끌 때까지 유지</p>
+          <button class="simulation-run" data-simulation-run type="button" disabled>11초 물 붓기 데모</button>
+          <div class="hardware-telemetry" aria-label="장치 상태">
+            <div><small>STEPPER</small><strong data-motor-state>정지</strong></div>
+            <div><small>BUZZER</small><strong data-buzzer-state>OFF</strong></div>
+            <div><small>LASER</small><strong data-laser-state>OFF</strong></div>
+          </div>
           <div class="phase-list" aria-label="경고 단계">
-            <div data-phase="safe"><b>01</b><span>대기</span><small>감지 전</small></div>
-            <div data-phase="detect"><b>02</b><span>감지</span><small>장벽 상승</small></div>
-            <div data-phase="caution"><b>03</b><span>주의</span><small>황색 신호</small></div>
-            <div data-phase="danger"><b>04</b><span>위험</span><small>적색 경고</small></div>
-            <div data-phase="recover"><b>05</b><span>복구</span><small>초기 위치</small></div>
+            <div data-phase="idle"><b>00</b><span>감지 대기</span><small>수위 &lt; 24%</small></div>
+            <div data-phase="deploy"><b>01</b><span>방벽 상승</span><small>0–27초</small></div>
+            <div data-phase="hold"><b>02</b><span>방벽 유지</span><small>27–47초</small></div>
+            <div data-phase="yellow-pulse"><b>03</b><span>황색 점멸</span><small>47–70초</small></div>
+            <div data-phase="red-yellow"><b>04</b><span>적·황 경고</span><small>70–90초</small></div>
+            <div data-phase="retract"><b>05</b><span>방벽 복귀</span><small>90–110초</small></div>
+            <div data-phase="complete"><b>06</b><span>시퀀스 완료</span><small>110초 이후</small></div>
           </div>
         </aside>
       </div>
