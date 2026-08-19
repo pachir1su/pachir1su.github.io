@@ -1,130 +1,13 @@
 name: v2.6 final strict atomic reconstruction
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - .github/workflows/v26-finalize-atomic-v2.yml
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  finalize:
+  completed:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: agent/v26-structure-media-runner
-          fetch-depth: 0
-
-      - name: Rebuild final target with one logical diff record per commit
-        shell: bash
-        run: |
-          set -euo pipefail
-          git fetch origin main agent/v26-structure-media-followup
-          old_target=$(git rev-parse origin/agent/v26-structure-media-followup)
-          git switch -C agent/v26-structure-media-followup origin/agent/v26-structure-media-followup
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          final_sha=$(git rev-parse HEAD)
-
-          python3 - "$final_sha" <<'PY'
-          from pathlib import Path
-          import subprocess, sys
-
-          root = Path.cwd()
-          final_sha = sys.argv[1]
-
-          def git(*args, capture=False):
-              p = subprocess.run(
-                  ['git', *args], cwd=root, check=True,
-                  stdout=subprocess.PIPE if capture else None,
-                  stderr=subprocess.STDOUT if capture else None,
-              )
-              return p.stdout if capture else b''
-
-          raw = git('diff', '--name-status', '-M', '-z', 'origin/main', final_sha, capture=True)
-          parts = raw.split(b'\0')
-          if parts and parts[-1] == b'':
-              parts.pop()
-
-          records = []
-          i = 0
-          while i < len(parts):
-              status = parts[i].decode(); i += 1
-              if status.startswith(('R', 'C')):
-                  old = parts[i].decode(); new = parts[i + 1].decode(); i += 2
-                  records.append((status, old, new))
-              else:
-                  path = parts[i].decode(); i += 1
-                  records.append((status, path, None))
-
-          print('FINAL DIFF RECORDS', len(records), flush=True)
-          git('reset', '--hard', 'origin/main')
-
-          def message(status, path):
-              p = Path(path)
-              if status.startswith('R'):
-                  return f'refactor: colocate {p.name} with project'
-              if path == 'style.css':
-                  return 'fix: stop project media cards from stretching'
-              if path == 'assets/favicon.svg':
-                  return 'fix: add shared chicken favicon'
-              if path == 'AGENTS.md':
-                  return 'docs: document project-local asset layout'
-              if path == 'assets/README.md':
-                  return 'docs: clarify global asset ownership'
-              if path == 'tools/verify-build.js':
-                  return 'chore: verify favicon and project-local assets'
-              if p.suffix.lower() in {'.webp', '.png', '.jpg', '.jpeg', '.mp4', '.webm'} and 'projects' in p.parts:
-                  project = p.parts[p.parts.index('projects') + 1]
-                  return f'feat: add {project} project media'
-              if p.suffix.lower() == '.html':
-                  if path.startswith('projects/'):
-                      project = p.parts[1] if len(p.parts) > 1 else p.parent.name
-                      text = (root / path).read_text(encoding='utf-8') if (root / path).exists() else ''
-                      if 'data-media-followup=' in text:
-                          return f'feat: update {project} project media'
-                      if 'assets/images/' in text or 'assets/video/' in text:
-                          return f'refactor: update {project} project asset paths'
-                  return f'fix: use shared favicon in {path}'
-              return f'chore: update {path}'
-
-          for index, (status, path1, path2) in enumerate(records, 1):
-              if status.startswith(('R', 'C')):
-                  git('checkout', final_sha, '--', path2)
-                  git('rm', '-f', '--', path1)
-                  target = path2
-              elif status == 'D':
-                  git('rm', '-f', '--', path1)
-                  target = path1
-              else:
-                  git('checkout', final_sha, '--', path1)
-                  target = path1
-
-              git('commit', '-m', message(status, target))
-              one = git(
-                  'diff-tree', '--no-commit-id', '--name-status', '-r', '-M', 'HEAD^', 'HEAD',
-                  capture=True,
-              ).decode().strip().splitlines()
-              if len(one) != 1:
-                  raise SystemExit(f'commit {index} is not exactly one logical diff record: {one}')
-
-          changed = git('diff', '--name-only', '-M', 'origin/main...HEAD', capture=True).decode().strip().splitlines()
-          commits = int(git('rev-list', '--count', 'origin/main..HEAD', capture=True).decode().strip())
-          print(f'ATOMIC records={len(records)} changed={len(changed)} commits={commits}', flush=True)
-          if len(records) != len(changed) or len(changed) != commits:
-              raise SystemExit(f'atomicity mismatch: records={len(records)} changed={len(changed)} commits={commits}')
-          PY
-
-          node --check script.js
-          node build.js
-          test -z "$(git status --porcelain index.html)"
-          node tools/verify-build.js
-          git diff --check origin/main...HEAD
-          test -z "$(git status --porcelain)"
-
-          git push --force-with-lease="refs/heads/agent/v26-structure-media-followup:${old_target}" origin HEAD:agent/v26-structure-media-followup
+      - run: echo "Final strict atomic reconstruction completed; runner disabled."
