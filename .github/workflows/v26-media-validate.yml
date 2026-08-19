@@ -21,7 +21,7 @@ jobs:
         run: |
           set -euo pipefail
           for page in 2024_5th_CSRC Master_Creator_Challenge Wall_Sina PlantClock BerryIno; do
-            sed -i -E 's/ data-aos="[^"]*"//g; s/ data-aos-delay="[^"]*"//g' "projects/$page/index.html"
+            sed -i -E 's/ data-aos="[^"]*"//g; s/ data-aos-delay="[^"]*"//g; s/loading="lazy"/loading="eager"/g' "projects/$page/index.html"
           done
           python3 -m http.server 8000 >/tmp/v26-media-server.log 2>&1 &
           echo $! > /tmp/v26-media-server.pid
@@ -41,7 +41,7 @@ jobs:
             browser=$(command -v chromium-browser || command -v chromium)
           fi
           mkdir -p /tmp/v26-media-shots
-          flags=(--headless --no-sandbox --disable-dev-shm-usage --hide-scrollbars --virtual-time-budget=3500)
+          flags=(--headless --no-sandbox --disable-dev-shm-usage --hide-scrollbars --virtual-time-budget=10000)
           for page in 2024_5th_CSRC Master_Creator_Challenge Wall_Sina PlantClock BerryIno; do
             "$browser" "${flags[@]}" --window-size=390,9000 --screenshot="/tmp/v26-media-shots/${page}-mobile.png" "http://127.0.0.1:8000/projects/$page/"
             "$browser" "${flags[@]}" --window-size=1280,5600 --screenshot="/tmp/v26-media-shots/${page}-desktop.png" "http://127.0.0.1:8000/projects/$page/"
@@ -51,6 +51,6 @@ jobs:
       - name: Upload visual validation screenshots
         uses: actions/upload-artifact@v4
         with:
-          name: v26-media-visual-validation
+          name: v26-media-visual-validation-eager
           path: /tmp/v26-media-shots
           retention-days: 3
