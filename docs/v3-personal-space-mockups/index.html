@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>v3.0.0 · Personal Space Mockups</title>
+  <style>
+    /* Gallery-only visual language: moon-paper, violet ink, and starlight yellow. */
+    :root { color-scheme: light; --paper:#f8f6ff; --ink:#282047; --muted:#6f668b; --violet:#6d4bd1; --soft:#e9e2ff; --star:#efc85a; --night:#272044; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-width:320px; background:radial-gradient(circle at 88% 4%, #fff4c9 0 3%, transparent 17%), var(--paper); color:var(--ink); font-family:ui-rounded, "Segoe UI", system-ui, sans-serif; }
+    main { max-width:1160px; margin:auto; padding:48px 24px 72px; }
+    .eyebrow { color:var(--violet); font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    h1 { max-width:780px; margin:12px 0; font-size:clamp(36px,6vw,74px); letter-spacing:-.065em; line-height:.94; }
+    .intro { max-width:620px; color:var(--muted); font-size:17px; line-height:1.65; }
+    .rule { display:flex; flex-wrap:wrap; gap:10px; margin:28px 0 40px; }
+    .rule span { padding:8px 12px; border-radius:999px; color:#514970; background:#fff; box-shadow:0 8px 24px #35245c12; font-size:13px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+    a { position:relative; overflow:hidden; min-height:240px; padding:26px; border-radius:28px; color:inherit; text-decoration:none; background:#fff; box-shadow:0 18px 50px #39265712; transition:transform .35s ease, box-shadow .35s ease; }
+    a:hover, a:focus-visible { transform:translateY(-5px); box-shadow:0 26px 62px #39265724; outline:3px solid #d6c8ff; outline-offset:3px; }
+    a::after { content:""; position:absolute; width:170px; height:170px; right:-42px; bottom:-56px; border:1px solid currentColor; border-radius:50%; opacity:.15; }
+    .number { display:block; color:var(--violet); font-size:12px; font-weight:800; letter-spacing:.1em; }
+    h2 { position:relative; z-index:1; margin:24px 0 8px; font-size:30px; letter-spacing:-.04em; }
+    p { position:relative; z-index:1; max-width:390px; margin:0; color:var(--muted); line-height:1.55; }
+    .tag { position:absolute; z-index:1; left:26px; bottom:25px; color:var(--night); font-size:13px; font-weight:700; }
+    .day { background:linear-gradient(135deg,#fff 20%,#eee8ff 100%); }.diary { background:linear-gradient(135deg,#fbf8f1 15%,#f4e2c8 100%); }.club { background:linear-gradient(135deg,#efeaff 10%,#d8f0ed 100%); }.transit { background:linear-gradient(135deg,#f9f5ff 15%,#e7e0ff 55%,#c7c3ef 100%); }.signal { color:#f5efff; background:linear-gradient(135deg,#373158,#211d3e); }.signal p,.signal .number { color:#d7ccef; }.detail { background:linear-gradient(135deg,#fff9dd,#f2eaff 72%); }
+    @media (max-width:700px) { main { padding:32px 18px 48px; } .grid { grid-template-columns:1fr; } a { min-height:210px; } }
+    @media (prefers-reduced-motion:reduce) { a { transition:none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <span class="eyebrow">pachir1su.github.io · v3.0.0 exploration</span>
+    <h1>별을 모으는 사람의<br>개성 있는 우주.</h1>
+    <p class="intro">라이트 테마를 좋아하는 사용성을 포기하지 않으면서도, 밤·별자리·드림코어의 감정을 담는 다섯 가지 홈과 하나의 프로젝트 상세 시안입니다. 이력서가 아니라, 선후배·동기에게 편하게 보여 주는 성장 기록을 목표로 합니다.</p>
+    <div class="rule"><span>밝은 달빛 배경</span><span>보라색은 깊이감</span><span>노란색은 별·성장 포인트</span><span>움직임은 사용자 행동에 반응</span></div>
+    <section class="grid" aria-label="시안 목록">
+      <a class="day" href="01-daylight-constellation.html"><span class="number">01 / HOME</span><h2>Daylight Constellation</h2><p>낮에도 볼 수 있는 별자리 지도. 프로젝트가 ‘별’이자 메뉴가 되는 가장 직접적인 홈입니다.</p><span class="tag">Light-first · playful atlas →</span></a>
+      <a class="diary" href="02-orbit-diary.html"><span class="number">02 / HOME</span><h2>Orbit Diary</h2><p>성장 갈증을 기록하는 우주 일기. 결과보다 시도와 관찰의 흔적을 첫 화면에 둡니다.</p><span class="tag">Warm paper · personal log →</span></a>
+      <a class="club" href="03-starlight-club.html"><span class="number">03 / HOME</span><h2>Starlight Club</h2><p>친구에게 보여 주기 좋은 귀여운 ‘별 관찰부’ 콘셉트. 딱딱한 포트폴리오 톤을 벗어납니다.</p><span class="tag">Soft community · collectible cards →</span></a>
+      <a class="transit" href="04-dream-transit.html"><span class="number">04 / HOME</span><h2>Dream Transit</h2><p>새벽의 우주 정거장을 지나는 여정. 타임라인과 프로젝트를 하나의 이동 경로로 엮습니다.</p><span class="tag">Dreamcore · journey-first →</span></a>
+      <a class="signal" href="05-night-signal.html"><span class="number">05 / HOME</span><h2>Night Signal</h2><p>가장 어두운 안. 순수 검정과 네온 없이도 몽환적인 밤을 만들 수 있는지 비교합니다.</p><span class="tag">Deep violet · quiet immersion →</span></a>
+      <a class="detail" href="06-project-skylog.html"><span class="number">DETAIL / ONE PAGE</span><h2>Project Skylog</h2><p>선택한 디자인 언어를 상세 페이지까지 확장한 예시. 과정·감정·기술을 한 화면의 궤도로 읽습니다.</p><span class="tag">Project detail · one representative page →</span></a>
+    </section>
+  </main>
+</body>
+</html>
+
