@@ -1,0 +1,85 @@
+name: v2.6.x freeze PR runner v2
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-freeze-pr-runner-v2.yml
+      - .github/workflows/v26-freeze-builder.yml
+
+permissions:
+  contents: write
+
+jobs:
+  run-builder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Extract builder with whitespace-tolerant replacements
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          raw = Path('.github/workflows/v26-freeze-builder.yml').read_text(encoding='utf-8')
+          begin_marker = "          python3 <<'PY'\n"
+          end_marker = "\n          PY\n"
+          start = raw.index(begin_marker) + len(begin_marker)
+          end = raw.index(end_marker, start)
+          payload_lines = []
+          for line in raw[start:end].splitlines():
+              payload_lines.append(line[10:] if line.startswith('          ') else line)
+          payload = '\n'.join(payload_lines) + '\n'
+
+          old_helper = '''def replace_once(text, old, new, label):
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(f"{label}: expected 1 exact match, got {count}")
+    return text.replace(old, new, 1)
+'''
+          new_helper = '''def replace_once(text, old, new, label):
+    count = text.count(old)
+    if count == 1:
+        return text.replace(old, new, 1)
+    if "\\n" in old:
+        tokens = [token for token in re.split(r"\\s+", old.strip()) if token]
+        pattern = re.compile(r"\\s+".join(re.escape(token) for token in tokens), re.S)
+        matches = list(pattern.finditer(text))
+        if len(matches) == 1:
+            match = matches[0]
+            return text[:match.start()] + new.strip() + text[match.end():]
+    raise SystemExit(f"{label}: expected one match, exact={count}")
+'''
+          if old_helper not in payload:
+              raise SystemExit('replace_once helper source not found')
+          payload = payload.replace(old_helper, new_helper, 1)
+          Path('/tmp/v26-freeze-builder.py').write_text(payload, encoding='utf-8')
+          PY
+          python3 /tmp/v26-freeze-builder.py
+          node build.js
+
+      - name: Commit each changed file separately
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          commit_one() {
+            file="$1"
+            message="$2"
+            git add -- "$file"
+            if ! git diff --cached --quiet; then
+              git commit -m "$message"
+            fi
+          }
+
+          commit_one projects.json "refactor: restore project card source copy"
+          commit_one index.html "refactor: freeze normalized homepage markup"
+          commit_one style.css "refactor: remove obsolete layout and easter egg css"
+          commit_one script.js "refactor: remove v2.6 runtime compatibility layers"
+
+          git push origin HEAD:${{ github.head_ref }}
