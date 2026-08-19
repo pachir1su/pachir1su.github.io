@@ -31,8 +31,8 @@ jobs:
           p = Path('/tmp/v26_structure_media_followup.py')
           s = p.read_text()
           s = s.replace(
-              "rels = [str(Path(p)) for p in paths]",
-              "rels = [str(Path(p).relative_to(ROOT)) if Path(p).is_absolute() else str(Path(p)) for p in paths]",
+              "    rels = [str(Path(p)) for p in paths]\n    run(['git', 'add', '-A', '--', *rels])",
+              "    rels = [str(Path(p).relative_to(ROOT)) if Path(p).is_absolute() else str(Path(p)) for p in paths]\n    existing_rels = [rel for rel in rels if (ROOT / rel).exists()]\n    if existing_rels:\n        run(['git', 'add', '-A', '--', *existing_rels])",
           )
           p.write_text(s)
           PY
@@ -47,8 +47,9 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y ffmpeg chromium chromium-driver || sudo apt-get install -y ffmpeg chromium-browser chromium-chromedriver
+          sudo apt-get install -y ffmpeg
           python3 -m pip install --quiet selenium flask python-dotenv google-generativeai
+          command -v google-chrome || command -v chromium || command -v chromium-browser
 
       - name: Implement issues and remaining automatable media
         shell: bash
