@@ -70,7 +70,7 @@
         "email": "mailto:capybara@koreatech.ac.kr",
         "sameAs": ["https://github.com/pachir1su"],
         "knowsAbout": ["AI 자동화", "임베디드", "IoT", "웹 백엔드", "Discord 봇 개발", "라즈베리파이"],
-        "alumniOf": {
+        "affiliation": {
           "@type": "CollegeOrUniversity",
           "name": "한국기술교육대학교"
         }
@@ -138,11 +138,10 @@
           <span class="logo-bracket">}</span></a
         >
         <ul class="nav-links">
-          <li><a href="#home">홈</a></li>
-          <li><a href="#projects">프로젝트</a></li>
-          <li><a href="#skills">역량</a></li>
-          <li><a href="#awards">수상</a></li>
-          <li><a href="#about">비전</a></li>
+          <li><a href="#projects" data-ko="프로젝트" data-en="Projects">프로젝트</a></li>
+          <li><a href="#skills" data-ko="역량" data-en="Skills">역량</a></li>
+          <li><a href="#awards" data-ko="수상" data-en="Awards">수상</a></li>
+          <li><a href="#about" data-ko="비전" data-en="Vision">비전</a></li>
           <li>
             <a
               href="https://github.com/pachir1su"
@@ -174,11 +173,10 @@
       <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기">
         <i class="fas fa-times"></i>
       </button>
-      <a href="#home" onclick="closeMobile()"><i class="fas fa-home"></i> 홈</a>
-      <a href="#projects" onclick="closeMobile()"><i class="fas fa-folder-open"></i> 프로젝트</a>
-      <a href="#skills" onclick="closeMobile()"><i class="fas fa-code"></i> 역량</a>
-      <a href="#awards" onclick="closeMobile()"><i class="fas fa-trophy"></i> 수상</a>
-      <a href="#about" onclick="closeMobile()"><i class="fas fa-user"></i> 비전</a>
+      <a href="#projects" onclick="closeMobile()" data-ko="프로젝트" data-en="Projects"><i class="fas fa-folder-open"></i> 프로젝트</a>
+      <a href="#skills" onclick="closeMobile()" data-ko="역량" data-en="Skills"><i class="fas fa-code"></i> 역량</a>
+      <a href="#awards" onclick="closeMobile()" data-ko="수상" data-en="Awards"><i class="fas fa-trophy"></i> 수상</a>
+      <a href="#about" onclick="closeMobile()" data-ko="비전" data-en="Vision"><i class="fas fa-user"></i> 비전</a>
       <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
       <div class="sidebar-utils">
         <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환">
@@ -198,22 +196,14 @@
 
     <!-- ============================================================
          히어로 섹션 (홈) — 포트폴리오의 첫 인상
-         배경: 노트 줄 + 빨간 마진선 / 부유 아이콘 5개 / 타이핑 효과
-         통계(stat-item): 스크롤 진입 시 카운트업 애니메이션 (script.js #9)
-         부유 아이콘(.fi): JS rAF로 float 및 드래그 가능 (script.js #8)
+         배경: 노트 줄 + 빨간 마진선 / 타이핑 효과
+         통계(stat-item): 스크롤 진입 시 카운트업 애니메이션
          ============================================================ -->
     <!-- HERO -->
     <section id="home" class="hero">
       <div class="hero-grid-bg" aria-hidden="true"></div>
       <div class="hero-glow" aria-hidden="true"></div>
 
-      <div class="floating-icons" aria-hidden="true">
-        <i class="devicon-python-plain fi fi-1"></i>
-        <i class="devicon-sqlite-plain fi fi-2"></i>
-        <i class="devicon-javascript-plain fi fi-3"></i>
-        <i class="devicon-cplusplus-plain fi fi-4"></i>
-        <i class="devicon-arduino-plain fi fi-5"></i>
-      </div>
 
       <div class="container hero-content">
         <!-- 좌측 본문 열 — 우측 지표 열(.hero-stats)과 2단을 이룬다.
@@ -226,26 +216,19 @@
           <span class="name-en">Lee Geon Yeong</span>
         </h1>
         <div class="hero-role">
-          풀스택 개발자 &amp;
-          <span class="typing-wrap"
-            ><span id="typing-text"></span><span class="typing-cursor"></span
-          ></span>
+혁신의 기업가 &amp;
+<span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>
         </div>
         <p class="hero-desc">
-          <strong>공지 알림 봇</strong> · <strong>멀티 LLM 도구</strong> ·
-          <strong>라즈베리파이 서버</strong>처럼 실제로 돌아가는 것을 만듭니다.<br />
-          길게는 이윤을 넘어 혁신을 추구하는 기업가를 목표로 합니다.
+이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br />
+<strong>월 100만 명</strong>이 사용하는 서비스를 만드는 것이 목표입니다.
         </p>
         <div class="hero-btns" data-aos="fade-up" data-aos-delay="80">
-          <a href="#projects" class="btn btn-primary"
-            ><i class="fas fa-folder-open"></i> 프로젝트 보기</a
-          >
-          <a
-            href="https://github.com/pachir1su"
-            target="_blank" rel="noopener noreferrer"
-            class="btn btn-ghost"
-            ><i class="fab fa-github"></i> GitHub</a
-          >
+<a href="#projects" class="btn btn-primary"><i class="fas fa-folder-open"></i> 프로젝트 보기</a>
+<a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" class="btn btn-ghost"><i class="fab fa-github"></i> GitHub</a>
+<button type="button" class="btn btn-ghost contact-email hero-email" title="클릭하면 복사됩니다">
+  <i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span><span class="copy-hint sr-only">복사</span>
+</button>
         </div>
         </div>
 
@@ -295,76 +278,67 @@
           <i class="fas fa-star"></i> 대표 프로젝트
         </div>
         <div class="featured-grid">
-          <article class="featured-card" data-card-href="projects/koreatechGongjiAgent/">
-            <div class="featured-top">
-              <i class="fas fa-bell featured-icon"></i>
-              <span class="featured-badge" data-en="2026 · Solo Project" data-ko="2026 · 개인 개발">2026 · 개인 개발</span>
-            </div>
-            <h3 class="featured-title" data-en="KOREATECH Unified Alert System" data-ko="코리아텍 통합 알림 시스템">코리아텍 통합 알림 시스템</h3>
-            <dl class="featured-detail">
-              <dt data-en="Problem" data-ko="문제">문제</dt>
-              <dd data-en="KOREATECH notices, mail, and shuttle info are scattered across places, so it's easy to miss what matters." data-ko="코리아텍 공지·메일·셔틀 정보가 여러 곳에 흩어져 있어 중요한 소식을 놓치기 쉽습니다.">코리아텍 공지·메일·셔틀 정보가 여러 곳에 흩어져 있어 중요한 소식을 놓치기 쉽습니다.</dd>
-              <dt data-en="What I Did" data-ko="한 일">한 일</dt>
-              <dd data-en-html="Solo-built a system that watches portal/dormitory notices, mail (receive & read-receipt), and shuttle timetables, and alerts Discord in real time — with an admin panel, DM subscriptions, a web dashboard, and Raspberry Pi LED support.<span class='fd-role'>Solo dev · Full process</span>" data-ko-html="포털·생활관 공지, 메일, 셔틀 현재 위치를 감시해 디스코드로 실시간 알림을 주는 시스템을 개발했습니다. 관리자 패널·DM 구독·웹 대시보드·라즈베리파이 상태 LED를 지원합니다.<span class='fd-role'>1인 개발 · 전 과정</span>">포털·생활관 공지, 메일, 셔틀 현재 위치를 감시해 디스코드로 실시간 알림을 주는 시스템을 개발했습니다. 관리자 패널·DM 구독·웹 대시보드·라즈베리파이 상태 LED를 지원합니다.<span class="fd-role">1인 개발 · 전 과정</span></dd>
-              <dt data-en="Result" data-ko="결과">결과</dt>
-              <dd data-en-html="Real-time unified alerts (quick check <strong>~60s</strong>) with personal DM subscriptions and a live web dashboard." data-ko-html="빠른 체크 <strong>약 60초</strong>의 실시간 통합 알림 + 개인 DM 구독·웹 대시보드 운영.">빠른 체크 <strong>약 60초</strong>의 실시간 통합 알림 + 개인 DM 구독·웹 대시보드 운영.</dd>
-            </dl>
-            <div class="tech-stack">
-              <span>Python</span><span>Selenium</span><span>Discord.py</span><span>FastAPI</span><span>IMAP</span><span>Raspberry Pi</span>
-            </div>
-            <div class="featured-links">
-              <a href="projects/koreatechGongjiAgent/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
-              <a href="https://github.com/pachir1su/koreatechGongjiAgent" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
-              <a href="https://discord.com/oauth2/authorize?client_id=1518630779922546759" target="_blank" rel="noopener noreferrer" class="flink" data-en="Invite Bot" data-ko="봇 초대"><i class="fab fa-discord"></i> 봇 초대</a>
-            </div>
-          </article>
+<article class="featured-card" data-card-href="projects/Wall_Sina/">
+  <div class="featured-top">
+    <i class="fas fa-house-flood-water featured-icon"></i>
+    <span class="featured-badge" data-en="2024 · Sustainable Dev" data-ko="2024 · 지속 가능한 발전 프로젝트">2024 · 지속 가능한 발전 프로젝트</span>
+  </div>
+  <h3 class="featured-title" data-en="Coastal Barrier System" data-ko="해안 장벽 시스템">해안 장벽 시스템</h3>
+  <dl class="featured-detail">
+    <dt data-en="Theme" data-ko="주제">주제</dt>
+    <dd data-en="Rising sea levels and coastal erosion from climate change threaten shorelines." data-ko="기후 변화에 따른 해수면 상승·해안 침식으로 해안이 위협받고 있습니다.">기후 변화에 따른 해수면 상승·해안 침식으로 해안이 위협받고 있습니다.</dd>
+    <dt data-en="What I Did" data-ko="한 일">한 일</dt>
+    <dd data-en="Designed and built a coastal barrier system as a Sustainable Development (Jigabal) project." data-ko="해안을 보호하는 해안 장벽 시스템을 설계·구현했습니다.">해안을 보호하는 해안 장벽 시스템을 설계·구현했습니다.</dd>
+    <dt data-en="Category" data-ko="분류">분류</dt>
+    <dd data-en-html="A <strong>2024 Sustainable Development (Jigabal)</strong> project." data-ko-html="<strong>2024 지속 가능한 발전</strong> 출품 프로젝트.">2024 <strong>지속 가능한 발전</strong> 출품 프로젝트.</dd>
+  </dl>
+  <div class="featured-links">
+    <a href="projects/Wall_Sina/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
+  </div>
+</article>
 
-          <article class="featured-card" data-card-href="projects/MultiMind/">
-            <div class="featured-top">
-              <i class="fas fa-brain featured-icon"></i>
-              <span class="featured-badge" data-en="2025 · Solo Project" data-ko="2025 · 개인 개발">2025 · 개인 개발</span>
-            </div>
-            <h3 class="featured-title">MultiMind</h3>
-            <dl class="featured-detail">
-              <dt data-en="Problem" data-ko="문제">문제</dt>
-              <dd data-en="Each LLM excels in different areas, making it tedious to copy-paste prompts across multiple sites, with API costs being a burden." data-ko="LLM마다 잘하는 영역이 달라 여러 LLM에 프롬프트를 일일이 복붙하는 게 번거로웠습니다. API로 쓰기엔 API 비용이 부담스러웠습니다.">LLM마다 잘하는 영역이 달라 여러 LLM에 프롬프트를 일일이 복붙하는 게 번거로웠습니다. API로 쓰기엔 API 비용이 부담스러웠습니다.</dd>
-              <dt data-en="What I Did" data-ko="한 일">한 일</dt>
-              <dd data-en-html="Solo-developed a GUI orchestrator that uses pyautogui to directly control browsers, querying multiple LLMs simultaneously while a Head LLM synthesizes the answers — no API needed.<span class='fd-role'>Solo dev · Full process</span>" data-ko-html="API 없이 pyautogui로 브라우저를 직접 조작해 여러 LLM에 동시에 질문하고 Head LLM이 답변을 종합하는 GUI 오케스트레이터를 개발했습니다.<span class='fd-role'>1인 개발 · 전 과정</span>">API 없이 pyautogui로 브라우저를 직접 조작해 여러 LLM에 동시에 질문하고 Head LLM이 답변을 종합하는 GUI 오케스트레이터를 개발했습니다.<span class="fd-role">1인 개발 · 전 과정</span></dd>
-              <dt data-en="Result" data-ko="결과">결과</dt>
-              <dd data-en-html="Achieved better answer quality than a single LLM by utilizing multiple LLMs simultaneously at <strong>$0 API cost</strong>." data-ko-html="API 비용 <strong>0원</strong>으로 멀티 LLM을 활용해서 단일 LLM보다 나은 답변 품질이 나왔습니다.">API 비용 <strong>0원</strong>으로 멀티 LLM을 활용해서 단일 LLM보다 나은 답변 품질이 나왔습니다.</dd>
-            </dl>
-            <div class="tech-stack">
-              <span>Python</span><span>pyautogui</span><span>tkinter</span><span>threading</span><span>Multi-Agent</span>
-            </div>
-            <div class="featured-links">
-              <a href="projects/MultiMind/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
-              <a href="https://github.com/pachir1su/MultiMind" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
-            </div>
-          </article>
+<article class="featured-card" data-card-href="projects/HEALTH_CHECK_PROJECT/">
+  <div class="featured-top">
+    <i class="fas fa-heart-pulse featured-icon"></i>
+    <span class="featured-badge" data-en="2025 · Sustainable Dev" data-ko="2025 · 지속 가능한 발전 프로젝트">2025 · 지속 가능한 발전 프로젝트</span>
+  </div>
+  <h3 class="featured-title" data-en="Healthcare System" data-ko="헬스케어 시스템">헬스케어 시스템</h3>
+  <dl class="featured-detail">
+    <dt data-en="Theme" data-ko="주제">주제</dt>
+    <dd data-en="Building sustainable, accessible healthcare that keeps supporting people's health over the long term." data-ko="장기적으로 사람들의 건강을 돌보는 지속 가능하고 접근성 있는 헬스케어가 필요합니다.">장기적으로 사람들의 건강을 돌보는 지속 가능하고 접근성 있는 헬스케어가 필요합니다.</dd>
+    <dt data-en="What I Did" data-ko="한 일">한 일</dt>
+    <dd data-en="Designed and built a healthcare system as a Sustainable Development (Jigabal) project." data-ko="헬스케어 시스템을 설계·구현했습니다.">헬스케어 시스템을 설계·구현했습니다.</dd>
+    <dt data-en="Category" data-ko="분류">분류</dt>
+    <dd data-en-html="A <strong>2025 Sustainable Development (Jigabal)</strong> project." data-ko-html="<strong>2025 지속 가능한 발전</strong> 출품 프로젝트.">2025 <strong>지속 가능한 발전</strong> 출품 프로젝트.</dd>
+  </dl>
+  <div class="featured-links">
+    <a href="projects/HEALTH_CHECK_PROJECT/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
+  </div>
+</article>
 
-          <article class="featured-card" data-card-href="projects/github_rank_insight/">
-            <div class="featured-top">
-              <i class="fab fa-github featured-icon"></i>
-              <span class="featured-badge" data-en="2026 · Solo Project" data-ko="2026 · 개인 개발">2026 · 개인 개발</span>
-            </div>
-            <h3 class="featured-title">GitHub Rank Insight</h3>
-            <dl class="featured-detail">
-              <dt data-en="Problem" data-ko="문제">문제</dt>
-              <dd data-en="GitHub Stats shows a rank letter but never explains which metric produced it or what the next rank needs." data-ko="GitHub Stats는 등급만 보여줄 뿐, 그 등급이 어느 지표에서 나왔는지도 다음 등급 조건도 알려주지 않습니다.">GitHub Stats는 등급만 보여줄 뿐, 그 등급이 어느 지표에서 나왔는지도 다음 등급 조건도 알려주지 않습니다.</dd>
-              <dt data-en="What I Did" data-ko="한 일">한 일</dt>
-              <dd data-en-html="Reimplemented the original scoring algorithm — per-metric CDF normalization, weighted summation, and a 60-iteration binary search for the percentile — then visualized per-metric contribution and next-rank requirements. The token is kept in localStorage only.<span class='fd-role'>Solo dev · Full process</span>" data-ko-html="원본의 점수 산출을 다시 구현했습니다. 지표별 CDF 정규화 · 가중 합산 · 백분위를 구하는 이진 탐색(60회 반복)을 거쳐 지표별 기여도와 다음 등급 달성 조건을 시각화합니다. 토큰은 localStorage에만 둡니다.<span class='fd-role'>1인 개발 · 전 과정</span>">원본의 점수 산출을 다시 구현했습니다. 지표별 CDF 정규화 · 가중 합산 · 백분위를 구하는 이진 탐색(60회 반복)을 거쳐 지표별 기여도와 다음 등급 달성 조건을 시각화합니다. 토큰은 localStorage에만 둡니다.<span class="fd-role">1인 개발 · 전 과정</span></dd>
-              <dt data-en="Result" data-ko="결과">결과</dt>
-              <dd data-en-html="Reproduces all <strong>9 ranks</strong> (S·A+·A·A-·B+·B·B-·C+·C) identically to <code>anuraghazra/github-readme-stats</code>, with no framework and no build step." data-ko-html="<code>anuraghazra/github-readme-stats</code>와 동일한 <strong>9개 등급</strong>(S·A+·A·A-·B+·B·B-·C+·C)을 재현합니다. 프레임워크·빌드 단계 없음.">
-                <code>anuraghazra/github-readme-stats</code>와 동일한 <strong>9개 등급</strong>(S·A+·A·A-·B+·B·B-·C+·C)을 재현합니다. 프레임워크·빌드 단계 없음.</dd>
-            </dl>
-            <div class="tech-stack">
-              <span>HTML/CSS/JS</span><span>GitHub API</span><span>ES Modules</span>
-            </div>
-            <div class="featured-links">
-              <a href="projects/github_rank_insight/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
-              <a href="https://github.com/pachir1su/github-rank-insight" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
-            </div>
-          </article>
+<article class="featured-card" data-card-href="projects/koreatechGongjiAgent/">
+  <div class="featured-top">
+    <i class="fas fa-bell featured-icon"></i>
+    <span class="featured-badge" data-en="2026 · Solo Project" data-ko="2026 · 개인 개발">2026 · 개인 개발</span>
+  </div>
+  <h3 class="featured-title" data-en="KOREATECH Unified Alert System" data-ko="코리아텍 통합 알림 시스템">코리아텍 통합 알림 시스템</h3>
+  <dl class="featured-detail">
+    <dt data-en="Problem" data-ko="문제">문제</dt>
+    <dd data-en="KOREATECH notices, mail, and shuttle info are scattered across places, so it's easy to miss what matters." data-ko="코리아텍 공지·메일·셔틀 정보가 여러 곳에 흩어져 있어 중요한 소식을 놓치기 쉽습니다.">코리아텍 공지·메일·셔틀 정보가 여러 곳에 흩어져 있어 중요한 소식을 놓치기 쉽습니다.</dd>
+    <dt data-en="What I Did" data-ko="한 일">한 일</dt>
+    <dd data-en-html="Solo-built a system that watches portal/dormitory notices, mail (receive & read-receipt), and shuttle timetables, and alerts Discord in real time — with an admin panel, DM subscriptions, a web dashboard, and Raspberry Pi LED support.<span class='fd-role'>Solo dev · Full process</span>" data-ko-html="포털·생활관 공지, 메일, 셔틀 현재 위치를 감시해 디스코드로 실시간 알림을 주는 시스템을 개발했습니다. 관리자 패널·DM 구독·웹 대시보드·라즈베리파이 상태 LED를 지원합니다.<span class='fd-role'>1인 개발 · 전 과정</span>">포털·생활관 공지, 메일, 셔틀 현재 위치를 감시해 디스코드로 실시간 알림을 주는 시스템을 개발했습니다. 관리자 패널·DM 구독·웹 대시보드·라즈베리파이 상태 LED를 지원합니다.<span class="fd-role">1인 개발 · 전 과정</span></dd>
+    <dt data-en="Result" data-ko="결과">결과</dt>
+    <dd data-en-html="Real-time unified alerts (quick check <strong>~60s</strong>) with personal DM subscriptions and a live web dashboard." data-ko-html="빠른 체크 <strong>약 60초</strong>의 실시간 통합 알림 + 개인 DM 구독·웹 대시보드 운영.">빠른 체크 <strong>약 60초</strong>의 실시간 통합 알림 + 개인 DM 구독·웹 대시보드 운영.</dd>
+  </dl>
+  <div class="tech-stack">
+    <span>Python</span><span>Selenium</span><span>Discord.py</span><span>FastAPI</span><span>IMAP</span><span>Raspberry Pi</span>
+  </div>
+  <div class="featured-links">
+    <a href="projects/koreatechGongjiAgent/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
+    <a href="https://github.com/pachir1su/koreatechGongjiAgent" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
+    <a href="https://discord.com/oauth2/authorize?client_id=1518630779922546759" target="_blank" rel="noopener noreferrer" class="flink" data-en="Invite Bot" data-ko="봇 초대"><i class="fab fa-discord"></i> 봇 초대</a>
+  </div>
+</article>
         </div>
         </div>
 
@@ -422,7 +396,7 @@
               <h3 data-en="KOREATECH Freshman Guide '26" data-ko="한기대 26학번 신입생 가이드">한기대 26학번 신입생 가이드</h3>
               <p class="project-subtitle" data-en="Notion guide for KOREATECH freshmen '26" data-ko="한기대 26학번 신입생용 노션 가이드">한기대 26학번 신입생용 노션 가이드</p>
               <p class="project-role" data-en="Solo Development" data-ko="1인 개발"><i class="fas fa-user-tag"></i> 1인 개발</p>
-              <p data-en="Online core course guide, assignment criteria, and an FAQ collection" data-ko="온라인중점강좌 안내 · 과제 평가 기준 · FAQ 모음">온라인중점강좌 안내 · 과제 평가 기준 · FAQ 모음</p>
+              <p data-en="A Notion site for KOREATECH class of '26 freshmen" data-ko="한기대 26학번 신입생을 위한 노션 사이트">한기대 26학번 신입생을 위한 노션 사이트</p>
               <div class="tech-stack"><span>Notion</span><span>Documentation</span></div>
             </div>
 
@@ -623,7 +597,7 @@
               <h3 data-en="MZ Bot" data-ko="면진봇">면진봇</h3>
               <p class="project-subtitle" data-en="Discord economy simulation bot" data-ko="디스코드 경제 시뮬레이션 봇">디스코드 경제 시뮬레이션 봇</p>
               <p class="project-role" data-en="Solo Development" data-ko="1인 개발"><i class="fas fa-user-tag"></i> 1인 개발</p>
-              <p data-en="Coins, gambling, transfers, shop and leaderboard on SQLite" data-ko="주화 · 도박 · 송금 · 상점 · 순위표를 SQLite로 관리">주화 · 도박 · 송금 · 상점 · 순위표를 SQLite로 관리</p>
+              <p data-en="Discord economy game bot" data-ko="디스코드 경제 게임 봇">디스코드 경제 게임 봇</p>
               <div class="tech-stack"><span>Python</span><span>Discord.py</span></div>
             </div>
 
@@ -979,7 +953,7 @@
             <div class="skill-icon"><i class="fas fa-brain"></i></div>
             <h3 data-en="AI &amp; Data" data-ko="AI &amp; 데이터">AI & 데이터</h3>
             <ul class="skill-list">
-              <li data-en="LLM API Integration (Gemini)" data-ko="LLM API 연동 (Gemini)"><i class="fas fa-robot"></i> LLM API 연동 (Gemini)</li>
+              <li data-en="LLM Proficiency" data-ko="LLM 활용 능력"><i class="fas fa-robot"></i> LLM 활용 능력</li>
               <li>
                 <i class="devicon-scikitlearn-plain colored"></i> Scikit-learn /
                 Keras
@@ -1038,10 +1012,11 @@
             <div class="skill-icon"><i class="fas fa-file-alt"></i></div>
             <h3 data-en="Documentation &amp; Collaboration" data-ko="문서화 &amp; 협업">문서화 & 협업</h3>
             <ul class="skill-list">
-              <li><i class="devicon-notion-plain colored"></i> Notion</li>
-              <li data-en="Technical Documentation" data-ko="기술 문서 작성"><i class="fas fa-pen-nib"></i> 기술 문서 작성</li>
-              <li><i class="devicon-git-plain colored"></i> Git / GitHub</li>
-            </ul>
+    <li><i class="devicon-notion-plain colored"></i> Notion</li>
+    <li data-en="Excellent Report Writing" data-ko="탁월한 보고서 작성"><i class="fas fa-file-contract"></i> 탁월한 보고서 작성</li>
+    <li data-en="Systematic File Organization" data-ko="체계적인 자료 정리"><i class="fas fa-folder-open"></i> 체계적인 자료 정리</li>
+    <li data-en="Technical Documentation" data-ko="기술 문서 작성"><i class="fas fa-pen-nib"></i> 기술 문서 작성</li>
+  </ul>
           </div>
           <div
             class="skill-card"
@@ -1052,10 +1027,11 @@
             <div class="skill-icon"><i class="fas fa-crown"></i></div>
             <h3 data-en="Leadership &amp; Communication" data-ko="리더십 &amp; 커뮤니케이션">리더십 & 커뮤니케이션</h3>
             <ul class="skill-list">
-              <li data-en="Overall Project Management" data-ko="프로젝트 총괄 관리"><i class="fas fa-tasks"></i> 프로젝트 총괄 관리</li>
-              <li data-en="Team Lead on 6 Projects" data-ko="팀 리딩 (팀장 6회)"><i class="fas fa-user-friends"></i> 팀 리딩 (팀장 6회)</li>
-              <li data-en="U-CAST Team 5 Mentoring" data-ko="멘토링 (U-CAST 5팀)"><i class="fas fa-chalkboard-teacher"></i> 멘토링 (U-CAST 5팀)</li>
-            </ul>
+    <li data-en="Overall Project Management" data-ko="프로젝트 총괄 관리"><i class="fas fa-tasks"></i> 프로젝트 총괄 관리</li>
+    <li data-en="Extensive Team Leading" data-ko="팀 리딩 경험 다수"><i class="fas fa-user-friends"></i> 팀 리딩 경험 다수</li>
+    <li data-en="Proficient Presentation Skills" data-ko="능숙한 발표 능력"><i class="fas fa-microphone-alt"></i> 능숙한 발표 능력</li>
+    <li data-en="Effective Presentation" data-ko="효과적인 프레젠테이션"><i class="fas fa-chalkboard-teacher"></i> 효과적인 프레젠테이션</li>
+  </ul>
           </div>
           <div
             class="skill-card"
@@ -1066,9 +1042,9 @@
             <div class="skill-icon"><i class="fas fa-photo-video"></i></div>
             <h3 data-en="Media &amp; Presentation" data-ko="미디어 &amp; 프레젠테이션">미디어 & 프레젠테이션</h3>
             <ul class="skill-list">
-              <li data-en="Video Editing" data-ko="영상 편집"><i class="fas fa-film"></i> 영상 편집</li>
-              <li data-en="Presentation" data-ko="발표 · 프레젠테이션"><i class="fas fa-microphone-alt"></i> 발표 · 프레젠테이션</li>
-            </ul>
+    <li data-en="Video Editing" data-ko="영상 편집 기술"><i class="fas fa-film"></i> 영상 편집 기술</li>
+    <li data-en="VTuber Technology" data-ko="버츄얼(VTuber) 기술 보유"><i class="fas fa-vr-cardboard"></i> 버츄얼(VTuber) 기술 보유</li>
+  </ul>
           </div>
         </div>
       </div>
@@ -1193,29 +1169,22 @@
         <div class="about-card" data-aos="fade-up" data-aos-delay="100">
           <div class="about-quote">"아이디어를 현실로 만드는 혁신가"</div>
           <div class="about-body">
-            <p>
-              안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고
-              만드는 <strong>이건영</strong>입니다. 저는 사업가가 아닌
-              <strong>기업가</strong>를 지향합니다. 이윤을 쫓기보다
-              기술로 세상에 없던 가치를 만들고 싶습니다.
-            </p>
-            <p>
-              떠오르는 아이디어는 기록해 두고 직접 만들어 확인합니다. 지금까지
-              만든 것은 대부분
-              <strong>AI 자동화, 임베디드·IoT, 웹 백엔드</strong> 세 갈래에
-              있습니다.
-            </p>
-          </div>
-          <div class="about-chips">
-            <div class="chip">
-              <i class="fas fa-rocket"></i> 목표 : 월 100만명 유저 서비스
-            </div>
-            <div class="chip">
-              <i class="fas fa-users"></i> 팀장으로 참여한 프로젝트 6개
-            </div>
-          </div>
+  <p
+    data-ko-html="안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고 만드는 &lt;strong&gt;이건영&lt;/strong&gt;입니다. 저는 사업가가 아닌 &lt;strong&gt;기업가&lt;/strong&gt;를 지향합니다. 이윤을 쫓기보다 기술을 통해 세상에 없던 가치를 창출하고 혁신을 일으키고 싶습니다."
+    data-en-html="Hello, I'm &lt;strong&gt;Lee Geon Yeong&lt;/strong&gt;, someone who goes beyond simple development to plan and create services that can change the world. I aspire to be an &lt;strong&gt;entrepreneur&lt;/strong&gt;, not just a businessman — creating unprecedented value and driving innovation through technology."
+  >안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고 만드는 <strong>이건영</strong>입니다. 저는 사업가가 아닌 <strong>기업가</strong>를 지향합니다. 이윤을 쫓기보다 기술을 통해 세상에 없던 가치를 창출하고 혁신을 일으키고 싶습니다.</p>
+  <p
+    data-ko-html="떠오르는 아이디어가 있을 때마다 구체화하여 기록하고 있으며 이를 실현하기 위해 &lt;strong&gt;AI, 통신, 웹/앱 개발, 임베디드, 하드웨어, 정보보안, 해킹, DB, 기획&lt;/strong&gt; 등 분야를 가리지 않고 기술을 익히고 있습니다."
+    data-en-html="Whenever an idea strikes, I document and refine it. To make these ideas a reality, I study &lt;strong&gt;AI, Communications, Web/App Development, Embedded, Hardware, Information Security, Hacking, DB, and Planning&lt;/strong&gt; — with no boundaries on the field."
+  >떠오르는 아이디어가 있을 때마다 구체화하여 기록하고 있으며 이를 실현하기 위해 <strong>AI, 통신, 웹/앱 개발, 임베디드, 하드웨어, 정보보안, 해킹, DB, 기획</strong> 등 분야를 가리지 않고 기술을 익히고 있습니다.</p>
+</div>
+<div class="about-chips">
+  <div class="chip" data-en="Goal: 1M Monthly Users" data-ko="목표 : 월 100만명 유저 서비스"><i class="fas fa-rocket"></i> 목표 : 월 100만명 유저 서비스</div>
+  <div class="chip" data-en="Idea Bank" data-ko="아이디어 뱅크"><i class="fas fa-lightbulb"></i> 아이디어 뱅크</div>
+  <div class="chip" data-en="Team Lead Experience" data-ko="팀장 경험 多"><i class="fas fa-users"></i> 팀장 경험 多</div>
+</div>
           <!-- 학력 배지 (#41 연계) — 한국기술교육대학교 소속 표시. 로고: assets/koreatech-logo.png, 로드 실패 시 아이콘+텍스트 폴백 -->
-          <div class="about-edu" aria-label="학력: 한국기술교육대학교 26학번 재학">
+          <div class="about-edu" aria-label="한국기술교육대학교 26학번">
             <img
               class="edu-logo"
               src="assets/koreatech-logo.png"
@@ -1227,8 +1196,7 @@
             />
             <i class="fas fa-graduation-cap edu-fallback" aria-hidden="true"></i>
             <div class="edu-text">
-              <span class="edu-school">한국기술교육대학교</span>
-              <span class="edu-sub">KOREATECH · 26학번 재학 중</span>
+              <span class="edu-school" data-en="KOREATECH · Class of 2026" data-ko="한국기술교육대학교 26학번">한국기술교육대학교 26학번</span>
             </div>
           </div>
           <div class="about-github-link">
@@ -1242,9 +1210,6 @@
           </div>
         </div>
 
-        <!-- MBTI — 차트 형식의 신뢰도로 자기보고 내용을 전달하던 5줄 막대(#62)를
-             한 줄 텍스트로 줄였다 (#112 Remove P1-2). -->
-        <p class="about-note" id="mbti-section" data-en="MBTI: ENTJ-A (self-reported)" data-ko="MBTI: ENTJ-A (자기보고)">MBTI: ENTJ-A (자기보고)</p>
 
         <!-- ===== GitHub 활동 — SVG 3장 → 1장 (#112 Remove P2-6).
              외부 서비스 3곳 의존은 하나만 죽어도 About 한가운데가 빈칸이 됐다. ===== -->
@@ -1253,41 +1218,31 @@
             <i class="fab fa-github"></i> GitHub 활동
           </div>
           <div class="github-cards">
-            <!-- raw.githubusercontent.com: CDN 캐시 없이 항상 최신 SVG 직접 로드 -->
-            <img
-              class="gh-card gh-card-stats"
-              loading="lazy"
-              src="https://raw.githubusercontent.com/pachir1su/pachir1su/main/github-stats.svg"
-              alt="pachir1su님의 GitHub 통계 — 스타·커밋·PR·이슈·랭크"
-            />
-          </div>
+  <div class="gh-row">
+    <img
+      class="gh-card gh-card-stats"
+      loading="lazy"
+      src="https://raw.githubusercontent.com/pachir1su/pachir1su/main/github-stats.svg"
+      alt="pachir1su님의 GitHub 통계 — 스타·커밋·PR·이슈·랭크"
+    />
+    <img
+      class="gh-card gh-card-streak"
+      loading="lazy"
+      src="https://streak-stats.demolab.com?user=pachir1su&hide_border=true&background=fffdf6&ring=c63b3b&fire=c63b3b&currStreakLabel=c63b3b&sideLabels=5a5040&currStreakNum=1f1c14&sideNums=1f1c14&dates=5a5040"
+      alt="pachir1su님의 GitHub 연속 기여(Streak) 통계"
+    />
+  </div>
+  <img
+    class="gh-card gh-card-metrics"
+    loading="lazy"
+    src="https://raw.githubusercontent.com/pachir1su/pachir1su/main/github-metrics.svg"
+    alt="pachir1su님의 GitHub 상세 메트릭 — 활동·커뮤니티·사용 언어"
+  />
+</div>
         </div>
       </div>
     </section>
 
-    <!-- 섹션 네비게이터 (#72) — 책갈피 스타일 우측 플로팅 -->
-    <nav class="section-nav" id="sectionNav" aria-label="섹션 네비게이터">
-      <a href="#home" class="section-nav-item active" data-nav-section="home">
-        <span class="nav-bookmark-label">홈</span>
-        <span class="nav-bookmark-dot"></span>
-      </a>
-      <a href="#projects" class="section-nav-item" data-nav-section="projects">
-        <span class="nav-bookmark-label">프로젝트</span>
-        <span class="nav-bookmark-dot"></span>
-      </a>
-      <a href="#skills" class="section-nav-item" data-nav-section="skills">
-        <span class="nav-bookmark-label">역량</span>
-        <span class="nav-bookmark-dot"></span>
-      </a>
-      <a href="#awards" class="section-nav-item" data-nav-section="awards">
-        <span class="nav-bookmark-label">수상</span>
-        <span class="nav-bookmark-dot"></span>
-      </a>
-      <a href="#about" class="section-nav-item" data-nav-section="about">
-        <span class="nav-bookmark-label">비전</span>
-        <span class="nav-bookmark-dot"></span>
-      </a>
-    </nav>
 
     <!-- ============================================================
          푸터 — 로고, 저작권, 소셜 링크(GitHub + 이메일 복사 버튼)

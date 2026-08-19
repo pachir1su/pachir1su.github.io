@@ -1,5 +1,5 @@
 /* =============================================================
-   pachir1su.github.io — v2.6.0 interactions
+   pachir1su.github.io — v2.6.x interactions
    정보 탐색에 필요한 동작만 유지하고 오래된 장식/중복 내비게이션은 제거한다.
    ============================================================= */
 
@@ -15,93 +15,6 @@ function onMediaChange(query, handler) {
 function scrollBehavior() {
   return prefersReducedMotion ? 'auto' : 'smooth';
 }
-
-/* ------------------------------------------------------------- */
-/* 1. v2.6 DOM normalization                                     */
-/* ------------------------------------------------------------- */
-(function normalizeV26Markup() {
-  document.getElementById('mbti-section')?.remove();
-  document.querySelector('.floating-icons')?.remove();
-  document.getElementById('sectionNav')?.remove();
-
-  document.querySelector('.nav-links a[href="#home"]')?.closest('li')?.remove();
-  document.querySelector('.mobile-menu > a[href="#home"]')?.remove();
-
-  const navLabels = {
-    '#projects': ['프로젝트', 'Projects'],
-    '#skills': ['역량', 'Skills'],
-    '#awards': ['수상', 'Awards'],
-    '#about': ['비전', 'Vision'],
-  };
-  Object.entries(navLabels).forEach(([href, labels]) => {
-    document.querySelectorAll(`a[href="${href}"]`).forEach((link) => {
-      if (!link.closest('.nav-links, .mobile-menu')) return;
-      link.dataset.ko = labels[0];
-      link.dataset.en = labels[1];
-    });
-  });
-
-  const personSchema = document.querySelector('script[type="application/ld+json"]');
-  if (personSchema) {
-    try {
-      const data = JSON.parse(personSchema.textContent);
-      if (data && data['@type'] === 'Person') {
-        delete data.alumniOf;
-        data.affiliation = {
-          '@type': 'CollegeOrUniversity',
-          name: '한국기술교육대학교',
-        };
-        personSchema.textContent = JSON.stringify(data, null, 2);
-      }
-    } catch (error) {
-      console.warn('JSON-LD normalization skipped:', error);
-    }
-  }
-
-  const education = document.querySelector('.about-edu');
-  if (education) education.setAttribute('aria-label', '한국기술교육대학교 26학번');
-
-  const school = document.querySelector('.edu-school');
-  if (school) {
-    school.dataset.ko = '한국기술교육대학교 26학번';
-    school.dataset.en = 'KOREATECH · Class of 2026';
-    school.textContent = school.dataset.ko;
-  }
-  const schoolSub = document.querySelector('.edu-sub');
-  if (schoolSub) schoolSub.remove();
-
-  const heroButtons = document.querySelector('.hero-btns');
-  if (heroButtons && !heroButtons.querySelector('.hero-email')) {
-    const emailButton = document.createElement('button');
-    emailButton.type = 'button';
-    emailButton.className = 'btn btn-ghost contact-email hero-email';
-    emailButton.title = '클릭하면 복사됩니다';
-    emailButton.innerHTML = '<i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span><span class="copy-hint sr-only">복사</span>';
-    heroButtons.appendChild(emailButton);
-  }
-
-  if (!document.getElementById('v26-runtime-layout')) {
-    const style = document.createElement('style');
-    style.id = 'v26-runtime-layout';
-    style.textContent = `
-      .hero-btns { flex-wrap: wrap; }
-      .hero-email { max-width: 100%; }
-      .hero-email .email-addr { overflow-wrap: anywhere; }
-      .sr-only { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; }
-      .skills-grid { align-items: stretch; }
-      @media (max-width: 1024px) {
-        .container { padding-left: clamp(16px, 4vw, 24px); padding-right: clamp(16px, 4vw, 24px); }
-        .hero-content { grid-template-columns: minmax(0, 1fr); }
-        .hero-main, .hero-stats { min-width: 0; }
-      }
-      @media (max-width: 640px) {
-        .hero-btns > * { width: 100%; justify-content: center; }
-        .hero-email { font-size: .78rem; }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-})();
 
 /* ------------------------------------------------------------- */
 /* 2. AOS                                                        */
@@ -145,7 +58,7 @@ if (backBtn) {
 /* 4. Typing                                                    */
 /* ------------------------------------------------------------- */
 (function initTyping() {
-  const defaults = ['메이커', '엔지니어', '팀 리더'];
+  const defaults = ['풀스택 개발자', '메이커', '아이디어 뱅크', '팀 리더', '엔지니어'];
   let wordIndex = 0;
   let charIndex = 0;
   let deleting = false;
@@ -513,8 +426,8 @@ window._updateProjectCount();
   const map = {
     en: {
       '.hero-tag': 'Hello',
-      '.hero-role': { html: 'Full-Stack Developer &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>' },
-      '.hero-desc': { html: 'I build things that actually run — a <strong>campus notification bot</strong>, a <strong>multi-LLM desktop tool</strong>, and a <strong>Raspberry Pi server</strong>.<br />Long term, I aim to be an entrepreneur pursuing innovation beyond profit.' },
+      '.hero-role': { html: 'Innovator &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>' },
+      '.hero-desc': { html: 'I dream of being an entrepreneur who pursues <strong>innovation</strong> beyond profit.<br /><strong>1 million monthly users</strong> — that\'s my goal.' },
       '.btn-primary': { html: '<i class="fas fa-folder-open"></i> Projects' },
       '.stat-label': ['Projects', 'Awards', 'out of 581'],
       '#projects .section-title': 'Projects',
@@ -542,8 +455,8 @@ window._updateProjectCount();
     },
     ko: {
       '.hero-tag': '안녕하세요',
-      '.hero-role': { html: '풀스택 개발자 &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>' },
-      '.hero-desc': { html: '<strong>공지 알림 봇</strong> · <strong>멀티 LLM 도구</strong> · <strong>라즈베리파이 서버</strong>처럼 실제로 돌아가는 것을 만듭니다.<br />길게는 이윤을 넘어 혁신을 추구하는 기업가를 목표로 합니다.' },
+      '.hero-role': { html: '혁신의 기업가 &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>' },
+      '.hero-desc': { html: '이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br /><strong>월 100만 명</strong>이 사용하는 서비스를 만드는 것이 목표입니다.' },
       '.btn-primary': { html: '<i class="fas fa-folder-open"></i> 프로젝트 보기' },
       '.stat-label': ['프로젝트', '수상 경력', '581 팀 중'],
       '#projects .section-title': '프로젝트',
@@ -572,8 +485,8 @@ window._updateProjectCount();
   };
 
   const typingWords = {
-    ko: ['메이커', '엔지니어', '팀 리더'],
-    en: ['Maker', 'Engineer', 'Team Leader'],
+    ko: ['풀스택 개발자', '메이커', '아이디어 뱅크', '팀 리더', '엔지니어'],
+    en: ['Full-Stack Dev', 'Maker', 'Idea Bank', 'Team Leader', 'Engineer'],
   };
   let current = localStorage.getItem('lang') || 'ko';
 
@@ -651,254 +564,4 @@ window._updateProjectCount();
       window.location.href = card.dataset.cardHref;
     });
   });
-})();
-
-/* ------------------------------------------------------------- */
-/* 19. Issue #129 featured project rollback                      */
-/* ------------------------------------------------------------- */
-(function restoreIssue129FeaturedProjects() {
-  const grid = document.querySelector('#featured-section .featured-grid');
-  if (!grid) return;
-
-  grid.innerHTML = `
-    <article class="featured-card" data-card-href="projects/Wall_Sina/">
-      <div class="featured-top">
-        <i class="fas fa-house-flood-water featured-icon"></i>
-        <span class="featured-badge" data-en="2024 · Sustainable Dev" data-ko="2024 · 지속 가능한 발전 프로젝트">2024 · 지속 가능한 발전 프로젝트</span>
-      </div>
-      <h3 class="featured-title" data-en="Coastal Barrier System" data-ko="해안 장벽 시스템">해안 장벽 시스템</h3>
-      <dl class="featured-detail">
-        <dt data-en="Theme" data-ko="주제">주제</dt>
-        <dd data-en="Rising sea levels and coastal erosion from climate change threaten shorelines." data-ko="기후 변화에 따른 해수면 상승·해안 침식으로 해안이 위협받고 있습니다.">기후 변화에 따른 해수면 상승·해안 침식으로 해안이 위협받고 있습니다.</dd>
-        <dt data-en="What I Did" data-ko="한 일">한 일</dt>
-        <dd data-en="Designed and built a coastal barrier system as a Sustainable Development (Jigabal) project." data-ko="해안을 보호하는 해안 장벽 시스템을 설계·구현했습니다.">해안을 보호하는 해안 장벽 시스템을 설계·구현했습니다.</dd>
-        <dt data-en="Category" data-ko="분류">분류</dt>
-        <dd data-en-html="A <strong>2024 Sustainable Development (Jigabal)</strong> project." data-ko-html="<strong>2024 지속 가능한 발전</strong> 출품 프로젝트.">2024 <strong>지속 가능한 발전</strong> 출품 프로젝트.</dd>
-      </dl>
-      <div class="featured-links">
-        <a href="projects/Wall_Sina/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
-      </div>
-    </article>
-
-    <article class="featured-card" data-card-href="projects/HEALTH_CHECK_PROJECT/">
-      <div class="featured-top">
-        <i class="fas fa-heart-pulse featured-icon"></i>
-        <span class="featured-badge" data-en="2025 · Sustainable Dev" data-ko="2025 · 지속 가능한 발전 프로젝트">2025 · 지속 가능한 발전 프로젝트</span>
-      </div>
-      <h3 class="featured-title" data-en="Healthcare System" data-ko="헬스케어 시스템">헬스케어 시스템</h3>
-      <dl class="featured-detail">
-        <dt data-en="Theme" data-ko="주제">주제</dt>
-        <dd data-en="Building sustainable, accessible healthcare that keeps supporting people's health over the long term." data-ko="장기적으로 사람들의 건강을 돌보는 지속 가능하고 접근성 있는 헬스케어가 필요합니다.">장기적으로 사람들의 건강을 돌보는 지속 가능하고 접근성 있는 헬스케어가 필요합니다.</dd>
-        <dt data-en="What I Did" data-ko="한 일">한 일</dt>
-        <dd data-en="Designed and built a healthcare system as a Sustainable Development (Jigabal) project." data-ko="헬스케어 시스템을 설계·구현했습니다.">헬스케어 시스템을 설계·구현했습니다.</dd>
-        <dt data-en="Category" data-ko="분류">분류</dt>
-        <dd data-en-html="A <strong>2025 Sustainable Development (Jigabal)</strong> project." data-ko-html="<strong>2025 지속 가능한 발전</strong> 출품 프로젝트.">2025 <strong>지속 가능한 발전</strong> 출품 프로젝트.</dd>
-      </dl>
-      <div class="featured-links">
-        <a href="projects/HEALTH_CHECK_PROJECT/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
-      </div>
-    </article>
-
-    <article class="featured-card" data-card-href="projects/koreatechGongjiAgent/">
-      <div class="featured-top">
-        <i class="fas fa-bell featured-icon"></i>
-        <span class="featured-badge" data-en="2026 · Solo Project" data-ko="2026 · 개인 개발">2026 · 개인 개발</span>
-      </div>
-      <h3 class="featured-title" data-en="KOREATECH Unified Alert System" data-ko="코리아텍 통합 알림 시스템">코리아텍 통합 알림 시스템</h3>
-      <dl class="featured-detail">
-        <dt data-en="Problem" data-ko="문제">문제</dt>
-        <dd data-en="KOREATECH notices, mail, and shuttle info are scattered across places, so it's easy to miss what matters." data-ko="코리아텍 공지·메일·셔틀 정보가 여러 곳에 흩어져 있어 중요한 소식을 놓치기 쉽습니다.">코리아텍 공지·메일·셔틀 정보가 여러 곳에 흩어져 있어 중요한 소식을 놓치기 쉽습니다.</dd>
-        <dt data-en="What I Did" data-ko="한 일">한 일</dt>
-        <dd data-en-html="Solo-built a system that watches portal/dormitory notices, mail (receive & read-receipt), and shuttle timetables, and alerts Discord in real time — with an admin panel, DM subscriptions, a web dashboard, and Raspberry Pi LED support.<span class='fd-role'>Solo dev · Full process</span>" data-ko-html="포털·생활관 공지, 메일, 셔틀 현재 위치를 감시해 디스코드로 실시간 알림을 주는 시스템을 개발했습니다. 관리자 패널·DM 구독·웹 대시보드·라즈베리파이 상태 LED를 지원합니다.<span class='fd-role'>1인 개발 · 전 과정</span>">포털·생활관 공지, 메일, 셔틀 현재 위치를 감시해 디스코드로 실시간 알림을 주는 시스템을 개발했습니다. 관리자 패널·DM 구독·웹 대시보드·라즈베리파이 상태 LED를 지원합니다.<span class="fd-role">1인 개발 · 전 과정</span></dd>
-        <dt data-en="Result" data-ko="결과">결과</dt>
-        <dd data-en-html="Real-time unified alerts (quick check <strong>~60s</strong>) with personal DM subscriptions and a live web dashboard." data-ko-html="빠른 체크 <strong>약 60초</strong>의 실시간 통합 알림 + 개인 DM 구독·웹 대시보드 운영.">빠른 체크 <strong>약 60초</strong>의 실시간 통합 알림 + 개인 DM 구독·웹 대시보드 운영.</dd>
-      </dl>
-      <div class="tech-stack">
-        <span>Python</span><span>Selenium</span><span>Discord.py</span><span>FastAPI</span><span>IMAP</span><span>Raspberry Pi</span>
-      </div>
-      <div class="featured-links">
-        <a href="projects/koreatechGongjiAgent/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
-        <a href="https://github.com/pachir1su/koreatechGongjiAgent" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
-        <a href="https://discord.com/oauth2/authorize?client_id=1518630779922546759" target="_blank" rel="noopener noreferrer" class="flink" data-en="Invite Bot" data-ko="봇 초대"><i class="fab fa-discord"></i> 봇 초대</a>
-      </div>
-    </article>`;
-
-  const lang = localStorage.getItem('lang') || 'ko';
-  grid.querySelectorAll('[data-en][data-ko]').forEach((el) => {
-    const text = lang === 'en' ? el.dataset.en : el.dataset.ko;
-    const icon = el.firstElementChild?.tagName === 'I' ? el.firstElementChild.outerHTML : '';
-    if (icon) el.innerHTML = `${icon} ${text}`;
-    else el.textContent = text;
-  });
-  grid.querySelectorAll('[data-en-html][data-ko-html]').forEach((el) => {
-    el.innerHTML = lang === 'en' ? el.dataset.enHtml : el.dataset.koHtml;
-  });
-  grid.querySelectorAll('[data-card-href]').forEach((card) => {
-    card.addEventListener('click', (event) => {
-      if (event.target.closest('a, button')) return;
-      if (window.getSelection()?.toString().trim()) return;
-      window.location.href = card.dataset.cardHref;
-    });
-  });
-})();
-
-/* ------------------------------------------------------------- */
-/* 20. Restore original GitHub activity cards                    */
-/* ------------------------------------------------------------- */
-(function restoreGitHubActivityCards() {
-  const cards = document.querySelector('#github-section .github-cards');
-  const stats = cards?.querySelector('.gh-card-stats');
-  if (!cards || !stats || cards.querySelector('.gh-card-streak, .gh-card-metrics')) return;
-
-  const row = document.createElement('div');
-  row.className = 'gh-row';
-  cards.insertBefore(row, stats);
-  row.appendChild(stats);
-
-  const streak = document.createElement('img');
-  streak.className = 'gh-card gh-card-streak';
-  streak.loading = 'lazy';
-  streak.src = 'https://streak-stats.demolab.com?user=pachir1su&hide_border=true&background=fffdf6&ring=c63b3b&fire=c63b3b&currStreakLabel=c63b3b&sideLabels=5a5040&currStreakNum=1f1c14&sideNums=1f1c14&dates=5a5040';
-  streak.alt = 'pachir1su님의 GitHub 연속 기여(Streak) 통계';
-  row.appendChild(streak);
-
-  const metrics = document.createElement('img');
-  metrics.className = 'gh-card gh-card-metrics';
-  metrics.loading = 'lazy';
-  metrics.src = 'https://raw.githubusercontent.com/pachir1su/pachir1su/main/github-metrics.svg';
-  metrics.alt = 'pachir1su님의 GitHub 상세 메트릭 — 활동·커뮤니티·사용 언어';
-  cards.appendChild(metrics);
-})();
-
-/* ------------------------------------------------------------- */
-/* 21. Roll back vision section to pre-v2.3 layout              */
-/* ------------------------------------------------------------- */
-(function rollbackVisionSectionToPreV23() {
-  const card = document.querySelector('.about-card');
-  if (card) {
-    card.style.maxWidth = 'none';
-    card.style.marginTop = '8px';
-  }
-
-  document.querySelectorAll('.about-body p').forEach((paragraph) => {
-    paragraph.style.maxWidth = 'none';
-    paragraph.style.fontSize = '0.98rem';
-    paragraph.style.lineHeight = '2';
-    paragraph.style.marginBottom = '14px';
-  });
-})();
-
-/* ------------------------------------------------------------- */
-/* 22. Restore user-authored copy from before PR #115            */
-/* ------------------------------------------------------------- */
-(function restorePre115UserCopy() {
-  const copies = {
-    ko: {
-      heroRole: '혁신의 기업가 &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>',
-      heroDesc: '이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br /><strong>월 100만 명</strong>이 사용하는 서비스를 만드는 것이 목표입니다.',
-      aboutBody: '<p>안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고 만드는 <strong>이건영</strong>입니다. 저는 사업가가 아닌 <strong>기업가</strong>를 지향합니다. 이윤을 쫓기보다 기술을 통해 세상에 없던 가치를 창출하고 혁신을 일으키고 싶습니다.</p><p>떠오르는 아이디어가 있을 때마다 구체화하여 기록하고 있으며 이를 실현하기 위해 <strong>AI, 통신, 웹/앱 개발, 임베디드, 하드웨어, 정보보안, 해킹, DB, 기획</strong> 등 분야를 가리지 않고 기술을 익히고 있습니다.</p>',
-      chips: [
-        '<i class="fas fa-rocket"></i> 목표 : 월 100만명 유저 서비스',
-        '<i class="fas fa-lightbulb"></i> 아이디어 뱅크',
-        '<i class="fas fa-users"></i> 팀장 경험 多',
-      ],
-      typing: ['풀스택 개발자', '메이커', '아이디어 뱅크', '팀 리더', '엔지니어'],
-      llm: 'LLM 활용 능력',
-      docsSkills: '<li><i class="devicon-notion-plain colored"></i> Notion</li><li data-en="Excellent Report Writing" data-ko="탁월한 보고서 작성"><i class="fas fa-file-contract"></i> 탁월한 보고서 작성</li><li data-en="Systematic File Organization" data-ko="체계적인 자료 정리"><i class="fas fa-folder-open"></i> 체계적인 자료 정리</li><li data-en="Technical Documentation" data-ko="기술 문서 작성"><i class="fas fa-pen-nib"></i> 기술 문서 작성</li>',
-      leadershipSkills: '<li data-en="Overall Project Management" data-ko="프로젝트 총괄 관리"><i class="fas fa-tasks"></i> 프로젝트 총괄 관리</li><li data-en="Extensive Team Leading" data-ko="팀 리딩 경험 다수"><i class="fas fa-user-friends"></i> 팀 리딩 경험 다수</li><li data-en="Proficient Presentation Skills" data-ko="능숙한 발표 능력"><i class="fas fa-microphone-alt"></i> 능숙한 발표 능력</li><li data-en="Effective Presentation" data-ko="효과적인 프레젠테이션"><i class="fas fa-chalkboard-teacher"></i> 효과적인 프레젠테이션</li>',
-      mediaSkills: '<li data-en="Video Editing" data-ko="영상 편집 기술"><i class="fas fa-film"></i> 영상 편집 기술</li><li data-en="VTuber Technology" data-ko="버츄얼(VTuber) 기술 보유"><i class="fas fa-vr-cardboard"></i> 버츄얼(VTuber) 기술 보유</li>',
-      freshmanDesc: '한기대 26학번 신입생을 위한 노션 사이트',
-      mzDesc: '디스코드 경제 게임 봇',
-    },
-    en: {
-      heroRole: 'Innovator &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>',
-      heroDesc: 'I dream of being an entrepreneur who pursues <strong>innovation</strong> beyond profit.<br /><strong>1 million monthly users</strong> — that\'s my goal.',
-      aboutBody: '<p>Hello, I\'m <strong>Lee Geon Yeong</strong>, someone who goes beyond simple development to plan and create services that can change the world. I aspire to be an <strong>entrepreneur</strong>, not just a businessman — creating unprecedented value and driving innovation through technology.</p><p>Whenever an idea strikes, I document and refine it. To make these ideas a reality, I study <strong>AI, Communications, Web/App Development, Embedded, Hardware, Information Security, Hacking, DB, and Planning</strong> — with no boundaries on the field.</p>',
-      chips: [
-        '<i class="fas fa-rocket"></i> Goal: 1M Monthly Users',
-        '<i class="fas fa-lightbulb"></i> Idea Bank',
-        '<i class="fas fa-users"></i> Team Lead Experience',
-      ],
-      typing: ['Full-Stack Dev', 'Maker', 'Idea Bank', 'Team Leader', 'Engineer'],
-      llm: 'LLM Proficiency',
-      docsSkills: '<li><i class="devicon-notion-plain colored"></i> Notion</li><li data-en="Excellent Report Writing" data-ko="탁월한 보고서 작성"><i class="fas fa-file-contract"></i> Excellent Report Writing</li><li data-en="Systematic File Organization" data-ko="체계적인 자료 정리"><i class="fas fa-folder-open"></i> Systematic File Organization</li><li data-en="Technical Documentation" data-ko="기술 문서 작성"><i class="fas fa-pen-nib"></i> Technical Documentation</li>',
-      leadershipSkills: '<li data-en="Overall Project Management" data-ko="프로젝트 총괄 관리"><i class="fas fa-tasks"></i> Overall Project Management</li><li data-en="Extensive Team Leading" data-ko="팀 리딩 경험 다수"><i class="fas fa-user-friends"></i> Extensive Team Leading</li><li data-en="Proficient Presentation Skills" data-ko="능숙한 발표 능력"><i class="fas fa-microphone-alt"></i> Proficient Presentation Skills</li><li data-en="Effective Presentation" data-ko="효과적인 프레젠테이션"><i class="fas fa-chalkboard-teacher"></i> Effective Presentation</li>',
-      mediaSkills: '<li data-en="Video Editing" data-ko="영상 편집 기술"><i class="fas fa-film"></i> Video Editing</li><li data-en="VTuber Technology" data-ko="버츄얼(VTuber) 기술 보유"><i class="fas fa-vr-cardboard"></i> VTuber Technology</li>',
-      freshmanDesc: "A Notion site for KOREATECH class of '26 freshmen",
-      mzDesc: 'Discord economy game bot',
-    },
-  };
-
-  function skillCard(key) {
-    return [...document.querySelectorAll('.skill-card')].find((card) => card.querySelector('h3')?.dataset.ko === key);
-  }
-
-  function setProjectDescription(href, text, en, ko) {
-    const card = document.querySelector(`[data-card-href="${href}"]`);
-    if (!card) return;
-    const description = [...card.querySelectorAll('p')].find((p) => !p.classList.contains('project-subtitle') && !p.classList.contains('project-role'));
-    if (!description) return;
-    description.dataset.en = en;
-    description.dataset.ko = ko;
-    description.textContent = text;
-  }
-
-  function restore() {
-    const lang = localStorage.getItem('lang') || 'ko';
-    const copy = copies[lang];
-
-    const heroRole = document.querySelector('.hero-role');
-    if (heroRole) heroRole.innerHTML = copy.heroRole;
-    const heroDesc = document.querySelector('.hero-desc');
-    if (heroDesc) heroDesc.innerHTML = copy.heroDesc;
-
-    const aboutBody = document.querySelector('.about-body');
-    if (aboutBody) {
-      aboutBody.innerHTML = copy.aboutBody;
-      aboutBody.querySelectorAll('p').forEach((paragraph) => {
-        paragraph.style.maxWidth = 'none';
-        paragraph.style.fontSize = '0.98rem';
-        paragraph.style.lineHeight = '2';
-        paragraph.style.marginBottom = '14px';
-      });
-    }
-
-    const chips = document.querySelector('.about-chips');
-    if (chips) chips.innerHTML = copy.chips.map((item) => `<div class="chip">${item}</div>`).join('');
-
-    const aiCard = skillCard('AI & 데이터');
-    const llm = aiCard?.querySelector('.skill-list li');
-    if (llm) {
-      llm.dataset.en = 'LLM Proficiency';
-      llm.dataset.ko = 'LLM 활용 능력';
-      llm.innerHTML = `<i class="fas fa-robot"></i> ${copy.llm}`;
-    }
-
-    const docs = skillCard('문서화 & 협업')?.querySelector('.skill-list');
-    if (docs) docs.innerHTML = copy.docsSkills;
-    const leadership = skillCard('리더십 & 커뮤니케이션')?.querySelector('.skill-list');
-    if (leadership) leadership.innerHTML = copy.leadershipSkills;
-    const media = skillCard('미디어 & 프레젠테이션')?.querySelector('.skill-list');
-    if (media) media.innerHTML = copy.mediaSkills;
-
-    setProjectDescription(
-      'projects/koreatech_noob_guide/',
-      copy.freshmanDesc,
-      "A Notion site for KOREATECH class of '26 freshmen",
-      '한기대 26학번 신입생을 위한 노션 사이트'
-    );
-    setProjectDescription(
-      'projects/MZ_bot/',
-      copy.mzDesc,
-      'Discord economy game bot',
-      '디스코드 경제 게임 봇'
-    );
-
-    window._typingWords = copy.typing;
-    window._restartTyping?.();
-  }
-
-  restore();
-  document.getElementById('langToggle')?.addEventListener('click', () => queueMicrotask(restore));
-  document.getElementById('langToggleMobile')?.addEventListener('click', () => queueMicrotask(restore));
 })();
