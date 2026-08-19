@@ -30,7 +30,7 @@
   --bronze-text: #975e23;
   --radius: 4px;
   --font-main: "Noto Sans KR", sans-serif;
-  --font-mono: "Space Mono", monospace;
+  --font-mono: "Space Mono", "Noto Sans KR", monospace;
   --font-hand: "Caveat", cursive;
 
   /* 타입 스케일 — 이전에는 각 컴포넌트가 0.78/0.82/0.88/1.05rem 을 제각기
