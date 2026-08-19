@@ -61,7 +61,6 @@ jobs:
               if not ok:
                   failures.append(message)
 
-          # Removed markup/runtime compatibility layers must stay removed.
           for token in ['id="mbti-section"', 'class="floating-icons"', 'id="sectionNav"', 'id="v26-runtime-layout"']:
               check(token not in html, f'dead markup/runtime token remains in index.html: {token}')
           for token in ['normalizeV26Markup', 'restoreIssue129FeaturedProjects', 'restoreGitHubActivityCards', 'rollbackVisionSectionToPreV23', 'restorePre115UserCopy']:
@@ -69,7 +68,6 @@ jobs:
           for token in ['.floating-icons', '.chicken-mode', '.about-note', '#sectionNav', '.edu-sub']:
               check(token not in css, f'dead selector remains in style.css: {token}')
 
-          # Static source must contain the state that runtime patches used to create.
           check('class="btn btn-ghost contact-email hero-email"' in html, 'hero email is not static HTML')
           check('data-ko="한국기술교육대학교 26학번"' in html, 'KOREATECH class label missing from static HTML')
           check('"affiliation"' in html and '"alumniOf"' not in html, 'Person JSON-LD affiliation was not frozen correctly')
@@ -78,11 +76,9 @@ jobs:
           check(html.count('class="gh-card ') == 3, 'GitHub activity must contain exactly three static cards')
           check('href="#home"' not in re.sub(r'<a href="#" class="logo".*?</a>', '', html, flags=re.S), 'duplicate Home navigation link remains')
 
-          # User-authored copy must be frozen, not rewritten.
           for text in ['혁신의 기업가', '월 100만 명', '아이디어 뱅크', 'LLM 활용 능력', '탁월한 보고서 작성', '팀 리딩 경험 다수', '버츄얼(VTuber) 기술 보유']:
               check(text in html or text in js, f'expected preserved user copy missing: {text}')
 
-          # projects.json is the SSOT for generated cards.
           cards = [card for group in projects['groups'] for card in group['cards']]
           by_detail = {card.get('detail'): card for card in cards}
           check(by_detail['projects/koreatech_noob_guide/']['desc']['ko'] == '한기대 26학번 신입생을 위한 노션 사이트', 'freshman guide SSOT copy mismatch')
@@ -93,15 +89,12 @@ jobs:
                   super().__init__()
                   self.ids = []
                   self.img_missing_alt = []
-                  self.buttons = []
               def handle_starttag(self, tag, attrs):
                   data = dict(attrs)
                   if 'id' in data:
                       self.ids.append(data['id'])
                   if tag == 'img' and 'alt' not in data:
                       self.img_missing_alt.append(data.get('src', '<no src>'))
-                  if tag == 'button':
-                      self.buttons.append(data)
 
           parser = AuditParser()
           parser.feed(html)
@@ -111,7 +104,6 @@ jobs:
           check('aria-expanded="false"' in html and 'aria-controls="mobileMenu"' in html, 'hamburger ARIA state/control missing')
           check('aria-label="맨 위로"' in html, 'back-to-top accessible name missing')
 
-          # Responsive/reduced-motion source gates.
           for query in ['@media (max-width: 1024px)', '@media (max-width: 640px)', '@media (prefers-reduced-motion: reduce)']:
               check(query in css, f'responsive/accessibility media query missing: {query}')
           check('finePointerQuery' in js and 'hasFinePointer' in js, 'fine/coarse pointer capability guard missing')
@@ -193,7 +185,7 @@ jobs:
             const mobileMenu = q('#mobileMenu');
             hamburger?.click();
             result.mobileOpened = !!mobileMenu?.classList.contains('open') && hamburger?.getAttribute('aria-expanded') === 'true';
-            doc.dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            doc.body.dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
             result.mobileClosedByEscape = !mobileMenu?.classList.contains('open') && hamburger?.getAttribute('aria-expanded') === 'false';
 
             q('#langToggle')?.click();
