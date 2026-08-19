@@ -72,7 +72,7 @@
 
   const pageType = document.body.dataset.page || 'unknown';
   const projectState = { groups:fallbackGroups, visited:new Set(), current:'2026' };
-  const sequenceState = { expected:0, complete:false, drag:null };
+  const sequenceState = { expected:1, complete:false, drag:null };
   const audioState = { context:null, nodes:[], stopTimer:0 };
 
   /* Utility helpers keep malformed optional data from breaking the mockup. */
@@ -92,6 +92,150 @@
     const node = document.createElementNS('http://www.w3.org/2000/svg', name);
     Object.entries(attributes).forEach(([key,value]) => node.setAttribute(key, String(value)));
     return node;
+  }
+
+  /* Canvas gives the first scene depth while remaining dependency-free on GitHub Pages. */
+  function createCosmosCanvases() {
+    document.querySelectorAll('[data-cosmos-canvas]').forEach((canvas, canvasIndex) => {
+      const context = canvas.getContext('2d');
+      if (!context) return;
+      const pattern = introConstellations[Math.random() < .5 ? 0 : 1];
+      const state = {
+        width:0,
+        height:0,
+        dpr:1,
+        visible:true,
+        frame:0,
+        lastFrame:0,
+        started:performance.now(),
+        pointerX:0,
+        pointerY:0,
+        targetX:0,
+        targetY:0,
+      };
+      let seed = 1741 + canvasIndex * 307;
+      const random = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+      const stars = Array.from({ length:190 }, (_, index) => ({
+        x:random(),
+        y:random(),
+        radius:.35 + random() * (index % 17 === 0 ? 2.1 : 1.05),
+        alpha:.1 + random() * .48,
+        depth:.18 + random() * .82,
+        phase:random() * Math.PI * 2,
+      }));
+
+      const resize = () => {
+        const bounds = canvas.getBoundingClientRect();
+        state.dpr = Math.min(window.devicePixelRatio || 1, 2);
+        state.width = Math.max(1, bounds.width);
+        state.height = Math.max(1, bounds.height);
+        canvas.width = Math.round(state.width * state.dpr);
+        canvas.height = Math.round(state.height * state.dpr);
+        context.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+      };
+
+      const mapPoint = ([sourceX,sourceY]) => {
+        const desktop = state.width > 760;
+        const left = desktop ? .47 : .08;
+        const top = desktop ? .07 : .025;
+        const width = desktop ? .5 : .84;
+        const height = desktop ? .78 : .49;
+        return [
+          state.width * (left + sourceX / 1000 * width) + state.pointerX * 18,
+          state.height * (top + sourceY / 680 * height) + state.pointerY * 13,
+        ];
+      };
+
+      const draw = (time) => {
+        state.frame = 0;
+        if (!state.visible) return;
+        if (time - state.lastFrame < 30 && !reducedMotion()) {
+          state.frame = requestAnimationFrame(draw);
+          return;
+        }
+        state.lastFrame = time;
+        state.pointerX += (state.targetX - state.pointerX) * .055;
+        state.pointerY += (state.targetY - state.pointerY) * .055;
+        const styles = getComputedStyle(document.documentElement);
+        const ink = styles.getPropertyValue('--ink').trim() || '#262637';
+        const violet = styles.getPropertyValue('--violet').trim() || '#706994';
+        const gold = styles.getPropertyValue('--gold').trim() || '#a9914d';
+        const surface = styles.getPropertyValue('--surface-raised').trim() || '#f6f6fa';
+        const elapsed = reducedMotion() ? 100000 : time - state.started;
+        context.clearRect(0, 0, state.width, state.height);
+
+        /* Three apparent depths create restrained pointer parallax and star scintillation. */
+        stars.forEach((star) => {
+          const pulse = reducedMotion() ? 1 : .78 + Math.sin(time * .00055 + star.phase) * .22;
+          const x = star.x * state.width + state.pointerX * star.depth * 17;
+          const y = star.y * state.height + state.pointerY * star.depth * 13;
+          context.globalAlpha = star.alpha * pulse;
+          context.fillStyle = star.depth > .72 ? gold : violet;
+          context.beginPath();
+          context.arc(x, y, star.radius, 0, Math.PI * 2);
+          context.fill();
+        });
+
+        /* Constellation stars arrive independently before their edges are drawn. */
+        pattern.edges.forEach(([from,to], edgeIndex) => {
+          const progress = clamp((elapsed - 820 - edgeIndex * 145) / 620, 0, 1);
+          if (progress <= 0) return;
+          const [x1,y1] = mapPoint(pattern.points[from]);
+          const [x2,y2] = mapPoint(pattern.points[to]);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const gradient = context.createLinearGradient(x1,y1,x2,y2);
+          gradient.addColorStop(0, violet);
+          gradient.addColorStop(1, gold);
+          context.globalAlpha = .56 * progress;
+          context.strokeStyle = gradient;
+          context.lineWidth = 1.15;
+          context.beginPath();
+          context.moveTo(x1,y1);
+          context.lineTo(x1 + (x2 - x1) * eased, y1 + (y2 - y1) * eased);
+          context.stroke();
+        });
+
+        pattern.points.forEach((point,index) => {
+          const progress = clamp((elapsed - 180 - index * 92) / 420, 0, 1);
+          if (progress <= 0) return;
+          const [x,y] = mapPoint(point);
+          const radius = (index % 4 === 0 ? 3.8 : 2.7) * (1 - Math.pow(1 - progress, 3));
+          context.globalAlpha = .16 * progress;
+          context.fillStyle = gold;
+          context.beginPath();
+          context.arc(x,y,radius * 4.6,0,Math.PI * 2);
+          context.fill();
+          context.globalAlpha = .96 * progress;
+          context.fillStyle = surface;
+          context.beginPath();
+          context.arc(x,y,radius,0,Math.PI * 2);
+          context.fill();
+          context.globalAlpha = .86 * progress;
+          context.strokeStyle = ink;
+          context.lineWidth = .6;
+          context.stroke();
+        });
+        context.globalAlpha = 1;
+        if (!reducedMotion()) state.frame = requestAnimationFrame(draw);
+      };
+
+      const hero = canvas.parentElement;
+      hero?.addEventListener('pointermove', (event) => {
+        const bounds = hero.getBoundingClientRect();
+        state.targetX = clamp((event.clientX - bounds.left) / bounds.width * 2 - 1, -1, 1);
+        state.targetY = clamp((event.clientY - bounds.top) / bounds.height * 2 - 1, -1, 1);
+        if (!state.frame && state.visible) state.frame = requestAnimationFrame(draw);
+      }, { passive:true });
+      hero?.addEventListener('pointerleave', () => { state.targetX = 0; state.targetY = 0; });
+      new ResizeObserver(resize).observe(canvas);
+      new IntersectionObserver(([entry]) => {
+        state.visible = entry.isIntersecting;
+        if (state.visible && !state.frame) state.frame = requestAnimationFrame(draw);
+        if (!state.visible && state.frame) { cancelAnimationFrame(state.frame); state.frame = 0; }
+      }, { rootMargin:'120px' }).observe(canvas);
+      resize();
+      state.frame = requestAnimationFrame(draw);
+    });
   }
 
   /* Each refresh chooses one familiar silhouette without exposing its name in the interface. */
@@ -143,7 +287,7 @@
     }, { passive:true });
   }
 
-  /* The temporary Web Audio score proves the gated 20-second experience without shipping an asset. */
+  /* The temporary Web Audio score proves the gated 11-second experience without shipping an asset. */
   function ensureAudioContext() {
     if (!audioState.context) {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -169,33 +313,36 @@
     const context = ensureAudioContext();
     if (!context) return;
     stopAudio();
+    const musicDuration = 11;
+    const noteSpacing = 1.15;
     const start = context.currentTime + .04;
     const master = registerAudioNode(context.createGain());
     master.gain.setValueAtTime(.0001, start);
-    master.gain.exponentialRampToValueAtTime(.13, start + 1.4);
-    master.gain.setValueAtTime(.13, start + 17.7);
-    master.gain.exponentialRampToValueAtTime(.0001, start + 20);
+    master.gain.exponentialRampToValueAtTime(.13, start + 1.1);
+    master.gain.setValueAtTime(.13, start + 9.5);
+    master.gain.exponentialRampToValueAtTime(.0001, start + musicDuration);
     master.connect(context.destination);
     const notes = [293.66,369.99,440,554.37,440,369.99,329.63,493.88];
     notes.forEach((frequency, index) => {
       const tone = registerAudioNode(context.createOscillator());
       const gain = registerAudioNode(context.createGain());
+      const noteStart = start + index * noteSpacing;
       tone.type = index % 2 ? 'sine' : 'triangle';
-      tone.frequency.setValueAtTime(frequency, start + index * 1.9);
-      gain.gain.setValueAtTime(.0001, start + index * 1.9);
-      gain.gain.exponentialRampToValueAtTime(.12, start + index * 1.9 + .4);
-      gain.gain.exponentialRampToValueAtTime(.0001, start + index * 1.9 + 4.4);
+      tone.frequency.setValueAtTime(frequency, noteStart);
+      gain.gain.setValueAtTime(.0001, noteStart);
+      gain.gain.exponentialRampToValueAtTime(.12, noteStart + .32);
+      gain.gain.exponentialRampToValueAtTime(.0001, noteStart + 2.65);
       tone.connect(gain); gain.connect(master);
-      tone.start(start + index * 1.9); tone.stop(start + index * 1.9 + 4.6);
+      tone.start(noteStart); tone.stop(noteStart + 2.75);
     });
     const pad = registerAudioNode(context.createOscillator());
     const padGain = registerAudioNode(context.createGain());
     pad.type = 'sine'; pad.frequency.value = 146.83;
     padGain.gain.setValueAtTime(.0001, start);
     padGain.gain.exponentialRampToValueAtTime(.055, start + 3);
-    padGain.gain.exponentialRampToValueAtTime(.0001, start + 20);
-    pad.connect(padGain); padGain.connect(master); pad.start(start); pad.stop(start + 20.1);
-    revealSoundStop(20000);
+    padGain.gain.exponentialRampToValueAtTime(.0001, start + musicDuration);
+    pad.connect(padGain); padGain.connect(master); pad.start(start); pad.stop(start + musicDuration + .1);
+    revealSoundStop(musicDuration * 1000);
   }
   function playEffect(kind) {
     const context = ensureAudioContext();
@@ -239,42 +386,72 @@
         if (index > 5) label.style.left = `calc(${x}% - 210px)`;
         label.innerHTML = `<b>${event.year} · ${event.title}</b><small>${event.detail}</small>`;
         node.addEventListener('pointerdown', (pointerEvent) => {
-          node.dataset.pointerHandled = 'true';
+          selectGrowthEvent(container,index);
           beginGrowthDrag(pointerEvent,container,index);
-          window.setTimeout(() => { delete node.dataset.pointerHandled; },450);
         });
         node.addEventListener('click', () => {
-          if (node.dataset.pointerHandled === 'true') { delete node.dataset.pointerHandled; return; }
           selectGrowthEvent(container,index);
+          if (index === sequenceState.expected) connectGrowthEvent(container,index);
         });
         container.append(node, label);
       });
+      container.querySelector('[data-growth-index="0"]')?.classList.add('seen','selected');
+      container.querySelector('[data-growth-label="0"]')?.classList.add('active');
     });
+    updateSequenceStatus('첫 번째 별에서 시작합니다');
   }
   function selectGrowthEvent(container, index, options={}) {
     const event = growthEvents[index];
+    if (!event) return false;
     container.querySelectorAll('.growth-node').forEach((node) => node.classList.toggle('selected', Number(node.dataset.growthIndex) === index));
     container.querySelectorAll('.growth-label').forEach((label) => label.classList.toggle('active', Number(label.dataset.growthLabel) === index));
     const summary = document.querySelector('[data-growth-summary]');
     if (summary) summary.textContent = `${event.year} · ${event.title} — ${event.detail}`;
     if (pageType === 'atlas') openAtlasDrawer(`${event.year} · ${event.title}`, event.detail, 'GROWTH CONSTELLATION');
-    const clickedNode = container.querySelector(`[data-growth-index="${index}"]`);
-    if (sequenceState.complete || clickedNode.classList.contains('seen')) return false;
-    if (index !== sequenceState.expected) {
-      if (!options.quietWrong) { clickedNode.classList.remove('wrong'); void clickedNode.offsetWidth; clickedNode.classList.add('wrong'); }
-      updateSequenceStatus(`${event.year} 기록을 살펴보는 중 · 연결은 ${growthEvents[sequenceState.expected].year}부터`);
-      return false;
+    if (!options.quietStatus && !sequenceState.complete && index !== sequenceState.expected) {
+      updateSequenceStatus(`${event.year} 기록을 보고 있습니다`);
     }
-    clickedNode.classList.add('seen');
-    container.querySelector(`[data-growth-line="${index - 1}"]`)?.classList.add('active');
-    sequenceState.expected += 1;
+    return true;
+  }
+
+  /* Each accepted step is drawn once from its source instead of appearing abruptly. */
+  function revealGrowthConnection(line) {
+    if (!line) return;
+    line.classList.add('active');
+    if (reducedMotion() || typeof line.animate !== 'function') return;
+    let length = 100;
+    try { length = Math.max(1,line.getTotalLength()); } catch (_) { /* SVG geometry may not be measurable before layout. */ }
+    line.animate([
+      { strokeDasharray:`${length} ${length}`, strokeDashoffset:length, opacity:.28 },
+      { strokeDasharray:`${length} ${length}`, strokeDashoffset:0, opacity:.9 },
+    ], { duration:760, easing:'cubic-bezier(.22,.72,.2,1)' });
+  }
+
+  /* The destination star answers the line with one restrained arrival pulse. */
+  function pulseGrowthDestination(node) {
+    if (!node || reducedMotion() || typeof node.animate !== 'function') return;
+    node.animate([
+      { transform:'scale(.82)', filter:'brightness(1)' },
+      { transform:'scale(1.32)', filter:'brightness(1.2)', offset:.58 },
+      { transform:'scale(1.18)', filter:'brightness(1)' },
+    ], { duration:620, easing:'cubic-bezier(.2,.78,.24,1)' });
+  }
+
+  /* Selection is free; only the chronological path has an order. */
+  function connectGrowthEvent(container, index) {
+    if (sequenceState.complete || index !== sequenceState.expected) return false;
+    const node = container.querySelector(`[data-growth-index="${index}"]`);
+    if (!node) return false;
+    node.classList.add('seen');
     document.querySelectorAll(`[data-growth-index="${index}"]`).forEach((node) => node.classList.add('seen'));
-    document.querySelectorAll(`[data-growth-line="${index - 1}"]`).forEach((line) => line.classList.add('active'));
+    document.querySelectorAll(`[data-growth-line="${index - 1}"]`).forEach(revealGrowthConnection);
+    pulseGrowthDestination(node);
+    sequenceState.expected += 1;
     if (sequenceState.expected === growthEvents.length) {
       sequenceState.complete = true;
       updateSequenceStatus('별자리 완성');
       playConstellationMusic();
-    } else updateSequenceStatus(`${sequenceState.expected}번째 별 연결 완료`);
+    } else updateSequenceStatus(`${sequenceState.expected} / ${growthEvents.length}`);
     return true;
   }
   function updateSequenceStatus(message) {
@@ -284,15 +461,21 @@
   function beginGrowthDrag(pointerEvent,container,index) {
     if (pointerEvent.pointerType === 'mouse' && pointerEvent.button !== 0) return;
     pointerEvent.stopPropagation();
-    selectGrowthEvent(container,index,{quietWrong:true});
     const sourceIndex = sequenceState.expected - 1;
     if (sequenceState.complete || sourceIndex < 0 || index !== sourceIndex) return;
     pointerEvent.preventDefault();
     const owner = pointerEvent.currentTarget;
     const trace = container.querySelector('[data-growth-trace]');
     if (!trace) return;
-    sequenceState.drag = { pointerId:pointerEvent.pointerId, sourceIndex, owner };
-    owner.setPointerCapture(pointerEvent.pointerId);
+    sequenceState.drag = {
+      pointerId:pointerEvent.pointerId,
+      sourceIndex,
+      owner,
+      startX:pointerEvent.clientX,
+      startY:pointerEvent.clientY,
+      moved:false,
+    };
+    try { owner.setPointerCapture(pointerEvent.pointerId); } catch (_) { /* Window listeners still retain the drag. */ }
     container.classList.add('dragging'); owner.classList.add('drag-source'); trace.classList.add('active');
     const setTraceStart = (pointIndex) => {
       const [x,y] = growthPoints[pointIndex];
@@ -301,6 +484,8 @@
     setTraceStart(sourceIndex);
     const move = (event) => {
       if (!sequenceState.drag || event.pointerId !== sequenceState.drag.pointerId) return;
+      event.preventDefault();
+      if (Math.hypot(event.clientX-sequenceState.drag.startX,event.clientY-sequenceState.drag.startY) > 5) sequenceState.drag.moved = true;
       const rect = container.getBoundingClientRect();
       trace.setAttribute('x2',clamp((event.clientX-rect.left)/rect.width*100,0,100));
       trace.setAttribute('y2',clamp((event.clientY-rect.top)/rect.height*100,0,100));
@@ -309,7 +494,8 @@
       const target = container.querySelector(`[data-growth-index="${targetIndex}"]`);
       const targetRect = target.getBoundingClientRect();
       const distance = Math.hypot(event.clientX-(targetRect.left+targetRect.width/2),event.clientY-(targetRect.top+targetRect.height/2));
-      if (distance <= Math.max(34,targetRect.width*.72) && selectGrowthEvent(container,targetIndex,{quietWrong:true})) {
+      if (distance <= Math.max(38,targetRect.width*.82) && connectGrowthEvent(container,targetIndex)) {
+        selectGrowthEvent(container,targetIndex,{quietStatus:true});
         sequenceState.drag.sourceIndex = targetIndex;
         container.querySelectorAll('.drag-source').forEach((node) => node.classList.remove('drag-source'));
         target.classList.add('drag-source');
@@ -322,11 +508,11 @@
       try { owner.releasePointerCapture(sequenceState.drag.pointerId); } catch (_) { /* capture may already be released */ }
       sequenceState.drag = null; container.classList.remove('dragging'); trace.classList.remove('active');
       container.querySelectorAll('.drag-source').forEach((node) => node.classList.remove('drag-source'));
-      owner.removeEventListener('pointermove',move); owner.removeEventListener('pointerup',finish); owner.removeEventListener('pointercancel',finish);
+      window.removeEventListener('pointermove',move); window.removeEventListener('pointerup',finish); window.removeEventListener('pointercancel',finish);
     };
-    owner.addEventListener('pointermove',move);
-    owner.addEventListener('pointerup',finish);
-    owner.addEventListener('pointercancel',finish);
+    window.addEventListener('pointermove',move,{passive:false});
+    window.addEventListener('pointerup',finish);
+    window.addEventListener('pointercancel',finish);
   }
   function initStoryScroll() {
     const shell = document.querySelector('.growth-scroll');
@@ -339,7 +525,6 @@
       const progress = clamp(-rect.top / travel, 0, .999);
       const activeIndex = Math.min(growthEvents.length - 1, Math.floor(progress * growthEvents.length));
       shell.querySelectorAll('.growth-node').forEach((node,index) => node.classList.toggle('current', index === activeIndex));
-      shell.querySelectorAll('.growth-label').forEach((label,index) => label.classList.toggle('active', index === activeIndex));
     };
     window.addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive:true });
     update();
@@ -356,13 +541,23 @@
       const payload = await response.json();
       const groups = payload.groups.map((group) => ({
         label:group.kind === 'year' ? group.year : localText(group.heading),
-        cards:(group.cards || []).map((card) => ({ title:localText(card.title), subtitle:plainText(card.subtitle || card.desc || card.descHtml), role:localText(card.role || card.status || card.failedReason) })),
+        cards:(group.cards || []).map((card) => ({
+          title:localText(card.title),
+          subtitle:plainText(card.subtitle || card.desc || card.descHtml),
+          role:localText(card.role || card.status || card.failedReason),
+          detail:typeof card.detail === 'string' ? card.detail : '',
+        })),
       })).filter((group) => group.label && group.cards.length);
       return groups.length ? groups : fallbackGroups;
     } catch (error) {
       console.info('Prototype uses embedded project fallback:', error.message);
       return fallbackGroups;
     }
+  }
+  function projectDetailHref(card) {
+    const detail = (card.detail || '').replace(/^\.\//,'').replace(/^\/+/, '');
+    if (!detail) return '';
+    return /(^|\/)Wall_Sina\/?$/i.test(detail) ? 'wall-sina.html' : `../../${detail}`;
   }
   function renderProjectArchive() {
     const tabs = document.querySelector('[data-year-tabs]');
@@ -383,10 +578,19 @@
     if (!group) return;
     projectState.current = group.label; projectState.visited.add(group.label);
     document.querySelectorAll('[data-year-tabs] button').forEach((button) => button.setAttribute('aria-selected', String(Number(button.dataset.groupIndex) === index)));
+    document.querySelectorAll('[data-orbit-years] button').forEach((button) => button.setAttribute('aria-pressed', String(Number(button.dataset.groupIndex) === index)));
     const grid = document.querySelector('[data-project-grid]');
     if (grid) {
       grid.replaceChildren(...group.cards.map((card) => {
-        const article = document.createElement('article'); article.className = 'project-record';
+        const detailHref = projectDetailHref(card);
+        const article = document.createElement(detailHref ? 'a' : 'article');
+        article.className = 'project-record';
+        if (detailHref) {
+          article.href = detailHref;
+          article.style.color = 'inherit';
+          article.style.textDecoration = 'none';
+          article.setAttribute('aria-label', `${card.title} 상세 기록 열기`);
+        }
         const type = document.createElement('small'); type.textContent = group.label;
         const title = document.createElement('h3'); title.textContent = card.title;
         const desc = document.createElement('p'); desc.textContent = card.subtitle || '프로젝트 기록';
@@ -397,6 +601,103 @@
     document.querySelectorAll('[data-archive-label]').forEach((node) => { node.textContent = group.label; });
     document.querySelectorAll('[data-project-count]').forEach((node) => { node.textContent = `${group.cards.length}개의 기록`; });
     checkCometUnlock();
+  }
+
+  /* Two deliberate turns reveal the orrery's unlabelled eclipse event. */
+  function revealOrreryEclipse(shell) {
+    if (shell.dataset.eclipse === 'true') return;
+    const core = shell.querySelector('.orrery-core');
+    const moon = core?.querySelector('span');
+    if (!core || !moon) return;
+    shell.dataset.eclipse = 'true';
+    if (reducedMotion() || typeof moon.animate !== 'function') {
+      moon.style.opacity = '1';
+      moon.style.transform = 'scale(5.55)';
+    } else {
+      moon.animate([
+        { opacity:.08, transform:'translateX(-360%) scale(.7)' },
+        { opacity:.92, transform:'translateX(-45%) scale(3.8)', offset:.72 },
+        { opacity:1, transform:'translateX(0) scale(5.55)' },
+      ], { duration:2200, easing:'cubic-bezier(.22,.72,.2,1)', fill:'forwards' });
+      core.animate([
+        { filter:'brightness(1)' },
+        { filter:'brightness(.58)', offset:.82 },
+        { filter:'brightness(.7)' },
+      ], { duration:2200, easing:'ease-out', fill:'forwards' });
+      shell.querySelectorAll('.orrery-ring').forEach((ring,index) => {
+        ring.animate([
+          { opacity:1 },
+          { opacity:.22, offset:.65 },
+          { opacity:.68 },
+        ], { duration:1800, delay:index*90, easing:'ease-out' });
+      });
+    }
+    playConstellationMusic();
+  }
+
+  /* The third direction treats project years as a tactile celestial instrument. */
+  function initOrrery() {
+    const shell = document.querySelector('[data-orrery]');
+    const yearLayer = document.querySelector('[data-orbit-years]');
+    if (!shell || !yearLayer) return;
+    const state = { rotation:0, drag:null, travel:0 };
+    const apply = () => shell.style.setProperty('--rotation', `${state.rotation}deg`);
+    yearLayer.replaceChildren(...projectState.groups.map((group,index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.groupIndex = String(index);
+      button.style.setProperty('--angle', `${index * 360 / projectState.groups.length}deg`);
+      button.setAttribute('aria-pressed', String(group.label === projectState.current));
+      const year = document.createElement('b');
+      year.textContent = group.label;
+      const count = document.createElement('small');
+      count.textContent = `${group.cards.length}`;
+      button.append(year,count);
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        selectProjectGroup(index);
+        state.rotation = -(index * 360 / projectState.groups.length);
+        apply();
+      });
+      return button;
+    }));
+    shell.addEventListener('pointerdown', (event) => {
+      if (event.target.closest('button,a')) return;
+      state.drag = { pointerId:event.pointerId, lastX:event.clientX, startRotation:state.rotation, startTravel:state.travel };
+      try { shell.setPointerCapture(event.pointerId); } catch (_) { /* Pointer stays usable without capture. */ }
+      shell.classList.add('dragging');
+    });
+    shell.addEventListener('pointermove', (event) => {
+      if (!state.drag || event.pointerId !== state.drag.pointerId) return;
+      const delta = (event.clientX - state.drag.lastX) * .32;
+      state.drag.lastX = event.clientX;
+      state.rotation += delta;
+      state.travel += Math.abs(delta);
+      apply();
+      if (state.travel >= 720) revealOrreryEclipse(shell);
+    });
+    const finish = () => {
+      if (!state.drag) return;
+      const step = 360 / projectState.groups.length;
+      const normalized = ((-state.rotation % 360) + 360) % 360;
+      const index = Math.round(normalized / step) % projectState.groups.length;
+      state.rotation = -index * step;
+      state.drag = null;
+      shell.classList.remove('dragging');
+      selectProjectGroup(index);
+      apply();
+    };
+    const cancel = () => {
+      if (!state.drag) return;
+      state.rotation = state.drag.startRotation;
+      state.travel = state.drag.startTravel;
+      state.drag = null;
+      shell.classList.remove('dragging');
+      apply();
+    };
+    shell.addEventListener('pointerup',finish);
+    shell.addEventListener('pointercancel',cancel);
+    apply();
   }
   function checkCometUnlock() {
     if (projectState.visited.size < projectState.groups.length) return;
@@ -413,8 +714,69 @@
   /* Pointer and keyboard eclipse puzzles share the same reveal state. */
   function revealEclipse(scene) {
     scene?.classList.add('eclipsed');
-    document.querySelectorAll('[data-capy-constellation]').forEach((map) => map.classList.add('revealed'));
+    renderCapybaraNebula(scene);
     playEffect('success');
+  }
+
+  /* A soft particle silhouette reads as a capybara only after the eclipse. */
+  function renderCapybaraNebula(scene) {
+    const canvas = scene?.querySelector('[data-capy-nebula]');
+    const context = canvas?.getContext('2d');
+    if (!canvas || !context || canvas.dataset.rendered === 'true') return;
+    const bounds = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = Math.max(1,bounds.width);
+    const height = Math.max(1,bounds.height);
+    canvas.width = Math.round(width*dpr);
+    canvas.height = Math.round(height*dpr);
+    context.setTransform(dpr,0,0,dpr,0,0);
+    let seed = 98317;
+    const random = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+    const insideEllipse = (x,y,cx,cy,rx,ry) => ((x-cx)/rx)**2 + ((y-cy)/ry)**2 <= 1;
+    const insideShape = (x,y) => (
+      insideEllipse(x,y,.42,.57,.31,.205) ||
+      insideEllipse(x,y,.72,.49,.17,.155) ||
+      insideEllipse(x,y,.845,.545,.115,.08) ||
+      insideEllipse(x,y,.68,.34,.045,.055) ||
+      insideEllipse(x,y,.785,.36,.04,.05) ||
+      insideEllipse(x,y,.26,.76,.065,.17) ||
+      insideEllipse(x,y,.51,.77,.065,.16)
+    );
+    const styles = getComputedStyle(document.documentElement);
+    const violet = styles.getPropertyValue('--violet').trim() || '#706994';
+    const gold = styles.getPropertyValue('--gold').trim() || '#a9914d';
+    const points = [];
+    while (points.length < 620) {
+      const x = random();
+      const y = random();
+      if (insideShape(x,y)) points.push({x:x*width,y:y*height,r:.35+random()*1.45,a:.12+random()*.55,gold:random()>.77});
+    }
+    const start = performance.now();
+    const draw = (time) => {
+      const progress = reducedMotion() ? 1 : clamp((time-start)/1450,0,1);
+      context.clearRect(0,0,width,height);
+      points.forEach((point,index) => {
+        const arrival = clamp(progress*1.22-index/points.length*.22,0,1);
+        if (!arrival) return;
+        context.globalAlpha = point.a*arrival;
+        context.fillStyle = point.gold ? gold : violet;
+        context.shadowBlur = point.r*5;
+        context.shadowColor = point.gold ? gold : violet;
+        context.beginPath();
+        context.arc(point.x,point.y,point.r*arrival,0,Math.PI*2);
+        context.fill();
+      });
+      context.shadowBlur = 0;
+      context.globalAlpha = .82*progress;
+      context.fillStyle = violet;
+      context.beginPath();
+      context.arc(width*.79,height*.475,Math.max(1.5,width*.004),0,Math.PI*2);
+      context.fill();
+      context.globalAlpha = 1;
+      if (progress < 1) requestAnimationFrame(draw);
+      else canvas.dataset.rendered = 'true';
+    };
+    requestAnimationFrame(draw);
   }
   function initStoryEclipse() {
     const moon = document.querySelector('[data-moon-drag]');
@@ -487,6 +849,46 @@
     });
     const finish = () => { trace=null; belt.classList.remove('tracing'); };
     trigger.addEventListener('pointerup',finish); trigger.addEventListener('pointercancel',finish);
+
+    /* Mobile keeps the twelve constellations without shrinking the desktop atlas. */
+    const mobileBelt = svgElement('svg',{viewBox:'0 0 720 170','aria-hidden':'true'});
+    mobileBelt.classList.add('zodiac-belt-mobile');
+    mobileBelt.append(svgElement('path',{d:'M 18 83 Q 360 10 702 83 Q 360 156 18 83',class:'zodiac-orbit'}));
+    zodiacGlyphs.forEach((glyph,index) => {
+      const x = 20 + (index % 6) * 116;
+      const y = 7 + Math.floor(index / 6) * 78;
+      const group = svgElement('g',{transform:`translate(${x} ${y}) scale(.58)`,class:'zodiac-glyph'});
+      glyph.edges.forEach(([from,to]) => {
+        const [x1,y1] = glyph.points[from], [x2,y2] = glyph.points[to];
+        group.append(svgElement('line',{x1,y1,x2,y2}));
+      });
+      glyph.points.forEach(([cx,cy],pointIndex) => group.append(svgElement('circle',{cx,cy,r:pointIndex % 3 === 0 ? 3.5 : 2.4})));
+      mobileBelt.append(group);
+    });
+    const mobileTrigger = svgElement('path',{d:'M 260 84 Q 360 122 460 84',class:'zodiac-secret-trigger'});
+    const mobileHidden = svgElement('g',{transform:'translate(320 43) scale(.8)',class:'ophiuchus-glyph'});
+    hiddenEdges.forEach(([from,to]) => {
+      const [x1,y1] = hiddenPoints[from], [x2,y2] = hiddenPoints[to];
+      mobileHidden.append(svgElement('line',{x1,y1,x2,y2}));
+    });
+    hiddenPoints.forEach(([cx,cy]) => mobileHidden.append(svgElement('circle',{cx,cy,r:3.2})));
+    mobileBelt.append(mobileTrigger,mobileHidden); world.append(mobileBelt);
+
+    let mobileTrace = null;
+    mobileTrigger.addEventListener('pointerdown',(event) => {
+      if (world.classList.contains('ophiuchus-revealed')) return;
+      event.preventDefault(); event.stopPropagation(); mobileTrigger.setPointerCapture(event.pointerId);
+      mobileTrace = {pointerId:event.pointerId,x:event.clientX,y:event.clientY,distance:0}; mobileBelt.classList.add('tracing');
+    });
+    mobileTrigger.addEventListener('pointermove',(event) => {
+      if (!mobileTrace || event.pointerId !== mobileTrace.pointerId) return;
+      mobileTrace.distance += Math.hypot(event.clientX-mobileTrace.x,event.clientY-mobileTrace.y); mobileTrace.x=event.clientX; mobileTrace.y=event.clientY;
+      if (mobileTrace.distance >= 90) {
+        world.classList.add('ophiuchus-revealed'); mobileBelt.classList.remove('tracing'); mobileTrace=null; playEffect('success');
+      }
+    });
+    const finishMobileTrace = () => { mobileTrace=null; mobileBelt.classList.remove('tracing'); };
+    mobileTrigger.addEventListener('pointerup',finishMobileTrace); mobileTrigger.addEventListener('pointercancel',finishMobileTrace);
   }
 
   /* Atlas camera provides direct manipulation on desktop and becomes static sections on mobile. */
@@ -532,7 +934,11 @@
   function openAtlasDrawer(title,description,kicker='OBSERVATORY',cards=[]) {
     const drawer=document.querySelector('[data-atlas-drawer]');if(!drawer)return;
     drawer.querySelector('[data-drawer-kicker]').textContent=kicker;drawer.querySelector('[data-drawer-title]').textContent=title;drawer.querySelector('[data-drawer-description]').textContent=description;
-    const grid=drawer.querySelector('[data-drawer-projects]');grid.replaceChildren(...cards.slice(0,7).map((card)=>{const article=document.createElement('article');const strong=document.createElement('b');strong.textContent=card.title;const small=document.createElement('small');small.textContent=card.subtitle||card.role||'';article.append(strong,small);return article;}));drawer.classList.add('open');
+    const grid=drawer.querySelector('[data-drawer-projects]');grid.replaceChildren(...cards.slice(0,7).map((card)=>{
+      const detailHref=projectDetailHref(card),record=document.createElement(detailHref?'a':'article');record.className='drawer-project-record';
+      if(detailHref){record.href=detailHref;record.setAttribute('aria-label',`${card.title} 상세 기록 열기`);}
+      const strong=document.createElement('b');strong.textContent=card.title;const small=document.createElement('small');small.textContent=card.subtitle||card.role||'';record.append(strong,small);return record;
+    }));drawer.classList.add('open');
   }
   function initAtlasMoon() {
     const moon=document.querySelector('[data-atlas-moon]'),target=document.querySelector('[data-atlas-eclipse-target]');if(!moon||!target)return;
@@ -541,77 +947,30 @@
     moon.addEventListener('pointerup',()=>{if(!drag)return;drag=null;const a=moon.getBoundingClientRect(),b=target.getBoundingClientRect();if(Math.hypot(a.left+a.width/2-b.left-b.width/2,a.top+a.height/2-b.top-b.height/2)<95)revealEclipse(moon.closest('.atlas-zone'));});
   }
 
-  /* Wall_Sina keeps a physical water control while compressing the source's 110-second sequence to eleven seconds. */
-  function initWallSimulator() {
-    const switchButton=document.querySelector('[data-system-switch]');if(!switchButton)return;
-    const slider=document.querySelector('[data-water-slider]'),run=document.querySelector('[data-simulation-run]'),water=document.querySelector('[data-water]'),barrier=document.querySelector('[data-barrier]');
-    const stateLabel=document.querySelector('[data-system-state]'),stateDot=document.querySelector('[data-status-dot]'),output=document.querySelector('[data-water-output]'),sensor=document.querySelector('[data-water-sensor]'),beacon=document.querySelector('[data-alert-beacon]');
-    const lights=[...document.querySelectorAll('[data-light]')],alertLeds=[...document.querySelectorAll('[data-alert-led]')],phases=[...document.querySelectorAll('[data-phase]')];
-    const tmDisplay=document.querySelector('[data-tm-display]'),motorState=document.querySelector('[data-motor-state]'),buzzerState=document.querySelector('[data-buzzer-state]'),laserState=document.querySelector('[data-laser-state]');
-    const sensorLevel=24;
-    const system={powered:false,latched:false,waterLevel:0,sequenceFrame:0,fillFrame:0,startedAt:0,lastPhase:'off'};
-    const phaseFor=(seconds)=>seconds<27?'deploy':seconds<47?'hold':seconds<70?'yellow-pulse':seconds<90?'red-yellow':seconds<110?'retract':'complete';
-    const cancelFrames=()=>{cancelAnimationFrame(system.sequenceFrame);cancelAnimationFrame(system.fillFrame);system.sequenceFrame=0;system.fillFrame=0;};
-    const setLight=(type,on)=>lights.find((light)=>light.dataset.light===type)?.classList.toggle('active',on);
-    const setAlertLed=(type,on)=>alertLeds.find((light)=>light.dataset.alertLed===type)?.classList.toggle('active',on);
-    const displayValue=(phase,seconds)=>{
-      if(phase==='off'||phase==='idle')return '----';
-      const value=phase==='deploy'?Math.ceil(27-seconds):phase==='hold'?Math.ceil(47-seconds):phase==='yellow-pulse'?Math.ceil(70-seconds):phase==='red-yellow'?Math.ceil(90-seconds):phase==='retract'?Math.floor(seconds):110;
-      return String(clamp(value,0,9999)).padStart(4,'0');
-    };
-    const renderPhase=(phase,seconds=0,now=performance.now())=>{
-      const slowPulse=Math.floor(now/600)%2===0,fastPulse=Math.floor(now/280)%2===0,alternate=Math.floor(now/500)%2===0;
-      const raised=['deploy','hold','yellow-pulse','red-yellow'].includes(phase);
-      barrier.classList.toggle('raised',raised);barrier.classList.toggle('retracting',phase==='retract');sensor.classList.toggle('detected',system.latched||system.waterLevel>=sensorLevel);
-      beacon.classList.toggle('active',phase==='red-yellow'||phase==='retract');stateDot.className=`status-dot${system.powered?' on':''}${phase==='red-yellow'||phase==='retract'?' danger':''}`;
-      const names={off:'전원 꺼짐',idle:'감지 대기 · 수위 정상',deploy:'수분 감지 · 방벽 상승',hold:'방벽 유지 · 황색 신호', 'yellow-pulse':'주의 · 황색 점멸','red-yellow':'위험 · 적·황 경고',retract:'복구 · 방벽 하강',complete:'시퀀스 완료 · 감지 유지'};
-      stateLabel.textContent=names[phase];tmDisplay.textContent=displayValue(phase,seconds);
-      setLight('green',phase==='deploy'||phase==='complete');
-      setLight('yellow',phase==='hold'||phase==='yellow-pulse'&&slowPulse||phase==='red-yellow'&&fastPulse);
-      setLight('red',phase==='red-yellow'&&fastPulse||phase==='retract');
-      setAlertLed('red',(phase==='deploy'||phase==='hold')&&alternate||phase==='yellow-pulse'&&slowPulse||phase==='red-yellow'&&fastPulse);
-      setAlertLed('blue',(phase==='deploy'||phase==='hold')&&!alternate||phase==='retract'&&slowPulse);
-      motorState.textContent=phase==='deploy'?'정회전 · 방벽 상승':phase==='retract'?'역회전 · 방벽 하강':raised?'정지 · 방벽 유지':'정지';
-      buzzerState.textContent=phase==='deploy'||phase==='hold'?'1 kHz · ON':'OFF';laserState.textContent=system.powered?'ON':'OFF';
-      phases.forEach((row)=>row.classList.toggle('active',row.dataset.phase===phase));
-      if(phase!==system.lastPhase){if(phase==='deploy')playEffect('detect');if(phase==='red-yellow')playEffect('danger');system.lastPhase=phase;}
-    };
-    const setWater=(level,allowTrigger=true)=>{
-      system.waterLevel=clamp(level,0,100);water.style.height=`${system.waterLevel}%`;slider.value=String(Math.round(system.waterLevel));output.textContent=`${Math.round(system.waterLevel)}%`;
-      sensor.classList.toggle('detected',system.latched||system.powered&&system.waterLevel>=sensorLevel);
-      if(allowTrigger&&system.powered&&!system.latched&&system.waterLevel>=sensorLevel)startSequence();
-    };
-    const startSequence=()=>{
-      if(!system.powered||system.latched)return;system.latched=true;system.startedAt=performance.now();run.disabled=true;ensureAudioContext();
-      const duration=reducedMotion()?1650:11000;
-      const tick=(now)=>{
-        const progress=clamp((now-system.startedAt)/duration,0,1);const seconds=progress*110;renderPhase(phaseFor(seconds),seconds,now);
-        if(progress<1)system.sequenceFrame=requestAnimationFrame(tick);else{renderPhase('complete',110,now);system.sequenceFrame=0;}
+  /* The detail prototype compares real planning material with the photographed MVP. */
+  function initWallCompare() {
+    document.querySelectorAll('[data-wall-compare]').forEach((section) => {
+      const frame = section.querySelector('.compare-frame');
+      const range = section.querySelector('[data-compare-range]');
+      if (!frame || !range) return;
+      const apply = () => {
+        const reveal = clamp(Number(range.value),0,100);
+        frame.style.setProperty('--reveal', `${reveal}%`);
+        range.setAttribute('aria-valuenow', String(reveal));
       };
-      system.sequenceFrame=requestAnimationFrame(tick);
-    };
-    switchButton.addEventListener('click',()=>{
-      system.powered=!system.powered;switchButton.setAttribute('aria-pressed',String(system.powered));switchButton.textContent=system.powered?'시스템 전원 끄기':'시스템 전원 켜기';slider.disabled=!system.powered;
-      if(!system.powered){cancelFrames();system.latched=false;system.lastPhase='off';run.disabled=true;renderPhase('off');setWater(system.waterLevel,false);}
-      else{run.disabled=false;system.lastPhase='off';renderPhase('idle');if(system.waterLevel>=sensorLevel)startSequence();}
+      range.addEventListener('input',apply);
+      apply();
     });
-    slider.addEventListener('input',()=>setWater(Number(slider.value)));
-    run.addEventListener('click',()=>{
-      if(!system.powered||system.latched)return;ensureAudioContext();run.disabled=true;const from=system.waterLevel,to=Math.max(62,from),started=performance.now(),fillDuration=reducedMotion()?220:950;
-      const fill=(now)=>{const progress=clamp((now-started)/fillDuration,0,1);setWater(from+(to-from)*progress);if(progress<1)system.fillFrame=requestAnimationFrame(fill);else system.fillFrame=0;};
-      system.fillFrame=requestAnimationFrame(fill);
-    });
-    setWater(0,false);renderPhase('off');
-    document.querySelectorAll('[data-component]').forEach((button)=>button.addEventListener('click',()=>{document.querySelectorAll('[data-component]').forEach((item)=>item.classList.remove('active'));button.classList.add('active');const [title,description]=button.dataset.component.split('|');document.querySelector('[data-component-title]').textContent=title;document.querySelector('[data-component-description]').textContent=description;}));
   }
 
   /* Boot only the interactions present on the current prototype page. */
   async function boot() {
-    createIntroConstellation();createStarfields();createGrowthConstellations();createZodiacBelt();
+    createCosmosCanvases();createIntroConstellation();createStarfields();createGrowthConstellations();createZodiacBelt();
     document.querySelectorAll('[data-sound-stop]').forEach((button)=>{button.textContent='소리 끄기 ×';button.setAttribute('aria-label','재생 중인 소리 끄기');button.addEventListener('click',stopAudio);});
     if(pageType==='story'){initStoryScroll();initStoryEclipse();projectState.groups=await loadProjectGroups();renderProjectArchive();}
     if(pageType==='atlas'){projectState.groups=await loadProjectGroups();createAtlasStations();initAtlas();document.querySelector('[data-drawer-close]')?.addEventListener('click',()=>document.querySelector('[data-atlas-drawer]')?.classList.remove('open'));}
-    if(pageType==='wall')initWallSimulator();
+    if(pageType==='celestial'){projectState.groups=await loadProjectGroups();renderProjectArchive();initOrrery();}
+    if(pageType==='wall')initWallCompare();
   }
   boot().catch((error)=>console.error('Prototype initialization failed:',error));
 })();
