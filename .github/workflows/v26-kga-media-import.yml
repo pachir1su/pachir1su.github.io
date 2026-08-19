@@ -1,0 +1,94 @@
+name: v2.6 KGA media import
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-kga-media-import.yml
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v26-structure-media-runner
+          fetch-depth: 0
+
+      - name: Switch to target branch
+        run: |
+          git fetch origin agent/v26-structure-media-followup
+          git switch -C agent/v26-structure-media-followup origin/agent/v26-structure-media-followup
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Download and import inspected KGA captures
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pillow
+          curl -L --fail --retry 2 'https://sdmntprjapaneast.oaiusercontent.com/files/00000000-719c-8209-9a21-f62c27b84986/raw?se=2026-08-19T18%3A48%3A10Z&sp=r&sv=2026-02-06&sr=b&scid=6767ec0d-108f-50fd-8dd4-d8635c204cc8&skoid=03727f49-62d3-42ac-8350-1c0e6559d238&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-08-19T00%3A07%3A44Z&ske=2026-08-20T00%3A07%3A44Z&sks=b&skv=2026-02-06&sig=iVBz//pnr81/dL%2BV44yqdm57Prlo/ymtrC9lDAvLDBs%3D' -o /tmp/kga.zip
+          rm -rf /tmp/kga && mkdir -p /tmp/kga
+          unzip -q /tmp/kga.zip -d /tmp/kga
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import re, subprocess
+
+          root = Path.cwd()
+          out_dir = root / 'projects/koreatechGongjiAgent/assets/images'
+          out_dir.mkdir(parents=True, exist_ok=True)
+          items = [
+              ('home.png', 'web-home.webp', 'feat: add KGA home screenshot'),
+              ('notice.png', 'web-notice.webp', 'feat: add KGA notice screenshot'),
+              ('admin.png', 'web-admin.webp', 'feat: add KGA admin screenshot'),
+          ]
+          dims = {}
+          for src_name, dst_name, message in items:
+              src = Path('/tmp/kga') / src_name
+              dst = out_dir / dst_name
+              with Image.open(src) as im:
+                  im = im.convert('RGB')
+                  im.save(dst, 'WEBP', quality=82, method=6)
+                  dims[dst_name] = im.size
+              rel = dst.relative_to(root).as_posix()
+              subprocess.run(['git','add','--',rel], check=True)
+              subprocess.run(['git','commit','-m',message], check=True)
+
+          page = root / 'projects/koreatechGongjiAgent/index.html'
+          html = page.read_text()
+          if 'data-media-followup="v26-kga"' not in html:
+              figs = []
+              meta = [
+                  ('web-home.webp', '코리아텍 통합 알림 시스템 웹 홈 화면', '통합 웹 홈', 'Unified web home'),
+                  ('web-notice.webp', '코리아텍 통합 알림 시스템 공지 조회 화면', '공지 조회 화면', 'Notice browser'),
+                  ('web-admin.webp', '코리아텍 통합 알림 시스템 관리자 일정 관리 화면', '관리자 일정 관리', 'Admin schedule management'),
+              ]
+              for filename, alt, ko, en in meta:
+                  w, h = dims[filename]
+                  figs.append(f'''                <figure class="detail-figure">\n                  <img src="assets/images/{filename}" width="{w}" height="{h}" loading="lazy" decoding="async" alt="{alt}" />\n                  <figcaption data-en="{en}" data-ko="{ko}">{ko}</figcaption>\n                </figure>''')
+              block = '''            <div class="detail-section" data-media-followup="v26-kga">\n              <h2 data-en="Web Screens" data-ko="웹 화면">웹 화면</h2>\n              <div class="detail-gallery">\n''' + '\n'.join(figs) + '''\n              </div>\n            </div>\n'''
+              marker = re.search(r'\s*<div class="detail-section"[^>]*>\s*<h2[^>]*data-en="My Role"', html, re.S)
+              if not marker:
+                  raise SystemExit('KGA My Role marker not found')
+              html = html[:marker.start()] + '\n' + block.rstrip() + '\n' + html[marker.start():]
+              page.write_text(html)
+              subprocess.run(['git','add','--',page.relative_to(root).as_posix()], check=True)
+              subprocess.run(['git','commit','-m','feat: add KGA web media'], check=True)
+          PY
+
+      - name: Validate and push
+        run: |
+          set -euo pipefail
+          node --check script.js
+          node build.js
+          test -z "$(git status --porcelain index.html)"
+          node tools/verify-build.js
+          git diff --check origin/main...HEAD
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:agent/v26-structure-media-followup
