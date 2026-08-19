@@ -13,7 +13,7 @@ permissions:
 jobs:
   repair:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,24 +29,27 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Capture public Notion with Korean system font
+      - name: Capture public Notion with Korean font
         shell: bash
         run: |
           set -euo pipefail
-          sudo apt-get update >/dev/null
-          sudo apt-get install -y fonts-noto-cjk >/dev/null
+          font_dir="$HOME/.local/share/fonts"
+          mkdir -p "$font_dir"
+          curl -fsSL --retry 3 --retry-delay 2 \
+            https://raw.githubusercontent.com/notofonts/noto-cjk/main/Sans/OTF/Korean/NotoSansCJKkr-Regular.otf \
+            -o "$font_dir/NotoSansCJKkr-Regular.otf"
+          fc-cache -f "$font_dir" >/dev/null
           fc-match 'Noto Sans CJK KR'
           python3 -m pip install --quiet selenium pillow
           python3 - <<'PY'
           from pathlib import Path
-          import shutil, subprocess, time
+          import shutil, time
           from PIL import Image
           from selenium import webdriver
           from selenium.common.exceptions import TimeoutException
           from selenium.webdriver.chrome.options import Options
           from selenium.webdriver.chrome.service import Service
 
-          root=Path.cwd()
           chrome=shutil.which('google-chrome') or shutil.which('chromium') or shutil.which('chromium-browser')
           driver_bin=shutil.which('chromedriver') or shutil.which('chromium-driver')
           opts=Options(); opts.binary_location=chrome; opts.page_load_strategy='eager'
@@ -62,40 +65,44 @@ jobs:
               pass
           deadline=time.time()+35
           while time.time()<deadline:
-              source=d.page_source
-              if '2026' in source and d.execute_script('return document.body && document.body.innerText.length > 100'):
+              if '2026' in d.page_source and d.execute_script('return document.body && document.body.innerText.length > 100'):
                   break
               time.sleep(1)
           else:
               raise SystemExit('public freshman guide did not load usable content')
           d.execute_script('''
             const s=document.createElement('style');
-            s.textContent='html,body,body *{font-family:"Noto Sans CJK KR","Noto Sans KR",sans-serif !important;}';
+            s.textContent='html,body,body *{font-family:"Noto Sans CJK KR",sans-serif !important;}';
             document.head.appendChild(s);
           ''')
-          font_ok=d.execute_script('return document.fonts.check("16px \\\"Noto Sans CJK KR\\\"")')
-          if not font_ok:
+          if not d.execute_script('return document.fonts.check("16px \\\"Noto Sans CJK KR\\\"")'):
               raise SystemExit('Noto Sans CJK KR not available to Chrome')
           time.sleep(4)
           png=Path('/tmp/freshman-guide.png')
           d.save_screenshot(str(png)); d.quit()
           if png.stat().st_size<40000:
               raise SystemExit(f'guide screenshot unexpectedly small: {png.stat().st_size}')
-          out=root/'projects/koreatech_noob_guide/assets/images/notion-guide.webp'
+          out=Path('/tmp/notion-guide.webp')
           with Image.open(png) as im:
               im=im.convert('RGB'); im.save(out,'WEBP',quality=84,method=6)
-          subprocess.run(['git','add','--',out.relative_to(root).as_posix()],check=True)
-          subprocess.run(['git','commit','-m','feat: refresh freshman guide screenshot'],check=True)
+          print('CAPTURED', out, out.stat().st_size, flush=True)
           PY
 
-      - name: Validate and push
+      - name: Rebase captured media onto latest target, validate and push
         shell: bash
         run: |
           set -euo pipefail
+          target=agent/v26-structure-media-followup
+          git fetch origin "$target" main
+          git reset --hard "origin/$target"
+          mkdir -p projects/koreatech_noob_guide/assets/images
+          cp /tmp/notion-guide.webp projects/koreatech_noob_guide/assets/images/notion-guide.webp
+          git add -- projects/koreatech_noob_guide/assets/images/notion-guide.webp
+          git commit -m "feat: refresh freshman guide screenshot"
           node --check script.js
           node build.js
           test -z "$(git status --porcelain index.html)"
           node tools/verify-build.js
           git diff --check origin/main...HEAD
           test -z "$(git status --porcelain)"
-          git push origin HEAD:agent/v26-structure-media-followup
+          git push origin HEAD:"$target"
