@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="v3.0.0 Star Archive concept mockup" />
+    <title>03 Star Archive — pachir1su.github.io v3.0.0</title>
+    <style>
+      /* 역할: 콘텐츠 우선 아카이브 시안의 색상 토큰 */
+      :root { color-scheme:light; --paper:#f8f6ff; --paper-2:#eeebff; --ink:#201740; --muted:#71688b; --violet:#5b21b6; --violet-2:#7c3aed; --lavender:#a78bfa; --gold:#a16207; --gold-bg:#fff1a8; --line:rgba(91,33,182,.2); --panel:rgba(255,255,255,.74); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+      [data-theme="dark"] { color-scheme:dark; --paper:#0b0a1f; --paper-2:#171443; --ink:#eeeaff; --muted:#aaa1cc; --violet:#a78bfa; --violet-2:#7c3aed; --lavender:#c4b5fd; --gold:#fde68a; --gold-bg:rgba(253,230,138,.12); --line:rgba(167,139,250,.24); --panel:rgba(24,20,61,.78); }
+
+      /* 역할: 기본 문서 스타일과 절제된 편집 레이아웃 */
+      * { box-sizing:border-box; }
+      body { margin:0; min-width:320px; color:var(--ink); background:linear-gradient(120deg,var(--paper),var(--paper-2)); line-height:1.72; }
+      a { color:inherit; text-underline-offset:4px; }.shell{width:min(1120px,calc(100% - 38px));margin:0 auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:24px 0;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:10px;text-decoration:none}.brand-mark{display:grid;width:32px;height:32px;place-items:center;color:var(--paper);background:var(--violet);border-radius:50%}.brand strong,.brand small{display:block}.brand strong{font-size:.9rem}.brand small{color:var(--muted);font-size:.7rem}.actions{display:flex;gap:8px;align-items:center}.action{border:1px solid var(--line);padding:8px 11px;color:var(--muted);background:transparent;cursor:pointer;text-decoration:none;font-size:.8rem}.action:hover{color:var(--ink);border-color:var(--violet)}
+      :focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+
+      /* 역할: 아카이브 헤더와 수치 증거 */
+      .masthead{display:grid;grid-template-columns:1.2fr .8fr;gap:42px;padding:76px 0 62px;align-items:end}.eyebrow{margin:0 0 12px;color:var(--gold);font-size:.73rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.masthead h1{max-width:720px;margin:0;font-size:clamp(3rem,7vw,6.8rem);line-height:.94;letter-spacing:-.08em}.masthead-copy{max-width:390px;color:var(--muted);font-size:1rem}.masthead-copy strong{color:var(--ink)}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:22px}.stat{padding:12px 0;border-top:2px solid var(--violet)}.stat b{display:block;font-size:1.25rem}.stat span{color:var(--muted);font-size:.72rem}
+
+      /* 역할: 대표 사례를 증거 중심으로 보여주는 편집 카드 */
+      .section{padding:0 0 70px}.section-title{display:flex;align-items:baseline;justify-content:space-between;gap:18px;margin-bottom:16px}.section-title h2{margin:0;font-size:1.65rem;letter-spacing:-.04em}.section-title span{color:var(--muted);font-size:.78rem}.feature-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.feature{padding:22px;border:1px solid var(--line);background:var(--panel)}.feature-number{color:var(--gold);font-size:.75rem;font-weight:800;letter-spacing:.14em}.feature h3{margin:25px 0 9px;font-size:1.22rem;line-height:1.2}.feature p{margin:0;color:var(--muted);font-size:.87rem}.feature-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px;color:var(--violet);font-size:.72rem}.feature-meta span{padding:4px 7px;border:1px solid var(--line)}
+
+      /* 역할: 성장 타임라인과 프로젝트 기록 */
+      .archive-layout{display:grid;grid-template-columns:.72fr 1.28fr;gap:42px}.timeline{position:relative;padding-left:26px}.timeline::before{position:absolute;left:7px;top:8px;bottom:8px;width:1px;background:linear-gradient(var(--violet),var(--gold));content:""}.entry{position:relative;padding-bottom:25px}.entry::before{position:absolute;left:-24px;top:8px;width:9px;height:9px;border:2px solid var(--violet);border-radius:50%;background:var(--paper);content:""}.entry:last-child{padding-bottom:0}.entry b{color:var(--gold);font-size:.78rem}.entry h3{margin:4px 0 4px;font-size:.98rem}.entry p{margin:0;color:var(--muted);font-size:.82rem}.records{border-top:1px solid var(--line)}.record{display:grid;grid-template-columns:76px 1fr auto;gap:15px;align-items:start;padding:17px 0;border-bottom:1px solid var(--line)}.record-year{color:var(--gold);font-size:.78rem;font-weight:800}.record h3{margin:0;font-size:.98rem}.record p{margin:4px 0 0;color:var(--muted);font-size:.8rem}.record-status{color:var(--violet);font-size:.72rem;text-align:right}
+
+      /* 역할: 은유와 정보의 경계를 설명하는 카드 */
+      .translation{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:70px}.translation article{padding:17px;border:1px solid var(--line);background:var(--panel)}.translation b{display:block;margin-bottom:6px;color:var(--violet)}.translation span{color:var(--muted);font-size:.8rem}.translation em{display:block;margin-top:8px;color:var(--ink);font-size:.78rem;font-style:normal}
+      footer{display:flex;justify-content:space-between;gap:14px;padding:0 0 38px;color:var(--muted);font-size:.78rem}
+      @media (max-width:850px){.masthead{grid-template-columns:1fr;gap:18px;padding-top:52px}.feature-list,.translation{grid-template-columns:1fr}.archive-layout{grid-template-columns:1fr;gap:35px}}
+      @media (max-width:560px){.shell{width:calc(100% - 28px)}.topbar{align-items:flex-start}.masthead h1{font-size:clamp(3rem,16vw,5rem)}.stats{gap:6px}.stat b{font-size:1.05rem}.record{grid-template-columns:52px 1fr}.record-status{display:none}footer{display:block}footer a{display:block;margin-top:7px}}
+      @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    </style>
+  </head>
+  <body data-theme="light">
+    <div class="shell">
+      <header class="topbar"><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">✦</span><span><strong>pachir1su / archive</strong><small>v3.0.0 concept mockup 03</small></span></a><div class="actions"><button class="action" type="button" id="themeToggle">Dark</button><a class="action" href="index.html">All concepts</a></div></header>
+      <main>
+        <section class="masthead"><div><p class="eyebrow">Content-first direction</p><h1>Every project leaves a trace.</h1></div><div class="masthead-copy"><p>우주 컨셉을 장식이 아니라 기록 체계로 사용합니다. 무엇을 만들었는지, 어떤 역할을 했는지, 무엇을 배웠는지가 가장 먼저 읽힙니다.</p><div class="stats"><div class="stat"><b>31</b><span>projects catalogued</span></div><div class="stat"><b>4</b><span>years in motion</span></div><div class="stat"><b>3</b><span>north stars</span></div></div></div></section>
+
+        <section class="section" aria-labelledby="feature-title"><div class="section-title"><h2 id="feature-title">North stars</h2><span>featured work / first read</span></div><div class="feature-list"><article class="feature"><span class="feature-number">01</span><h3>코리아텍 통합 알림 시스템</h3><p>공지·개인 메일·셔틀·학식·도서관을 Discord 구독과 웹/GUI 대시보드로 연결한 운영 시스템.</p><div class="feature-meta"><span>Solo development</span><span>Python</span><span>FastAPI</span></div></article><article class="feature"><span class="feature-number">02</span><h3>MultiMind</h3><p>서로 다른 관점의 에이전트가 토론하고 결과를 정리하는 멀티 에이전트 실험 프로젝트.</p><div class="feature-meta"><span>Solo development</span><span>LLM</span><span>Flask</span></div></article><article class="feature"><span class="feature-number">03</span><h3>github-rank-insight</h3><p>GitHub 활동 지표와 등급 조건을 입력·비교·시각화하는 정적 분석 도구.</p><div class="feature-meta"><span>JavaScript</span><span>GitHub API</span><span>Data</span></div></article></div></section>
+
+        <section class="section" aria-labelledby="trajectory-title"><div class="section-title"><h2 id="trajectory-title">Trajectory</h2><span>selected milestones / #59</span></div><div class="archive-layout"><div class="timeline"><article class="entry"><b>2023</b><h3>처음 연결하다</h3><p>정보보안 동아리와 아두이노를 통해 코드를 현실의 장치와 연결하기 시작했습니다.</p></article><article class="entry"><b>2024</b><h3>만들고 발표하다</h3><p>지속 가능한 발전, 로봇대회, 도어락 등 팀 기반 하드웨어 프로젝트를 경험했습니다.</p></article><article class="entry"><b>2025</b><h3>AI와 IoT를 섞다</h3><p>NFC 출석, 공감 AI, Discord 봇처럼 사용자와 시스템 사이의 자동화를 반복했습니다.</p></article><article class="entry"><b>2026</b><h3>시스템을 배포하다</h3><p>통합 알림 시스템, GitHub 도구, 포트폴리오를 직접 운영 가능한 형태로 확장했습니다.</p></article></div><div class="records"><article class="record"><span class="record-year">2026</span><div><h3>“Stop!” Pedestrian Alert System</h3><p>채널 독립형 센서 구조를 멘토링하고 로컬임팩트상을 수상했습니다.</p></div><span class="record-status">award</span></article><article class="record"><span class="record-year">2025</span><div><h3>NFC Attendance System</h3><p>Arduino와 Raspberry Pi를 연결한 자동 출석 체크 시스템.</p></div><span class="record-status">hardware</span></article><article class="record"><span class="record-year">2024</span><div><h3>Wall_Sina</h3><p>해수면 상승에 대응하는 해안 장벽 MVP.</p></div><span class="record-status">team project</span></article><article class="record"><span class="record-year">2024</span><div><h3>Password Door Lock</h3><p>4×4 매트릭스 키패드 기반 도어락 시스템.</p></div><span class="record-status">contest</span></article></div></div></section>
+
+        <section class="section" aria-labelledby="translation-title"><div class="section-title"><h2 id="translation-title">Cosmic translation rules</h2><span>metaphor / information</span></div><div class="translation"><article><b>Completed</b><span>주계열성</span><em>완료 상태는 카드의 본문과 링크로 먼저 설명합니다.</em></article><article><b>In progress</b><span>원시성</span><em>WIP 라벨과 현재 단계가 별빛보다 우선합니다.</em></article><article><b>Failed</b><span>갈색왜성</span><em>실패 사유와 배운 점을 숨기지 않고 기록합니다.</em></article></div></section>
+      </main>
+      <footer><span>03 Star Archive · content-first direction</span><a href="01-observatory.html">Back: Observatory →</a></footer>
+    </div>
+    <script>
+      // 역할: 라이트 성도와 다크 밤하늘을 비교하기 위한 테마 토글
+      try { const themeToggle=document.querySelector("#themeToggle"); themeToggle?.addEventListener("click",()=>{const nextTheme=document.body.dataset.theme==="light"?"dark":"light";document.body.dataset.theme=nextTheme;themeToggle.textContent=nextTheme==="light"?"Dark":"Light";}); } catch(error) { console.warn("Theme preview could not initialize.", error); }
+    </script>
+  </body>
+</html>
+
