@@ -1,0 +1,194 @@
+name: v2.6 integrate latest main and atomicize
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-integrate-latest-main.yml
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v26-structure-media-runner
+          fetch-depth: 0
+
+      - name: Rebuild target on latest main without reverting concurrent v3 work
+        shell: bash
+        run: |
+          set -euo pipefail
+          target=agent/v26-structure-media-followup
+          git fetch origin main "$target"
+          old_target=$(git rev-parse "origin/$target")
+          merge_base=$(git merge-base origin/main "origin/$target")
+          final_sha=$old_target
+          echo "main=$(git rev-parse origin/main)"
+          echo "target=$old_target"
+          echo "merge_base=$merge_base"
+
+          git switch -C "$target" "origin/$target"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          python3 - "$merge_base" "$final_sha" <<'PY'
+          from pathlib import Path
+          import re
+          import subprocess
+          import sys
+
+          root = Path.cwd()
+          merge_base, final_sha = sys.argv[1:3]
+
+          def git(*args, capture=False, check=True):
+              p = subprocess.run(
+                  ['git', *args], cwd=root, check=check,
+                  stdout=subprocess.PIPE if capture else None,
+                  stderr=subprocess.STDOUT if capture else None,
+              )
+              return p.stdout if capture else b''
+
+          def parse_records(base, head):
+              raw = git('diff', '--name-status', '-M', '-z', base, head, capture=True)
+              parts = raw.split(b'\0')
+              if parts and parts[-1] == b'':
+                  parts.pop()
+              records = []
+              i = 0
+              while i < len(parts):
+                  status = parts[i].decode(); i += 1
+                  if status.startswith(('R', 'C')):
+                      old = parts[i].decode(); new = parts[i + 1].decode(); i += 2
+                      records.append((status, old, new))
+                  else:
+                      path = parts[i].decode(); i += 1
+                      records.append((status, path, None))
+              return records
+
+          records = parse_records(merge_base, final_sha)
+          main_changed = set(
+              git('diff', '--name-only', merge_base, 'origin/main', capture=True)
+              .decode().splitlines()
+          )
+          target_changed = set()
+          for status, p1, p2 in records:
+              target_changed.add(p1)
+              if p2:
+                  target_changed.add(p2)
+          overlap = main_changed & target_changed
+
+          allowed_overlap = {
+              'docs/v3-constellation-prototypes/index.html',
+              'docs/v3-constellation-prototypes/home-a-story.html',
+              'docs/v3-constellation-prototypes/home-b-atlas.html',
+              'docs/v3-constellation-prototypes/wall-sina.html',
+          }
+          unexpected = sorted(overlap - allowed_overlap)
+          print('TARGET DIFF RECORDS', len(records), flush=True)
+          print('CONCURRENT MAIN CHANGES', sorted(main_changed), flush=True)
+          print('OVERLAP', sorted(overlap), flush=True)
+          if unexpected:
+              raise SystemExit(f'unexpected concurrent overlap: {unexpected}')
+
+          git('reset', '--hard', 'origin/main')
+
+          def message(status, path):
+              p = Path(path)
+              if status.startswith('R'):
+                  return f'refactor: colocate {p.name} with project'
+              if path == 'style.css':
+                  return 'fix: stop project media cards from stretching'
+              if path == 'assets/favicon.svg':
+                  return 'fix: add shared chicken favicon'
+              if path == 'AGENTS.md':
+                  return 'docs: document project-local asset layout'
+              if path == 'assets/README.md':
+                  return 'docs: clarify global asset ownership'
+              if path == 'tools/verify-build.js':
+                  return 'chore: verify favicon and project-local assets'
+              if p.suffix.lower() in {'.webp', '.png', '.jpg', '.jpeg', '.mp4', '.webm'} and 'projects' in p.parts:
+                  project = p.parts[p.parts.index('projects') + 1]
+                  return f'feat: add {project} project media'
+              if p.suffix.lower() == '.html':
+                  if path.startswith('projects/'):
+                      project = p.parts[1] if len(p.parts) > 1 else p.parent.name
+                      text = (root / path).read_text(encoding='utf-8') if (root / path).exists() else ''
+                      if 'data-media-followup=' in text:
+                          return f'feat: update {project} project media'
+                      if 'assets/images/' in text or 'assets/video/' in text:
+                          return f'refactor: update {project} project asset paths'
+                  return f'fix: use shared favicon in {path}'
+              return f'chore: update {path}'
+
+          def add_shared_favicon(path):
+              file = root / path
+              text = file.read_text(encoding='utf-8')
+              # Preserve the concurrently merged prototype exactly; only add the shared favicon.
+              text = re.sub(r'\s*<link\s+rel=["\']icon["\'][^>]*>\s*', '\n', text, flags=re.I)
+              line = '  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />\n'
+              if '/assets/favicon.svg' not in text:
+                  m = re.search(r'(^\s*<title>.*?</title>\s*\n)', text, flags=re.M)
+                  if m:
+                      text = text[:m.end()] + line + text[m.end():]
+                  else:
+                      m = re.search(r'(^\s*<meta\s+name="color-scheme"[^>]*>\s*\n)', text, flags=re.M)
+                      if not m:
+                          raise SystemExit(f'cannot place favicon in concurrent file: {path}')
+                      text = text[:m.end()] + line + text[m.end():]
+              file.write_text(text, encoding='utf-8')
+              git('add', '--', path)
+
+          applied = 0
+          for index, (status, p1, p2) in enumerate(records, 1):
+              target = p2 if p2 else p1
+              if target in allowed_overlap:
+                  add_shared_favicon(target)
+              elif status.startswith(('R', 'C')):
+                  git('checkout', final_sha, '--', p2)
+                  if (root / p1).exists() or git('ls-files', '--error-unmatch', p1, capture=True, check=False):
+                      git('rm', '-f', '--', p1, check=False)
+              elif status == 'D':
+                  git('rm', '-f', '--', p1)
+              else:
+                  git('checkout', final_sha, '--', p1)
+
+              staged = git('diff', '--cached', '--name-only', capture=True).decode().strip().splitlines()
+              if not staged:
+                  print('SKIP already satisfied', target, flush=True)
+                  continue
+              git('commit', '-m', message(status, target))
+              applied += 1
+              one = git(
+                  'diff-tree', '--no-commit-id', '--name-status', '-r', '-M', 'HEAD^', 'HEAD',
+                  capture=True,
+              ).decode().strip().splitlines()
+              if len(one) != 1:
+                  raise SystemExit(f'commit {index} is not one logical diff record: {one}')
+
+          final_records = parse_records('origin/main', 'HEAD')
+          commits = int(git('rev-list', '--count', 'origin/main..HEAD', capture=True).decode().strip())
+          print(f'ATOMIC final_records={len(final_records)} commits={commits} applied={applied}', flush=True)
+          if len(final_records) != commits:
+              raise SystemExit(f'atomicity mismatch: final_records={len(final_records)} commits={commits}')
+
+          # Ensure all four concurrent prototype files still contain shared favicon.
+          for path in sorted(allowed_overlap):
+              text = (root / path).read_text(encoding='utf-8')
+              if '/assets/favicon.svg' not in text:
+                  raise SystemExit(f'favicon missing after concurrent merge: {path}')
+          PY
+
+          node --check script.js
+          node build.js
+          test -z "$(git status --porcelain index.html)"
+          node tools/verify-build.js
+          git diff --check origin/main...HEAD
+          test -z "$(git status --porcelain)"
+
+          git push --force-with-lease="refs/heads/$target:${old_target}" origin HEAD:"$target"
