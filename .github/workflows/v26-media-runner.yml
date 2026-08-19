@@ -1,0 +1,33 @@
+name: v2.6.x media runner
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  run-media-pass:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v26-media-pass
+          fetch-depth: 0
+      - name: Ensure ffmpeg
+        shell: bash
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+      - name: Run media pass script
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin agent/v26-media-runner-script
+          git show FETCH_HEAD:tools/v26_media_runner.py > /tmp/v26_media_runner.py
+          python3 -m py_compile /tmp/v26_media_runner.py
+          python3 /tmp/v26_media_runner.py
