@@ -13,6 +13,32 @@
     { year: '2026', title: '로컬임팩트상', detail: '천안 청소년 도시재생 챌린지' },
   ];
   const growthPoints = [[9,68],[23,39],[37,63],[49,27],[61,51],[72,20],[84,48],[92,75]];
+  const introConstellations = [
+    {
+      id:'dipper',
+      points:[[125,370],[250,330],[365,360],[480,315],[650,245],[810,340],[620,435]],
+      edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,3]],
+    },
+    {
+      id:'scorpio',
+      points:[[135,170],[245,250],[320,185],[350,300],[430,380],[530,440],[650,445],[750,395],[810,315],[850,235],[910,275],[925,205]],
+      edges:[[0,1],[2,1],[1,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10],[9,11]],
+    },
+  ];
+  const zodiacGlyphs = [
+    { points:[[8,48],[28,17],[48,45],[70,16],[92,48]], edges:[[0,1],[1,2],[2,3],[3,4]] },
+    { points:[[15,18],[34,36],[50,68],[66,36],[85,18],[50,68],[50,94]], edges:[[0,1],[1,2],[2,3],[3,4],[2,5],[5,6]] },
+    { points:[[22,15],[22,82],[78,15],[78,82],[22,48],[78,48]], edges:[[0,1],[2,3],[4,5]] },
+    { points:[[18,25],[50,15],[82,28],[68,52],[87,78],[50,67],[13,78],[32,52],[18,25]], edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8]] },
+    { points:[[12,62],[35,35],[62,22],[88,40],[72,70],[40,82],[12,62]], edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]] },
+    { points:[[18,18],[42,37],[55,15],[51,64],[28,88],[76,87]], edges:[[0,1],[1,2],[1,3],[3,4],[3,5]] },
+    { points:[[12,47],[88,47],[26,25],[74,25],[32,70],[68,70]], edges:[[0,1],[2,3],[4,5]] },
+    { points:[[12,18],[31,34],[46,55],[62,73],[80,62],[91,39],[78,22]], edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6]] },
+    { points:[[15,82],[38,62],[58,42],[78,20],[72,49],[91,68]], edges:[[0,1],[1,2],[2,3],[2,4],[4,5]] },
+    { points:[[13,30],[36,18],[58,36],[79,20],[89,49],[65,76],[34,82],[13,30]], edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7]] },
+    { points:[[12,31],[34,44],[52,27],[72,41],[91,24],[30,72],[52,58],[74,73]], edges:[[0,1],[1,2],[2,3],[3,4],[5,6],[6,7]] },
+    { points:[[12,28],[35,45],[51,30],[66,48],[88,34],[67,72],[46,61],[25,77]], edges:[[0,1],[1,2],[2,3],[3,4],[3,5],[5,6],[6,7]] },
+  ];
   const fallbackGroups = [
     { label:'2026', cards:[
       {title:'GitHub Rank Insight',subtitle:'GitHub Stats 등급 분석기',role:'1인 개발 · 전 과정'},
@@ -46,7 +72,7 @@
 
   const pageType = document.body.dataset.page || 'unknown';
   const projectState = { groups:fallbackGroups, visited:new Set(), current:'2026' };
-  const sequenceState = { expected:0, complete:false };
+  const sequenceState = { expected:0, complete:false, drag:null };
   const audioState = { context:null, nodes:[], stopTimer:0 };
 
   /* Utility helpers keep malformed optional data from breaking the mockup. */
@@ -62,6 +88,32 @@
   }
   function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
   function reducedMotion() { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  function svgElement(name, attributes={}) {
+    const node = document.createElementNS('http://www.w3.org/2000/svg', name);
+    Object.entries(attributes).forEach(([key,value]) => node.setAttribute(key, String(value)));
+    return node;
+  }
+
+  /* Each refresh chooses one familiar silhouette without exposing its name in the interface. */
+  function createIntroConstellation() {
+    const sky = document.querySelector('[data-intro-sky]');
+    const lineLayer = sky?.querySelector('[data-intro-lines]');
+    const starLayer = sky?.querySelector('[data-intro-stars]');
+    if (!sky || !lineLayer || !starLayer) return;
+    const pattern = introConstellations[Math.random() < .5 ? 0 : 1];
+    sky.dataset.pattern = pattern.id;
+    lineLayer.replaceChildren(...pattern.edges.map(([from,to],index) => {
+      const [x1,y1] = pattern.points[from], [x2,y2] = pattern.points[to];
+      const line = svgElement('line',{x1,y1,x2,y2});
+      line.style.animationDelay = `${.78 + index * .13}s`;
+      return line;
+    }));
+    starLayer.replaceChildren(...pattern.points.map(([cx,cy],index) => {
+      const circle = svgElement('circle',{cx,cy,r:index % 4 === 0 ? 9 : index % 2 === 0 ? 7 : 6});
+      circle.style.animationDelay = `${.2 + index * .09}s`;
+      return circle;
+    }));
+  }
 
   /* A deterministic field avoids layout changes between screenshots and reloads. */
   function createStarfields() {
@@ -164,14 +216,16 @@
   /* Growth constellations share facts but expose each page's navigation model. */
   function createGrowthConstellations() {
     document.querySelectorAll('[data-growth-constellation]').forEach((container) => {
-      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const svg = svgElement('svg');
       svg.classList.add('growth-lines'); svg.setAttribute('viewBox', '0 0 100 100'); svg.setAttribute('preserveAspectRatio', 'none');
       growthPoints.slice(1).forEach((point, index) => {
         const previous = growthPoints[index];
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const line = svgElement('line');
         line.setAttribute('x1', previous[0]); line.setAttribute('y1', previous[1]); line.setAttribute('x2', point[0]); line.setAttribute('y2', point[1]);
         line.dataset.growthLine = String(index); svg.append(line);
       });
+      const trace = svgElement('line',{x1:growthPoints[0][0],y1:growthPoints[0][1],x2:growthPoints[0][0],y2:growthPoints[0][1]});
+      trace.classList.add('growth-trace'); trace.dataset.growthTrace = ''; svg.append(trace);
       container.append(svg);
       growthEvents.forEach((event, index) => {
         const [x,y] = growthPoints[index];
@@ -184,23 +238,32 @@
         label.style.setProperty('--x', `${x}%`); label.style.setProperty('--y', `${y}%`);
         if (index > 5) label.style.left = `calc(${x}% - 210px)`;
         label.innerHTML = `<b>${event.year} · ${event.title}</b><small>${event.detail}</small>`;
-        node.addEventListener('click', () => selectGrowthEvent(container, index));
+        node.addEventListener('pointerdown', (pointerEvent) => {
+          node.dataset.pointerHandled = 'true';
+          beginGrowthDrag(pointerEvent,container,index);
+          window.setTimeout(() => { delete node.dataset.pointerHandled; },450);
+        });
+        node.addEventListener('click', () => {
+          if (node.dataset.pointerHandled === 'true') { delete node.dataset.pointerHandled; return; }
+          selectGrowthEvent(container,index);
+        });
         container.append(node, label);
       });
     });
   }
-  function selectGrowthEvent(container, index) {
+  function selectGrowthEvent(container, index, options={}) {
     const event = growthEvents[index];
+    container.querySelectorAll('.growth-node').forEach((node) => node.classList.toggle('selected', Number(node.dataset.growthIndex) === index));
     container.querySelectorAll('.growth-label').forEach((label) => label.classList.toggle('active', Number(label.dataset.growthLabel) === index));
     const summary = document.querySelector('[data-growth-summary]');
     if (summary) summary.textContent = `${event.year} · ${event.title} — ${event.detail}`;
     if (pageType === 'atlas') openAtlasDrawer(`${event.year} · ${event.title}`, event.detail, 'GROWTH CONSTELLATION');
     const clickedNode = container.querySelector(`[data-growth-index="${index}"]`);
-    if (sequenceState.complete || clickedNode.classList.contains('seen')) return;
+    if (sequenceState.complete || clickedNode.classList.contains('seen')) return false;
     if (index !== sequenceState.expected) {
-      clickedNode.classList.remove('wrong'); void clickedNode.offsetWidth; clickedNode.classList.add('wrong');
-      updateSequenceStatus(`다음 별은 ${growthEvents[sequenceState.expected].year} · ${growthEvents[sequenceState.expected].title}`);
-      return;
+      if (!options.quietWrong) { clickedNode.classList.remove('wrong'); void clickedNode.offsetWidth; clickedNode.classList.add('wrong'); }
+      updateSequenceStatus(`${event.year} 기록을 살펴보는 중 · 연결은 ${growthEvents[sequenceState.expected].year}부터`);
+      return false;
     }
     clickedNode.classList.add('seen');
     container.querySelector(`[data-growth-line="${index - 1}"]`)?.classList.add('active');
@@ -209,13 +272,61 @@
     document.querySelectorAll(`[data-growth-line="${index - 1}"]`).forEach((line) => line.classList.add('active'));
     if (sequenceState.expected === growthEvents.length) {
       sequenceState.complete = true;
-      updateSequenceStatus('별자리 완성 · 숨은 20초 신호 재생 중');
+      updateSequenceStatus('별자리 완성');
       playConstellationMusic();
     } else updateSequenceStatus(`${sequenceState.expected}번째 별 연결 완료`);
+    return true;
   }
   function updateSequenceStatus(message) {
     document.querySelectorAll('[data-sequence-count]').forEach((node) => { node.textContent = `${sequenceState.expected} / ${growthEvents.length}`; });
     document.querySelectorAll('[data-sequence-message]').forEach((node) => { node.textContent = message; });
+  }
+  function beginGrowthDrag(pointerEvent,container,index) {
+    if (pointerEvent.pointerType === 'mouse' && pointerEvent.button !== 0) return;
+    pointerEvent.stopPropagation();
+    selectGrowthEvent(container,index,{quietWrong:true});
+    const sourceIndex = sequenceState.expected - 1;
+    if (sequenceState.complete || sourceIndex < 0 || index !== sourceIndex) return;
+    pointerEvent.preventDefault();
+    const owner = pointerEvent.currentTarget;
+    const trace = container.querySelector('[data-growth-trace]');
+    if (!trace) return;
+    sequenceState.drag = { pointerId:pointerEvent.pointerId, sourceIndex, owner };
+    owner.setPointerCapture(pointerEvent.pointerId);
+    container.classList.add('dragging'); owner.classList.add('drag-source'); trace.classList.add('active');
+    const setTraceStart = (pointIndex) => {
+      const [x,y] = growthPoints[pointIndex];
+      trace.setAttribute('x1',x); trace.setAttribute('y1',y); trace.setAttribute('x2',x); trace.setAttribute('y2',y);
+    };
+    setTraceStart(sourceIndex);
+    const move = (event) => {
+      if (!sequenceState.drag || event.pointerId !== sequenceState.drag.pointerId) return;
+      const rect = container.getBoundingClientRect();
+      trace.setAttribute('x2',clamp((event.clientX-rect.left)/rect.width*100,0,100));
+      trace.setAttribute('y2',clamp((event.clientY-rect.top)/rect.height*100,0,100));
+      const targetIndex = sequenceState.expected;
+      if (targetIndex >= growthEvents.length) return;
+      const target = container.querySelector(`[data-growth-index="${targetIndex}"]`);
+      const targetRect = target.getBoundingClientRect();
+      const distance = Math.hypot(event.clientX-(targetRect.left+targetRect.width/2),event.clientY-(targetRect.top+targetRect.height/2));
+      if (distance <= Math.max(34,targetRect.width*.72) && selectGrowthEvent(container,targetIndex,{quietWrong:true})) {
+        sequenceState.drag.sourceIndex = targetIndex;
+        container.querySelectorAll('.drag-source').forEach((node) => node.classList.remove('drag-source'));
+        target.classList.add('drag-source');
+        setTraceStart(targetIndex);
+        if (sequenceState.complete) finish();
+      }
+    };
+    const finish = () => {
+      if (!sequenceState.drag) return;
+      try { owner.releasePointerCapture(sequenceState.drag.pointerId); } catch (_) { /* capture may already be released */ }
+      sequenceState.drag = null; container.classList.remove('dragging'); trace.classList.remove('active');
+      container.querySelectorAll('.drag-source').forEach((node) => node.classList.remove('drag-source'));
+      owner.removeEventListener('pointermove',move); owner.removeEventListener('pointerup',finish); owner.removeEventListener('pointercancel',finish);
+    };
+    owner.addEventListener('pointermove',move);
+    owner.addEventListener('pointerup',finish);
+    owner.addEventListener('pointercancel',finish);
   }
   function initStoryScroll() {
     const shell = document.querySelector('.growth-scroll');
@@ -327,6 +438,57 @@
     moon.addEventListener('keydown',(event)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();revealEclipse(scene);}});
   }
 
+  /* The zodiac sits outside the named atlas zones and reveals no labels or instructions. */
+  function createZodiacBelt() {
+    const world = document.querySelector('[data-atlas-world]');
+    if (!world) return;
+    const belt = svgElement('svg',{viewBox:'0 0 1900 1250','aria-hidden':'true'});
+    belt.classList.add('zodiac-belt'); belt.dataset.zodiacBelt = '';
+    belt.append(svgElement('ellipse',{cx:950,cy:625,rx:825,ry:535,class:'zodiac-orbit'}));
+    belt.append(svgElement('ellipse',{cx:950,cy:625,rx:755,ry:470,class:'zodiac-orbit zodiac-orbit-inner'}));
+    zodiacGlyphs.forEach((glyph,index) => {
+      const angle = -90 + index * 30;
+      const radians = angle * Math.PI / 180;
+      const x = 950 + Math.cos(radians) * 790;
+      const y = 625 + Math.sin(radians) * 505;
+      const group = svgElement('g',{transform:`translate(${x-42} ${y-36}) scale(.84)`,class:'zodiac-glyph'});
+      glyph.edges.forEach(([from,to]) => {
+        const [x1,y1] = glyph.points[from], [x2,y2] = glyph.points[to];
+        group.append(svgElement('line',{x1,y1,x2,y2}));
+      });
+      glyph.points.forEach(([cx,cy],pointIndex) => group.append(svgElement('circle',{cx,cy,r:pointIndex % 3 === 0 ? 3.5 : 2.4})));
+      belt.append(group);
+    });
+    const trigger = svgElement('path',{d:'M 1120 1080 Q 950 1195 780 1080',class:'zodiac-secret-trigger'});
+    trigger.dataset.ophiuchusTrigger = '';
+    belt.append(trigger);
+    const hidden = svgElement('g',{transform:'translate(875 965) scale(1.55)',class:'ophiuchus-glyph'});
+    const hiddenPoints = [[50,5],[35,22],[65,22],[42,42],[58,42],[30,63],[70,63],[38,91],[62,91],[4,38],[19,52],[81,52],[96,38]];
+    const hiddenEdges = [[0,1],[0,2],[1,3],[2,4],[3,4],[3,5],[4,6],[5,7],[6,8],[9,10],[10,3],[4,11],[11,12]];
+    hiddenEdges.forEach(([from,to]) => {
+      const [x1,y1] = hiddenPoints[from], [x2,y2] = hiddenPoints[to];
+      hidden.append(svgElement('line',{x1,y1,x2,y2}));
+    });
+    hiddenPoints.forEach(([cx,cy]) => hidden.append(svgElement('circle',{cx,cy,r:3.2})));
+    belt.append(hidden); world.prepend(belt);
+
+    let trace = null;
+    trigger.addEventListener('pointerdown',(event) => {
+      if (world.classList.contains('ophiuchus-revealed')) return;
+      event.preventDefault(); event.stopPropagation(); trigger.setPointerCapture(event.pointerId);
+      trace = {pointerId:event.pointerId,x:event.clientX,y:event.clientY,distance:0}; belt.classList.add('tracing');
+    });
+    trigger.addEventListener('pointermove',(event) => {
+      if (!trace || event.pointerId !== trace.pointerId) return;
+      trace.distance += Math.hypot(event.clientX-trace.x,event.clientY-trace.y); trace.x=event.clientX; trace.y=event.clientY;
+      if (trace.distance >= 125) {
+        world.classList.add('ophiuchus-revealed'); belt.classList.remove('tracing'); trace=null; playEffect('success');
+      }
+    });
+    const finish = () => { trace=null; belt.classList.remove('tracing'); };
+    trigger.addEventListener('pointerup',finish); trigger.addEventListener('pointercancel',finish);
+  }
+
   /* Atlas camera provides direct manipulation on desktop and becomes static sections on mobile. */
   let atlasApi = null;
   function initAtlas() {
@@ -337,6 +499,7 @@
     const apply=(animated=false)=>{
       world.style.transition=animated?'transform .72s cubic-bezier(.2,.78,.24,1)':'none';
       world.style.transform=`translate3d(${camera.x}px,${camera.y}px,0) scale(${camera.scale})`;
+      world.classList.toggle('zodiac-visible',camera.scale <= .68);
       const coordinate=document.querySelector('[data-atlas-coordinate]'); if(coordinate)coordinate.textContent=`ATLAS · ${Math.round(-camera.x)}, ${Math.round(-camera.y)} · ${Math.round(camera.scale*100)}%`;
       if(animated)window.setTimeout(()=>{world.style.transition='none';},760);
     };
@@ -347,7 +510,7 @@
       camera.x=viewport.clientWidth/2-centerX*camera.scale; camera.y=viewport.clientHeight/2-centerY*camera.scale; apply(true);
     };
     atlasApi={focus,apply,camera,viewport,world};
-    viewport.addEventListener('pointerdown',(event)=>{if(!desktop()||event.target.closest('button,a,[data-atlas-moon]'))return;camera.drag={x:event.clientX,y:event.clientY,cx:camera.x,cy:camera.y};viewport.setPointerCapture(event.pointerId);viewport.classList.add('dragging');});
+    viewport.addEventListener('pointerdown',(event)=>{if(!desktop()||event.target.closest('button,a,[data-atlas-moon],[data-ophiuchus-trigger]'))return;camera.drag={x:event.clientX,y:event.clientY,cx:camera.x,cy:camera.y};viewport.setPointerCapture(event.pointerId);viewport.classList.add('dragging');});
     viewport.addEventListener('pointermove',(event)=>{if(!camera.drag)return;camera.x=camera.drag.cx+event.clientX-camera.drag.x;camera.y=camera.drag.cy+event.clientY-camera.drag.y;apply();});
     const endDrag=()=>{camera.drag=null;viewport.classList.remove('dragging');}; viewport.addEventListener('pointerup',endDrag);viewport.addEventListener('pointercancel',endDrag);
     viewport.addEventListener('wheel',(event)=>{if(!desktop())return;event.preventDefault();const old=camera.scale;const next=clamp(old*(event.deltaY>0?.9:1.1),.55,1.35);const rect=viewport.getBoundingClientRect(),px=event.clientX-rect.left,py=event.clientY-rect.top;camera.x=px-(px-camera.x)*(next/old);camera.y=py-(py-camera.y)*(next/old);camera.scale=next;apply();},{passive:false});
@@ -378,34 +541,74 @@
     moon.addEventListener('pointerup',()=>{if(!drag)return;drag=null;const a=moon.getBoundingClientRect(),b=target.getBoundingClientRect();if(Math.hypot(a.left+a.width/2-b.left-b.width/2,a.top+a.height/2-b.top-b.height/2)<95)revealEclipse(moon.closest('.atlas-zone'));});
   }
 
-  /* Wall_Sina simulator compresses the repository's staged physical behavior into ten seconds. */
+  /* Wall_Sina keeps a physical water control while compressing the source's 110-second sequence to eleven seconds. */
   function initWallSimulator() {
     const switchButton=document.querySelector('[data-system-switch]');if(!switchButton)return;
     const slider=document.querySelector('[data-water-slider]'),run=document.querySelector('[data-simulation-run]'),water=document.querySelector('[data-water]'),barrier=document.querySelector('[data-barrier]');
     const stateLabel=document.querySelector('[data-system-state]'),stateDot=document.querySelector('[data-status-dot]'),output=document.querySelector('[data-water-output]'),sensor=document.querySelector('[data-water-sensor]'),beacon=document.querySelector('[data-alert-beacon]');
-    const lights=[...document.querySelectorAll('[data-light]')],phases=[...document.querySelectorAll('[data-phase]')];
-    let powered=false,frame=0,lastPhase='off';
-    const phaseFor=(level,recovering=false)=>recovering?'recover':level<20?'safe':level<45?'detect':level<70?'caution':'danger';
-    const render=(level,recovering=false)=>{
-      const phase=powered?phaseFor(level,recovering):'off';water.style.height=`${level}%`;slider.value=String(Math.round(level));output.textContent=`${Math.round(level)}%`;
-      barrier.classList.toggle('raised',powered&&level>=20&&!recovering);barrier.classList.toggle('recovering',powered&&recovering);sensor.classList.toggle('detected',powered&&level>=20);
-      beacon.classList.toggle('active',phase==='danger');stateDot.className=`status-dot${powered?' on':''}${phase==='danger'?' danger':''}`;
-      const names={off:'전원 꺼짐',safe:'대기 · 수위 정상',detect:'수분 감지 · 장벽 상승',caution:'주의 · 황색 신호',danger:'위험 · 적색 경고',recover:'복구 · 장벽 초기화'};stateLabel.textContent=names[phase];
-      lights.forEach((light)=>light.classList.toggle('active',(phase==='safe'||phase==='detect')&&light.dataset.light==='green'||phase==='caution'&&light.dataset.light==='yellow'||(phase==='danger'||phase==='recover')&&light.dataset.light==='red'));
-      phases.forEach((row)=>row.classList.toggle('active',row.dataset.phase===phase));
-      if(phase!==lastPhase){if(phase==='detect')playEffect('detect');if(phase==='danger')playEffect('danger');lastPhase=phase;}
+    const lights=[...document.querySelectorAll('[data-light]')],alertLeds=[...document.querySelectorAll('[data-alert-led]')],phases=[...document.querySelectorAll('[data-phase]')];
+    const tmDisplay=document.querySelector('[data-tm-display]'),motorState=document.querySelector('[data-motor-state]'),buzzerState=document.querySelector('[data-buzzer-state]'),laserState=document.querySelector('[data-laser-state]');
+    const sensorLevel=24;
+    const system={powered:false,latched:false,waterLevel:0,sequenceFrame:0,fillFrame:0,startedAt:0,lastPhase:'off'};
+    const phaseFor=(seconds)=>seconds<27?'deploy':seconds<47?'hold':seconds<70?'yellow-pulse':seconds<90?'red-yellow':seconds<110?'retract':'complete';
+    const cancelFrames=()=>{cancelAnimationFrame(system.sequenceFrame);cancelAnimationFrame(system.fillFrame);system.sequenceFrame=0;system.fillFrame=0;};
+    const setLight=(type,on)=>lights.find((light)=>light.dataset.light===type)?.classList.toggle('active',on);
+    const setAlertLed=(type,on)=>alertLeds.find((light)=>light.dataset.alertLed===type)?.classList.toggle('active',on);
+    const displayValue=(phase,seconds)=>{
+      if(phase==='off'||phase==='idle')return '----';
+      const value=phase==='deploy'?Math.ceil(27-seconds):phase==='hold'?Math.ceil(47-seconds):phase==='yellow-pulse'?Math.ceil(70-seconds):phase==='red-yellow'?Math.ceil(90-seconds):phase==='retract'?Math.floor(seconds):110;
+      return String(clamp(value,0,9999)).padStart(4,'0');
     };
-    switchButton.addEventListener('click',()=>{powered=!powered;switchButton.setAttribute('aria-pressed',String(powered));switchButton.textContent=powered?'시스템 전원 끄기':'시스템 전원 켜기';slider.disabled=!powered;run.disabled=!powered;if(!powered){cancelAnimationFrame(frame);render(0);}else render(Number(slider.value));});
-    slider.addEventListener('input',()=>render(Number(slider.value)));
-    run.addEventListener('click',()=>{if(!powered)return;cancelAnimationFrame(frame);ensureAudioContext();run.disabled=true;const started=performance.now();const duration=reducedMotion()?1200:10000;const animate=(now)=>{const elapsed=now-started;const progress=clamp(elapsed/duration,0,1);let level,recovering=false;if(progress<.78)level=progress/.78*100;else{recovering=true;level=(1-(progress-.78)/.22)*100;}render(clamp(level,0,100),recovering);if(progress<1)frame=requestAnimationFrame(animate);else{render(0);run.disabled=false;}};frame=requestAnimationFrame(animate);});
-    render(0);
+    const renderPhase=(phase,seconds=0,now=performance.now())=>{
+      const slowPulse=Math.floor(now/600)%2===0,fastPulse=Math.floor(now/280)%2===0,alternate=Math.floor(now/500)%2===0;
+      const raised=['deploy','hold','yellow-pulse','red-yellow'].includes(phase);
+      barrier.classList.toggle('raised',raised);barrier.classList.toggle('retracting',phase==='retract');sensor.classList.toggle('detected',system.latched||system.waterLevel>=sensorLevel);
+      beacon.classList.toggle('active',phase==='red-yellow'||phase==='retract');stateDot.className=`status-dot${system.powered?' on':''}${phase==='red-yellow'||phase==='retract'?' danger':''}`;
+      const names={off:'전원 꺼짐',idle:'감지 대기 · 수위 정상',deploy:'수분 감지 · 방벽 상승',hold:'방벽 유지 · 황색 신호', 'yellow-pulse':'주의 · 황색 점멸','red-yellow':'위험 · 적·황 경고',retract:'복구 · 방벽 하강',complete:'시퀀스 완료 · 감지 유지'};
+      stateLabel.textContent=names[phase];tmDisplay.textContent=displayValue(phase,seconds);
+      setLight('green',phase==='deploy'||phase==='complete');
+      setLight('yellow',phase==='hold'||phase==='yellow-pulse'&&slowPulse||phase==='red-yellow'&&fastPulse);
+      setLight('red',phase==='red-yellow'&&fastPulse||phase==='retract');
+      setAlertLed('red',(phase==='deploy'||phase==='hold')&&alternate||phase==='yellow-pulse'&&slowPulse||phase==='red-yellow'&&fastPulse);
+      setAlertLed('blue',(phase==='deploy'||phase==='hold')&&!alternate||phase==='retract'&&slowPulse);
+      motorState.textContent=phase==='deploy'?'정회전 · 방벽 상승':phase==='retract'?'역회전 · 방벽 하강':raised?'정지 · 방벽 유지':'정지';
+      buzzerState.textContent=phase==='deploy'||phase==='hold'?'1 kHz · ON':'OFF';laserState.textContent=system.powered?'ON':'OFF';
+      phases.forEach((row)=>row.classList.toggle('active',row.dataset.phase===phase));
+      if(phase!==system.lastPhase){if(phase==='deploy')playEffect('detect');if(phase==='red-yellow')playEffect('danger');system.lastPhase=phase;}
+    };
+    const setWater=(level,allowTrigger=true)=>{
+      system.waterLevel=clamp(level,0,100);water.style.height=`${system.waterLevel}%`;slider.value=String(Math.round(system.waterLevel));output.textContent=`${Math.round(system.waterLevel)}%`;
+      sensor.classList.toggle('detected',system.latched||system.powered&&system.waterLevel>=sensorLevel);
+      if(allowTrigger&&system.powered&&!system.latched&&system.waterLevel>=sensorLevel)startSequence();
+    };
+    const startSequence=()=>{
+      if(!system.powered||system.latched)return;system.latched=true;system.startedAt=performance.now();run.disabled=true;ensureAudioContext();
+      const duration=reducedMotion()?1650:11000;
+      const tick=(now)=>{
+        const progress=clamp((now-system.startedAt)/duration,0,1);const seconds=progress*110;renderPhase(phaseFor(seconds),seconds,now);
+        if(progress<1)system.sequenceFrame=requestAnimationFrame(tick);else{renderPhase('complete',110,now);system.sequenceFrame=0;}
+      };
+      system.sequenceFrame=requestAnimationFrame(tick);
+    };
+    switchButton.addEventListener('click',()=>{
+      system.powered=!system.powered;switchButton.setAttribute('aria-pressed',String(system.powered));switchButton.textContent=system.powered?'시스템 전원 끄기':'시스템 전원 켜기';slider.disabled=!system.powered;
+      if(!system.powered){cancelFrames();system.latched=false;system.lastPhase='off';run.disabled=true;renderPhase('off');setWater(system.waterLevel,false);}
+      else{run.disabled=false;system.lastPhase='off';renderPhase('idle');if(system.waterLevel>=sensorLevel)startSequence();}
+    });
+    slider.addEventListener('input',()=>setWater(Number(slider.value)));
+    run.addEventListener('click',()=>{
+      if(!system.powered||system.latched)return;ensureAudioContext();run.disabled=true;const from=system.waterLevel,to=Math.max(62,from),started=performance.now(),fillDuration=reducedMotion()?220:950;
+      const fill=(now)=>{const progress=clamp((now-started)/fillDuration,0,1);setWater(from+(to-from)*progress);if(progress<1)system.fillFrame=requestAnimationFrame(fill);else system.fillFrame=0;};
+      system.fillFrame=requestAnimationFrame(fill);
+    });
+    setWater(0,false);renderPhase('off');
     document.querySelectorAll('[data-component]').forEach((button)=>button.addEventListener('click',()=>{document.querySelectorAll('[data-component]').forEach((item)=>item.classList.remove('active'));button.classList.add('active');const [title,description]=button.dataset.component.split('|');document.querySelector('[data-component-title]').textContent=title;document.querySelector('[data-component-description]').textContent=description;}));
   }
 
   /* Boot only the interactions present on the current prototype page. */
   async function boot() {
-    createStarfields(); createGrowthConstellations();
-    document.querySelectorAll('[data-sound-stop]').forEach((button)=>button.addEventListener('click',stopAudio));
+    createIntroConstellation();createStarfields();createGrowthConstellations();createZodiacBelt();
+    document.querySelectorAll('[data-sound-stop]').forEach((button)=>{button.textContent='소리 끄기 ×';button.setAttribute('aria-label','재생 중인 소리 끄기');button.addEventListener('click',stopAudio);});
     if(pageType==='story'){initStoryScroll();initStoryEclipse();projectState.groups=await loadProjectGroups();renderProjectArchive();}
     if(pageType==='atlas'){projectState.groups=await loadProjectGroups();createAtlasStations();initAtlas();document.querySelector('[data-drawer-close]')?.addEventListener('click',()=>document.querySelector('[data-atlas-drawer]')?.classList.remove('open'));}
     if(pageType==='wall')initWallSimulator();

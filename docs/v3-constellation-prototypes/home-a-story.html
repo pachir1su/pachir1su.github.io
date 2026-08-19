@@ -21,19 +21,8 @@
     <section class="story-hero" id="top" aria-labelledby="story-title">
       <div class="ambient-stars" data-starfield aria-hidden="true"></div>
       <svg class="intro-sky" data-intro-sky viewBox="0 0 1000 680" role="img" aria-label="흩어진 별이 나타나 하나의 별자리로 연결됩니다">
-        <g class="intro-lines">
-          <line x1="120" y1="390" x2="270" y2="220"/><line x1="270" y1="220" x2="430" y2="300"/>
-          <line x1="430" y1="300" x2="560" y2="150"/><line x1="560" y1="150" x2="735" y2="240"/>
-          <line x1="735" y1="240" x2="865" y2="145"/><line x1="430" y1="300" x2="610" y2="430"/>
-          <line x1="610" y1="430" x2="810" y2="470"/><line x1="610" y1="430" x2="475" y2="555"/>
-          <line x1="475" y1="555" x2="250" y2="505"/><line x1="250" y1="505" x2="120" y2="390"/>
-        </g>
-        <g class="intro-stars">
-          <circle cx="120" cy="390" r="7"/><circle cx="270" cy="220" r="9"/><circle cx="430" cy="300" r="6"/>
-          <circle cx="560" cy="150" r="8"/><circle cx="735" cy="240" r="7"/><circle cx="865" cy="145" r="10"/>
-          <circle cx="610" cy="430" r="9"/><circle cx="810" cy="470" r="6"/><circle cx="475" cy="555" r="8"/>
-          <circle cx="250" cy="505" r="6"/>
-        </g>
+        <g class="intro-lines" data-intro-lines></g>
+        <g class="intro-stars" data-intro-stars></g>
       </svg>
       <div class="story-hero-copy">
         <p class="section-kicker">CONSTELLATION LOG · 2024—2026</p>
@@ -49,10 +38,10 @@
         <div class="growth-copy">
           <p class="section-kicker">GROWTH CONSTELLATION</p>
           <h2 id="growth-title">남아 있는 사건을<br>순서대로 연결합니다.</h2>
-          <p data-growth-summary>별을 눌러 실제 사건을 확인해 보세요. 과거부터 차례로 모두 열면 숨은 신호가 완성됩니다.</p>
-          <div class="sequence-status" aria-live="polite"><span data-sequence-count>0 / 8</span><span data-sequence-message>첫 별을 기다리는 중</span></div>
+          <p data-growth-summary>별을 누르면 사건이 열리고, 현재 별에서 다음 별까지 끌면 선이 이어집니다.</p>
+          <div class="sequence-status" aria-live="polite"><span data-sequence-count>0 / 8</span><span data-sequence-message>어느 별부터 살펴봐도 괜찮습니다</span></div>
         </div>
-        <div class="growth-constellation" data-growth-constellation aria-label="성장 사건 별자리"></div>
+        <div class="growth-constellation" data-growth-constellation aria-label="누르거나 드래그해 연결하는 성장 사건 별자리"></div>
       </div>
     </section>
 
@@ -89,7 +78,7 @@
     </section>
   </main>
 
-  <button class="sound-stop" data-sound-stop type="button" hidden aria-label="재생 중인 소리 멈추기">소리 멈춤 ×</button>
+  <button class="sound-stop" data-sound-stop type="button" hidden aria-label="재생 중인 소리 끄기">소리 끄기 ×</button>
   <script type="application/json" id="prototype-config">{"source":"../../projects.json","defaultGroup":"2026"}</script>
 </body>
 </html>
