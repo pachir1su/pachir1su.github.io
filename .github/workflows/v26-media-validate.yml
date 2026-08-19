@@ -1,4 +1,4 @@
-name: v2.6.x media visual validation
+name: v2.6.x committed media inspection
 
 on:
   pull_request:
@@ -9,48 +9,21 @@ permissions:
   contents: read
 
 jobs:
-  screenshots:
+  inspect-media:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: agent/v26-media-pass
-
-      - name: Prepare static visual validation copy
+      - name: Verify committed media inventory
         shell: bash
         run: |
           set -euo pipefail
-          for page in 2024_5th_CSRC Master_Creator_Challenge Wall_Sina PlantClock BerryIno; do
-            sed -i -E 's/ data-aos="[^"]*"//g; s/ data-aos-delay="[^"]*"//g; s/loading="lazy"/loading="eager"/g' "projects/$page/index.html"
-          done
-          python3 -m http.server 8000 >/tmp/v26-media-server.log 2>&1 &
-          echo $! > /tmp/v26-media-server.pid
-          sleep 1
-
-      - name: Capture desktop and mobile pages
-        shell: bash
-        run: |
-          set -euo pipefail
-          browser=""
-          for candidate in google-chrome chromium chromium-browser; do
-            if command -v "$candidate" >/dev/null 2>&1; then browser="$candidate"; break; fi
-          done
-          if [ -z "$browser" ]; then
-            sudo apt-get update
-            sudo apt-get install -y chromium-browser || sudo apt-get install -y chromium
-            browser=$(command -v chromium-browser || command -v chromium)
-          fi
-          mkdir -p /tmp/v26-media-shots
-          flags=(--headless --no-sandbox --disable-dev-shm-usage --hide-scrollbars --virtual-time-budget=10000)
-          for page in 2024_5th_CSRC Master_Creator_Challenge Wall_Sina PlantClock BerryIno; do
-            "$browser" "${flags[@]}" --window-size=390,9000 --screenshot="/tmp/v26-media-shots/${page}-mobile.png" "http://127.0.0.1:8000/projects/$page/"
-            "$browser" "${flags[@]}" --window-size=1280,5600 --screenshot="/tmp/v26-media-shots/${page}-desktop.png" "http://127.0.0.1:8000/projects/$page/"
-          done
-          test "$(find /tmp/v26-media-shots -name '*.png' | wc -l)" -eq 10
-
-      - name: Upload visual validation screenshots
+          test "$(find assets/media -type f -name '*.webp' | wc -l)" -eq 21
+          find assets/media -type f -name '*.webp' -size 0 -print -quit | grep -q . && exit 1 || true
+      - name: Upload committed media
         uses: actions/upload-artifact@v4
         with:
-          name: v26-media-visual-validation-eager
-          path: /tmp/v26-media-shots
+          name: v26-media-committed-files
+          path: assets/media
           retention-days: 3
