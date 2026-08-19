@@ -651,3 +651,92 @@ window._updateProjectCount();
     });
   });
 })();
+
+/* ------------------------------------------------------------- */
+/* 19. Issue #129 featured project rollback                      */
+/* ------------------------------------------------------------- */
+(function restoreIssue129FeaturedProjects() {
+  const grid = document.querySelector('#featured-section .featured-grid');
+  if (!grid) return;
+
+  grid.innerHTML = `
+    <article class="featured-card" data-card-href="projects/Wall_Sina/">
+      <div class="featured-top">
+        <i class="fas fa-house-flood-water featured-icon"></i>
+        <span class="featured-badge" data-en="2024 · Sustainable Dev" data-ko="2024 · 지속 가능한 발전 프로젝트">2024 · 지속 가능한 발전 프로젝트</span>
+      </div>
+      <h3 class="featured-title" data-en="Coastal Barrier System" data-ko="해안 장벽 시스템">해안 장벽 시스템</h3>
+      <dl class="featured-detail">
+        <dt data-en="Theme" data-ko="주제">주제</dt>
+        <dd data-en="Rising sea levels and coastal erosion from climate change threaten shorelines." data-ko="기후 변화에 따른 해수면 상승·해안 침식으로 해안이 위협받고 있습니다.">기후 변화에 따른 해수면 상승·해안 침식으로 해안이 위협받고 있습니다.</dd>
+        <dt data-en="What I Did" data-ko="한 일">한 일</dt>
+        <dd data-en="Designed and built a coastal barrier system as a Sustainable Development (Jigabal) project." data-ko="해안을 보호하는 해안 장벽 시스템을 설계·구현했습니다.">해안을 보호하는 해안 장벽 시스템을 설계·구현했습니다.</dd>
+        <dt data-en="Category" data-ko="분류">분류</dt>
+        <dd data-en-html="A <strong>2024 Sustainable Development (Jigabal)</strong> project." data-ko-html="<strong>2024 지속 가능한 발전</strong> 출품 프로젝트.">2024 <strong>지속 가능한 발전</strong> 출품 프로젝트.</dd>
+      </dl>
+      <div class="featured-links">
+        <a href="projects/Wall_Sina/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
+      </div>
+    </article>
+
+    <article class="featured-card" data-card-href="projects/HEALTH_CHECK_PROJECT/">
+      <div class="featured-top">
+        <i class="fas fa-heart-pulse featured-icon"></i>
+        <span class="featured-badge" data-en="2025 · Sustainable Dev" data-ko="2025 · 지속 가능한 발전 프로젝트">2025 · 지속 가능한 발전 프로젝트</span>
+      </div>
+      <h3 class="featured-title" data-en="Healthcare System" data-ko="헬스케어 시스템">헬스케어 시스템</h3>
+      <dl class="featured-detail">
+        <dt data-en="Theme" data-ko="주제">주제</dt>
+        <dd data-en="Building sustainable, accessible healthcare that keeps supporting people's health over the long term." data-ko="장기적으로 사람들의 건강을 돌보는 지속 가능하고 접근성 있는 헬스케어가 필요합니다.">장기적으로 사람들의 건강을 돌보는 지속 가능하고 접근성 있는 헬스케어가 필요합니다.</dd>
+        <dt data-en="What I Did" data-ko="한 일">한 일</dt>
+        <dd data-en="Designed and built a healthcare system as a Sustainable Development (Jigabal) project." data-ko="헬스케어 시스템을 설계·구현했습니다.">헬스케어 시스템을 설계·구현했습니다.</dd>
+        <dt data-en="Category" data-ko="분류">분류</dt>
+        <dd data-en-html="A <strong>2025 Sustainable Development (Jigabal)</strong> project." data-ko-html="<strong>2025 지속 가능한 발전</strong> 출품 프로젝트.">2025 <strong>지속 가능한 발전</strong> 출품 프로젝트.</dd>
+      </dl>
+      <div class="featured-links">
+        <a href="projects/HEALTH_CHECK_PROJECT/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
+      </div>
+    </article>
+
+    <article class="featured-card" data-card-href="projects/koreatechGongjiAgent/">
+      <div class="featured-top">
+        <i class="fas fa-bell featured-icon"></i>
+        <span class="featured-badge" data-en="2026 · Solo Project" data-ko="2026 · 개인 개발">2026 · 개인 개발</span>
+      </div>
+      <h3 class="featured-title" data-en="KOREATECH Unified Alert System" data-ko="코리아텍 통합 알림 시스템">코리아텍 통합 알림 시스템</h3>
+      <dl class="featured-detail">
+        <dt data-en="Problem" data-ko="문제">문제</dt>
+        <dd data-en="KOREATECH notices, mail, and shuttle info are scattered across places, so it's easy to miss what matters." data-ko="코리아텍 공지·메일·셔틀 정보가 여러 곳에 흩어져 있어 중요한 소식을 놓치기 쉽습니다.">코리아텍 공지·메일·셔틀 정보가 여러 곳에 흩어져 있어 중요한 소식을 놓치기 쉽습니다.</dd>
+        <dt data-en="What I Did" data-ko="한 일">한 일</dt>
+        <dd data-en-html="Solo-built a system that watches portal/dormitory notices, mail (receive & read-receipt), and shuttle timetables, and alerts Discord in real time — with an admin panel, DM subscriptions, a web dashboard, and Raspberry Pi LED support.<span class='fd-role'>Solo dev · Full process</span>" data-ko-html="포털·생활관 공지, 메일, 셔틀 현재 위치를 감시해 디스코드로 실시간 알림을 주는 시스템을 개발했습니다. 관리자 패널·DM 구독·웹 대시보드·라즈베리파이 상태 LED를 지원합니다.<span class='fd-role'>1인 개발 · 전 과정</span>">포털·생활관 공지, 메일, 셔틀 현재 위치를 감시해 디스코드로 실시간 알림을 주는 시스템을 개발했습니다. 관리자 패널·DM 구독·웹 대시보드·라즈베리파이 상태 LED를 지원합니다.<span class="fd-role">1인 개발 · 전 과정</span></dd>
+        <dt data-en="Result" data-ko="결과">결과</dt>
+        <dd data-en-html="Real-time unified alerts (quick check <strong>~60s</strong>) with personal DM subscriptions and a live web dashboard." data-ko-html="빠른 체크 <strong>약 60초</strong>의 실시간 통합 알림 + 개인 DM 구독·웹 대시보드 운영.">빠른 체크 <strong>약 60초</strong>의 실시간 통합 알림 + 개인 DM 구독·웹 대시보드 운영.</dd>
+      </dl>
+      <div class="tech-stack">
+        <span>Python</span><span>Selenium</span><span>Discord.py</span><span>FastAPI</span><span>IMAP</span><span>Raspberry Pi</span>
+      </div>
+      <div class="featured-links">
+        <a href="projects/koreatechGongjiAgent/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
+        <a href="https://github.com/pachir1su/koreatechGongjiAgent" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
+        <a href="https://discord.com/oauth2/authorize?client_id=1518630779922546759" target="_blank" rel="noopener noreferrer" class="flink" data-en="Invite Bot" data-ko="봇 초대"><i class="fab fa-discord"></i> 봇 초대</a>
+      </div>
+    </article>`;
+
+  const lang = localStorage.getItem('lang') || 'ko';
+  grid.querySelectorAll('[data-en][data-ko]').forEach((el) => {
+    const text = lang === 'en' ? el.dataset.en : el.dataset.ko;
+    const icon = el.firstElementChild?.tagName === 'I' ? el.firstElementChild.outerHTML : '';
+    if (icon) el.innerHTML = `${icon} ${text}`;
+    else el.textContent = text;
+  });
+  grid.querySelectorAll('[data-en-html][data-ko-html]').forEach((el) => {
+    el.innerHTML = lang === 'en' ? el.dataset.enHtml : el.dataset.koHtml;
+  });
+  grid.querySelectorAll('[data-card-href]').forEach((card) => {
+    card.addEventListener('click', (event) => {
+      if (event.target.closest('a, button')) return;
+      if (window.getSelection()?.toString().trim()) return;
+      window.location.href = card.dataset.cardHref;
+    });
+  });
+})();
