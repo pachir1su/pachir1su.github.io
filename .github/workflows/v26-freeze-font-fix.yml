@@ -1,0 +1,40 @@
+name: v2.6.x freeze font fallback fix
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-freeze-font-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v26-freeze-refactor
+          fetch-depth: 0
+      - name: Add Korean fallback to mono stack
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          path = Path('style.css')
+          text = path.read_text(encoding='utf-8')
+          old = '--font-mono: "Space Mono", monospace;'
+          new = '--font-mono: "Space Mono", "Noto Sans KR", monospace;'
+          if text.count(old) != 1:
+              raise SystemExit(f'expected exactly one font token, got {text.count(old)}')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+          git diff --check -- style.css
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add style.css
+          git commit -m "fix: add Korean fallback to mono font"
+          git push origin HEAD:agent/v26-freeze-refactor
