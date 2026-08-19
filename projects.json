@@ -33,7 +33,7 @@
           "title": { "en": "KOREATECH Freshman Guide '26", "ko": "한기대 26학번 신입생 가이드" },
           "subtitle": { "en": "Notion guide for KOREATECH freshmen '26", "ko": "한기대 26학번 신입생용 노션 가이드" },
           "role": { "en": "Solo Development", "ko": "1인 개발" },
-          "desc": { "en": "Online core course guide, assignment criteria, and an FAQ collection", "ko": "온라인중점강좌 안내 · 과제 평가 기준 · FAQ 모음" },
+          "desc": { "en": "A Notion site for KOREATECH class of '26 freshmen", "ko": "한기대 26학번 신입생을 위한 노션 사이트" },
           "tech": ["Notion", "Documentation"]
         },
         {
@@ -242,7 +242,7 @@
           "title": { "en": "MZ Bot", "ko": "면진봇" },
           "subtitle": { "en": "Discord economy simulation bot", "ko": "디스코드 경제 시뮬레이션 봇" },
           "role": { "en": "Solo Development", "ko": "1인 개발" },
-          "desc": { "en": "Coins, gambling, transfers, shop and leaderboard on SQLite", "ko": "주화 · 도박 · 송금 · 상점 · 순위표를 SQLite로 관리" },
+          "desc": { "en": "Discord economy game bot", "ko": "디스코드 경제 게임 봇" },
           "tech": ["Python", "Discord.py"]
         },
         {
