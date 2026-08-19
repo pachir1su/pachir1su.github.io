@@ -88,6 +88,7 @@ function scrollBehavior() {
       .hero-email { max-width: 100%; }
       .hero-email .email-addr { overflow-wrap: anywhere; }
       .sr-only { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; }
+      .skills-grid { align-items: stretch; }
       @media (max-width: 1024px) {
         .container { padding-left: clamp(16px, 4vw, 24px); padding-right: clamp(16px, 4vw, 24px); }
         .hero-content { grid-template-columns: minmax(0, 1fr); }
