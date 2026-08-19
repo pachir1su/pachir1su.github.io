@@ -26,6 +26,17 @@ jobs:
         run: |
           set -euo pipefail
           cp tools/v26_structure_media_followup.py /tmp/v26_structure_media_followup.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('/tmp/v26_structure_media_followup.py')
+          s = p.read_text()
+          s = s.replace(
+              "rels = [str(Path(p)) for p in paths]",
+              "rels = [str(Path(p).relative_to(ROOT)) if Path(p).is_absolute() else str(Path(p)) for p in paths]",
+          )
+          p.write_text(s)
+          PY
+          python3 -m py_compile /tmp/v26_structure_media_followup.py
           git fetch origin agent/v26-structure-media-followup
           git switch -C agent/v26-structure-media-followup origin/agent/v26-structure-media-followup
           git config user.name "github-actions[bot]"
