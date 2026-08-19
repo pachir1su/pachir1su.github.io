@@ -1,4 +1,4 @@
-name: v2.6.x media preflight
+name: v2.6.x media implementation runner
 
 on:
   pull_request:
@@ -8,15 +8,18 @@ on:
       - .github/workflows/v26-media-preflight.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  prepare-media:
+  implement-media:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: agent/v26-media-pass
+          fetch-depth: 0
 
-      - name: Prepare optimized source media
+      - name: Import, optimize and place project media
         shell: bash
         run: |
           set -euo pipefail
@@ -25,58 +28,236 @@ jobs:
             sudo apt-get install -y ffmpeg
           fi
 
-          mkdir -p sources out/2024_5th_CSRC out/Master_Creator_Challenge out/Wall_Sina out/PlantClock out/BerryIno
-          git clone --depth 1 https://github.com/pachir1su/2024_5th_CSRC.git sources/2024_5th_CSRC
-          git clone --depth 1 https://github.com/pachir1su/Master_Creator_Challenge.git sources/Master_Creator_Challenge
-          git clone --depth 1 https://github.com/pachir1su/Wall_Sina.git sources/Wall_Sina
-          git clone --depth 1 https://github.com/pachir1su/PlantClock.git sources/PlantClock
-          git clone --depth 1 https://github.com/pachir1su/BerryIno.git sources/BerryIno
+          rm -rf /tmp/v26-media-sources
+          mkdir -p /tmp/v26-media-sources
+          git clone --depth 1 https://github.com/pachir1su/2024_5th_CSRC.git /tmp/v26-media-sources/2024_5th_CSRC
+          git clone --depth 1 https://github.com/pachir1su/Master_Creator_Challenge.git /tmp/v26-media-sources/Master_Creator_Challenge
+          git clone --depth 1 https://github.com/pachir1su/Wall_Sina.git /tmp/v26-media-sources/Wall_Sina
+          git clone --depth 1 https://github.com/pachir1su/PlantClock.git /tmp/v26-media-sources/PlantClock
+          git clone --depth 1 https://github.com/pachir1su/BerryIno.git /tmp/v26-media-sources/BerryIno
+
+          mkdir -p assets/media/2024_5th_CSRC assets/media/Master_Creator_Challenge assets/media/Wall_Sina assets/media/PlantClock assets/media/BerryIno
 
           convert_image() {
             src="$1"
             dst="$2"
-            ffmpeg -hide_banner -loglevel error -y -i "$src" -vf "scale='min(1600,iw)':-2" -c:v libwebp -quality 82 -compression_level 6 "$dst"
+            ffmpeg -hide_banner -loglevel error -y -i "$src" -vf "scale='min(1200,iw)':-2" -c:v libwebp -quality 80 -compression_level 6 "$dst"
           }
 
-          convert_image sources/2024_5th_CSRC/media/CSRC_LED.jpg out/2024_5th_CSRC/csrc-led.webp
-          convert_image sources/2024_5th_CSRC/media/CSRC_LED2.jpg out/2024_5th_CSRC/csrc-led-2.webp
-          convert_image sources/2024_5th_CSRC/media/CSRC_SSAKSSAK.jpg out/2024_5th_CSRC/csrc-build-1.webp
-          convert_image sources/2024_5th_CSRC/media/CSRC_SSAKSSAK2.jpg out/2024_5th_CSRC/csrc-build-2.webp
-          convert_image sources/2024_5th_CSRC/media/CSRC_SSAKSSAK3.jpg out/2024_5th_CSRC/csrc-build-3.webp
-          convert_image sources/2024_5th_CSRC/media/CSRC_hall.jpg out/2024_5th_CSRC/csrc-hall.webp
+          convert_image /tmp/v26-media-sources/2024_5th_CSRC/media/CSRC_LED.jpg assets/media/2024_5th_CSRC/csrc-led.webp
+          convert_image /tmp/v26-media-sources/2024_5th_CSRC/media/CSRC_LED2.jpg assets/media/2024_5th_CSRC/csrc-led-2.webp
+          convert_image /tmp/v26-media-sources/2024_5th_CSRC/media/CSRC_SSAKSSAK.jpg assets/media/2024_5th_CSRC/csrc-build-1.webp
+          convert_image /tmp/v26-media-sources/2024_5th_CSRC/media/CSRC_SSAKSSAK2.jpg assets/media/2024_5th_CSRC/csrc-build-2.webp
+          convert_image /tmp/v26-media-sources/2024_5th_CSRC/media/CSRC_SSAKSSAK3.jpg assets/media/2024_5th_CSRC/csrc-build-3.webp
+          convert_image /tmp/v26-media-sources/2024_5th_CSRC/media/CSRC_hall.jpg assets/media/2024_5th_CSRC/csrc-hall.webp
 
-          convert_image sources/Master_Creator_Challenge/tray01.jpg out/Master_Creator_Challenge/doorlock-1.webp
-          convert_image sources/Master_Creator_Challenge/tray02.jpg out/Master_Creator_Challenge/doorlock-2.webp
-          convert_image sources/Master_Creator_Challenge/tray03.jpg out/Master_Creator_Challenge/doorlock-3.webp
+          convert_image /tmp/v26-media-sources/Master_Creator_Challenge/tray01.jpg assets/media/Master_Creator_Challenge/doorlock-1.webp
+          convert_image /tmp/v26-media-sources/Master_Creator_Challenge/tray02.jpg assets/media/Master_Creator_Challenge/doorlock-2.webp
+          convert_image /tmp/v26-media-sources/Master_Creator_Challenge/tray03.jpg assets/media/Master_Creator_Challenge/doorlock-3.webp
 
-          convert_image sources/Wall_Sina/plan.png out/Wall_Sina/plan-1.webp
-          convert_image sources/Wall_Sina/plan2.jpg out/Wall_Sina/plan-2.webp
-          convert_image sources/Wall_Sina/plan3.png out/Wall_Sina/plan-3.webp
-          convert_image sources/Wall_Sina/tray.jpg out/Wall_Sina/prototype-1.webp
-          convert_image sources/Wall_Sina/tray2.jpg out/Wall_Sina/prototype-2.webp
-          convert_image sources/Wall_Sina/tray3.jpg out/Wall_Sina/prototype-3.webp
+          convert_image /tmp/v26-media-sources/Wall_Sina/plan.png assets/media/Wall_Sina/plan-1.webp
+          convert_image /tmp/v26-media-sources/Wall_Sina/plan2.jpg assets/media/Wall_Sina/plan-2.webp
+          convert_image /tmp/v26-media-sources/Wall_Sina/plan3.png assets/media/Wall_Sina/plan-3.webp
+          convert_image /tmp/v26-media-sources/Wall_Sina/tray.jpg assets/media/Wall_Sina/prototype-1.webp
+          convert_image /tmp/v26-media-sources/Wall_Sina/tray2.jpg assets/media/Wall_Sina/prototype-2.webp
+          convert_image /tmp/v26-media-sources/Wall_Sina/tray3.jpg assets/media/Wall_Sina/prototype-3.webp
 
-          convert_image sources/PlantClock/media/2025PlantClock.jpg out/PlantClock/plantclock.webp
+          convert_image /tmp/v26-media-sources/PlantClock/media/2025PlantClock.jpg assets/media/PlantClock/plantclock.webp
 
-          convert_image sources/BerryIno/img/LCD.png out/BerryIno/nfc-lcd.webp
-          convert_image sources/BerryIno/img/웹서버.png out/BerryIno/nfc-web-dashboard.webp
-          convert_image sources/BerryIno/img/tlqkf.jpeg out/BerryIno/nfc-photo-1.webp
-          convert_image sources/BerryIno/img/tlqkf2.jpeg out/BerryIno/nfc-photo-2.webp
-          convert_image sources/BerryIno/img/맞짱.jpeg out/BerryIno/nfc-photo-3.webp
+          convert_image /tmp/v26-media-sources/BerryIno/img/LCD.png assets/media/BerryIno/nfc-lcd.webp
+          convert_image /tmp/v26-media-sources/BerryIno/img/웹서버.png assets/media/BerryIno/nfc-web-dashboard.webp
+          convert_image /tmp/v26-media-sources/BerryIno/img/tlqkf.jpeg assets/media/BerryIno/nfc-photo-1.webp
+          convert_image /tmp/v26-media-sources/BerryIno/img/tlqkf2.jpeg assets/media/BerryIno/nfc-photo-2.webp
+          convert_image /tmp/v26-media-sources/BerryIno/img/맞짱.jpeg assets/media/BerryIno/nfc-photo-3.webp
 
+          python3 <<'PY'
+          from pathlib import Path
+          import subprocess
+          import html
+
+          def dims(asset):
+              value = subprocess.check_output([
+                  'ffprobe', '-v', 'error', '-select_streams', 'v:0',
+                  '-show_entries', 'stream=width,height', '-of', 'csv=s=x:p=0', str(asset)
+              ], text=True).strip()
+              width, height = value.split('x')
+              return int(width), int(height)
+
+          def figure(project, filename, alt_ko, ko, en):
+              asset = Path('assets/media') / project / filename
+              width, height = dims(asset)
+              src = f'../../assets/media/{project}/{filename}'
+              return f'''                <figure class="detail-figure">
+                  <img src="{src}" width="{width}" height="{height}" loading="lazy" decoding="async" alt="{html.escape(alt_ko, quote=True)}" />
+                  <figcaption data-en="{html.escape(en, quote=True)}" data-ko="{html.escape(ko, quote=True)}">{html.escape(ko)}</figcaption>
+                </figure>'''
+
+          galleries = {
+              'projects/2024_5th_CSRC/index.html': [
+                  figure('2024_5th_CSRC', 'csrc-led.webp', '졸음 방지 시스템 완성 단계 시제품의 전면 제어부와 센서 구성', '완성 단계 시제품 — 전면 제어부와 센서 구성', 'Near-final prototype — front controls and sensor assembly'),
+                  figure('2024_5th_CSRC', 'csrc-led-2.webp', '졸음 방지 시스템 시제품의 LED 출력 동작 상태', '시제품 동작 상태 — LED 출력 확인', 'Prototype in operation — LED output check'),
+                  figure('2024_5th_CSRC', 'csrc-build-1.webp', '졸음 방지 시스템 본체를 조립하고 배선하는 제작 과정', '제작 과정 — 본체 조립과 배선 작업', 'Build process — body assembly and wiring'),
+                  figure('2024_5th_CSRC', 'csrc-build-2.webp', '졸음 방지 시스템 내부 하드웨어 배선 제작 과정', '제작 과정 — 내부 하드웨어 배선', 'Build process — internal hardware wiring'),
+                  figure('2024_5th_CSRC', 'csrc-build-3.webp', '졸음 방지 시스템 프로토타입 내부의 아두이노와 브레드보드 배선', '프로토타입 내부 아두이노·브레드보드 배선', 'Arduino and breadboard wiring inside the prototype'),
+                  figure('2024_5th_CSRC', 'csrc-hall.webp', '제5회 천안학생로봇대회 행사 현장', '제5회 천안학생로봇대회 현장', '5th Cheonan Student Robot Competition venue'),
+              ],
+              'projects/Master_Creator_Challenge/index.html': [
+                  figure('Master_Creator_Challenge', 'doorlock-1.webp', '제작 및 배선 작업 중인 비밀번호 도어락 시제품', '제작 및 배선 작업 중인 도어락 시제품', 'Door-lock prototype during assembly and wiring'),
+                  figure('Master_Creator_Challenge', 'doorlock-2.webp', '파란색과 흰색으로 제작한 비밀번호 도어락 완성 모형 정면', '비밀번호 도어락 완성 모형 — 정면', 'Completed password door-lock model — front'),
+                  figure('Master_Creator_Challenge', 'doorlock-3.webp', '비밀번호 도어락 완성 모형의 측면과 내부 배선', '비밀번호 도어락 완성 모형 — 측면', 'Completed password door-lock model — side'),
+              ],
+              'projects/Wall_Sina/index.html': [
+                  figure('Wall_Sina', 'plan-1.webp', '해수면 상승에 따라 장벽이 올라가는 해안 장벽 작동 개념도', '해수면 상승 시 장벽 작동 개념도', 'Concept diagram of the barrier rising with sea level'),
+                  figure('Wall_Sina', 'plan-2.webp', '해안 장벽 프로젝트 초기 아이디어를 정리한 화이트보드 스케치', '초기 아이디어 화이트보드 스케치', 'Early concept sketch on a whiteboard'),
+                  figure('Wall_Sina', 'plan-3.webp', '물 감지 센서와 방수천 및 모터 구조를 나타낸 해안 장벽 시스템 구조도', '센서·방수천·모터를 포함한 시스템 구조도', 'System diagram with sensors, waterproof sheet, and motor'),
+                  figure('Wall_Sina', 'prototype-1.webp', '수조 안에 설치한 해안 장벽 시제품 정면', '수조에 설치한 해안 장벽 시제품 — 정면', 'Coastal barrier prototype installed in the tank — front'),
+                  figure('Wall_Sina', 'prototype-2.webp', '수조 안에 설치한 해안 장벽 시제품 측면', '해안 장벽 시제품 — 측면', 'Coastal barrier prototype — side'),
+                  figure('Wall_Sina', 'prototype-3.webp', '수조 내부의 도시와 해안 장벽 모형 전경', '수조 내부 도시·장벽 모형 전경', 'Overview of the city and barrier model inside the tank'),
+              ],
+              'projects/PlantClock/index.html': [
+                  figure('PlantClock', 'plantclock.webp', 'LCD와 버튼 및 팬이 결합된 식물 타이머 완성 시제품', '식물 타이머 완성 시제품', 'Completed Plant Timer prototype'),
+              ],
+              'projects/BerryIno/index.html': [
+                  figure('BerryIno', 'nfc-lcd.webp', 'NFC 출석 체크 시스템의 LCD와 키패드 모듈을 테스트하는 모습', 'LCD·키패드 모듈 테스트', 'LCD and keypad module test'),
+                  figure('BerryIno', 'nfc-photo-1.webp', '분홍색 케이스에 LCD와 키패드를 장착한 출석 체크 시스템 시제품 정면', '출석 체크 시스템 케이스 시제품 — 정면', 'Attendance-system enclosure prototype — front'),
+                  figure('BerryIno', 'nfc-photo-2.webp', '출석 체크 시스템 케이스 내부의 아두이노와 배선', '케이스 내부 하드웨어와 배선', 'Hardware and wiring inside the enclosure'),
+                  figure('BerryIno', 'nfc-photo-3.webp', '흰색 케이스로 제작한 출석 체크 시스템 시제품 외형', '출석 체크 시스템 케이스 시제품 — 외형', 'Attendance-system enclosure prototype — exterior'),
+                  figure('BerryIno', 'nfc-web-dashboard.webp', '웹 브라우저에 표시된 출석 현황 대시보드', '실시간 출석 현황 웹 화면', 'Real-time attendance status web dashboard'),
+              ],
+          }
+
+          marker = '''            <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
+              <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>'''
+
+          for page_name, figures in galleries.items():
+              page = Path(page_name)
+              text = page.read_text(encoding='utf-8')
+              if 'data-media-pass="v26"' in text:
+                  raise SystemExit(f'media gallery already exists: {page_name}')
+              if text.count(marker) != 1:
+                  raise SystemExit(f'expected one My Role marker in {page_name}, found {text.count(marker)}')
+              gallery = '''            <div class="detail-section" data-aos="fade-up" data-aos-delay="75" data-media-pass="v26">
+              <h2 data-en="Project Media" data-ko="프로젝트 사진">프로젝트 사진</h2>
+              <div class="detail-gallery">
+''' + '\n'.join(figures) + '''
+              </div>
+            </div>'''
+              page.write_text(text.replace(marker, gallery + '\n' + marker, 1), encoding='utf-8')
+          PY
+
+      - name: Validate media pass
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find assets/media -type f -name '*.webp' | wc -l)" -eq 21
+          while IFS= read -r -d '' file; do
+            ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$file" >/dev/null
+          done < <(find assets/media -type f -name '*.webp' -print0)
+
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+          expected = {
+              'projects/2024_5th_CSRC/index.html': 6,
+              'projects/Master_Creator_Challenge/index.html': 3,
+              'projects/Wall_Sina/index.html': 6,
+              'projects/PlantClock/index.html': 1,
+              'projects/BerryIno/index.html': 5,
+          }
+          total = 0
+          for page_name, count in expected.items():
+              text = Path(page_name).read_text(encoding='utf-8')
+              assert text.count('data-media-pass="v26"') == 1, page_name
+              section = text.split('data-media-pass="v26"', 1)[1].split('</div>\n            </div>', 1)[0]
+              figures = section.count('<figure class="detail-figure">')
+              assert figures == count, (page_name, figures, count)
+              images = re.findall(r'<img\s+[^>]*src="([^"]+)"[^>]*>', section)
+              assert len(images) == count, (page_name, len(images), count)
+              for tag in re.findall(r'<img\s+[^>]*>', section):
+                  assert 'loading="lazy"' in tag
+                  assert 'decoding="async"' in tag
+                  assert re.search(r'width="\d+"', tag)
+                  assert re.search(r'height="\d+"', tag)
+                  assert re.search(r'alt="[^"]+"', tag)
+              for src in images:
+                  local = (Path(page_name).parent / src).resolve()
+                  assert local.exists(), (page_name, src, local)
+              total += figures
+          assert total == 21, total
+          print(f'validated {total} gallery images across {len(expected)} pages')
+          PY
+
+          node --check script.js
+          node build.js
+          git diff --exit-code -- index.html
+          node tools/verify-build.js
+          git diff --check
+
+          python3 -m http.server 8000 >/tmp/v26-media-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid 2>/dev/null || true' EXIT
+          sleep 1
+          for page in 2024_5th_CSRC Master_Creator_Challenge Wall_Sina PlantClock BerryIno; do
+            curl -fsS "http://127.0.0.1:8000/projects/$page/" >/dev/null
+          done
+          while IFS= read -r -d '' file; do
+            curl -fsS "http://127.0.0.1:8000/$file" >/dev/null
+          done < <(find assets/media -type f -name '*.webp' -print0)
+          kill $server_pid
+          trap - EXIT
+
+      - name: Commit each changed file atomically and push
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          mapfile -t assets < <(find assets/media -type f -name '*.webp' | sort)
+          for file in "${assets[@]}"; do
+            git add -- "$file"
+            git commit -m "feat: add $(basename "$file" .webp) project media" -- "$file"
+          done
+
+          declare -a pages=(
+            projects/2024_5th_CSRC/index.html
+            projects/Master_Creator_Challenge/index.html
+            projects/Wall_Sina/index.html
+            projects/PlantClock/index.html
+            projects/BerryIno/index.html
+          )
+          for file in "${pages[@]}"; do
+            project=$(basename "$(dirname "$file")")
+            git add -- "$file"
+            git commit -m "feat: add $project media gallery" -- "$file"
+          done
+
+          commits=$(git rev-list --count origin/main..HEAD)
+          files=$(git diff --name-only origin/main...HEAD | wc -l)
+          test "$commits" -eq 26
+          test "$files" -eq 26
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:agent/v26-media-pass
+
+      - name: Upload optimized media manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/v26-media-final
           {
-            echo '# v2.6.x media preflight manifest'
+            echo '# Final optimized media manifest'
             echo
-            find out -type f -name '*.webp' -print0 | sort -z | while IFS= read -r -d '' file; do
+            find assets/media -type f -name '*.webp' -print0 | sort -z | while IFS= read -r -d '' file; do
               dims=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$file")
               bytes=$(stat -c%s "$file")
               printf '%s | %s | %s bytes\n' "$file" "$dims" "$bytes"
             done
-          } > out/MANIFEST.md
+          } > /tmp/v26-media-final/MANIFEST.md
+          cp -R assets/media /tmp/v26-media-final/media
 
-      - name: Upload preflight media
+      - name: Upload final optimized media
         uses: actions/upload-artifact@v4
         with:
-          name: v26-media-preflight
-          path: out
+          name: v26-media-final
+          path: /tmp/v26-media-final
           retention-days: 3
