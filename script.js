@@ -786,3 +786,118 @@ window._updateProjectCount();
     paragraph.style.marginBottom = '14px';
   });
 })();
+
+/* ------------------------------------------------------------- */
+/* 22. Restore user-authored copy from before PR #115            */
+/* ------------------------------------------------------------- */
+(function restorePre115UserCopy() {
+  const copies = {
+    ko: {
+      heroRole: '혁신의 기업가 &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>',
+      heroDesc: '이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br /><strong>월 100만 명</strong>이 사용하는 서비스를 만드는 것이 목표입니다.',
+      aboutBody: '<p>안녕하세요, 저는 단순한 개발을 넘어 세상을 바꿀 서비스를 기획하고 만드는 <strong>이건영</strong>입니다. 저는 사업가가 아닌 <strong>기업가</strong>를 지향합니다. 이윤을 쫓기보다 기술을 통해 세상에 없던 가치를 창출하고 혁신을 일으키고 싶습니다.</p><p>떠오르는 아이디어가 있을 때마다 구체화하여 기록하고 있으며 이를 실현하기 위해 <strong>AI, 통신, 웹/앱 개발, 임베디드, 하드웨어, 정보보안, 해킹, DB, 기획</strong> 등 분야를 가리지 않고 기술을 익히고 있습니다.</p>',
+      chips: [
+        '<i class="fas fa-rocket"></i> 목표 : 월 100만명 유저 서비스',
+        '<i class="fas fa-lightbulb"></i> 아이디어 뱅크',
+        '<i class="fas fa-users"></i> 팀장 경험 多',
+      ],
+      typing: ['풀스택 개발자', '메이커', '아이디어 뱅크', '팀 리더', '엔지니어'],
+      llm: 'LLM 활용 능력',
+      docsSkills: '<li><i class="devicon-notion-plain colored"></i> Notion</li><li data-en="Excellent Report Writing" data-ko="탁월한 보고서 작성"><i class="fas fa-file-contract"></i> 탁월한 보고서 작성</li><li data-en="Systematic File Organization" data-ko="체계적인 자료 정리"><i class="fas fa-folder-open"></i> 체계적인 자료 정리</li><li data-en="Technical Documentation" data-ko="기술 문서 작성"><i class="fas fa-pen-nib"></i> 기술 문서 작성</li>',
+      leadershipSkills: '<li data-en="Overall Project Management" data-ko="프로젝트 총괄 관리"><i class="fas fa-tasks"></i> 프로젝트 총괄 관리</li><li data-en="Extensive Team Leading" data-ko="팀 리딩 경험 다수"><i class="fas fa-user-friends"></i> 팀 리딩 경험 다수</li><li data-en="Proficient Presentation Skills" data-ko="능숙한 발표 능력"><i class="fas fa-microphone-alt"></i> 능숙한 발표 능력</li><li data-en="Effective Presentation" data-ko="효과적인 프레젠테이션"><i class="fas fa-chalkboard-teacher"></i> 효과적인 프레젠테이션</li>',
+      mediaSkills: '<li data-en="Video Editing" data-ko="영상 편집 기술"><i class="fas fa-film"></i> 영상 편집 기술</li><li data-en="VTuber Technology" data-ko="버츄얼(VTuber) 기술 보유"><i class="fas fa-vr-cardboard"></i> 버츄얼(VTuber) 기술 보유</li>',
+      freshmanDesc: '한기대 26학번 신입생을 위한 노션 사이트',
+      mzDesc: '디스코드 경제 게임 봇',
+    },
+    en: {
+      heroRole: 'Innovator &amp; <span class="typing-wrap"><span id="typing-text"></span><span class="typing-cursor"></span></span>',
+      heroDesc: 'I dream of being an entrepreneur who pursues <strong>innovation</strong> beyond profit.<br /><strong>1 million monthly users</strong> — that\'s my goal.',
+      aboutBody: '<p>Hello, I\'m <strong>Lee Geon Yeong</strong>, someone who goes beyond simple development to plan and create services that can change the world. I aspire to be an <strong>entrepreneur</strong>, not just a businessman — creating unprecedented value and driving innovation through technology.</p><p>Whenever an idea strikes, I document and refine it. To make these ideas a reality, I study <strong>AI, Communications, Web/App Development, Embedded, Hardware, Information Security, Hacking, DB, and Planning</strong> — with no boundaries on the field.</p>',
+      chips: [
+        '<i class="fas fa-rocket"></i> Goal: 1M Monthly Users',
+        '<i class="fas fa-lightbulb"></i> Idea Bank',
+        '<i class="fas fa-users"></i> Team Lead Experience',
+      ],
+      typing: ['Full-Stack Dev', 'Maker', 'Idea Bank', 'Team Leader', 'Engineer'],
+      llm: 'LLM Proficiency',
+      docsSkills: '<li><i class="devicon-notion-plain colored"></i> Notion</li><li data-en="Excellent Report Writing" data-ko="탁월한 보고서 작성"><i class="fas fa-file-contract"></i> Excellent Report Writing</li><li data-en="Systematic File Organization" data-ko="체계적인 자료 정리"><i class="fas fa-folder-open"></i> Systematic File Organization</li><li data-en="Technical Documentation" data-ko="기술 문서 작성"><i class="fas fa-pen-nib"></i> Technical Documentation</li>',
+      leadershipSkills: '<li data-en="Overall Project Management" data-ko="프로젝트 총괄 관리"><i class="fas fa-tasks"></i> Overall Project Management</li><li data-en="Extensive Team Leading" data-ko="팀 리딩 경험 다수"><i class="fas fa-user-friends"></i> Extensive Team Leading</li><li data-en="Proficient Presentation Skills" data-ko="능숙한 발표 능력"><i class="fas fa-microphone-alt"></i> Proficient Presentation Skills</li><li data-en="Effective Presentation" data-ko="효과적인 프레젠테이션"><i class="fas fa-chalkboard-teacher"></i> Effective Presentation</li>',
+      mediaSkills: '<li data-en="Video Editing" data-ko="영상 편집 기술"><i class="fas fa-film"></i> Video Editing</li><li data-en="VTuber Technology" data-ko="버츄얼(VTuber) 기술 보유"><i class="fas fa-vr-cardboard"></i> VTuber Technology</li>',
+      freshmanDesc: "A Notion site for KOREATECH class of '26 freshmen",
+      mzDesc: 'Discord economy game bot',
+    },
+  };
+
+  function skillCard(key) {
+    return [...document.querySelectorAll('.skill-card')].find((card) => card.querySelector('h3')?.dataset.ko === key);
+  }
+
+  function setProjectDescription(href, text, en, ko) {
+    const card = document.querySelector(`[data-card-href="${href}"]`);
+    if (!card) return;
+    const description = [...card.querySelectorAll('p')].find((p) => !p.classList.contains('project-subtitle') && !p.classList.contains('project-role'));
+    if (!description) return;
+    description.dataset.en = en;
+    description.dataset.ko = ko;
+    description.textContent = text;
+  }
+
+  function restore() {
+    const lang = localStorage.getItem('lang') || 'ko';
+    const copy = copies[lang];
+
+    const heroRole = document.querySelector('.hero-role');
+    if (heroRole) heroRole.innerHTML = copy.heroRole;
+    const heroDesc = document.querySelector('.hero-desc');
+    if (heroDesc) heroDesc.innerHTML = copy.heroDesc;
+
+    const aboutBody = document.querySelector('.about-body');
+    if (aboutBody) {
+      aboutBody.innerHTML = copy.aboutBody;
+      aboutBody.querySelectorAll('p').forEach((paragraph) => {
+        paragraph.style.maxWidth = 'none';
+        paragraph.style.fontSize = '0.98rem';
+        paragraph.style.lineHeight = '2';
+        paragraph.style.marginBottom = '14px';
+      });
+    }
+
+    const chips = document.querySelector('.about-chips');
+    if (chips) chips.innerHTML = copy.chips.map((item) => `<div class="chip">${item}</div>`).join('');
+
+    const aiCard = skillCard('AI & 데이터');
+    const llm = aiCard?.querySelector('.skill-list li');
+    if (llm) {
+      llm.dataset.en = 'LLM Proficiency';
+      llm.dataset.ko = 'LLM 활용 능력';
+      llm.innerHTML = `<i class="fas fa-robot"></i> ${copy.llm}`;
+    }
+
+    const docs = skillCard('문서화 & 협업')?.querySelector('.skill-list');
+    if (docs) docs.innerHTML = copy.docsSkills;
+    const leadership = skillCard('리더십 & 커뮤니케이션')?.querySelector('.skill-list');
+    if (leadership) leadership.innerHTML = copy.leadershipSkills;
+    const media = skillCard('미디어 & 프레젠테이션')?.querySelector('.skill-list');
+    if (media) media.innerHTML = copy.mediaSkills;
+
+    setProjectDescription(
+      'projects/koreatech_noob_guide/',
+      copy.freshmanDesc,
+      "A Notion site for KOREATECH class of '26 freshmen",
+      '한기대 26학번 신입생을 위한 노션 사이트'
+    );
+    setProjectDescription(
+      'projects/MZ_bot/',
+      copy.mzDesc,
+      'Discord economy game bot',
+      '디스코드 경제 게임 봇'
+    );
+
+    window._typingWords = copy.typing;
+    window._restartTyping?.();
+  }
+
+  restore();
+  document.getElementById('langToggle')?.addEventListener('click', () => queueMicrotask(restore));
+  document.getElementById('langToggleMobile')?.addEventListener('click', () => queueMicrotask(restore));
+})();
