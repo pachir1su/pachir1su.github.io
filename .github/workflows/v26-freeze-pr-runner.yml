@@ -20,7 +20,7 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
-      - name: Extract and run freeze builder
+      - name: Extract builder with whitespace-tolerant replacements
         shell: bash
         run: |
           python3 <<'PY'
@@ -33,7 +33,31 @@ jobs:
           payload_lines = []
           for line in raw[start:end].splitlines():
               payload_lines.append(line[10:] if line.startswith('          ') else line)
-          Path('/tmp/v26-freeze-builder.py').write_text('\n'.join(payload_lines) + '\n', encoding='utf-8')
+          payload = '\n'.join(payload_lines) + '\n'
+
+          old_helper = '''def replace_once(text, old, new, label):
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(f"{label}: expected 1 exact match, got {count}")
+    return text.replace(old, new, 1)
+'''
+          new_helper = '''def replace_once(text, old, new, label):
+    count = text.count(old)
+    if count == 1:
+        return text.replace(old, new, 1)
+    if "\\n" in old:
+        tokens = [token for token in re.split(r"\\s+", old.strip()) if token]
+        pattern = re.compile(r"\\s+".join(re.escape(token) for token in tokens), re.S)
+        matches = list(pattern.finditer(text))
+        if len(matches) == 1:
+            match = matches[0]
+            return text[:match.start()] + new.strip() + text[match.end():]
+    raise SystemExit(f"{label}: expected one match, exact={count}")
+'''
+          if old_helper not in payload:
+              raise SystemExit('replace_once helper source not found')
+          payload = payload.replace(old_helper, new_helper, 1)
+          Path('/tmp/v26-freeze-builder.py').write_text(payload, encoding='utf-8')
           PY
           python3 /tmp/v26-freeze-builder.py
           node build.js
