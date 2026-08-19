@@ -770,9 +770,19 @@ window._updateProjectCount();
 })();
 
 /* ------------------------------------------------------------- */
-/* 21. Roll back vision card width                              */
+/* 21. Roll back vision section to pre-v2.3 layout              */
 /* ------------------------------------------------------------- */
-(function rollbackVisionCardWidth() {
+(function rollbackVisionSectionToPreV23() {
   const card = document.querySelector('.about-card');
-  if (card) card.style.maxWidth = 'none';
+  if (card) {
+    card.style.maxWidth = 'none';
+    card.style.marginTop = '8px';
+  }
+
+  document.querySelectorAll('.about-body p').forEach((paragraph) => {
+    paragraph.style.maxWidth = 'none';
+    paragraph.style.fontSize = '0.98rem';
+    paragraph.style.lineHeight = '2';
+    paragraph.style.marginBottom = '14px';
+  });
 })();
