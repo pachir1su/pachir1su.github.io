@@ -26,6 +26,45 @@ jobs:
         run: |
           set -euo pipefail
           cp tools/v26_public_media_capture.py /tmp/v26_public_media_capture.py
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('/tmp/v26_public_media_capture.py')
+          s = p.read_text()
+          replacement = '''def insert_media(rel_html: str, block: str, key: str, message: str):
+              path = ROOT / rel_html
+              html = path.read_text(encoding='utf-8')
+              if f'data-media-followup="{key}"' in html:
+                  return False
+              marker = re.search(r'\\s*<div class="detail-section"[^>]*>\\s*<h2[^>]*data-en="My Role"', html, re.S)
+              if marker:
+                  pos = marker.start()
+                  html = html[:pos] + '\\n' + block.rstrip() + '\\n' + html[pos:]
+              elif rel_html == 'projects/swordmaster/index.html':
+                  needle = '\\n        </div>\\n      </div>\\n    </section>'
+                  pos = html.find(needle)
+                  if pos == -1:
+                      raise RuntimeError('Swordmaster project-grid closing marker not found')
+                  pos += len('\\n        </div>')
+                  html = html[:pos] + '\\n' + block.rstrip() + html[pos:]
+              else:
+                  sidebar = html.find('\\n          <div class="detail-sidebar">')
+                  if sidebar == -1:
+                      raise RuntimeError(f'Media insertion point not found in {rel_html}')
+                  pos = html.rfind('          </div>', 0, sidebar)
+                  if pos == -1:
+                      raise RuntimeError(f'detail-main closing marker not found in {rel_html}')
+                  html = html[:pos] + block + html[pos:]
+              path.write_text(html, encoding='utf-8')
+              return commit_file(path, message)
+
+          chrome ='''
+          s2, n = re.subn(r'def insert_media\(.*?\nchrome =', replacement, s, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit('failed to patch insert_media')
+          p.write_text(s2)
+          PY
+          python3 -m py_compile /tmp/v26_public_media_capture.py
           git fetch origin agent/v26-structure-media-followup
           git switch -C agent/v26-structure-media-followup origin/agent/v26-structure-media-followup
           git config user.name "github-actions[bot]"
