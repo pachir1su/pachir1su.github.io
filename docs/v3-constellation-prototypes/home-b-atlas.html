@@ -11,15 +11,19 @@
 <body data-page="atlas">
   <header class="site-header atlas-header">
     <a class="brand-mark" href="index.html">PACHIR1SU <span>✦</span></a>
-    <p class="atlas-coordinate" data-atlas-coordinate>ORIGIN · 0, 0 · 100%</p>
     <a class="header-mail" href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
   </header>
 
   <main class="atlas-page">
     <section class="atlas-intro">
-      <p class="section-kicker">GALAXY ATLAS · DRAG TO EXPLORE</p>
-      <h1>직접 움직여<br>기록을 찾는 우주.</h1>
-      <p>빈 공간을 끌어 이동하고, 휠로 확대하고, 별이나 관측소를 눌러 보세요.</p>
+      <p class="atlas-greeting">안녕하세요.</p>
+      <h1>이건영<small>Lee Geon Yeong</small></h1>
+      <p class="atlas-role">혁신의 기업가 &amp; 풀스택 개발자</p>
+      <p class="atlas-vision">이윤을 넘어 혁신을 추구합니다.<br>월 100만 명이 사용하는 서비스를 만드는 것이 목표입니다.</p>
+      <div class="atlas-identity-links">
+        <a href="https://github.com/pachir1su">GitHub</a>
+        <span>한국기술교육대학교 26학번</span>
+      </div>
     </section>
 
     <div class="atlas-toolbar" aria-label="우주 지도 조작">
@@ -33,13 +37,11 @@
       <div class="atlas-world" data-atlas-world>
         <div class="ambient-stars atlas-stars" data-starfield aria-hidden="true"></div>
         <section class="atlas-zone atlas-growth-zone" data-zone="growth">
-          <p class="atlas-zone-label">01 · GROWTH CONSTELLATION</p>
           <h2>실제 사건으로<br>연결된 별자리</h2>
           <div class="atlas-growth-map" data-growth-constellation></div>
         </section>
 
         <section class="atlas-zone atlas-project-zone" data-zone="projects">
-          <p class="atlas-zone-label">02 · PROJECT OBSERVATORIES</p>
           <h2>연도별 관측소</h2>
           <div class="orbit-rings" aria-hidden="true"><i></i><i></i><i></i></div>
           <div class="atlas-stations" data-atlas-stations></div>
@@ -47,33 +49,22 @@
 
         <section class="atlas-zone atlas-moon-zone" data-zone="moon">
           <div class="atlas-moon" data-atlas-moon aria-hidden="true"></div>
-          <p class="atlas-zone-label">03 · MOON OBSERVATORY</p>
           <h2>가장 빠른 연락</h2>
           <a href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
-          <p>달을 태양 표식까지 끌어 보세요.</p>
           <div class="atlas-eclipse-target" data-atlas-eclipse-target aria-hidden="true"></div>
-        </section>
-
-        <section class="atlas-zone atlas-unknown-zone" data-zone="unknown">
-          <p class="atlas-zone-label">UNMARKED ORBIT</p>
-          <p>모든 관측소를 방문하면 이 궤도에서 신호가 시작됩니다.</p>
         </section>
 
         <div class="comet-event atlas-comet" data-comet-event aria-hidden="true">
           <div class="comet-tail"></div><div class="capybara-placeholder"><span class="capy-ear"></span><span class="capy-eye"></span></div>
-          <p>CAPYBARA SIGNAL FOUND</p>
         </div>
 
-        <svg class="capy-constellation atlas-capy" data-capy-constellation viewBox="0 0 520 300" aria-label="카피바라 모양 별자리">
-          <path d="M95 175 L135 112 L220 86 L315 100 L378 140 L430 146 L460 126 M430 146 L448 188 L400 208 L330 218 L235 224 L150 212 L95 175 M165 212 L155 252 M335 216 L345 254 M220 87 L196 48 L242 77"/>
-          <g><circle cx="95" cy="175" r="5"/><circle cx="135" cy="112" r="5"/><circle cx="220" cy="86" r="5"/><circle cx="315" cy="100" r="5"/><circle cx="378" cy="140" r="5"/><circle cx="430" cy="146" r="5"/><circle cx="460" cy="126" r="5"/><circle cx="448" cy="188" r="5"/><circle cx="400" cy="208" r="5"/><circle cx="330" cy="218" r="5"/><circle cx="235" cy="224" r="5"/><circle cx="150" cy="212" r="5"/><circle cx="155" cy="252" r="5"/><circle cx="345" cy="254" r="5"/><circle cx="196" cy="48" r="5"/><circle cx="242" cy="77" r="5"/></g>
-        </svg>
+        <canvas class="capy-nebula atlas-capy" data-capy-nebula aria-hidden="true"></canvas>
       </div>
     </section>
 
     <aside class="atlas-drawer" data-atlas-drawer aria-live="polite">
       <button type="button" data-drawer-close aria-label="정보 패널 닫기">×</button>
-      <p class="section-kicker" data-drawer-kicker>OBSERVATORY</p>
+      <p class="section-kicker" data-drawer-kicker hidden>OBSERVATORY</p>
       <h2 data-drawer-title>별이나 관측소를 선택하세요.</h2>
       <p data-drawer-description>선택한 기록이 이곳에 표시됩니다.</p>
       <div class="drawer-projects" data-drawer-projects></div>
