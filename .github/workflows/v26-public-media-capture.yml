@@ -1,0 +1,40 @@
+name: v2.6 public media capture runner
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-public-media-capture.yml
+      - tools/v26_public_media_capture.py
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v26-structure-media-runner
+          fetch-depth: 0
+
+      - name: Preserve capture script and switch target
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp tools/v26_public_media_capture.py /tmp/v26_public_media_capture.py
+          git fetch origin agent/v26-structure-media-followup
+          git switch -C agent/v26-structure-media-followup origin/agent/v26-structure-media-followup
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install capture dependencies
+        run: python3 -m pip install --quiet selenium pillow
+
+      - name: Capture public media
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: python3 /tmp/v26_public_media_capture.py
