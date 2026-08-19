@@ -529,62 +529,6 @@ p {
   background: radial-gradient(circle, rgba(198, 59, 59, 0.06), transparent 65%);
   pointer-events: none;
 }
-.floating-icons {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-/* 96px 짜리 이중 테두리 원 다섯 개가 히어로 글 주변에 흩어져 떠다녔다.
-   지름이 본문 글자 크기의 6배라 시선을 먼저 가져가고, 아이콘 폰트가 늦게
-   뜨면 그냥 빈 고리로 보인다. 지름을 절반으로 줄이고 테두리 한 겹만 남겨
-   배경 요소로 내린다. 위치도 본문 열을 피해 가장자리로 밀었다. */
-.fi {
-  position: absolute;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  line-height: 1;
-  background: var(--card);
-  border: 1px solid currentColor;
-  box-shadow: var(--shadow-soft);
-  opacity: 0.5;
-  animation: floatUp 8s ease-in-out infinite;
-}
-.fi-1 {
-  top: 18%;
-  left: 3%;
-  color: var(--red-text);
-  animation-delay: 0s;
-}
-.fi-2 {
-  top: 14%;
-  right: 5%;
-  color: var(--cyan-text);
-  animation-delay: 1.5s;
-}
-.fi-3 {
-  bottom: 30%;
-  left: 5%;
-  color: var(--gold-text);
-  animation-delay: 3s;
-}
-.fi-4 {
-  bottom: 20%;
-  right: 3%;
-  color: var(--bronze-text);
-  animation-delay: 4.5s;
-}
-.fi-5 {
-  top: 52%;
-  left: 1%;
-  color: var(--ink);
-  animation-delay: 6s;
-}
-
 /* 히어로는 max-width:820px 짜리 가운데 정렬 블록이라 본문 그리드와 어긋난
    위치에서 시작하고, 1440px 화면에서는 오른쪽 절반이 통째로 비었다.
    본문과 같은 컨테이너 폭을 쓰고 2단으로 나눠 오른쪽에 지표를 세운다. */
@@ -604,8 +548,17 @@ p {
   align-self: center;
 }
 @media (max-width: 1024px) {
+  .container {
+    padding-left: clamp(16px, 4vw, 24px);
+    padding-right: clamp(16px, 4vw, 24px);
+  }
   .hero-content {
     display: block;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .hero-main,
+  .hero-stats {
+    min-width: 0;
   }
 }
 .hero-tag {
@@ -688,6 +641,23 @@ p {
   margin-bottom: 44px;
   flex-wrap: wrap;
 }
+.hero-email {
+  max-width: 100%;
+}
+.hero-email .email-addr {
+  overflow-wrap: anywhere;
+}
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
 .btn {
   display: inline-flex;
   align-items: center;
@@ -717,6 +687,16 @@ p {
 .btn-ghost:hover {
   background: var(--paper-2);
   transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .hero-btns > * {
+    width: 100%;
+    justify-content: center;
+  }
+  .hero-email {
+    font-size: 0.78rem;
+  }
 }
 
 .hero-stats {
@@ -802,7 +782,7 @@ p {
    오른쪽 절반이 빈 종이로 남는다. 카드도 글 폭에 맞춰 메모지처럼 세운다. */
 .about-card {
   margin-top: var(--sp-2);
-  max-width: 780px;
+  max-width: none;
 }
 .about-quote {
   font-family: var(--font-hand);
@@ -816,11 +796,11 @@ p {
 /* 산문은 컨테이너 폭(1160px)을 그대로 채우면 1440px 화면에서 한 줄이 100자를
    넘는다. 문단 자체에 상한을 걸어 줄 길이를 읽기 좋은 범위로 묶는다. */
 .about-body p {
-  font-size: var(--fs-md);
+  font-size: 0.98rem;
   color: var(--ink);
-  line-height: 1.9;
-  margin-bottom: var(--sp-4);
-  max-width: var(--measure);
+  line-height: 2;
+  margin-bottom: 14px;
+  max-width: none;
 }
 .about-body strong {
   position: relative;
@@ -917,12 +897,6 @@ p {
   font-size: 0.98rem;
   color: var(--ink);
 }
-.about-edu .edu-sub {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
-  color: var(--text-muted);
-}
 
 /* 12. Skills */
 /* 역량 카드는 항목 수가 3~7개로 제각각이라 행 높이를 맞추면 짧은 카드
@@ -931,7 +905,7 @@ p {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: var(--sp-5);
-  align-items: start;
+  align-items: stretch;
 }
 .skill-icon {
   font-size: 1.9rem;
@@ -1225,15 +1199,6 @@ p {
 }
 
 /* 16. Animations */
-@keyframes floatUp {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-11px) rotate(3deg);
-  }
-}
 @keyframes blink {
   0%,
   100% {
@@ -1284,11 +1249,6 @@ p {
   }
   .hero-name {
     font-size: clamp(2rem, 8vw, 3rem);
-  }
-  .fi {
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
   }
   .hero-stats {
     gap: 14px;
@@ -1628,29 +1588,6 @@ p {
 .key-hint.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
-}
-
-/* ==========================================================================
-   20. 스티커 (.fi) — 드래그 상태
-   ========================================================================== */
-
-.fi {
-  transform: translate(var(--drag-x, 0px), calc(var(--drag-y, 0px) + var(--scroll-y, 0px)));
-  transition: box-shadow 0.2s ease;
-  z-index: 1;
-  user-select: none;
-  -webkit-user-select: none;
-}
-.fi:hover {
-  box-shadow: 0 10px 22px rgba(31, 28, 20, 0.16);
-}
-.fi.grabbing {
-  cursor: grabbing !important;
-  z-index: 50;
-  box-shadow: 0 18px 36px rgba(31, 28, 20, 0.28);
-}
-.fi.settled {
-  animation: none !important;
 }
 
 /* ==========================================================================
@@ -2026,9 +1963,6 @@ html {
   .stamp-pop {
     display: none !important;
   }
-  .fi {
-    animation: none !important;
-  }
 }
 
 /* ==========================================================================
@@ -2048,12 +1982,6 @@ html {
   .hero-name {
     font-size: clamp(2.2rem, 5vw, 3.6rem);
   }
-  .fi-1, .fi-5 {
-    left: 3%;
-  }
-  .fi-2, .fi-4 {
-    right: 6%;
-  }
   .detail-grid {
     grid-template-columns: 1fr 280px;
     gap: 24px;
@@ -2064,7 +1992,6 @@ html {
    38. GPU 가속 힌트 — 주요 애니메이션 요소
    ========================================================================== */
 
-.fi,
 .progress-bar,
 #btn-back-to-top {
   will-change: transform;
@@ -2437,15 +2364,6 @@ html {
   color: var(--red-text);
 }
 
-/* MBTI 등 자기보고 항목 — 차트가 아니라 각주 한 줄로 (#112 Remove P1-2) */
-.about-note {
-  margin-top: 18px;
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  color: var(--text-muted);
-  letter-spacing: 0.02em;
-}
-
 /* --- 푸터 이메일 텍스트 + 복사 (#30) --- */
 .footer .social-links { align-items: center; }
 .contact-email {
@@ -2583,81 +2501,6 @@ html {
   margin: 0;
   color: var(--text-muted);
   font-size: 0.85rem;
-}
-
-/* ==========================================================================
-   28. 🐔 치킨 모드 이스터에그 (#38) — 글리치 없는 닭 비 + 되돌리기 버튼
-   ========================================================================== */
-.chicken-drop {
-  position: fixed;
-  top: -8vh;
-  z-index: 9998;
-  pointer-events: none;
-  user-select: none;
-  will-change: transform, opacity;
-  animation-name: chicken-fall;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-}
-@keyframes chicken-fall {
-  0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-  8%   { opacity: 1; }
-  92%  { opacity: 1; }
-  100% { transform: translate(var(--sway, 0), 116vh) rotate(360deg); opacity: 0.9; }
-}
-.egg-toast {
-  position: fixed;
-  top: 84px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-12px);
-  z-index: 9999;
-  background: var(--card);
-  color: var(--ink);
-  border: 2px solid var(--ink);
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-family: var(--font-main);
-  font-weight: 700;
-  box-shadow: 4px 4px 0 var(--red);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s ease,
-    transform 0.35s var(--ease-out);
-}
-.egg-toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-.egg-rollback {
-  position: fixed;
-  bottom: 24px;
-  left: 24px;
-  z-index: 9999;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--ink);
-  color: var(--paper);
-  border: 2px solid var(--ink);
-  border-radius: 8px;
-  padding: 11px 18px;
-  font-family: var(--font-main);
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  box-shadow: 3px 3px 0 var(--red);
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.12s ease;
-}
-.egg-rollback.show { opacity: 1; transform: translateY(0); }
-.egg-rollback:hover {
-  transform: translateY(-1px);
-  box-shadow: 5px 5px 0 var(--red);
-}
-.egg-rollback:active {
-  transform: translateY(2px);
-  box-shadow: 1px 1px 0 var(--red);
 }
 
 /* ==========================================================================
@@ -3129,158 +2972,4 @@ html {
 }
 .sidebar-util-btn:hover i {
   color: var(--red-text);
-}
-
-/* ==========================================================================
-   56. 섹션 네비게이터 — 책갈피 스타일 (#72)
-   ========================================================================== */
-
-.section-nav {
-  position: fixed;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 900;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.section-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px 6px 14px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-right: none;
-  border-radius: 6px 0 0 6px;
-  box-shadow: -2px 2px 8px rgba(31, 28, 20, 0.08);
-  cursor: pointer;
-  text-decoration: none;
-  color: var(--ink);
-  white-space: nowrap;
-  transform: translateX(calc(100% - 16px));
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              background 0.2s,
-              border-color 0.2s,
-              box-shadow 0.2s;
-}
-.nav-bookmark-label {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.nav-bookmark-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  flex-shrink: 0;
-  transition: background 0.2s, box-shadow 0.2s;
-}
-
-/* 호버 시 전체 네비게이터 펼침 */
-.section-nav:hover .section-nav-item {
-  transform: translateX(0);
-}
-.section-nav:hover .nav-bookmark-label {
-  opacity: 1;
-}
-
-/* 활성 섹션 — 주황색(빨간) 포인트 */
-.section-nav-item.active {
-  background: var(--red-soft);
-  border-color: var(--red-text);
-  box-shadow: -2px 2px 10px rgba(198, 59, 59, 0.15);
-}
-.section-nav-item.active .nav-bookmark-dot {
-  background: var(--red);
-  box-shadow: 0 0 6px rgba(198, 59, 59, 0.4);
-}
-.section-nav-item.active .nav-bookmark-label {
-  color: var(--red-text);
-  font-weight: 700;
-}
-
-/* 하위 섹션 항목 — 들여쓰기 */
-.section-nav-item.nav-sub {
-  padding-left: 18px;
-}
-.section-nav-item.nav-sub .nav-bookmark-dot {
-  width: 6px;
-  height: 6px;
-}
-.section-nav-item.nav-sub .nav-bookmark-label {
-  font-size: 0.7rem;
-}
-
-/* 섹션별 dot 컬러 */
-.section-nav-item[data-nav-section="home"] .nav-bookmark-dot { background: var(--red); }
-.section-nav-item[data-nav-section="about"] .nav-bookmark-dot { background: var(--cyan); }
-.section-nav-item[data-nav-section="skills"] .nav-bookmark-dot { background: var(--gold); }
-.section-nav-item[data-nav-section="awards"] .nav-bookmark-dot { background: var(--bronze); }
-.section-nav-item[data-nav-section="projects"] .nav-bookmark-dot { background: var(--red); }
-.section-nav-item.active .nav-bookmark-dot { background: var(--red) !important; }
-
-/* 모바일: 하단 도트 네비게이션 */
-@media (max-width: 768px) {
-  .section-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: auto;
-    transform: none;
-    flex-direction: row;
-    justify-content: center;
-    gap: 0;
-    z-index: 900;
-    background: var(--card);
-    border-top: 1px solid var(--line);
-    box-shadow: 0 -2px 8px rgba(31, 28, 20, 0.08);
-    padding: 6px 4px;
-    /* 항목이 5개로 줄어 가로 스크롤이 필요 없다 */
-    overflow-x: visible;
-  }
-  /* 하위 섹션(MBTI · GitHub · 자격증 · 대표)은 모바일 최상위 네비에서 제외 —
-     9개가 48px ellipsis로 잘리며 가로 스크롤이 생기던 문제 해소 (#114) */
-  .section-nav-item.nav-sub {
-    display: none;
-  }
-  .section-nav-item {
-    transform: none;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    background: transparent;
-    padding: 4px 6px;
-    flex-direction: column;
-    gap: 3px;
-    min-width: 0;
-    flex: 1 1 0;
-  }
-  .nav-bookmark-label {
-    font-size: 0.7rem;
-    opacity: 1;
-    max-width: none;
-    text-align: center;
-  }
-  .nav-bookmark-dot {
-    width: 6px;
-    height: 6px;
-    order: -1;
-  }
-  .section-nav:hover .section-nav-item {
-    transform: none;
-  }
-  .section-nav-item.active {
-    background: var(--red-soft);
-    border-radius: 6px;
-  }
-  body {
-    padding-bottom: 52px;
-  }
 }
