@@ -1,0 +1,86 @@
+name: v2.6 freshman guide media repair
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-freshman-guide-quality.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v26-structure-media-runner
+          fetch-depth: 0
+
+      - name: Switch to target branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin agent/v26-structure-media-followup
+          git switch -C agent/v26-structure-media-followup origin/agent/v26-structure-media-followup
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Capture public Notion with Korean font
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet selenium pillow
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil, subprocess, time
+          from PIL import Image
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.chrome.service import Service
+
+          root=Path.cwd()
+          chrome=shutil.which('google-chrome') or shutil.which('chromium') or shutil.which('chromium-browser')
+          driver_bin=shutil.which('chromedriver') or shutil.which('chromium-driver')
+          opts=Options(); opts.binary_location=chrome
+          for arg in ['--headless=new','--no-sandbox','--disable-dev-shm-usage','--hide-scrollbars','--ignore-certificate-errors','--window-size=1440,1000','--lang=ko-KR']:
+              opts.add_argument(arg)
+          d=webdriver.Chrome(service=Service(driver_bin) if driver_bin else Service(),options=opts)
+          d.set_window_size(1440,1000)
+          url='https://capybaracute.notion.site/2026-2fca8de5ee5f806db9e9e64464a9ac78'
+          d.get(url); time.sleep(10)
+          source=d.page_source
+          if '2026' not in source:
+              raise SystemExit('public freshman guide did not load')
+          d.execute_script('''
+            const l=document.createElement('link'); l.rel='stylesheet';
+            l.href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap'; document.head.appendChild(l);
+            const s=document.createElement('style'); s.textContent='body,body *{font-family:"Noto Sans KR",sans-serif !important;}'; document.head.appendChild(s);
+          ''')
+          d.execute_async_script('const done=arguments[0]; document.fonts.ready.then(()=>done());')
+          time.sleep(4)
+          png=Path('/tmp/freshman-guide.png')
+          d.save_screenshot(str(png)); d.quit()
+          if png.stat().st_size<40000:
+              raise SystemExit(f'guide screenshot unexpectedly small: {png.stat().st_size}')
+          out=root/'projects/koreatech_noob_guide/assets/images/notion-guide.webp'
+          with Image.open(png) as im:
+              im=im.convert('RGB'); im.save(out,'WEBP',quality=84,method=6)
+          subprocess.run(['git','add','--',out.relative_to(root).as_posix()],check=True)
+          subprocess.run(['git','commit','-m','feat: refresh freshman guide screenshot'],check=True)
+          PY
+
+      - name: Validate and push
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check script.js
+          node build.js
+          test -z "$(git status --porcelain index.html)"
+          node tools/verify-build.js
+          git diff --check origin/main...HEAD
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:agent/v26-structure-media-followup
