@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>01 · Daylight Constellation</title>
+  <style>
+    /* Daylight constellation: a low-contrast moon-paper interface with meaningful stars only. */
+    :root { --paper:#f8f7ff; --panel:#ffffff; --ink:#292241; --muted:#71698b; --line:#d8d0ee; --violet:#6948ca; --violet-soft:#eeeaff; --gold:#efc75e; --night:#342b60; }
+    * { box-sizing:border-box; } body { margin:0; background:linear-gradient(125deg,#faf9ff,#f3efff 58%,#fbf3dc); color:var(--ink); font-family:ui-rounded,"Segoe UI",system-ui,sans-serif; }
+    button { font:inherit; } .page { min-height:100vh; max-width:1440px; margin:auto; padding:20px 34px 38px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:20px; } .brand { display:flex; gap:10px; align-items:center; font-weight:900; letter-spacing:-.04em; } .brand i { display:grid; place-items:center; width:32px; height:32px; border-radius:11px; background:var(--night); color:#ffe999; font-style:normal; }
+    nav { display:flex; gap:18px; color:var(--muted); font-size:14px; } nav a { color:inherit; text-decoration:none; } .lang { padding:9px 12px; border:1px solid var(--line); border-radius:99px; background:#fff; color:var(--ink); }
+    .hero { display:grid; grid-template-columns:minmax(320px,.9fr) minmax(500px,1.1fr); align-items:center; gap:34px; min-height:650px; } .label { color:var(--violet); font-size:12px; font-weight:900; letter-spacing:.12em; } h1 { margin:15px 0 18px; font-size:clamp(45px,6vw,88px); letter-spacing:-.08em; line-height:.88; } .intro { max-width:430px; color:var(--muted); font-size:17px; line-height:1.75; }
+    .actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-top:28px; } .primary { border:0; padding:13px 18px; border-radius:14px; background:var(--night); color:#fff; font-weight:800; cursor:pointer; box-shadow:0 13px 28px #392a6824; } .note { color:var(--muted); font-size:13px; }
+    .sky { position:relative; aspect-ratio:1.08; min-height:480px; overflow:hidden; border-radius:42% 58% 48% 52% / 48% 44% 56% 52%; background:radial-gradient(circle at 69% 19%,#fff8cf 0 2%,transparent 2.4%),radial-gradient(circle at 32% 29%,#ddd2ff 0 2%,transparent 2.5%),linear-gradient(145deg,#e4dcff,#c5b9ef 60%,#d9cdf9); box-shadow:inset 0 0 70px #fff8,0 30px 70px #56497e26; }
+    .sky:before,.sky:after { content:""; position:absolute; inset:11%; border:1px solid #fff9; border-radius:48% 52% 62% 38%; transform:rotate(-18deg); } .sky:after { inset:26% 4% 19% 21%; border-color:#5c4f9b33; transform:rotate(31deg); }
+    .path { position:absolute; top:26%; left:21%; width:57%; height:46%; border-top:1.5px solid #554879aa; border-right:1.5px solid #554879aa; transform:rotate(12deg) skew(-17deg); clip-path:polygon(0 0,100% 0,100% 6%,10% 6%,10% 100%,0 100%); }
+    .star { position:absolute; display:grid; place-items:center; width:60px; aspect-ratio:1; border:0; border-radius:50%; background:#fffdf3; color:var(--night); box-shadow:0 8px 22px #392a6833; cursor:pointer; transition:transform .3s ease, background .3s ease, box-shadow .3s ease; } .star:hover,.star:focus-visible,.star.active { transform:scale(1.16); outline:none; background:#ffe589; box-shadow:0 12px 26px #edbd4d6b; } .star b { display:block; font-size:12px; } .star small { display:block; margin-top:1px; font-size:9px; color:#746a92; }
+    .s1{top:22%;left:22%}.s2{top:50%;left:42%}.s3{top:27%;right:17%}.s4{bottom:17%;right:23%}.s5{bottom:14%;left:19%}.moon { position:absolute; right:11%; bottom:9%; width:92px; height:92px; border-radius:50%; background:#fff8cf; box-shadow:inset -18px -6px #eddb9d,0 0 0 12px #fff4; }
+    .ticker { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:14px; padding:16px 20px; border:1px solid #e2dbf5; border-radius:20px; background:#ffffffa8; backdrop-filter:blur(14px); } .ticker strong { font-size:14px; }.ticker p{margin:0;color:var(--muted);font-size:14px}.counter{color:var(--violet);font-weight:900;font-size:13px}
+    @media(max-width:840px){.page{padding:18px}.hero{grid-template-columns:1fr;gap:4px;min-height:auto;padding:55px 0 22px}.sky{min-height:420px;order:-1}nav{display:none}h1{font-size:55px}} @media(prefers-reduced-motion:reduce){.star{transition:none}}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header><div class="brand"><i>✦</i>pachir1su’s sky</div><nav><a href="#constellation">별자리</a><a href="#diary">관찰일지</a><a href="#about">나에 대해</a></nav><button class="lang" type="button">KO · EN</button></header>
+    <main class="hero">
+      <section><span class="label">CONSTELLATION 01 · 아직 확장 중</span><h1>오늘도<br>별 하나를<br>더 잇는 중.</h1><p class="intro">잘하고 싶은 마음을 연료로, 매번 조금 더 멀리 가는 사람의 우주입니다. 여기서는 완성한 것보다 계속 커지는 궤적을 먼저 보여 드려요.</p><div class="actions"><button class="primary" id="findStar" type="button">오늘의 별 찾기 ✦</button><span class="note">별을 누르면 이야기가 열립니다</span></div></section>
+      <section class="sky" id="constellation" aria-label="프로젝트로 이루어진 별자리 지도"><div class="path"></div><button class="star s1" type="button"><span><b>pico</b><small>web</small></span></button><button class="star s2" type="button"><span><b>MZ bot</b><small>ai</small></span></button><button class="star s3" type="button"><span><b>guide</b><small>app</small></span></button><button class="star s4" type="button"><span><b>pixel</b><small>play</small></span></button><button class="star s5" type="button"><span><b>zero</b><small>start</small></span></button><div class="moon" aria-hidden="true"></div></section>
+    </main>
+    <aside class="ticker" id="diary"><strong>✦ 관찰 중인 목표</strong><p id="starMessage">새로운 언어로 작은 화면 하나를 끝까지 만들어 보기</p><span class="counter">03 / 08</span></aside>
+  </div>
+  <script>
+    /* Local interaction: selecting a star changes one concise observation, without decorative loops. */
+    const starItems = [...document.querySelectorAll('.star')];
+    const messages = ['작고 귀여운 인터랙션 하나가, 누군가의 하루를 바꿀 수 있다고 믿어요.','혼자 끝내지 않고, 기록해서 다음의 나에게 넘겨요.','익숙하지 않은 문제일수록 조금 더 오래 들여다봅니다.','재미있는 일이라면 일단 만들어 보고 싶어요.','처음의 나도 지금의 별자리 안에 남겨 두었습니다.'];
+    starItems.forEach((star,index) => star.addEventListener('click',() => { starItems.forEach(item => item.classList.remove('active')); star.classList.add('active'); document.querySelector('#starMessage').textContent = messages[index]; }));
+    document.querySelector('#findStar').addEventListener('click',() => starItems[Math.floor(Math.random()*starItems.length)].click());
+  </script>
+</body>
+</html>
+
