@@ -1,0 +1,141 @@
+name: v2.6 media quality repair
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-media-quality-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v26-structure-media-runner
+          fetch-depth: 0
+
+      - name: Switch to target branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin agent/v26-structure-media-followup
+          git switch -C agent/v26-structure-media-followup origin/agent/v26-structure-media-followup
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install capture dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update >/dev/null
+          sudo apt-get install -y fonts-noto-cjk ffmpeg >/dev/null
+          fc-cache -f >/dev/null
+          python3 -m pip install --quiet selenium pillow flask python-dotenv google-generativeai gradio pypdf pydub reportlab mutagen
+
+      - name: Replace low-quality captures with real local UIs
+        shell: bash
+        env:
+          PYTHONUNBUFFERED: "1"
+          GOOGLE_API_KEY: portfolio-capture-placeholder
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/v26-quality && mkdir -p /tmp/v26-quality
+          git clone --depth 1 https://github.com/pachir1su/Legend_SakSak_GongGam_AI.git /tmp/v26-quality/gonggam
+          git clone --depth 1 https://github.com/pachir1su/file_swordmaster.git /tmp/v26-quality/file
+          git clone --depth 1 https://github.com/pachir1su/media_swordmaster.git /tmp/v26-quality/media
+          python3 - <<'PY'
+          from __future__ import annotations
+          import os, shutil, socket, subprocess, time
+          from pathlib import Path
+          from PIL import Image
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from selenium.webdriver.chrome.service import Service
+
+          root = Path.cwd()
+          tmp = Path('/tmp/v26-quality')
+          chrome = shutil.which('google-chrome') or shutil.which('chromium') or shutil.which('chromium-browser')
+          driver_bin = shutil.which('chromedriver') or shutil.which('chromium-driver')
+          if not chrome:
+              raise SystemExit('Chrome unavailable')
+          opts = Options(); opts.binary_location = chrome
+          for arg in ['--headless=new','--no-sandbox','--disable-dev-shm-usage','--hide-scrollbars','--ignore-certificate-errors','--window-size=1440,1000','--lang=ko-KR']:
+              opts.add_argument(arg)
+          driver = webdriver.Chrome(service=Service(driver_bin) if driver_bin else Service(), options=opts)
+          driver.set_window_size(1440,1000)
+
+          def wait_port(port, timeout=35):
+              end = time.time()+timeout
+              while time.time()<end:
+                  try:
+                      with socket.create_connection(('127.0.0.1',port),timeout=.5): return True
+                  except OSError: time.sleep(.5)
+              return False
+
+          def capture(url, out, required, wait=4):
+              driver.get(url)
+              end=time.time()+25
+              while time.time()<end and driver.execute_script('return document.readyState')!='complete': time.sleep(.2)
+              time.sleep(wait)
+              source=driver.page_source
+              for needle in required:
+                  if needle not in source:
+                      raise RuntimeError(f'missing expected text {needle!r} at {url}; title={driver.title!r}')
+              lower=source.lower()
+              if 'this page isn\'t working' in lower or 'configuration error' in lower:
+                  raise RuntimeError(f'error page captured: {url}')
+              png=tmp/(out.stem+'.png')
+              driver.save_screenshot(str(png))
+              if png.stat().st_size<18000: raise RuntimeError(f'screenshot too small: {png.stat().st_size}')
+              out.parent.mkdir(parents=True,exist_ok=True)
+              with Image.open(png) as im:
+                  im=im.convert('RGB')
+                  if im.width>1600:
+                      h=round(im.height*1600/im.width); im=im.resize((1600,h),Image.Resampling.LANCZOS)
+                  im.save(out,'WEBP',quality=84,method=6)
+              with Image.open(out) as im: print('CAPTURED',out,im.size,out.stat().st_size,flush=True)
+
+          def commit(path,message):
+              rel=path.relative_to(root).as_posix()
+              subprocess.run(['git','add','--',rel],check=True)
+              subprocess.run(['git','commit','-m',message],check=True)
+
+          # GongGam actual Flask UI with system Korean font available.
+          env=os.environ.copy(); env['GOOGLE_API_KEY']='portfolio-capture-placeholder'
+          gong=subprocess.Popen(['python3','-c','from Server import app; app.run(host="127.0.0.1",port=8124,debug=False,use_reloader=False)'],cwd=tmp/'gonggam',env=env,stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
+          if not wait_port(8124): raise RuntimeError('GongGam server did not start')
+          out=root/'projects/Legend_SakSak_GongGam_AI/assets/images/app-home.webp'
+          capture('http://127.0.0.1:8124/',out,['공감','레시피'],3); gong.terminate(); commit(out,'feat: refresh GongGam app screenshot')
+
+          # File Swordmaster actual local Gradio UI.
+          filep=subprocess.Popen(['python3','app.py'],cwd=tmp/'file',stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
+          if not wait_port(7860): raise RuntimeError('File Swordmaster did not start')
+          out=root/'projects/swordmaster/assets/images/file-swordmaster.webp'
+          capture('http://127.0.0.1:7860/',out,['File Swordmaster','PDF 분할'],5); filep.terminate(); filep.wait(timeout=10); commit(out,'feat: replace File Swordmaster error capture')
+
+          # Media Swordmaster actual local Gradio UI.
+          mediap=subprocess.Popen(['python3','app.py'],cwd=tmp/'media',stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
+          if not wait_port(7860): raise RuntimeError('Media Swordmaster did not start')
+          out=root/'projects/swordmaster/assets/images/media-swordmaster.webp'
+          capture('http://127.0.0.1:7860/',out,['Media Swordmaster'],6); mediap.terminate(); commit(out,'feat: replace Media Swordmaster error capture')
+
+          driver.quit()
+          PY
+
+      - name: Validate and push
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check script.js
+          node build.js
+          test -z "$(git status --porcelain index.html)"
+          node tools/verify-build.js
+          git diff --check origin/main...HEAD
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:agent/v26-structure-media-followup
