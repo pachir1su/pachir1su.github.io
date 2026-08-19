@@ -127,7 +127,7 @@ jobs:
           out=root/'projects/swordmaster/assets/images/file-swordmaster.webp'
           capture('http://127.0.0.1:7860/',out,['File Swordmaster','PDF 분할'],5); filep.terminate(); filep.wait(timeout=10); commit(out,'feat: replace File Swordmaster error capture')
 
-          mediap=subprocess.Popen(['python3','app.py'],cwd=tmp/'media',stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
+          mediap=subprocess.Popen(['python3','-c','import app; app.buildApp().launch()'],cwd=tmp/'media',stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
           if not wait_port(7860): raise RuntimeError('Media Swordmaster did not start')
           out=root/'projects/swordmaster/assets/images/media-swordmaster.webp'
           capture('http://127.0.0.1:7860/',out,['Media Swordmaster'],6); mediap.terminate(); commit(out,'feat: replace Media Swordmaster error capture')
