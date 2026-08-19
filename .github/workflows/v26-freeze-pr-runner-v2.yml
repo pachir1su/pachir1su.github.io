@@ -20,6 +20,7 @@ jobs:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
 
+      # The source workflow is used only as a text container for the patch script.
       - name: Extract builder with whitespace-tolerant replacements
         shell: bash
         run: |
