@@ -1,0 +1,322 @@
+name: v2.6.x freeze independent validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-freeze-validation.yml
+      - index.html
+      - projects.json
+      - style.css
+      - script.js
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Syntax and build gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --version
+          node --check script.js
+          cp index.html /tmp/index-before-build.html
+          node build.js
+          if ! cmp -s /tmp/index-before-build.html index.html; then
+            echo '❌ node build.js changed index.html'
+            git --no-pager diff -- index.html
+            exit 1
+          fi
+          node tools/verify-build.js
+          git diff --exit-code -- index.html
+          echo '✅ syntax/build/idempotency gates passed'
+
+      - name: Static source invariants and accessibility structure
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from collections import Counter
+          from html.parser import HTMLParser
+          from pathlib import Path
+          import json
+          import re
+
+          html = Path('index.html').read_text(encoding='utf-8')
+          css = Path('style.css').read_text(encoding='utf-8')
+          js = Path('script.js').read_text(encoding='utf-8')
+          projects = json.loads(Path('projects.json').read_text(encoding='utf-8'))
+
+          failures = []
+          def check(ok, message):
+              if not ok:
+                  failures.append(message)
+
+          # Removed markup/runtime compatibility layers must stay removed.
+          for token in ['id="mbti-section"', 'class="floating-icons"', 'id="sectionNav"', 'id="v26-runtime-layout"']:
+              check(token not in html, f'dead markup/runtime token remains in index.html: {token}')
+          for token in ['normalizeV26Markup', 'restoreIssue129FeaturedProjects', 'restoreGitHubActivityCards', 'rollbackVisionSectionToPreV23', 'restorePre115UserCopy']:
+              check(token not in js, f'legacy runtime compatibility function remains in script.js: {token}')
+          for token in ['.floating-icons', '.chicken-mode', '.about-note', '#sectionNav', '.edu-sub']:
+              check(token not in css, f'dead selector remains in style.css: {token}')
+
+          # Static source must contain the state that runtime patches used to create.
+          check('class="btn btn-ghost contact-email hero-email"' in html, 'hero email is not static HTML')
+          check('data-ko="한국기술교육대학교 26학번"' in html, 'KOREATECH class label missing from static HTML')
+          check('"affiliation"' in html and '"alumniOf"' not in html, 'Person JSON-LD affiliation was not frozen correctly')
+          for detail in ['projects/Wall_Sina/', 'projects/HEALTH_CHECK_PROJECT/', 'projects/koreatechGongjiAgent/']:
+              check(f'<article class="featured-card" data-card-href="{detail}">' in html, f'featured project missing: {detail}')
+          check(html.count('class="gh-card ') == 3, 'GitHub activity must contain exactly three static cards')
+          check('href="#home"' not in re.sub(r'<a href="#" class="logo".*?</a>', '', html, flags=re.S), 'duplicate Home navigation link remains')
+
+          # User-authored copy must be frozen, not rewritten.
+          for text in ['혁신의 기업가', '월 100만 명', '아이디어 뱅크', 'LLM 활용 능력', '탁월한 보고서 작성', '팀 리딩 경험 다수', '버츄얼(VTuber) 기술 보유']:
+              check(text in html or text in js, f'expected preserved user copy missing: {text}')
+
+          # projects.json is the SSOT for generated cards.
+          cards = [card for group in projects['groups'] for card in group['cards']]
+          by_detail = {card.get('detail'): card for card in cards}
+          check(by_detail['projects/koreatech_noob_guide/']['desc']['ko'] == '한기대 26학번 신입생을 위한 노션 사이트', 'freshman guide SSOT copy mismatch')
+          check(by_detail['projects/MZ_bot/']['desc']['ko'] == '디스코드 경제 게임 봇', 'MZ Bot SSOT copy mismatch')
+
+          class AuditParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = []
+                  self.img_missing_alt = []
+                  self.buttons = []
+              def handle_starttag(self, tag, attrs):
+                  data = dict(attrs)
+                  if 'id' in data:
+                      self.ids.append(data['id'])
+                  if tag == 'img' and 'alt' not in data:
+                      self.img_missing_alt.append(data.get('src', '<no src>'))
+                  if tag == 'button':
+                      self.buttons.append(data)
+
+          parser = AuditParser()
+          parser.feed(html)
+          duplicates = sorted(k for k, v in Counter(parser.ids).items() if v > 1)
+          check(not duplicates, f'duplicate IDs: {duplicates}')
+          check(not parser.img_missing_alt, f'images missing alt: {parser.img_missing_alt}')
+          check('aria-expanded="false"' in html and 'aria-controls="mobileMenu"' in html, 'hamburger ARIA state/control missing')
+          check('aria-label="맨 위로"' in html, 'back-to-top accessible name missing')
+
+          # Responsive/reduced-motion source gates.
+          for query in ['@media (max-width: 1024px)', '@media (max-width: 640px)', '@media (prefers-reduced-motion: reduce)']:
+              check(query in css, f'responsive/accessibility media query missing: {query}')
+          check('finePointerQuery' in js and 'hasFinePointer' in js, 'fine/coarse pointer capability guard missing')
+
+          print('Static file sizes (bytes):')
+          for path in ['index.html', 'projects.json', 'style.css', 'script.js']:
+              print(f'  {path}: {Path(path).stat().st_size}')
+
+          if failures:
+              print('❌ static validation failed')
+              for failure in failures:
+                  print('  -', failure)
+              raise SystemExit(1)
+          print('✅ static source/accessibility invariants passed')
+          PY
+
+      - name: Headless browser viewport, language, theme and keyboard probes
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME" ]; then
+            echo '❌ Chrome/Chromium is not installed on the runner'
+            exit 1
+          fi
+          echo "Browser: $CHROME"
+          "$CHROME" --version
+
+          cat > .validation-probe.html <<'HTML'
+          <!doctype html><meta charset="utf-8"><title>validation probe</title>
+          <pre id="result">pending</pre>
+          <script>
+          const params = new URLSearchParams(location.search);
+          const width = Number(params.get('w') || 390);
+          const lang = params.get('lang') || 'ko';
+          const theme = params.get('theme') || 'light';
+          localStorage.setItem('lang', lang);
+          localStorage.setItem('theme', theme);
+
+          const frame = document.createElement('iframe');
+          frame.style.cssText = `display:block;width:${width}px;height:1600px;border:0`;
+          frame.src = `/index.html?validation=${Date.now()}`;
+          document.body.appendChild(frame);
+
+          frame.addEventListener('load', () => setTimeout(() => {
+            const win = frame.contentWindow;
+            const doc = frame.contentDocument;
+            const q = (selector) => doc.querySelector(selector);
+            const qa = (selector) => [...doc.querySelectorAll(selector)];
+            const style = (selector) => q(selector) ? win.getComputedStyle(q(selector)) : null;
+            const heroButtons = q('.hero-btns');
+            const firstHeroButton = q('.hero-btns > *');
+
+            const result = {
+              requestedWidth: width,
+              viewportWidth: win.innerWidth,
+              initialLang: doc.documentElement.lang,
+              initialTheme: doc.documentElement.dataset.theme,
+              schoolText: q('.edu-school')?.textContent.trim() || null,
+              homeNavCount: qa('.nav-links a[href="#home"], .mobile-menu > a[href="#home"]').length,
+              mbtiExists: !!q('#mbti-section'),
+              floatingExists: !!q('.floating-icons'),
+              sectionNavExists: !!q('#sectionNav'),
+              runtimeStyleExists: !!q('#v26-runtime-layout'),
+              heroEmailExists: !!q('.hero-email .email-addr'),
+              featuredCount: qa('#featured-section .featured-card').length,
+              githubCardCount: qa('#github-section .gh-card').length,
+              heroContentDisplay: style('.hero-content')?.display || null,
+              heroButtonWidthRatio: heroButtons && firstHeroButton ? firstHeroButton.getBoundingClientRect().width / heroButtons.getBoundingClientRect().width : null,
+              pageScrollWidth: Math.max(doc.documentElement.scrollWidth, doc.body.scrollWidth),
+              horizontalOverflow: Math.max(doc.documentElement.scrollWidth, doc.body.scrollWidth) > win.innerWidth + 1,
+              reducedMotion: win.matchMedia('(prefers-reduced-motion: reduce)').matches,
+              finePointer: win.matchMedia('(hover: hover) and (pointer: fine)').matches,
+              coarsePointer: win.matchMedia('(pointer: coarse)').matches,
+              typingText: q('#typing-text')?.textContent || '',
+            };
+
+            const hamburger = q('#hamburger');
+            const mobileMenu = q('#mobileMenu');
+            hamburger?.click();
+            result.mobileOpened = !!mobileMenu?.classList.contains('open') && hamburger?.getAttribute('aria-expanded') === 'true';
+            doc.dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+            result.mobileClosedByEscape = !mobileMenu?.classList.contains('open') && hamburger?.getAttribute('aria-expanded') === 'false';
+
+            q('#langToggle')?.click();
+            result.toggledLang = doc.documentElement.lang;
+            result.toggledSchoolText = q('.edu-school')?.textContent.trim() || null;
+            q('#themeToggle')?.click();
+            result.toggledTheme = doc.documentElement.dataset.theme;
+
+            document.getElementById('result').textContent = JSON.stringify(result);
+          }, 1200));
+          </script>
+          HTML
+
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/v26-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+          sleep 1
+
+          run_probe() {
+            name="$1"; width="$2"; lang="$3"; theme="$4"; shift 4
+            "$CHROME" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage \
+              --window-size=1700,1900 --virtual-time-budget=5000 "$@" \
+              --dump-dom "http://127.0.0.1:4173/.validation-probe.html?w=${width}&lang=${lang}&theme=${theme}" \
+              > "/tmp/${name}.html" 2>"/tmp/${name}.chrome.log"
+          }
+
+          for width in 360 390 430 768 1024 1280 1440; do
+            run_probe "probe-${width}" "$width" ko light
+          done
+          run_probe probe-en-dark 390 en dark
+          run_probe probe-reduced 390 ko light --force-prefers-reduced-motion
+
+          python3 <<'PY'
+          from pathlib import Path
+          import html as htmlmod
+          import json
+          import re
+
+          failures = []
+          def check(ok, message):
+              if not ok:
+                  failures.append(message)
+
+          def read_probe(name):
+              raw = Path(f'/tmp/{name}.html').read_text(encoding='utf-8', errors='replace')
+              match = re.search(r'<pre id="result">(.*?)</pre>', raw, re.S)
+              if not match or match.group(1).strip() == 'pending':
+                  raise RuntimeError(f'probe did not finish: {name}')
+              return json.loads(htmlmod.unescape(match.group(1)))
+
+          for width in [360, 390, 430, 768, 1024, 1280, 1440]:
+              data = read_probe(f'probe-{width}')
+              print(f'viewport {width}:', json.dumps(data, ensure_ascii=False))
+              check(abs(data['viewportWidth'] - width) <= 20, f'{width}: iframe viewport mismatch ({data["viewportWidth"]})')
+              check(data['initialLang'] == 'ko', f'{width}: KO initial language failed')
+              check(data['initialTheme'] == 'light', f'{width}: light initial theme failed')
+              check(data['schoolText'] == '한국기술교육대학교 26학번', f'{width}: school KO text mismatch: {data["schoolText"]}')
+              check(data['homeNavCount'] == 0, f'{width}: duplicate Home nav exists')
+              check(not data['mbtiExists'] and not data['floatingExists'] and not data['sectionNavExists'] and not data['runtimeStyleExists'], f'{width}: removed runtime/dead DOM returned')
+              check(data['heroEmailExists'], f'{width}: hero email missing')
+              check(data['featuredCount'] == 3, f'{width}: Featured count {data["featuredCount"]} != 3')
+              check(data['githubCardCount'] == 3, f'{width}: GitHub card count {data["githubCardCount"]} != 3')
+              check(not data['horizontalOverflow'], f'{width}: horizontal overflow (scrollWidth={data["pageScrollWidth"]}, viewport={data["viewportWidth"]})')
+              check(data['mobileOpened'] and data['mobileClosedByEscape'], f'{width}: mobile menu click/Escape interaction failed')
+              check(data['toggledLang'] == 'en', f'{width}: language toggle KO→EN failed')
+              check(data['toggledSchoolText'] == 'KOREATECH · Class of 2026', f'{width}: translated school text mismatch: {data["toggledSchoolText"]}')
+              check(data['toggledTheme'] == 'dark', f'{width}: theme toggle light→dark failed')
+              expected_display = 'block' if width <= 1024 else 'grid'
+              check(data['heroContentDisplay'] == expected_display, f'{width}: hero layout expected {expected_display}, got {data["heroContentDisplay"]}')
+              if width <= 640 and data['heroButtonWidthRatio'] is not None:
+                  check(data['heroButtonWidthRatio'] >= 0.95, f'{width}: mobile hero buttons are not full-width ({data["heroButtonWidthRatio"]:.3f})')
+
+          en = read_probe('probe-en-dark')
+          print('en/dark:', json.dumps(en, ensure_ascii=False))
+          check(en['initialLang'] == 'en', 'EN initial state failed')
+          check(en['initialTheme'] == 'dark', 'dark initial state failed')
+          check(en['schoolText'] == 'KOREATECH · Class of 2026', f'EN school label mismatch: {en["schoolText"]}')
+          check(en['toggledLang'] == 'ko', 'language toggle EN→KO failed')
+          check(en['toggledTheme'] == 'light', 'theme toggle dark→light failed')
+
+          reduced = read_probe('probe-reduced')
+          print('reduced-motion:', json.dumps(reduced, ensure_ascii=False))
+          check(reduced['reducedMotion'], 'prefers-reduced-motion was not honored by browser probe')
+          check(bool(reduced['typingText']), 'reduced-motion typing fallback did not render a static word')
+
+          if failures:
+              print('❌ browser validation failed')
+              for failure in failures:
+                  print('  -', failure)
+              raise SystemExit(1)
+          print('✅ browser viewport/language/theme/keyboard/reduced-motion probes passed')
+          PY
+
+      - name: Performance delta and screenshot capture
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'Current branch bytes:'
+          wc -c index.html style.css script.js projects.json
+          echo 'Main branch bytes:'
+          for file in index.html style.css script.js projects.json; do
+            printf '  %s: ' "$file"
+            git show origin/main:"$file" | wc -c
+          done
+
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          python3 -m http.server 4174 --bind 127.0.0.1 >/tmp/v26-shot-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+          sleep 1
+          mkdir -p validation-shots
+          for width in 360 430 768 1024 1280 1440; do
+            "$CHROME" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage \
+              --window-size=${width},1000 --hide-scrollbars \
+              --screenshot="validation-shots/${width}.png" \
+              "http://127.0.0.1:4174/index.html?validation-shot=${width}" >/dev/null 2>&1
+          done
+          ls -lh validation-shots
+
+      - name: Upload validation screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: v26-freeze-validation-screenshots
+          path: validation-shots/*.png
+          if-no-files-found: error
+          retention-days: 3
