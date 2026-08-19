@@ -4,82 +4,87 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <title>Constellation Story · v3 Prototype</title>
+  <meta name="description" content="이건영의 v3 우주·별자리 포트폴리오 디자인 시안">
+  <title>이건영 · Constellation Story Prototype</title>
   <link rel="stylesheet" href="prototype.css">
   <script src="prototype.js" defer></script>
 </head>
-<body data-page="story">
-  <header class="site-header">
-    <a class="brand-mark" href="index.html" aria-label="프로토타입 목록으로">PACHIR1SU <span>✦</span></a>
-    <nav class="site-nav" aria-label="주요 영역">
-      <a href="#growth">성장 별자리</a><a href="#projects">프로젝트</a><a href="#moon">달 관측소</a>
+<body data-page="story" class="space-story-page">
+  <header class="space-header">
+    <a class="space-brand" href="index.html" aria-label="프로토타입 목록으로">PACHIR1SU <span>✦</span></a>
+    <nav aria-label="주요 영역">
+      <a href="#projects">프로젝트</a>
+      <a href="#growth">성장</a>
+      <a href="https://github.com/pachir1su">GitHub</a>
     </nav>
-    <a class="header-mail" href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
   </header>
 
   <main>
-    <section class="story-hero" id="top" aria-labelledby="story-title">
-      <div class="ambient-stars" data-starfield aria-hidden="true"></div>
-      <svg class="intro-sky" data-intro-sky viewBox="0 0 1000 680" role="img" aria-label="흩어진 별이 나타나 하나의 별자리로 연결됩니다">
-        <g class="intro-lines" data-intro-lines></g>
-        <g class="intro-stars" data-intro-stars></g>
-      </svg>
-      <div class="story-hero-copy">
-        <p class="section-kicker">CONSTELLATION LOG · 2024—2026</p>
-        <h1 id="story-title">궁금한 건<br>일단 만들어 봅니다.</h1>
-        <p>프로젝트와 사건을 숨기지 않고, 실제로 남은 기록을 별과 선으로 연결합니다.</p>
-        <a class="quiet-link" href="#growth">첫 번째 별부터 보기 ↓</a>
+    <section class="cosmos-hero" id="top" aria-labelledby="hero-name">
+      <canvas class="cosmos-canvas" data-cosmos-canvas aria-hidden="true"></canvas>
+      <div class="cosmos-grain" aria-hidden="true"></div>
+      <div class="hero-identity">
+        <p class="hero-greeting">안녕하세요.</p>
+        <h1 id="hero-name"><span>이건영</span><small>Lee Geon Yeong</small></h1>
+        <p class="hero-role-line">혁신의 기업가 &amp; 풀스택 개발자</p>
+        <p class="hero-vision">이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다.<br>월 100만 명이 사용하는 서비스를 만드는 것이 목표입니다.</p>
+        <div class="hero-links">
+          <a href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
+          <a href="https://github.com/pachir1su">github.com/pachir1su</a>
+        </div>
+        <p class="hero-school">한국기술교육대학교 26학번</p>
       </div>
-      <p class="hero-coordinate">36.7640° N · 127.2817° E</p>
+      <div class="hero-facts" aria-label="포트폴리오 요약">
+        <span><strong>20+</strong> 프로젝트</span>
+        <span><strong>4</strong> 수상</span>
+        <span><strong>8위</strong> 581팀 중</span>
+      </div>
+      <a class="scroll-orbit" href="#projects" aria-label="프로젝트로 이동"><span></span></a>
     </section>
 
-    <section class="growth-scroll" id="growth" aria-labelledby="growth-title">
+    <section class="space-projects" id="projects" aria-labelledby="project-title">
+      <header class="space-section-heading">
+        <h2 id="project-title">프로젝트는<br>연도로 찾습니다.</h2>
+        <p>별자리는 성장에 남겨 두고, 만든 것들은 빠르게 꺼내 볼 수 있게 묶었습니다.</p>
+      </header>
+      <div class="year-tabs space-year-tabs" data-year-tabs role="tablist" aria-label="프로젝트 연도"></div>
+      <div class="archive-meta space-archive-meta">
+        <strong data-archive-label>2026</strong>
+        <span data-project-count>불러오는 중</span>
+      </div>
+      <section class="project-grid space-project-grid" data-project-grid aria-live="polite"></section>
+    </section>
+
+    <section class="growth-scroll space-growth" id="growth" aria-labelledby="growth-title">
       <div class="growth-stage">
         <div class="growth-copy">
-          <p class="section-kicker">GROWTH CONSTELLATION</p>
-          <h2 id="growth-title">남아 있는 사건을<br>순서대로 연결합니다.</h2>
-          <p data-growth-summary>별을 누르면 사건이 열리고, 현재 별에서 다음 별까지 끌면 선이 이어집니다.</p>
-          <div class="sequence-status" aria-live="polite"><span data-sequence-count>0 / 8</span><span data-sequence-message>어느 별부터 살펴봐도 괜찮습니다</span></div>
+          <h2 id="growth-title">성장은<br>사건으로 남습니다.</h2>
+          <p data-growth-summary>별 하나를 누르면 그때의 기록이 열립니다.</p>
+          <div class="sequence-status" aria-live="polite">
+            <span data-sequence-count>1 / 8</span>
+            <span data-sequence-message>첫 번째 별에서 시작합니다</span>
+          </div>
         </div>
-        <div class="growth-constellation" data-growth-constellation aria-label="누르거나 드래그해 연결하는 성장 사건 별자리"></div>
+        <div class="growth-constellation" data-growth-constellation aria-label="클릭하거나 드래그해 연결하는 성장 사건 별자리"></div>
       </div>
     </section>
 
-    <section class="project-archive" id="projects" aria-labelledby="project-title">
-      <header class="archive-heading">
-        <div><p class="section-kicker">PROJECT OBSERVATION ARCHIVE</p><h2 id="project-title">연도별 관측 기록</h2></div>
-        <p>별자리와 분리해 프로젝트를 빠르게 찾을 수 있도록 묶었습니다. 모든 관측소를 방문하면 혜성이 나타납니다.</p>
-      </header>
-      <div class="year-tabs" data-year-tabs role="tablist" aria-label="프로젝트 그룹"></div>
-      <div class="archive-meta"><span data-archive-label>2026</span><span data-project-count>불러오는 중</span></div>
-      <section class="project-grid" data-project-grid aria-live="polite"></section>
-      <div class="comet-event" data-comet-event aria-hidden="true">
-        <div class="comet-tail"></div><div class="capybara-placeholder"><span class="capy-ear"></span><span class="capy-eye"></span></div>
-        <p>CAPYBARA SIGNAL FOUND</p>
-      </div>
-    </section>
-
-    <section class="moon-observatory" id="moon" aria-labelledby="moon-title">
+    <section class="silent-eclipse" aria-label="달과 태양이 있는 우주 장면">
       <div class="eclipse-scene" data-eclipse-scene>
+        <div class="eclipse-aura" aria-hidden="true"></div>
         <div class="eclipse-sun" aria-hidden="true"></div>
-        <div class="moon-drag" data-moon-drag role="button" tabindex="0" aria-label="달을 드래그하거나 Enter 키를 눌러 일식을 만들어 보세요"></div>
         <div class="eclipse-target" aria-hidden="true"></div>
-        <svg class="capy-constellation" data-capy-constellation viewBox="0 0 520 300" aria-label="카피바라 모양 별자리">
-          <path d="M95 175 L135 112 L220 86 L315 100 L378 140 L430 146 L460 126 M430 146 L448 188 L400 208 L330 218 L235 224 L150 212 L95 175 M165 212 L155 252 M335 216 L345 254 M220 87 L196 48 L242 77"/>
-          <g><circle cx="95" cy="175" r="5"/><circle cx="135" cy="112" r="5"/><circle cx="220" cy="86" r="5"/><circle cx="315" cy="100" r="5"/><circle cx="378" cy="140" r="5"/><circle cx="430" cy="146" r="5"/><circle cx="460" cy="126" r="5"/><circle cx="448" cy="188" r="5"/><circle cx="400" cy="208" r="5"/><circle cx="330" cy="218" r="5"/><circle cx="235" cy="224" r="5"/><circle cx="150" cy="212" r="5"/><circle cx="155" cy="252" r="5"/><circle cx="345" cy="254" r="5"/><circle cx="196" cy="48" r="5"/><circle cx="242" cy="77" r="5"/></g>
-        </svg>
+        <div class="moon-drag" data-moon-drag role="button" tabindex="0" aria-label="달"></div>
+        <canvas class="capy-nebula" data-capy-nebula aria-hidden="true"></canvas>
       </div>
-      <div class="moon-copy">
-        <p class="section-kicker">MOON OBSERVATORY · EASTER EGG 02</p>
-        <h2 id="moon-title">달을 태양의 궤도로<br>옮겨 보세요.</h2>
-        <p>마우스나 손가락으로 달을 끌어 정확한 위치에 놓으면 숨겨진 별자리가 나타납니다.</p>
-        <div class="contact-lines"><a href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a><a href="https://github.com/pachir1su">github.com/pachir1su</a></div>
+      <div class="closing-note">
+        <h2>다음 우주도<br>계속 만듭니다.</h2>
+        <a href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
       </div>
     </section>
   </main>
 
-  <button class="sound-stop" data-sound-stop type="button" hidden aria-label="재생 중인 소리 끄기">소리 끄기 ×</button>
+  <button class="sound-stop" data-sound-stop type="button" hidden aria-label="재생 중인 소리 끄기">소리 끄기</button>
   <script type="application/json" id="prototype-config">{"source":"../../projects.json","defaultGroup":"2026"}</script>
 </body>
 </html>
-
