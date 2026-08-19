@@ -768,3 +768,11 @@ window._updateProjectCount();
   metrics.alt = 'pachir1su님의 GitHub 상세 메트릭 — 활동·커뮤니티·사용 언어';
   cards.appendChild(metrics);
 })();
+
+/* ------------------------------------------------------------- */
+/* 21. Normalize vision quote size                               */
+/* ------------------------------------------------------------- */
+(function normalizeAboutQuoteSize() {
+  const quote = document.querySelector('.about-quote');
+  if (quote) quote.style.fontSize = 'clamp(1.2rem, 1.5vw, 1.4rem)';
+})();
