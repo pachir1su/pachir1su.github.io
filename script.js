@@ -770,9 +770,9 @@ window._updateProjectCount();
 })();
 
 /* ------------------------------------------------------------- */
-/* 21. Normalize vision quote size                               */
+/* 21. Roll back vision card width                              */
 /* ------------------------------------------------------------- */
-(function normalizeAboutQuoteSize() {
-  const quote = document.querySelector('.about-quote');
-  if (quote) quote.style.fontSize = 'clamp(1.2rem, 1.5vw, 1.4rem)';
+(function rollbackVisionCardWidth() {
+  const card = document.querySelector('.about-card');
+  if (card) card.style.maxWidth = 'none';
 })();
