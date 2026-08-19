@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>해안 장벽 시스템 · Interactive Detail</title>
+  <link rel="stylesheet" href="prototype.css">
+  <script src="prototype.js" defer></script>
+</head>
+<body data-page="wall">
+  <header class="site-header">
+    <a class="brand-mark" href="index.html">MISSION ARCHIVE <span>04</span></a>
+    <a class="header-mail" href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
+  </header>
+
+  <main class="wall-page">
+    <section class="wall-hero">
+      <div class="wall-hero-copy">
+        <p class="section-kicker">2024 · SUSTAINABLE DEVELOPMENT PROJECT</p>
+        <h1>해안 장벽<br>시스템</h1>
+        <p>수조 안의 도시와 바다를 분리하고, 수분 센서가 물을 감지하면 장벽과 단계별 경고가 작동하는 MVP입니다.</p>
+        <div class="wall-badges"><span>진규야 밥먹자 시즌 1</span><span>4인 팀</span><span>아두이노 개발 총괄</span></div>
+      </div>
+      <div class="tidal-planet" aria-hidden="true"><div class="planet-ocean"></div><div class="planet-city"></div><div class="planet-barrier"></div></div>
+    </section>
+
+    <section class="simulator" aria-labelledby="simulator-title">
+      <header class="simulator-heading">
+        <div><p class="section-kicker">INTERACTIVE DEFENSE MODEL</p><h2 id="simulator-title">수위 상승 시뮬레이터</h2></div>
+        <p>시스템을 켠 뒤 수위를 직접 움직이거나 자동 시뮬레이션을 실행해 보세요.</p>
+      </header>
+      <div class="simulator-layout">
+        <div class="tank" data-tank>
+          <div class="tank-sky"><span class="mini-sun"></span><span class="mini-cloud"></span></div>
+          <div class="mini-city"><i></i><i></i><i></i><i></i></div>
+          <div class="water" data-water><span class="water-line"></span></div>
+          <div class="physical-barrier" data-barrier><span></span></div>
+          <div class="water-sensor" data-water-sensor><span>SENSOR</span></div>
+          <div class="traffic-light" data-traffic-light><i data-light="red"></i><i data-light="yellow"></i><i data-light="green"></i></div>
+          <div class="alert-beacon" data-alert-beacon></div>
+        </div>
+        <aside class="control-console">
+          <div class="console-status"><span class="status-dot" data-status-dot></span><div><small>SYSTEM STATE</small><strong data-system-state>전원 꺼짐</strong></div></div>
+          <button class="system-switch" data-system-switch type="button" aria-pressed="false">시스템 전원 켜기</button>
+          <label for="waterLevel">수위 <output data-water-output>0%</output></label>
+          <input id="waterLevel" data-water-slider type="range" min="0" max="100" value="0" disabled>
+          <button class="simulation-run" data-simulation-run type="button" disabled>10초 자동 시뮬레이션</button>
+          <div class="phase-list" aria-label="경고 단계">
+            <div data-phase="safe"><b>01</b><span>대기</span><small>감지 전</small></div>
+            <div data-phase="detect"><b>02</b><span>감지</span><small>장벽 상승</small></div>
+            <div data-phase="caution"><b>03</b><span>주의</span><small>황색 신호</small></div>
+            <div data-phase="danger"><b>04</b><span>위험</span><small>적색 경고</small></div>
+            <div data-phase="recover"><b>05</b><span>복구</span><small>초기 위치</small></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="circuit-section" aria-labelledby="circuit-title">
+      <header><p class="section-kicker">ORBITAL CIRCUIT MAP</p><h2 id="circuit-title">장치를 누르면 역할이 열립니다.</h2></header>
+      <div class="circuit-orbit">
+        <div class="circuit-core"><span>Arduino</span><small>CONTROL CORE</small></div>
+        <button style="--angle:0deg" data-component="수분 센서|A0 아날로그 입력으로 물 감지를 시작합니다." type="button">Water<br>Sensor</button>
+        <button style="--angle:60deg" data-component="스테퍼 모터|28BYJ-48 모터로 장벽의 정회전·정지·역회전을 제어합니다." type="button">Stepper<br>Motor</button>
+        <button style="--angle:120deg" data-component="3색 신호등|녹색·황색·적색으로 현재 위험 단계를 표시합니다." type="button">Traffic<br>Light</button>
+        <button style="--angle:180deg" data-component="경고 부저|센서 감지와 위험 단계에 짧은 경고음을 냅니다." type="button">Buzzer</button>
+        <button style="--angle:240deg" data-component="상태 LED|시스템 전원과 경고 상태를 시각적으로 구분합니다." type="button">Status<br>LED</button>
+        <button style="--angle:300deg" data-component="레이저 모듈|장치가 켜진 동안 기준선을 표시합니다." type="button">Laser<br>Module</button>
+      </div>
+      <aside class="component-readout" aria-live="polite"><small>SELECTED COMPONENT</small><h3 data-component-title>Arduino control core</h3><p data-component-description>각 센서와 출력 장치의 상태를 하나의 시퀀스로 제어합니다.</p></aside>
+    </section>
+
+    <section class="wall-facts">
+      <article><small>REFERENCE</small><h2>네덜란드 델타웍스</h2><p>해수면 상승과 홍수에 대응하는 실제 방재 시스템을 참고했습니다.</p></article>
+      <article><small>MY ROLE</small><h2>아두이노 개발 총괄</h2><p>프로그래밍, 배선, 장벽 방수 처리를 담당했습니다.</p></article>
+      <article><small>PROTOTYPE</small><h2>수조 기반 MVP</h2><p>가상의 도시와 바다를 분리하고 수위 상승 상황을 재현했습니다.</p></article>
+    </section>
+
+    <section class="wall-gallery" aria-label="해안 장벽 프로젝트 도식">
+      <article class="gallery-panel gallery-tank" role="img" aria-label="수조, 도시, 방벽으로 이루어진 전체 모형 도식">
+        <span class="gallery-water"></span><span class="gallery-city"></span><span class="gallery-barrier"></span>
+        <p>01 · PHYSICAL MODEL</p><strong>수조에서 검증한<br>도시와 방벽</strong>
+      </article>
+      <article class="gallery-panel gallery-sensor" role="img" aria-label="수위 센서 감지 범위 도식">
+        <span class="sensor-ripple"></span><span class="sensor-probe"></span>
+        <p>02 · WATER SENSOR</p><strong>수위 변화를<br>단계로 읽기</strong>
+      </article>
+      <article class="gallery-panel gallery-system" role="img" aria-label="아두이노 제어 시스템 도식">
+        <span class="system-board">UNO</span><span class="system-wire wire-one"></span><span class="system-wire wire-two"></span>
+        <p>03 · CONTROL LOGIC</p><strong>센서에서 모터까지<br>하나의 흐름</strong>
+      </article>
+    </section>
+  </main>
+  <button class="sound-stop" data-sound-stop type="button" hidden aria-label="재생 중인 소리 멈추기">소리 멈춤 ×</button>
+</body>
+</html>
+
