@@ -1,0 +1,47 @@
+name: v2.6.x freeze responsive screenshots
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v26-freeze-screenshots.yml
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Capture bounded viewport screenshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          python3 -m http.server 4174 --bind 127.0.0.1 >/tmp/v26-shot-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+          sleep 1
+          mkdir -p validation-shots
+          for width in 360 430 768 1024 1280 1440; do
+            timeout 20s "$CHROME" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage \
+              --disable-background-networking --window-size=${width},1000 --hide-scrollbars \
+              --virtual-time-budget=3000 --run-all-compositor-stages-before-draw \
+              --screenshot="validation-shots/${width}.png" \
+              "http://127.0.0.1:4174/index.html?validation-shot=${width}" >/dev/null 2>&1
+            test -s "validation-shots/${width}.png"
+          done
+          ls -lh validation-shots
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: v26-freeze-responsive-screenshots
+          path: validation-shots/*.png
+          if-no-files-found: error
+          retention-days: 3
