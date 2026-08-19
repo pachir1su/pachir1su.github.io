@@ -13,7 +13,7 @@ permissions:
 jobs:
   repair:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,10 +33,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sudo apt-get update >/dev/null
-          sudo apt-get install -y fonts-noto-cjk ffmpeg >/dev/null
-          fc-cache -f >/dev/null
-          python3 -m pip install --quiet selenium pillow flask python-dotenv google-generativeai gradio pypdf pydub reportlab mutagen
+          python3 -m pip install --quiet selenium pillow flask python-dotenv google-generativeai gradio pypdf pydub reportlab mutagen piexif pillow-heif ffmpeg-python
 
       - name: Replace low-quality captures with real local UIs
         shell: bash
@@ -78,11 +75,24 @@ jobs:
                   except OSError: time.sleep(.5)
               return False
 
+          def inject_korean_font():
+              driver.execute_script('''
+                const link=document.createElement('link');
+                link.rel='stylesheet';
+                link.href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap';
+                document.head.appendChild(link);
+                const style=document.createElement('style');
+                style.textContent='body,button,input,textarea,select,*{font-family:"Noto Sans KR",sans-serif !important;}';
+                document.head.appendChild(style);
+              ''')
+              time.sleep(3)
+
           def capture(url, out, required, wait=4):
               driver.get(url)
               end=time.time()+25
               while time.time()<end and driver.execute_script('return document.readyState')!='complete': time.sleep(.2)
               time.sleep(wait)
+              inject_korean_font()
               source=driver.page_source
               for needle in required:
                   if needle not in source:
@@ -106,20 +116,17 @@ jobs:
               subprocess.run(['git','add','--',rel],check=True)
               subprocess.run(['git','commit','-m',message],check=True)
 
-          # GongGam actual Flask UI with system Korean font available.
           env=os.environ.copy(); env['GOOGLE_API_KEY']='portfolio-capture-placeholder'
           gong=subprocess.Popen(['python3','-c','from Server import app; app.run(host="127.0.0.1",port=8124,debug=False,use_reloader=False)'],cwd=tmp/'gonggam',env=env,stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
           if not wait_port(8124): raise RuntimeError('GongGam server did not start')
           out=root/'projects/Legend_SakSak_GongGam_AI/assets/images/app-home.webp'
-          capture('http://127.0.0.1:8124/',out,['공감','레시피'],3); gong.terminate(); commit(out,'feat: refresh GongGam app screenshot')
+          capture('http://127.0.0.1:8124/',out,['공감'],3); gong.terminate(); commit(out,'feat: refresh GongGam app screenshot')
 
-          # File Swordmaster actual local Gradio UI.
           filep=subprocess.Popen(['python3','app.py'],cwd=tmp/'file',stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
           if not wait_port(7860): raise RuntimeError('File Swordmaster did not start')
           out=root/'projects/swordmaster/assets/images/file-swordmaster.webp'
           capture('http://127.0.0.1:7860/',out,['File Swordmaster','PDF 분할'],5); filep.terminate(); filep.wait(timeout=10); commit(out,'feat: replace File Swordmaster error capture')
 
-          # Media Swordmaster actual local Gradio UI.
           mediap=subprocess.Popen(['python3','app.py'],cwd=tmp/'media',stdout=subprocess.DEVNULL,stderr=subprocess.STDOUT)
           if not wait_port(7860): raise RuntimeError('Media Swordmaster did not start')
           out=root/'projects/swordmaster/assets/images/media-swordmaster.webp'
