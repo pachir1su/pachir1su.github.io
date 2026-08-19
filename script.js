@@ -740,3 +740,31 @@ window._updateProjectCount();
     });
   });
 })();
+
+/* ------------------------------------------------------------- */
+/* 20. Restore original GitHub activity cards                    */
+/* ------------------------------------------------------------- */
+(function restoreGitHubActivityCards() {
+  const cards = document.querySelector('#github-section .github-cards');
+  const stats = cards?.querySelector('.gh-card-stats');
+  if (!cards || !stats || cards.querySelector('.gh-card-streak, .gh-card-metrics')) return;
+
+  const row = document.createElement('div');
+  row.className = 'gh-row';
+  cards.insertBefore(row, stats);
+  row.appendChild(stats);
+
+  const streak = document.createElement('img');
+  streak.className = 'gh-card gh-card-streak';
+  streak.loading = 'lazy';
+  streak.src = 'https://streak-stats.demolab.com?user=pachir1su&hide_border=true&background=fffdf6&ring=c63b3b&fire=c63b3b&currStreakLabel=c63b3b&sideLabels=5a5040&currStreakNum=1f1c14&sideNums=1f1c14&dates=5a5040';
+  streak.alt = 'pachir1su님의 GitHub 연속 기여(Streak) 통계';
+  row.appendChild(streak);
+
+  const metrics = document.createElement('img');
+  metrics.className = 'gh-card gh-card-metrics';
+  metrics.loading = 'lazy';
+  metrics.src = 'https://raw.githubusercontent.com/pachir1su/pachir1su/main/github-metrics.svg';
+  metrics.alt = 'pachir1su님의 GitHub 상세 메트릭 — 활동·커뮤니티·사용 언어';
+  cards.appendChild(metrics);
+})();
