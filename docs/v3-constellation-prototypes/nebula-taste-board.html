@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="이건영 v3 포트폴리오 시각 언어를 고르기 위한 취향 캘리브레이션 보드">
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <title>v3 시각 언어 취향 보드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+  <style>
+    :root {
+      --page:#e8eaf2; --page-deep:#dfe2ec; --surface:#f1f2f7; --surface-2:#e0e2ec;
+      --ink:#242636; --muted:#606579; --subtle:#777c8f; --line:#cbd0df;
+      --violet:#706994; --violet-strong:#554d7d; --gold:#a9914d; --danger:#945b62;
+      --serif:"Nanum Myeongjo","Malgun Myeongjo",Georgia,serif;
+      --sans:"IBM Plex Sans KR","Pretendard","Segoe UI",system-ui,sans-serif;
+      --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --page:#11151d; --page-deep:#0d1118; --surface:#181d27; --surface-2:#222936;
+        --ink:#e0e3eb; --muted:#a2a8b8; --subtle:#858c9e; --line:#303848;
+        --violet:#968dbb; --violet-strong:#b0a7d0; --gold:#bda969; --danger:#c17d84;
+      }
+    }
+    :root[data-theme="dark"] {
+      --page:#11151d; --page-deep:#0d1118; --surface:#181d27; --surface-2:#222936;
+      --ink:#e0e3eb; --muted:#a2a8b8; --subtle:#858c9e; --line:#303848;
+      --violet:#968dbb; --violet-strong:#b0a7d0; --gold:#bda969; --danger:#c17d84;
+    }
+
+    * { box-sizing:border-box; }
+    body {
+      margin:0; background:var(--page); color:var(--ink);
+      font-family:var(--sans); font-size:14px; line-height:1.75;
+      -webkit-font-smoothing:antialiased;
+    }
+    .wrap { max-width:1180px; margin:0 auto; padding:0 clamp(18px,4vw,44px); }
+
+    /* ---------- header ---------- */
+    .masthead { padding:clamp(52px,9vw,104px) 0 clamp(34px,5vw,58px); }
+    .board-back { display:inline-block; margin-bottom:24px; color:var(--muted); font-size:12.5px;
+                text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:2px; }
+  .board-back:hover { color:var(--ink); border-bottom-color:var(--gold); }
+  .eyebrow { margin:0 0 22px; font-family:var(--mono); font-size:11px; font-weight:500;
+               letter-spacing:.16em; color:var(--violet-strong); }
+    .masthead h1 {
+      margin:0 0 20px; font-family:var(--serif); font-weight:400;
+      font-size:clamp(38px,6.2vw,68px); line-height:1.1; letter-spacing:-.035em;
+      text-wrap:balance;
+    }
+    .lead { max-width:60ch; margin:0; color:var(--muted); font-size:15px; }
+    .lead + .lead { margin-top:14px; }
+
+    .reply {
+      margin:38px 0 0; padding:22px 24px;
+      border:1px solid var(--line); background:var(--surface);
+    }
+    .reply h2 { margin:0 0 12px; font-family:var(--sans); font-size:13px; font-weight:600;
+                letter-spacing:.02em; }
+    .reply p { margin:0 0 14px; color:var(--muted); font-size:13.5px; max-width:62ch; }
+    .reply pre {
+      margin:0; padding:14px 16px; overflow-x:auto;
+      background:var(--page-deep); border:1px solid var(--line);
+      font-family:var(--mono); font-size:12.5px; line-height:2; color:var(--ink);
+    }
+
+    /* ---------- sections ---------- */
+    section { padding:clamp(46px,6vw,76px) 0; border-top:1px solid var(--line); }
+    .sec-head { display:grid; gap:8px 40px; margin-bottom:34px; }
+    @media (min-width:860px) { .sec-head { grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); align-items:end; } }
+    .sec-num { font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.16em; color:var(--gold); }
+    .sec-head h2 { margin:6px 0 0; font-family:var(--serif); font-weight:400;
+                   font-size:clamp(24px,3.4vw,34px); line-height:1.25; letter-spacing:-.03em; }
+    .sec-head p { margin:0; color:var(--muted); font-size:14px; max-width:56ch; }
+
+    /* ---------- swatch grid ---------- */
+    .grid { display:grid; gap:26px 22px; grid-template-columns:repeat(auto-fit,minmax(258px,1fr)); }
+    .grid.wide { grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); }
+
+    .swatch { display:flex; flex-direction:column; gap:14px; min-width:0; }
+    .view { position:relative; aspect-ratio:4/3; overflow:hidden; border:1px solid var(--line); background:var(--page-deep); }
+    .view.tall { aspect-ratio:16/10; }
+    .view canvas { display:block; width:100%; height:100%; }
+    .split-tag {
+      position:absolute; left:0; right:0; bottom:0; display:flex; pointer-events:none;
+      font-family:var(--mono); font-size:9.5px; letter-spacing:.14em;
+    }
+    .split-tag span { flex:1; padding:5px 7px; }
+    .split-tag span:first-child { color:#606579; }
+    .split-tag span:last-child { color:#a2a8b8; text-align:right; }
+
+    .meta { display:flex; flex-direction:column; gap:6px; }
+    .id-row { display:flex; align-items:baseline; gap:10px; }
+    .chip {
+      padding:3px 7px; border:1px solid var(--violet); color:var(--violet-strong);
+      font-family:var(--mono); font-size:10.5px; font-weight:500; letter-spacing:.1em;
+    }
+    .chip.bad { border-color:var(--danger); color:var(--danger); }
+    .meta h3 { margin:0; font-size:15px; font-weight:600; letter-spacing:-.01em; }
+    .meta p { margin:0; color:var(--muted); font-size:13px; line-height:1.7; }
+
+    /* ---------- typography specimens ---------- */
+    .spec { display:flex; flex-direction:column; justify-content:center; gap:10px;
+            padding:26px 24px; height:100%; }
+    .spec-name { margin:0; letter-spacing:-.04em; line-height:1.02; }
+    .spec-en { margin:0; color:var(--muted); }
+    .spec-line { margin:8px 0 0; color:var(--muted); font-size:12.5px; line-height:1.7; }
+    .spec-mail { margin:0; font-family:var(--mono); font-size:11px; letter-spacing:.02em; color:var(--subtle); }
+
+    .ty-a .spec-name { font-family:var(--serif); font-weight:400; font-size:clamp(30px,4.4vw,44px); }
+    .ty-a .spec-en   { font-family:var(--serif); font-weight:400; font-size:14px; letter-spacing:.06em; }
+    .ty-a .spec-line { font-family:var(--sans); }
+
+    .ty-b .spec-name { font-family:var(--sans); font-weight:600; font-size:clamp(28px,4vw,40px); letter-spacing:-.03em; }
+    .ty-b .spec-en   { font-family:var(--sans); font-weight:400; font-size:13px; letter-spacing:.02em; }
+    .ty-b .spec-line { font-family:var(--sans); }
+
+    .ty-c .spec-name { font-family:var(--serif); font-weight:400; font-size:clamp(30px,4.4vw,44px); }
+    .ty-c .spec-en   { font-family:var(--serif); font-weight:400; font-size:15px; font-style:italic;
+                       text-transform:lowercase; letter-spacing:.01em; }
+    .ty-c .spec-line { font-family:var(--sans); }
+
+    /* ---------- composition thumbs ---------- */
+    .comp { position:relative; }
+    .comp canvas { position:absolute; inset:0; }
+    .comp-txt { position:absolute; display:flex; flex-direction:column; gap:3px; }
+    .comp-txt b { font-family:var(--serif); font-weight:400; font-size:clamp(15px,2.6vw,21px);
+                  letter-spacing:-.03em; line-height:1.1; }
+    .comp-txt i { font-style:normal; font-family:var(--serif); font-size:9px; letter-spacing:.08em; color:var(--muted); }
+    .comp-txt em { font-style:normal; font-family:var(--sans); font-size:9.5px; line-height:1.5; color:var(--muted); max-width:22ch; }
+    .comp-txt u { text-decoration:none; font-family:var(--mono); font-size:8px; letter-spacing:.03em; color:var(--subtle); margin-top:4px; }
+    .cp-a .comp-txt { left:8%; bottom:12%; }
+    .cp-b .comp-txt { left:50%; bottom:11%; transform:translateX(-50%); text-align:center; align-items:center; }
+    .cp-c .comp-txt { left:8%; top:14%; }
+
+    /* ---------- anti-pattern demos ---------- */
+    .ng-demo { display:flex; flex-direction:column; justify-content:center; gap:12px;
+               padding:22px 20px; height:100%; background:var(--page-deep); }
+    .ng-pills { display:flex; flex-wrap:wrap; gap:7px; }
+    .ng-pills span {
+      padding:5px 13px; border-radius:999px; border:1px solid var(--line);
+      background:var(--surface); font-size:10.5px; color:var(--muted); white-space:nowrap;
+    }
+    .ng-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .ng-cards div {
+      aspect-ratio:1/.82; border-radius:12px; border:1px solid var(--line);
+      background:var(--surface); padding:9px;
+    }
+    .ng-cards i { display:block; width:16px; height:16px; border-radius:5px; background:var(--violet); opacity:.45; }
+    .ng-cards s { display:block; margin-top:8px; height:5px; border-radius:3px; background:var(--line); text-decoration:none; }
+    .ng-cards s + s { width:62%; margin-top:5px; }
+    .ng-kicker { font-family:var(--sans); font-size:9.5px; font-weight:600; letter-spacing:.22em;
+                 text-transform:uppercase; color:var(--violet-strong); }
+    .ng-hint { font-size:11px; color:var(--muted); }
+    .ng-note { display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--muted); }
+
+    /* ---------- reference list ---------- */
+    .refs { display:grid; gap:0; border-top:1px solid var(--line); }
+    .ref {
+      display:grid; gap:4px 28px; padding:20px 0; border-bottom:1px solid var(--line);
+      align-items:baseline;
+    }
+    @media (min-width:760px) { .ref { grid-template-columns:min-content minmax(180px,1fr) minmax(0,1.5fr); } }
+    .ref-id { font-family:var(--mono); font-size:11px; letter-spacing:.1em; color:var(--gold); white-space:nowrap; }
+    .ref-name { font-size:14px; font-weight:600; letter-spacing:-.01em; }
+    .ref-name a { color:inherit; text-decoration:none; border-bottom:1px solid var(--violet); padding-bottom:1px; }
+    .ref-name a:hover { border-bottom-color:var(--gold); }
+    .ref-what { margin:0; color:var(--muted); font-size:13px; }
+    .ref-what b { color:var(--ink); font-weight:600; }
+
+    footer { padding:clamp(44px,6vw,72px) 0 clamp(64px,9vw,110px); border-top:1px solid var(--line); }
+    footer p { margin:0 0 12px; max-width:62ch; color:var(--muted); font-size:13.5px; }
+    footer p:last-child { margin-bottom:0; }
+    footer strong { color:var(--ink); font-weight:600; }
+
+    a:focus-visible, .view:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
+    @media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; } }
+  </style>
+</head>
+<body data-page="nebula-taste-board">
+<div class="wrap">
+
+  <header class="masthead">
+    <a class="board-back" href="index.html">← 시안 목록</a>
+    <p class="eyebrow">V3 PORTFOLIO · 시각 언어 캘리브레이션</p>
+    <h1>어떤 우주를<br>만들지 먼저 고릅니다.</h1>
+    <p class="lead">기능을 더 붙이는 대신, 화면의 재질부터 정합니다. 아래 조각들은 전부 실제로 그려 둔 것이고, 설명이 아니라 결과물입니다.</p>
+    <p class="lead">각 타일은 <b>왼쪽이 라이트 모드, 오른쪽이 다크 모드</b>로 갈라져 있습니다. 지금 보고 계신 화면 테마와 상관없이 두 쪽을 함께 비교하실 수 있습니다.</p>
+
+    <div class="reply">
+      <h2>선택 결과 — 2026-08-20 확정</h2>
+      <p>이 문서는 열려 있는 질문지가 아니라 <b>결정이 끝난 기록</b>입니다. 아래가 선택 결과이며, 이 결과로 만든 화면은 <a href="nebula-keyvisual.html">키비주얼 시안</a>에 있습니다.</p>
+      <pre>배경  BG-B  엷은 성운      (BG-A 수묵 · BG-C 그레인 탈락)
+별    ST-   위임 → 3계층으로 구성 (먼 먼지 / 점 / 옅은 달무리)
+선    LN-A  낡은 금빛 실선  (LN-C 점선 탈락)
+서체  TY-B  산세리프
+구도  CP-A  좌하단 이름 · 우상단 별자리 (CP-C 지평선 탈락)
+
+피할 것  NG-1~4 전부 회피 확정</pre>
+      <p>덧붙여, 기획 초기의 <b>‘명조’는 명조체(서체)가 아니라 게임 〈명조: 워더링 웨이브〉</b>를 가리킨 것이었습니다. 따라서 명조 관련 언급은 전부 서체가 아니라 빛·재질·공간감의 완성도를 뜻합니다. 이 보드의 TY-A·TY-C가 명조체를 후보로 올린 것은 그 오해에서 나온 것이며, 실제 선택은 산세리프입니다.</p>
+    </div>
+
+    <div class="reply">
+      <h2>당시 답하는 방법</h2>
+      <p>다섯 줄만 채워 주시면 됩니다. 여러 개 고르셔도 되고, 전부 싫으면 “전부 싫음”이라고만 쓰셔도 됩니다. 그게 가장 빠른 정보입니다.</p>
+      <pre>배경  BG-
+별    ST-
+선    LN-
+서체  TY-
+구도  CP-
+
+싫은 것 :
+</pre>
+    </div>
+  </header>
+
+  <section id="bg">
+    <div class="sec-head">
+      <div>
+        <span class="sec-num">01 / 배경</span>
+        <h2>화면 뒤에 무엇이 깔려 있는가</h2>
+      </div>
+      <p>가장 큰 면적을 차지하는 결정입니다. 여기가 정해지면 별과 선의 밝기는 자동으로 따라옵니다. 그냥 어두운 배경과, 재질이 있는 배경은 완전히 다른 화면이 됩니다.</p>
+    </div>
+    <div class="grid">
+      <article class="swatch">
+        <div class="view"><canvas data-paint="ink" data-split></canvas><div class="split-tag"><span>LIGHT</span><span>DARK</span></div></div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">BG-A</span><h3>수묵 번짐</h3></div>
+          <p>먹이 종이에 스며든 자국. 가장자리가 고르지 않고 안쪽에 얼룩이 남습니다. 우주라기보다 <b>한지 위의 밤</b>에 가깝습니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view"><canvas data-paint="nebula" data-split></canvas><div class="split-tag"><span>LIGHT</span><span>DARK</span></div></div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">BG-B</span><h3>엷은 성운</h3></div>
+          <p>중심이 밝고 바깥으로 흐려집니다. 실제 천체 사진에 가깝고 깊이가 잘 생깁니다. 잘못 쓰면 흔한 우주 배경이 됩니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view"><canvas data-paint="grain" data-split></canvas><div class="split-tag"><span>LIGHT</span><span>DARK</span></div></div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">BG-C</span><h3>그레인 필드</h3></div>
+          <p>색은 거의 단색인데 표면에 필름 입자가 있습니다. 가장 조용하고 차갑습니다. 별이 주인공이 됩니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view"><canvas data-paint="smooth" data-split></canvas><div class="split-tag"><span>LIGHT</span><span>DARK</span></div></div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">BG-D</span><h3>매끈한 그라디언트</h3></div>
+          <p>재질 없이 색만 흐릅니다. 깔끔하지만 지금 기존 시안이 이것이고, “단조롭다”는 평가를 받은 지점입니다. 비교용으로 넣었습니다.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="st">
+    <div class="sec-head">
+      <div>
+        <span class="sec-num">02 / 별</span>
+        <h2>별 하나를 어떻게 그리는가</h2>
+      </div>
+      <p>네 타일 모두 <b>같은 자리에 같은 개수</b>의 별이 있습니다. 다른 것은 별 하나를 무엇으로 그렸는지뿐입니다. 강한 글로우는 넣지 않았습니다.</p>
+    </div>
+    <div class="grid">
+      <article class="swatch">
+        <div class="view"><canvas data-paint="star-dot" data-split></canvas><div class="split-tag"><span>LIGHT</span><span>DARK</span></div></div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">ST-A</span><h3>점</h3></div>
+          <p>크기와 농도만 다른 순수한 점. 가장 절제되어 있고 별자리 선이 잘 읽힙니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view"><canvas data-paint="star-cross" data-split></canvas><div class="split-tag"><span>LIGHT</span><span>DARK</span></div></div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">ST-B</span><h3>십자 회절</h3></div>
+          <p>렌즈를 통과한 빛처럼 네 방향으로 가늘게 뻗습니다. 사진처럼 보이지만 많아지면 반짝이 효과처럼 촌스러워질 수 있습니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view"><canvas data-paint="star-halo" data-split></canvas><div class="split-tag"><span>LIGHT</span><span>DARK</span></div></div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">ST-C</span><h3>달무리</h3></div>
+          <p>별 주위에 아주 옅은 번짐이 있습니다. 대기를 통과한 느낌이 나고 몽환 쪽에 가장 가깝습니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view"><canvas data-paint="star-dust" data-split></canvas><div class="split-tag"><span>LIGHT</span><span>DARK</span></div></div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">ST-D</span><h3>입자 군집</h3></div>
+          <p>별 하나가 사실은 작은 입자 무리입니다. 가까이 보면 흩어지고 멀리서는 별로 보입니다. 움직임을 넣었을 때 가장 재미있는 방식입니다.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="ln">
+    <div class="sec-head">
+      <div>
+        <span class="sec-num">03 / 선</span>
+        <h2>별과 별을 잇는 선</h2>
+      </div>
+      <p>진입 연출에서 실제로 그려질 선입니다. 세 타일 모두 같은 별자리, 같은 별입니다. 선의 처리만 다릅니다.</p>
+    </div>
+    <div class="grid">
+      <article class="swatch">
+        <div class="view"><canvas data-paint="line-solid" data-split></canvas><div class="split-tag"><span>LIGHT</span><span>DARK</span></div></div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">LN-A</span><h3>낡은 금빛 실선</h3></div>
+          <p>끝에서 끝까지 같은 굵기로 이어집니다. 별자리 모양이 가장 확실하게 읽힙니다. 대신 도형처럼 보일 위험이 있습니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view"><canvas data-paint="line-fade" data-split></canvas><div class="split-tag"><span>LIGHT</span><span>DARK</span></div></div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">LN-B</span><h3>양끝이 사라지는 선</h3></div>
+          <p>별 근처에서만 진하고 중간은 흐려집니다. 그어 놓은 선이 아니라 <b>빛이 이어진 흔적</b>처럼 보입니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view"><canvas data-paint="line-dot" data-split></canvas><div class="split-tag"><span>LIGHT</span><span>DARK</span></div></div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">LN-C</span><h3>가는 점선</h3></div>
+          <p>존재감이 가장 약합니다. 별이 주인공이 되고 선은 안내선 역할만 합니다. 성장 별자리처럼 아직 안 이어진 구간을 보여줄 때 유용합니다.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="ty">
+    <div class="sec-head">
+      <div>
+        <span class="sec-num">04 / 서체</span>
+        <h2>이름을 무엇으로 쓰는가</h2>
+      </div>
+      <p>첫 화면에 남기기로 한 것은 이름 · 한 문장 · 이메일 세 가지입니다. 그 세 줄을 실제로 세 가지 방식으로 짜 봤습니다.</p>
+    </div>
+    <div class="grid wide">
+      <article class="swatch">
+        <div class="view tall ty-a">
+          <div class="spec">
+            <p class="spec-name">이건영</p>
+            <p class="spec-en">Lee Geon Yeong</p>
+            <p class="spec-line">계속 자라고 싶어서 계속 만듭니다.</p>
+            <p class="spec-mail">capybara@koreatech.ac.kr</p>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">TY-A</span><h3>명조 한 벌</h3></div>
+          <p>한글도 영문도 명조. 가장 고요하고 낭만적입니다. 개발자 포트폴리오보다 시집에 가까운 인상이 됩니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view tall ty-b">
+          <div class="spec">
+            <p class="spec-name">이건영</p>
+            <p class="spec-en">Lee Geon Yeong</p>
+            <p class="spec-line">계속 자라고 싶어서 계속 만듭니다.</p>
+            <p class="spec-mail">capybara@koreatech.ac.kr</p>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">TY-B</span><h3>산세리프 한 벌</h3></div>
+          <p>정확하고 현대적입니다. 배경이 아무리 몽환적이어도 글자는 또렷합니다. 대신 우주 감성은 배경이 혼자 다 짊어져야 합니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view tall ty-c">
+          <div class="spec">
+            <p class="spec-name">이건영</p>
+            <p class="spec-en">lee geon yeong</p>
+            <p class="spec-line">계속 자라고 싶어서 계속 만듭니다.</p>
+            <p class="spec-mail">capybara@koreatech.ac.kr</p>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">TY-C</span><h3>한글 명조 + 영문 소문자</h3></div>
+          <p>이름은 명조로 크게, 영문은 소문자 이탤릭으로 작게. 대문자 영어를 쓰지 않아서 흔한 AI 시안 느낌이 잘 안 납니다.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="cp">
+    <div class="sec-head">
+      <div>
+        <span class="sec-num">05 / 구도</span>
+        <h2>첫 화면에서 무엇이 어디에 있는가</h2>
+      </div>
+      <p>썸네일이라 글자가 작습니다. 글자 내용이 아니라 <b>덩어리의 위치</b>만 봐 주세요. 이 세 개는 현재 화면 테마를 그대로 따릅니다.</p>
+    </div>
+    <div class="grid wide">
+      <article class="swatch">
+        <div class="view tall comp cp-a">
+          <canvas data-paint="comp-a"></canvas>
+          <div class="comp-txt"><b>이건영</b><i>Lee Geon Yeong</i><em>계속 자라고 싶어서 계속 만듭니다.</em><u>capybara@koreatech.ac.kr</u></div>
+        </div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">CP-A</span><h3>왼쪽 아래에 서고, 별자리는 오른쪽 위</h3></div>
+          <p>글과 그림이 대각선으로 마주 봅니다. 서로 겹치지 않아 이름이 확실히 읽히고, 별자리는 하늘 위쪽에 남습니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view tall comp cp-b">
+          <canvas data-paint="comp-b"></canvas>
+          <div class="comp-txt"><b>이건영</b><i>Lee Geon Yeong</i><em>계속 자라고 싶어서 계속 만듭니다.</em><u>capybara@koreatech.ac.kr</u></div>
+        </div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">CP-B</span><h3>가운데 별자리, 그 아래 이름</h3></div>
+          <p>별자리가 정면으로 옵니다. 가장 웅장하고 의식(儀式) 같습니다. 대칭이라 자칫 포스터처럼 굳어질 수 있습니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view tall comp cp-c">
+          <canvas data-paint="comp-c"></canvas>
+          <div class="comp-txt"><b>이건영</b><i>Lee Geon Yeong</i><em>계속 자라고 싶어서 계속 만듭니다.</em><u>capybara@koreatech.ac.kr</u></div>
+        </div>
+        <div class="meta">
+          <div class="id-row"><span class="chip">CP-C</span><h3>아래에 지평선, 위는 전부 하늘</h3></div>
+          <p>바닥에 아주 옅은 지평선이 생기면서 “서서 올려다보는” 시점이 됩니다. 쓸쓸함이 가장 강하게 나오는 구도입니다.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="ng">
+    <div class="sec-head">
+      <div>
+        <span class="sec-num">피할 것</span>
+        <h2>이건 안 만듭니다</h2>
+      </div>
+      <p>말로만 “안 하겠다”고 하면 나중에 또 나옵니다. 그래서 실제로 그려 놓고 계약처럼 박아 둡니다. 혹시 이 중에 괜찮은 게 있으면 그것도 알려 주세요.</p>
+    </div>
+    <div class="grid">
+      <article class="swatch">
+        <div class="view"><canvas data-paint="ng-neon"></canvas></div>
+        <div class="meta">
+          <div class="id-row"><span class="chip bad">NG-1</span><h3>네온 글로우</h3></div>
+          <p>고채도 보라에 순검정 배경, 별마다 강한 빛 번짐. 프로필 README가 지금 이 색입니다. 눈이 아프다고 하신 그 지점입니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view">
+          <div class="ng-demo">
+            <div class="ng-pills"><span>AI</span><span>하드웨어</span><span>웹</span><span>Discord</span><span>대회</span><span>2026</span><span>2025</span><span>전체 보기</span></div>
+            <p class="ng-note">필터 · 태그 · 상태 · 연도 전부 알약</p>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="id-row"><span class="chip bad">NG-2</span><h3>둥근 알약 남발</h3></div>
+          <p>기능이 늘 때마다 알약이 하나씩 늘어납니다. 우주 화면 위에 얹히는 순간 세계관이 앱 설정 화면이 됩니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view">
+          <div class="ng-demo">
+            <div class="ng-cards">
+              <div><i></i><s></s><s></s></div><div><i></i><s></s><s></s></div><div><i></i><s></s><s></s></div>
+              <div><i></i><s></s><s></s></div><div><i></i><s></s><s></s></div><div><i></i><s></s><s></s></div>
+            </div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="id-row"><span class="chip bad">NG-3</span><h3>똑같은 카드 여섯 장</h3></div>
+          <p>크기가 같은 카드가 반복되면 어떤 프로젝트가 중요한지 사라집니다. 대시보드는 이렇게 만들고, 포트폴리오는 이렇게 만들면 안 됩니다.</p>
+        </div>
+      </article>
+      <article class="swatch">
+        <div class="view">
+          <canvas data-paint="ng-scatter"></canvas>
+          <div class="ng-demo" style="position:absolute;inset:0;background:none;justify-content:flex-start;padding-top:26px;">
+            <p class="ng-kicker">Selected Works 2024—2026</p>
+            <p class="ng-hint">별을 눌러 보세요 ✦ 숨겨진 이스터에그가 있습니다</p>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="id-row"><span class="chip bad">NG-4</span><h3>흩뿌린 별 + 영문 대문자 + 조작 안내</h3></div>
+          <p>별을 아무 데나 균일하게 뿌리고, 뜻 없는 영어 문구를 얹고, 이스터에그를 미리 알려 주는 방식. 세 개가 같이 나오면 전형적인 AI 시안이 됩니다.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="refs">
+    <div class="sec-head">
+      <div>
+        <span class="sec-num">레퍼런스</span>
+        <h2>제가 고른 후보</h2>
+      </div>
+      <p>직접 5장을 모으기 어려우실 것 같아 먼저 골라 봤습니다. <b>제가 직접 화면을 확인하고 고른 게 아니라 방향으로 고른 후보</b>이니, 열어 보시고 좋음/싫음만 표시해 주세요. 이미 좋아하시는 화면이 있으면 이 목록은 버려도 됩니다.</p>
+    </div>
+    <div class="refs">
+      <div class="ref">
+        <span class="ref-id">R-1</span>
+        <span class="ref-name"><a href="https://wutheringwaves.kurogames.com/" target="_blank" rel="noopener">명조 (Wuthering Waves)</a></span>
+        <p class="ref-what">말씀하신 기준점. 볼 것은 전투 UI가 아니라 <b>빛과 재질</b>입니다. 금속·천·안개가 각각 다른 질감으로 빛을 받는 방식, 그리고 화면 안에 빈 공간을 크게 남기는 배짱.</p>
+      </div>
+      <div class="ref">
+        <span class="ref-id">R-2</span>
+        <span class="ref-name"><a href="https://esawebb.org/images/" target="_blank" rel="noopener">Webb 우주망원경 이미지</a></span>
+        <p class="ref-what">실제 성운의 색이 어떻게 생겼는지. 의외로 <b>채도가 낮고 색 경계가 흐립니다.</b> BG-B를 고르실 거면 여기 있는 색을 기준으로 삼는 게 안전합니다.</p>
+      </div>
+      <div class="ref">
+        <span class="ref-id">R-3</span>
+        <span class="ref-name"><a href="https://thatgamecompany.com/journey/" target="_blank" rel="noopener">Journey</a></span>
+        <p class="ref-what">“쓸쓸한데 아름다운”의 교과서. 볼 것은 <b>구도와 스케일</b>입니다. 인물이 아주 작고 하늘이 아주 넓습니다. CP-C가 이 정서입니다.</p>
+      </div>
+      <div class="ref">
+        <span class="ref-id">R-4</span>
+        <span class="ref-name"><a href="https://nomada.studio/" target="_blank" rel="noopener">GRIS (Nomada Studio)</a></span>
+        <p class="ref-what">수채·수묵 번짐을 실시간 화면에서 쓰는 방법. 볼 것은 <b>재질과 번짐의 경계</b>입니다. BG-A를 고르실 거면 여기가 목표 수준입니다.</p>
+      </div>
+      <div class="ref">
+        <span class="ref-id">R-5</span>
+        <span class="ref-name"><a href="https://www.shortwave.game/" target="_blank" rel="noopener">Sable</a></span>
+        <p class="ref-what">고요한 사막과 얇은 선. 볼 것은 <b>선의 굵기와 색 수</b>입니다. 쓰는 색이 서너 개뿐인데도 심심해 보이지 않는 이유를 보시면 좋겠습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>다음 단계.</strong> 위 다섯 줄을 채워 주시면, 고르신 조합 그대로 <strong>정적 키비주얼 3장</strong>을 만들어 드립니다. 데스크톱 라이트 첫 화면 · 데스크톱 다크 첫 화면 · 별자리가 완성되고 다음 공간으로 넘어가는 화면입니다. 그 세 장이 통과해야 HTML로 넘어갑니다.</p>
+    <p>이 보드는 <strong>취향을 좁히기 위한 것</strong>이지 시안이 아닙니다. 저장소 코드와 Draft PR #162는 아직 그대로입니다.</p>
+  </footer>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* 승인된 v3 팔레트 — 캔버스는 두 테마를 한 타일에 나란히 그리기 위해
+     CSS 변수 대신 이 값을 직접 사용한다. */
+  const LIGHT = { page:'#e8eaf2', deep:'#dfe2ec', ink:'#242636', muted:'#606579',
+                  line:'#cbd0df', violet:'#706994', vstrong:'#554d7d', gold:'#a9914d' };
+  const DARK  = { page:'#11151d', deep:'#0d1118', ink:'#e0e3eb', muted:'#a2a8b8',
+                  line:'#303848', violet:'#968dbb', vstrong:'#b0a7d0', gold:'#bda969' };
+
+  /* 시드 난수 — 다시 그려도 별 자리가 흔들리지 않게 한다. */
+  const rng = (seed) => { let s = seed >>> 0; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; };
+  const rgba = (hex, a) => {
+    const n = parseInt(hex.slice(1), 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+  };
+
+  /* 필름 입자 — 256px 타일 하나를 만들어 패턴으로 재사용한다. */
+  let noiseTile = null;
+  function noise() {
+    if (noiseTile) return noiseTile;
+    noiseTile = document.createElement('canvas');
+    noiseTile.width = noiseTile.height = 256;
+    const nc = noiseTile.getContext('2d');
+    const img = nc.createImageData(256, 256), d = img.data, r = rng(1337);
+    for (let i = 0; i < d.length; i += 4) { const v = (r() * 255) | 0; d[i] = d[i+1] = d[i+2] = v; d[i+3] = 255; }
+    nc.putImageData(img, 0, 0);
+    return noiseTile;
+  }
+  function grain(c, w, h, amount) {
+    c.save();
+    c.globalAlpha = amount;
+    c.globalCompositeOperation = 'overlay';
+    c.fillStyle = c.createPattern(noise(), 'repeat');
+    c.fillRect(0, 0, w, h);
+    c.restore();
+  }
+
+  /* 공통 별 배치 — 02 섹션 네 타일이 같은 별을 공유한다. */
+  const FIELD = (() => { const r = rng(21), a = []; for (let i = 0; i < 64; i++) a.push([r(), r(), r()]); return a; })();
+  /* 공통 별자리 — 03·05 섹션이 공유하는 여섯 점. */
+  const SHAPE = [[.16,.62],[.31,.40],[.47,.55],[.63,.30],[.80,.46],[.71,.72]];
+  const EDGES = [[0,1],[1,2],[2,3],[3,4],[4,5],[5,2]];
+
+  function ground(c, w, h, t) {
+    const g = c.createLinearGradient(0, 0, w * .3, h);
+    g.addColorStop(0, t.page); g.addColorStop(1, t.deep);
+    c.fillStyle = g; c.fillRect(0, 0, w, h);
+  }
+
+  /* ---------- 01 배경 ---------- */
+  function ink(c, w, h, t) {
+    c.fillStyle = t.page; c.fillRect(0, 0, w, h);
+    const r = rng(7);
+    const cores = [[w * .36, h * .46], [w * .58, h * .34], [w * .48, h * .66]];
+    for (let i = 0; i < 1100; i++) {
+      const k = cores[i % 3];
+      const ang = r() * Math.PI * 2, rad = Math.pow(r(), .55) * w * .30;
+      c.globalAlpha = .010 + r() * .013;
+      c.fillStyle = i % 11 === 0 ? t.gold : t.violet;
+      c.beginPath();
+      c.arc(k[0] + Math.cos(ang) * rad, k[1] + Math.sin(ang) * rad * .74, 5 + r() * 24, 0, 7);
+      c.fill();
+    }
+    c.globalAlpha = 1;
+    grain(c, w, h, .07);
+  }
+
+  function nebula(c, w, h, t) {
+    c.fillStyle = t.deep; c.fillRect(0, 0, w, h);
+    const blobs = [[w*.44,h*.46,w*.46,t.violet,.34],[w*.64,h*.32,w*.30,t.gold,.15],[w*.28,h*.68,w*.36,t.vstrong,.20]];
+    for (const [x, y, rad, col, al] of blobs) {
+      const g = c.createRadialGradient(x, y, 0, x, y, rad);
+      g.addColorStop(0, rgba(col, al)); g.addColorStop(.42, rgba(col, al * .34)); g.addColorStop(1, rgba(col, 0));
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+    }
+    const r = rng(11);
+    for (let i = 0; i < 40; i++) {
+      const x = r() * w, y = r() * h, m = r();
+      c.globalAlpha = .18 + m * .45;
+      c.fillStyle = i % 8 === 0 ? t.gold : t.ink;
+      c.beginPath(); c.arc(x, y, .6 + m * 1.1, 0, 7); c.fill();
+    }
+    c.globalAlpha = 1;
+    grain(c, w, h, .04);
+  }
+
+  function grainField(c, w, h, t) {
+    c.fillStyle = t.deep; c.fillRect(0, 0, w, h);
+    const v = c.createRadialGradient(w * .5, h * .42, 0, w * .5, h * .42, w * .72);
+    v.addColorStop(0, rgba(t.violet, .10)); v.addColorStop(1, rgba(t.violet, 0));
+    c.fillStyle = v; c.fillRect(0, 0, w, h);
+    grain(c, w, h, .16);
+  }
+
+  function smooth(c, w, h, t) {
+    ground(c, w, h, t);
+    const g = c.createRadialGradient(w * .62, h * .3, 0, w * .62, h * .3, w * .6);
+    g.addColorStop(0, rgba(t.violet, .16)); g.addColorStop(1, rgba(t.violet, 0));
+    c.fillStyle = g; c.fillRect(0, 0, w, h);
+  }
+
+  /* ---------- 02 별 ---------- */
+  function stars(style) {
+    return (c, w, h, t) => {
+      ground(c, w, h, t);
+      const g = c.createRadialGradient(w * .5, h * .45, 0, w * .5, h * .45, w * .7);
+      g.addColorStop(0, rgba(t.violet, .09)); g.addColorStop(1, rgba(t.violet, 0));
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+
+      for (const [fx, fy, m] of FIELD) {
+        const x = fx * w, y = fy * h, col = m > .88 ? t.gold : t.ink;
+        if (style === 'dot') {
+          c.globalAlpha = .22 + m * .55; c.fillStyle = col;
+          c.beginPath(); c.arc(x, y, .7 + m * 1.5, 0, 7); c.fill();
+        } else if (style === 'cross') {
+          const len = 4 + m * 13;
+          c.globalAlpha = .12 + m * .26; c.strokeStyle = col; c.lineWidth = .7;
+          c.beginPath();
+          c.moveTo(x - len, y); c.lineTo(x + len, y);
+          c.moveTo(x, y - len); c.lineTo(x, y + len);
+          c.stroke();
+          c.globalAlpha = .35 + m * .5; c.fillStyle = col;
+          c.beginPath(); c.arc(x, y, .7 + m * 1.2, 0, 7); c.fill();
+        } else if (style === 'halo') {
+          const rad = 2.5 + m * 9;
+          const hg = c.createRadialGradient(x, y, 0, x, y, rad);
+          hg.addColorStop(0, rgba(col, .20 + m * .16)); hg.addColorStop(1, rgba(col, 0));
+          c.globalAlpha = 1; c.fillStyle = hg;
+          c.beginPath(); c.arc(x, y, rad, 0, 7); c.fill();
+          c.globalAlpha = .34 + m * .5; c.fillStyle = col;
+          c.beginPath(); c.arc(x, y, .6 + m * .9, 0, 7); c.fill();
+        } else {
+          const r = rng(((fx * 9973) | 0) + 5);
+          const spread = 2 + m * 5;
+          for (let i = 0; i < 11; i++) {
+            const a = r() * Math.PI * 2, d = Math.pow(r(), .5) * spread;
+            c.globalAlpha = .10 + r() * .34;
+            c.fillStyle = col;
+            c.beginPath(); c.arc(x + Math.cos(a) * d, y + Math.sin(a) * d, .5 + r() * .7, 0, 7); c.fill();
+          }
+        }
+      }
+      c.globalAlpha = 1;
+      grain(c, w, h, .05);
+    };
+  }
+
+  /* ---------- 03 선 ---------- */
+  function constellation(c, w, h, t, style, box) {
+    const b = box || { x: 0, y: 0, w, h };
+    const P = SHAPE.map(([x, y]) => [b.x + x * b.w, b.y + y * b.h]);
+
+    for (const [a, z] of EDGES) {
+      const [x1, y1] = P[a], [x2, y2] = P[z];
+      c.save();
+      c.setLineDash([]);
+      if (style === 'solid') {
+        c.strokeStyle = rgba(t.gold, .62); c.lineWidth = 1.1;
+      } else if (style === 'fade') {
+        const g = c.createLinearGradient(x1, y1, x2, y2);
+        g.addColorStop(0, rgba(t.gold, .72)); g.addColorStop(.5, rgba(t.gold, .10)); g.addColorStop(1, rgba(t.gold, .72));
+        c.strokeStyle = g; c.lineWidth = 1.2;
+      } else {
+        c.strokeStyle = rgba(t.violet, .60); c.lineWidth = .9; c.setLineDash([1.6, 5]);
+      }
+      c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+      c.restore();
+    }
+    for (const [x, y] of P) {
+      const rad = 5.5;
+      const hg = c.createRadialGradient(x, y, 0, x, y, rad);
+      hg.addColorStop(0, rgba(t.ink, .26)); hg.addColorStop(1, rgba(t.ink, 0));
+      c.fillStyle = hg; c.beginPath(); c.arc(x, y, rad, 0, 7); c.fill();
+      c.fillStyle = rgba(t.ink, .85);
+      c.beginPath(); c.arc(x, y, 1.5, 0, 7); c.fill();
+    }
+  }
+
+  function lineTile(style) {
+    return (c, w, h, t) => {
+      ground(c, w, h, t);
+      const g = c.createRadialGradient(w * .5, h * .5, 0, w * .5, h * .5, w * .65);
+      g.addColorStop(0, rgba(t.violet, .10)); g.addColorStop(1, rgba(t.violet, 0));
+      c.fillStyle = g; c.fillRect(0, 0, w, h);
+      const r = rng(31);
+      for (let i = 0; i < 34; i++) {
+        c.globalAlpha = .10 + r() * .22; c.fillStyle = t.ink;
+        c.beginPath(); c.arc(r() * w, r() * h, .5 + r() * .8, 0, 7); c.fill();
+      }
+      c.globalAlpha = 1;
+      constellation(c, w, h, t, style, { x: w * .06, y: h * .10, w: w * .88, h: h * .78 });
+      grain(c, w, h, .05);
+    };
+  }
+
+  /* ---------- 05 구도 (현재 화면 테마를 따른다) ---------- */
+  function dust(c, w, h, t, n, seed) {
+    const r = rng(seed);
+    for (let i = 0; i < n; i++) {
+      const m = r();
+      c.globalAlpha = .10 + m * .34;
+      c.fillStyle = m > .92 ? t.gold : t.ink;
+      c.beginPath(); c.arc(r() * w, r() * h, .5 + m * 1.0, 0, 7); c.fill();
+    }
+    c.globalAlpha = 1;
+  }
+
+  function compA(c, w, h, t) {
+    nebula(c, w, h, t);
+    constellation(c, w, h, t, 'fade', { x: w * .46, y: h * .08, w: w * .48, h: h * .40 });
+    dust(c, w, h, t, 40, 5);
+    grain(c, w, h, .05);
+  }
+  function compB(c, w, h, t) {
+    grainField(c, w, h, t);
+    constellation(c, w, h, t, 'fade', { x: w * .22, y: h * .14, w: w * .56, h: h * .44 });
+    dust(c, w, h, t, 40, 6);
+  }
+  function compC(c, w, h, t) {
+    ink(c, w, h, t);
+    constellation(c, w, h, t, 'fade', { x: w * .30, y: h * .06, w: w * .62, h: h * .40 });
+    dust(c, w, h, t, 46, 7);
+    const hz = c.createLinearGradient(0, h * .70, 0, h);
+    hz.addColorStop(0, rgba(t.violet, 0));
+    hz.addColorStop(.55, rgba(t.violet, .16));
+    hz.addColorStop(1, rgba(t.deep, .55));
+    c.fillStyle = hz; c.fillRect(0, h * .70, w, h * .30);
+    c.strokeStyle = rgba(t.gold, .22); c.lineWidth = 1;
+    c.beginPath(); c.moveTo(0, h * .855); c.lineTo(w, h * .845); c.stroke();
+  }
+
+  /* ---------- 피할 것 ---------- */
+  function ngNeon(c, w, h) {
+    c.fillStyle = '#000000'; c.fillRect(0, 0, w, h);
+    for (const [fx, fy, m] of FIELD) {
+      const x = fx * w, y = fy * h, rad = 4 + m * 20;
+      const g = c.createRadialGradient(x, y, 0, x, y, rad);
+      g.addColorStop(0, rgba('#a78bfa', .85)); g.addColorStop(.3, rgba('#7c3aed', .40)); g.addColorStop(1, rgba('#7c3aed', 0));
+      c.fillStyle = g; c.beginPath(); c.arc(x, y, rad, 0, 7); c.fill();
+      c.fillStyle = '#ffffff';
+      c.beginPath(); c.arc(x, y, .8 + m * 1.4, 0, 7); c.fill();
+    }
+    for (const [a, z] of EDGES) {
+      const [x1, y1] = SHAPE[a], [x2, y2] = SHAPE[z];
+      c.strokeStyle = rgba('#fde68a', .9); c.lineWidth = 2;
+      c.shadowColor = '#fde68a'; c.shadowBlur = 14;
+      c.beginPath(); c.moveTo(x1 * w, y1 * h); c.lineTo(x2 * w, y2 * h); c.stroke();
+    }
+    c.shadowBlur = 0;
+  }
+
+  function ngScatter(c, w, h, t) {
+    c.fillStyle = t.deep; c.fillRect(0, 0, w, h);
+    /* 균일 격자에 가깝게 뿌린 별 — 깊이도 무리도 없다. */
+    const r = rng(3);
+    for (let gx = 0; gx < 11; gx++) {
+      for (let gy = 0; gy < 8; gy++) {
+        const x = (gx + .3 + r() * .4) * (w / 11), y = (gy + .3 + r() * .4) * (h / 8);
+        c.globalAlpha = .45;
+        c.fillStyle = t.ink;
+        c.beginPath(); c.arc(x, y, 1.2, 0, 7); c.fill();
+      }
+    }
+    c.globalAlpha = 1;
+  }
+
+  const PAINT = {
+    ink, nebula, grain: grainField, smooth,
+    'star-dot': stars('dot'), 'star-cross': stars('cross'),
+    'star-halo': stars('halo'), 'star-dust': stars('dust'),
+    'line-solid': lineTile('solid'), 'line-fade': lineTile('fade'), 'line-dot': lineTile('dot'),
+    'comp-a': compA, 'comp-b': compB, 'comp-c': compC,
+    'ng-neon': ngNeon, 'ng-scatter': ngScatter,
+  };
+
+  /* 현재 문서 테마의 토큰을 읽는다 — 구도 타일 전용. */
+  function liveTokens() {
+    const cs = getComputedStyle(document.documentElement);
+    const get = (n, fb) => (cs.getPropertyValue(n).trim() || fb);
+    return {
+      page: get('--page', LIGHT.page), deep: get('--page-deep', LIGHT.deep),
+      ink: get('--ink', LIGHT.ink), muted: get('--muted', LIGHT.muted),
+      line: get('--line', LIGHT.line), violet: get('--violet', LIGHT.violet),
+      vstrong: get('--violet-strong', LIGHT.vstrong), gold: get('--gold', LIGHT.gold),
+    };
+  }
+
+  function render(canvas) {
+    const fn = PAINT[canvas.dataset.paint];
+    if (!fn) return;
+    const box = canvas.getBoundingClientRect();
+    if (!box.width || !box.height) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.round(box.width), h = Math.round(box.height);
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    const c = canvas.getContext('2d');
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.clearRect(0, 0, w, h);
+
+    if (canvas.hasAttribute('data-split')) {
+      /* 같은 장면을 두 팔레트로 한 번씩, 반쪽씩 잘라 그린다. */
+      for (const [half, tokens] of [[0, LIGHT], [1, DARK]]) {
+        c.save();
+        c.beginPath(); c.rect(half * w / 2, 0, w / 2, h); c.clip();
+        fn(c, w, h, tokens);
+        c.restore();
+      }
+      c.strokeStyle = 'rgba(128,128,140,.55)'; c.lineWidth = 1;
+      c.beginPath(); c.moveTo(w / 2, 0); c.lineTo(w / 2, h); c.stroke();
+    } else {
+      fn(c, w, h, liveTokens());
+    }
+  }
+
+  const canvases = Array.from(document.querySelectorAll('canvas[data-paint]'));
+  const renderAll = () => canvases.forEach(render);
+
+  if ('ResizeObserver' in window) {
+    let frame = 0;
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(renderAll);
+    });
+    canvases.forEach((cv) => ro.observe(cv));
+  } else {
+    window.addEventListener('resize', renderAll);
+  }
+
+  const dark = window.matchMedia('(prefers-color-scheme: dark)');
+  const onTheme = () => canvases.forEach((cv) => { if (!cv.hasAttribute('data-split')) render(cv); });
+  dark.addEventListener ? dark.addEventListener('change', onTheme) : dark.addListener(onTheme);
+
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(renderAll);
+  renderAll();
+})();
+</script>
+</body>
+</html>
