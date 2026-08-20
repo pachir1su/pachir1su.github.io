@@ -5,9 +5,6 @@ on:
     branches:
       - main
     types: [opened, reopened, synchronize]
-  push:
-    branches:
-      - agent/v26-structure-media-runner
 
 permissions:
   contents: write
@@ -130,7 +127,6 @@ jobs:
           PY
           git add -- projects/koreatechGongjiAgent/index.html
           git commit --fixup="$index_commit"
-
           GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash "$base"
 
           set +e
@@ -181,6 +177,23 @@ jobs:
           done
           test "$rc" -eq 0
 
+          FILE='docs/v3-constellation-prototypes/home-c-celestial.html' python3 - <<'PY'
+          import os, re
+          from pathlib import Path
+          p = Path(os.environ['FILE'])
+          s = p.read_text(encoding='utf-8')
+          s = re.sub(r'\s*<link\s+rel=["\']icon["\'][^>]*>\s*', '\n', s, flags=re.I)
+          line = '  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />\n'
+          if '/assets/favicon.svg' not in s:
+              m = re.search(r'(^\s*<title>.*?</title>\s*\n)', s, flags=re.M)
+              if not m:
+                  raise SystemExit(f'cannot place favicon in {p}')
+              s = s[:m.end()] + line + s[m.end():]
+          p.write_text(s, encoding='utf-8')
+          PY
+          git add -- docs/v3-constellation-prototypes/home-c-celestial.html
+          git commit -m 'fix: use shared favicon in docs/v3-constellation-prototypes/home-c-celestial.html'
+
           node --check script.js
           node build.js
           test -z "$(git status --porcelain index.html)"
@@ -189,10 +202,11 @@ jobs:
           test -s projects/koreatechGongjiAgent/assets/images/web-shuttle.webp
           grep -q 'assets/images/web-shuttle.webp' projects/koreatechGongjiAgent/index.html
 
-          records=$(git diff --name-status -M -z origin/main...HEAD | python3 -c 'import sys; p=sys.stdin.buffer.read().split(b"\0"); p=p[:-1] if p and p[-1]==b"" else p; i=n=0\nwhile i<len(p):\n s=p[i].decode(); i+=1; i+=2 if s.startswith(("R","C")) else 1; n+=1\nprint(n)')
+          records=$(git diff --name-status -M origin/main...HEAD | wc -l)
           commits=$(git rev-list --count origin/main..HEAD)
           echo "ATOMIC records=$records commits=$commits"
           test "$records" -eq "$commits"
+          test "$records" -eq 94
 
           while read -r sha; do
             test "$(git diff-tree --no-commit-id --name-status -r -M "$sha^" "$sha" | wc -l)" -eq 1
