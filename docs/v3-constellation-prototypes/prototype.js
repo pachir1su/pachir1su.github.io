@@ -2,15 +2,30 @@
 (() => {
   'use strict';
 
+  const languageState = { current:localStorage.getItem('lang') === 'en' ? 'en' : 'ko' };
+  const uiText = {
+    ko:{
+      firstStar:'첫 번째 별에서 시작합니다', viewingRecord:'{year} 기록을 보고 있습니다', constellationComplete:'별자리 완성',
+      records:'{count}개의 기록', projectRecord:'프로젝트 기록', detailRecord:'상세 기록 확인', openDetail:'{title} 상세 기록 열기',
+      lostOrbit:'궤도 이탈', supernovaRemnant:'초신성 잔해', vanishedStar:'소실된 별', area51:'제51구역',
+      area51Description:'격리된 실험 기록', soundStop:'소리 끄기 ×', soundStopLabel:'재생 중인 소리 끄기',
+    },
+    en:{
+      firstStar:'Begin with the first star', viewingRecord:'Viewing the {year} record', constellationComplete:'Constellation complete',
+      records:'{count} records', projectRecord:'Project record', detailRecord:'Open full record', openDetail:'Open the {title} record',
+      lostOrbit:'Orbital departure', supernovaRemnant:'Supernova remnant', vanishedStar:'Vanished star', area51:'Area 51',
+      area51Description:'Isolated experiment record', soundStop:'Mute ×', soundStopLabel:'Mute the playing sound',
+    },
+  };
   const growthEvents = [
-    { year: '2024', title: '해안 장벽 MVP 제작', detail: '4인 팀 · 아두이노 개발 총괄' },
-    { year: '2024', title: '천안학생로봇대회 동상', detail: '허스키렌즈 기반 졸음 감지 시스템' },
-    { year: '2025', title: 'NFC 출석 시스템', detail: '6인 팀 · 팀장' },
-    { year: '2025', title: '면진봇 공개', detail: 'Discord 경제 시뮬레이션 봇 · 1인 개발' },
-    { year: '2026', title: '코리아텍 통합 알림 시스템', detail: '공지·메일·셔틀·학식·도서관 통합 운영' },
-    { year: '2026', title: 'Raspberry Pi 운영', detail: '실사용 서비스의 장시간 운용과 안정화' },
-    { year: '2026', title: 'U-CAST 5팀 멘토링', detail: '요구사항·상태 설계·배선 디버깅 지원' },
-    { year: '2026', title: '로컬임팩트상', detail: '천안 청소년 도시재생 챌린지' },
+    { year:'2024', title:{ko:'해안 장벽 MVP 제작',en:'Coastal Barrier MVP'}, detail:{ko:'4인 팀 · 아두이노 개발 총괄',en:'4-person team · Arduino development lead'} },
+    { year:'2024', title:{ko:'천안학생로봇대회 동상',en:'Cheonan Student Robot Contest Bronze'}, detail:{ko:'허스키렌즈 기반 졸음 감지 시스템',en:'HuskyLens-based drowsiness detection system'} },
+    { year:'2025', title:{ko:'NFC 출석 시스템',en:'NFC Attendance System'}, detail:{ko:'6인 팀 · 팀장',en:'Team lead · 6-person team'} },
+    { year:'2025', title:{ko:'면진봇 공개',en:'MZ Bot Released'}, detail:{ko:'Discord 경제 시뮬레이션 봇 · 1인 개발',en:'Discord economy simulation bot · Solo development'} },
+    { year:'2026', title:{ko:'코리아텍 통합 알림 시스템',en:'KOREATECH Unified Alert System'}, detail:{ko:'공지·메일·셔틀·학식·도서관 통합 운영',en:'Unified notices, mail, shuttle, cafeteria, and library operations'} },
+    { year:'2026', title:{ko:'Raspberry Pi 운영',en:'Raspberry Pi Operations'}, detail:{ko:'실사용 서비스의 장시간 운용과 안정화',en:'Long-running production service operation and stabilization'} },
+    { year:'2026', title:{ko:'U-CAST 5팀 멘토링',en:'U-CAST Team 5 Mentoring'}, detail:{ko:'요구사항·상태 설계·배선 디버깅 지원',en:'Requirements, state design, and wiring debugging support'} },
+    { year:'2026', title:{ko:'로컬임팩트상',en:'Local Impact Award'}, detail:{ko:'천안 청소년 도시재생 챌린지',en:'Cheonan Youth Urban Regeneration Challenge'} },
   ];
   const growthPoints = [[9,68],[23,39],[37,63],[49,27],[61,51],[72,20],[84,48],[92,75]];
   const introConstellations = [
@@ -40,45 +55,48 @@
     { points:[[12,28],[35,45],[51,30],[66,48],[88,34],[67,72],[46,61],[25,77]], edges:[[0,1],[1,2],[2,3],[3,4],[3,5],[5,6],[6,7]] },
   ];
   const fallbackGroups = [
-    { label:'2026', cards:[
-      {title:'GitHub Rank Insight',subtitle:'GitHub Stats 등급 분석기',role:'1인 개발 · 전 과정'},
-      {title:'코리아텍 통합 알림 시스템',subtitle:'공지·개인 메일·셔틀·학식·도서관 통합 알림',role:'1인 개발'},
-      {title:'Daily Report AI',subtitle:'Gemini 기반 디스코드 아침 브리핑 봇',role:'팀장 · 3인 팀'},
-      {title:'MultiMind',subtitle:'여러 LLM을 동시에 조작하는 오케스트레이터',role:'1인 개발'},
-      {title:'2026 U-CAST 「멈춰!」',subtitle:'돌발 보행자 감지 경고 시스템',role:'5팀 멘토'},
+    { id:'2026', kind:'year', label:'2026', cards:[
+      {title:'GitHub Rank Insight',subtitle:{ko:'GitHub Stats 등급 분석기',en:'GitHub Stats rank analyzer'},role:{ko:'1인 개발 · 전 과정',en:'Solo development · Full process'}},
+      {title:{ko:'코리아텍 통합 알림 시스템',en:'KOREATECH Unified Alert System'},subtitle:{ko:'공지·개인 메일·셔틀·학식·도서관 통합 알림',en:'Unified campus notices, mail, shuttle, cafeteria, and library alerts'},role:{ko:'1인 개발',en:'Solo development'}},
+      {title:'Daily Report AI',subtitle:{ko:'Gemini 기반 디스코드 아침 브리핑 봇',en:'Gemini-based Discord morning briefing bot'},role:{ko:'팀장 · 3인 팀',en:'Team lead · 3-person team'}},
+      {title:'MultiMind',subtitle:{ko:'여러 LLM을 동시에 조작하는 오케스트레이터',en:'Orchestrator controlling multiple LLMs'},role:{ko:'1인 개발',en:'Solo development'}},
+      {title:{ko:'2026 U-CAST 「멈춰!」',en:'2026 U-CAST “Stop!”'},subtitle:{ko:'돌발 보행자 감지 경고 시스템',en:'Sudden pedestrian detection warning system'},role:{ko:'5팀 멘토',en:'Team 5 mentor'}},
     ]},
-    { label:'2025', cards:[
-      {title:'NFC 출석 체크 시스템',subtitle:'NFC 태그 기반 자동 출석 체크 IoT',role:'팀장 · 6인 팀'},
-      {title:'식물 타이머',subtitle:'식물 관리 스마트 타이머',role:'1인 개발'},
-      {title:'헬스 케어 시스템',subtitle:'건강 데이터 기록·모니터링 시스템',role:'팀장 · 4인 팀'},
-      {title:'면진봇',subtitle:'Discord 경제 시뮬레이션 봇',role:'1인 개발'},
+    { id:'2025', kind:'year', label:'2025', cards:[
+      {title:{ko:'NFC 출석 체크 시스템',en:'NFC Attendance System'},subtitle:{ko:'NFC 태그 기반 자동 출석 체크 IoT',en:'NFC tag-based automatic attendance IoT'},role:{ko:'팀장 · 6인 팀',en:'Team lead · 6-person team'}},
+      {title:{ko:'식물 타이머',en:'Plant Timer'},subtitle:{ko:'식물 관리 스마트 타이머',en:'Smart plant-care timer'},role:{ko:'1인 개발',en:'Solo development'}},
+      {title:{ko:'헬스 케어 시스템',en:'Health Care System'},subtitle:{ko:'건강 데이터 기록·모니터링 시스템',en:'Health data logging and monitoring system'},role:{ko:'팀장 · 4인 팀',en:'Team lead · 4-person team'}},
+      {title:{ko:'면진봇',en:'MZ Bot'},subtitle:{ko:'Discord 경제 시뮬레이션 봇',en:'Discord economy simulation bot'},role:{ko:'1인 개발',en:'Solo development'}},
     ]},
-    { label:'2024', cards:[
-      {title:'해안 장벽 프로젝트',subtitle:'해수면 상승 대비 수조 기반 MVP',role:'아두이노 개발 총괄 · 4인 팀'},
-      {title:'졸음 방지 시스템',subtitle:'허스키렌즈 실시간 졸음 감지',role:'아두이노 개발 · 2인 팀'},
-      {title:'비밀번호 도어락',subtitle:'4×4 키패드 기반 장치',role:'팀장 · 4인 팀'},
+    { id:'2024', kind:'year', label:'2024', cards:[
+      {title:{ko:'해안 장벽 프로젝트',en:'Coastal Barrier Project'},subtitle:{ko:'해수면 상승 대비 수조 기반 MVP',en:'Tank-based MVP for rising sea levels'},role:{ko:'아두이노 개발 총괄 · 4인 팀',en:'Arduino development lead · 4-person team'}},
+      {title:{ko:'졸음 방지 시스템',en:'Drowsiness Prevention System'},subtitle:{ko:'허스키렌즈 실시간 졸음 감지',en:'HuskyLens real-time drowsiness detection'},role:{ko:'아두이노 개발 · 2인 팀',en:'Arduino development · 2-person team'}},
+      {title:{ko:'비밀번호 도어락',en:'Password Door Lock'},subtitle:{ko:'4×4 키패드 기반 장치',en:'4×4 keypad-based device'},role:{ko:'팀장 · 4인 팀',en:'Team lead · 4-person team'}},
     ]},
-    { label:'진행 중·예정', cards:[
-      {title:'한맵',subtitle:'KOREATECH 캠퍼스 인터랙티브 지도',role:'기획 단계'},
-      {title:'승기봇',subtitle:'면진봇 개편판 미니게임 봇',role:'개발 중'},
-      {title:'CentrifugeAI',subtitle:'Gemini 가상 과학 실험실',role:'마무리 단계'},
+    { id:'wip', kind:'wip', label:{ko:'진행 중·예정',en:'In progress · Planned'}, cards:[
+      {title:{ko:'한맵',en:'Koreatech Map'},subtitle:{ko:'KOREATECH 캠퍼스 인터랙티브 지도',en:'Interactive KOREATECH campus map'},role:{ko:'기획 단계',en:'Planning'}},
+      {title:{ko:'승기봇',en:'SG Bot'},subtitle:{ko:'면진봇 개편판 미니게임 봇',en:'Rebuilt MZ Bot mini-game bot'},role:{ko:'개발 중',en:'In development'}},
+      {title:'CentrifugeAI',subtitle:{ko:'Gemini 가상 과학 실험실',en:'Gemini virtual science laboratory'},role:{ko:'마무리 단계',en:'Finalizing'}},
     ]},
-    { label:'실패한 프로젝트', cards:[
-      {title:'InfoCatch',subtitle:'AI 뉴스 요약 웹 애플리케이션',role:'AI 구현 실패'},
-      {title:'InvestAI',subtitle:'Fear/Greed 지표 웹 위젯',role:'API 연동 실패'},
-      {title:'BrawlCraft',subtitle:'탐사·조합·전투 웹 게임',role:'최적화·디자인 실패'},
+    { id:'failed', kind:'failed', label:{ko:'실패한 프로젝트',en:'Failed projects'}, cards:[
+      {title:'InfoCatch',subtitle:{ko:'AI 뉴스 요약 웹 애플리케이션',en:'AI news summarization web app'},failedReason:{ko:'AI 구현 실패 · 당시 웹서버 구축 경험 부족',en:'AI implementation failed · Lacked web-server experience at the time'}},
+      {title:'InvestAI',subtitle:{ko:'Fear/Greed 지표 웹 위젯',en:'Fear/Greed index web widget'},failedReason:{ko:'API 연동 실패',en:'API integration failed'}},
+      {title:{ko:'건영운세',en:'GY Fortune'},subtitle:{ko:'날짜 기반 운세 생성 웹앱',en:'Date-based fortune generator'},failedReason:{ko:'운세 로직 구현 실패',en:'Fortune logic implementation failed'}},
+      {title:{ko:'한기대 지도 (초기 버전)',en:'KOREATECH Map (Early Ver.)'},subtitle:{ko:'캠퍼스 내부 지도 데이터 수집 프로젝트',en:'Campus indoor map data collection project'},failedReason:{ko:'데이터 수집 난이도 · AI 지도 변환 실패',en:'Data collection difficulty · AI map conversion failed'}},
+      {title:'BrawlCraft',subtitle:{ko:'탐사·조합·전투 웹 게임',en:'Exploration, crafting, and combat web game'},failedReason:{ko:'최적화·디자인 실패',en:'Optimization and design failed'}},
     ]},
   ];
 
   const pageType = document.body.dataset.page || 'unknown';
   const projectState = { groups:fallbackGroups, visited:new Set(), current:'2026' };
-  const sequenceState = { expected:1, complete:false, drag:null };
+  const sequenceState = { expected:1, complete:false, drag:null, status:{key:'firstStar',values:{}} };
   const audioState = { context:null, nodes:[], stopTimer:0 };
+  let bootComplete = false;
 
   /* Utility helpers keep malformed optional data from breaking the mockup. */
-  function localText(value) {
+  function localText(value, language=languageState.current) {
     if (typeof value === 'string') return value;
-    if (value && typeof value === 'object') return value.ko || value.en || '';
+    if (value && typeof value === 'object') return value[language] || value.ko || value.en || '';
     return '';
   }
   function plainText(value) {
@@ -87,11 +105,60 @@
     return shell.textContent.trim();
   }
   function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
+  function translate(key, values={}) {
+    let output = uiText[languageState.current]?.[key] || uiText.ko[key] || key;
+    Object.entries(values).forEach(([name,value]) => { output = output.replaceAll(`{${name}}`, String(value)); });
+    return output;
+  }
   function reducedMotion() { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
   function svgElement(name, attributes={}) {
     const node = document.createElementNS('http://www.w3.org/2000/svg', name);
     Object.entries(attributes).forEach(([key,value]) => node.setAttribute(key, String(value)));
     return node;
+  }
+
+  /* v2's bilingual contract remains, while theme selection stays system-only. */
+  function applyStaticLanguage() {
+    const language = languageState.current;
+    document.documentElement.lang = language;
+    document.querySelectorAll('[data-ko][data-en]').forEach((node) => {
+      node.textContent = language === 'en' ? node.dataset.en : node.dataset.ko;
+    });
+    document.querySelectorAll('[data-ko-html][data-en-html]').forEach((node) => {
+      node.innerHTML = language === 'en' ? node.dataset.enHtml : node.dataset.koHtml;
+    });
+    document.querySelectorAll('[data-language-switch]').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.languageSwitch === language));
+    });
+    document.querySelectorAll('[data-sound-stop]').forEach((button) => {
+      button.textContent = translate('soundStop');
+      button.setAttribute('aria-label', translate('soundStopLabel'));
+    });
+  }
+  function refreshLocalizedViews() {
+    refreshGrowthLanguage();
+    if (pageType === 'story' || pageType === 'celestial') {
+      renderProjectArchive();
+      renderLostStarArchive();
+    }
+    if (pageType === 'atlas') {
+      createAtlasStations();
+      renderArea51Records();
+      document.querySelector('[data-atlas-drawer]')?.classList.remove('open');
+    }
+    if (pageType === 'celestial') refreshOrreryLanguage();
+  }
+  function setLanguage(language) {
+    languageState.current = language === 'en' ? 'en' : 'ko';
+    localStorage.setItem('lang', languageState.current);
+    applyStaticLanguage();
+    if (bootComplete) refreshLocalizedViews();
+  }
+  function initLanguage() {
+    document.querySelectorAll('[data-language-switch]').forEach((button) => {
+      button.addEventListener('click', () => setLanguage(button.dataset.languageSwitch));
+    });
+    applyStaticLanguage();
   }
 
   /* Canvas gives the first scene depth while remaining dependency-free on GitHub Pages. */
@@ -379,12 +446,12 @@
         const node = document.createElement('button');
         node.type = 'button'; node.className = 'growth-node'; node.dataset.growthIndex = String(index);
         node.style.setProperty('--x', `${x}%`); node.style.setProperty('--y', `${y}%`);
-        node.setAttribute('aria-label', `${event.year} ${event.title}`);
+        node.setAttribute('aria-label', `${event.year} ${localText(event.title)}`);
         const label = document.createElement('span');
         label.className = `growth-label${index > 5 ? ' reverse' : ''}`; label.dataset.growthLabel = String(index);
         label.style.setProperty('--x', `${x}%`); label.style.setProperty('--y', `${y}%`);
         if (index > 5) label.style.left = `calc(${x}% - 210px)`;
-        label.innerHTML = `<b>${event.year} · ${event.title}</b><small>${event.detail}</small>`;
+        label.innerHTML = `<b>${event.year} · ${localText(event.title)}</b><small>${localText(event.detail)}</small>`;
         node.addEventListener('pointerdown', (pointerEvent) => {
           selectGrowthEvent(container,index);
           beginGrowthDrag(pointerEvent,container,index);
@@ -398,7 +465,22 @@
       container.querySelector('[data-growth-index="0"]')?.classList.add('seen','selected');
       container.querySelector('[data-growth-label="0"]')?.classList.add('active');
     });
-    updateSequenceStatus('첫 번째 별에서 시작합니다');
+    updateSequenceStatus('firstStar');
+  }
+  function refreshGrowthLanguage() {
+    document.querySelectorAll('[data-growth-constellation]').forEach((container) => {
+      growthEvents.forEach((event,index) => {
+        const node = container.querySelector(`[data-growth-index="${index}"]`);
+        const label = container.querySelector(`[data-growth-label="${index}"]`);
+        node?.setAttribute('aria-label', `${event.year} ${localText(event.title)}`);
+        if (label) label.innerHTML = `<b>${event.year} · ${localText(event.title)}</b><small>${localText(event.detail)}</small>`;
+      });
+      const selected = Number(container.querySelector('.growth-node.selected')?.dataset.growthIndex || 0);
+      const selectedEvent = growthEvents[selected];
+      const summary = document.querySelector('[data-growth-summary]');
+      if (summary && selectedEvent) summary.textContent = `${selectedEvent.year} · ${localText(selectedEvent.title)} — ${localText(selectedEvent.detail)}`;
+    });
+    updateSequenceStatus(sequenceState.status.key, sequenceState.status.values);
   }
   function selectGrowthEvent(container, index, options={}) {
     const event = growthEvents[index];
@@ -406,10 +488,10 @@
     container.querySelectorAll('.growth-node').forEach((node) => node.classList.toggle('selected', Number(node.dataset.growthIndex) === index));
     container.querySelectorAll('.growth-label').forEach((label) => label.classList.toggle('active', Number(label.dataset.growthLabel) === index));
     const summary = document.querySelector('[data-growth-summary]');
-    if (summary) summary.textContent = `${event.year} · ${event.title} — ${event.detail}`;
-    if (pageType === 'atlas') openAtlasDrawer(`${event.year} · ${event.title}`, event.detail, 'GROWTH CONSTELLATION');
+    if (summary) summary.textContent = `${event.year} · ${localText(event.title)} — ${localText(event.detail)}`;
+    if (pageType === 'atlas') openAtlasDrawer(`${event.year} · ${localText(event.title)}`, localText(event.detail), 'GROWTH CONSTELLATION');
     if (!options.quietStatus && !sequenceState.complete && index !== sequenceState.expected) {
-      updateSequenceStatus(`${event.year} 기록을 보고 있습니다`);
+      updateSequenceStatus('viewingRecord',{year:event.year});
     }
     return true;
   }
@@ -449,13 +531,15 @@
     sequenceState.expected += 1;
     if (sequenceState.expected === growthEvents.length) {
       sequenceState.complete = true;
-      updateSequenceStatus('별자리 완성');
+      updateSequenceStatus('constellationComplete');
       playConstellationMusic();
-    } else updateSequenceStatus(`${sequenceState.expected} / ${growthEvents.length}`);
+    } else updateSequenceStatus('progress');
     return true;
   }
-  function updateSequenceStatus(message) {
+  function updateSequenceStatus(key='progress', values={}) {
+    sequenceState.status = {key,values};
     document.querySelectorAll('[data-sequence-count]').forEach((node) => { node.textContent = `${sequenceState.expected} / ${growthEvents.length}`; });
+    const message = key === 'progress' ? `${sequenceState.expected} / ${growthEvents.length}` : translate(key,values);
     document.querySelectorAll('[data-sequence-message]').forEach((node) => { node.textContent = message; });
   }
   function beginGrowthDrag(pointerEvent,container,index) {
@@ -540,11 +624,18 @@
       if (!response.ok) throw new Error(`projects.json ${response.status}`);
       const payload = await response.json();
       const groups = payload.groups.map((group) => ({
-        label:group.kind === 'year' ? group.year : localText(group.heading),
+        id:group.kind === 'year' ? group.year : group.kind,
+        kind:group.kind,
+        label:group.kind === 'year' ? group.year
+          : group.kind === 'wip' ? {ko:localText(group.heading,'ko'),en:'In progress · Planned'}
+          : group.kind === 'failed' ? {ko:localText(group.heading,'ko'),en:'Failed projects'}
+          : group.heading,
         cards:(group.cards || []).map((card) => ({
-          title:localText(card.title),
-          subtitle:plainText(card.subtitle || card.desc || card.descHtml),
-          role:localText(card.role || card.status || card.failedReason),
+          title:card.title,
+          subtitle:card.subtitle || card.desc || card.descHtml,
+          role:card.role || card.status || card.failedReason,
+          failedReason:card.failedReason,
+          tech:Array.isArray(card.tech) ? card.tech : [],
           detail:typeof card.detail === 'string' ? card.detail : '',
         })),
       })).filter((group) => group.label && group.cards.length);
@@ -559,6 +650,7 @@
     if (!detail) return '';
     return /(^|\/)Wall_Sina\/?$/i.test(detail) ? 'wall-sina.html' : `../../${detail}`;
   }
+  function projectGroupLabel(group) { return localText(group?.label); }
   function renderProjectArchive() {
     const tabs = document.querySelector('[data-year-tabs]');
     const grid = document.querySelector('[data-project-grid]');
@@ -566,17 +658,17 @@
     tabs.replaceChildren();
     projectState.groups.forEach((group,index) => {
       const button = document.createElement('button');
-      button.type = 'button'; button.role = 'tab'; button.textContent = group.label; button.dataset.groupIndex = String(index);
-      button.setAttribute('aria-selected', String(group.label === projectState.current));
+      button.type = 'button'; button.role = 'tab'; button.textContent = projectGroupLabel(group); button.dataset.groupIndex = String(index);
+      button.setAttribute('aria-selected', String(group.id === projectState.current));
       button.addEventListener('click', () => selectProjectGroup(index)); tabs.append(button);
     });
-    const initial = Math.max(0, projectState.groups.findIndex((group) => group.label === projectState.current));
+    const initial = Math.max(0, projectState.groups.findIndex((group) => group.id === projectState.current));
     selectProjectGroup(initial);
   }
   function selectProjectGroup(index) {
     const group = projectState.groups[index];
     if (!group) return;
-    projectState.current = group.label; projectState.visited.add(group.label);
+    projectState.current = group.id; projectState.visited.add(group.id);
     document.querySelectorAll('[data-year-tabs] button').forEach((button) => button.setAttribute('aria-selected', String(Number(button.dataset.groupIndex) === index)));
     document.querySelectorAll('[data-orbit-years] button').forEach((button) => button.setAttribute('aria-pressed', String(Number(button.dataset.groupIndex) === index)));
     const grid = document.querySelector('[data-project-grid]');
@@ -589,18 +681,59 @@
           article.href = detailHref;
           article.style.color = 'inherit';
           article.style.textDecoration = 'none';
-          article.setAttribute('aria-label', `${card.title} 상세 기록 열기`);
+          article.setAttribute('aria-label', translate('openDetail',{title:localText(card.title)}));
         }
-        const type = document.createElement('small'); type.textContent = group.label;
-        const title = document.createElement('h3'); title.textContent = card.title;
-        const desc = document.createElement('p'); desc.textContent = card.subtitle || '프로젝트 기록';
-        const role = document.createElement('span'); role.className = 'project-role'; role.textContent = card.role || '상세 기록 확인';
+        const type = document.createElement('small'); type.textContent = projectGroupLabel(group);
+        const title = document.createElement('h3'); title.textContent = localText(card.title);
+        const desc = document.createElement('p'); desc.textContent = plainText(card.subtitle) || translate('projectRecord');
+        const role = document.createElement('span'); role.className = 'project-role'; role.textContent = plainText(card.role) || translate('detailRecord');
         article.append(type,title,desc,role); return article;
       }));
     }
-    document.querySelectorAll('[data-archive-label]').forEach((node) => { node.textContent = group.label; });
-    document.querySelectorAll('[data-project-count]').forEach((node) => { node.textContent = `${group.cards.length}개의 기록`; });
+    document.querySelectorAll('[data-archive-label]').forEach((node) => { node.textContent = projectGroupLabel(group); });
+    document.querySelectorAll('[data-project-count]').forEach((node) => { node.textContent = translate('records',{count:group.cards.length}); });
     checkCometUnlock();
+  }
+
+  /* The public archive shows four factual failures; BrawlCraft remains classified in the Atlas study. */
+  function failedProjectGroup() { return projectState.groups.find((group) => group.kind === 'failed' || group.id === 'failed'); }
+  function classifyFailedProject(card) {
+    const title = localText(card.title,'ko');
+    if (title.includes('한기대 지도')) return {state:'orbit',labelKey:'lostOrbit'};
+    if (title === 'InfoCatch' || title === 'InvestAI') return {state:'supernova',labelKey:'supernovaRemnant'};
+    if (title.includes('건영운세')) return {state:'vanished',labelKey:'vanishedStar'};
+    return {state:'classified',labelKey:'area51'};
+  }
+  function renderLostStarArchive() {
+    const group = failedProjectGroup();
+    if (!group) return;
+    const points = [[18,35],[42,68],[67,27],[82,67]];
+    document.querySelectorAll('[data-lost-stars]').forEach((section) => {
+      const field = section.querySelector('[data-lost-star-field]');
+      const record = section.querySelector('[data-lost-star-record]');
+      if (!field || !record) return;
+      const cards = group.cards.filter((card) => classifyFailedProject(card).state !== 'classified').slice(0,4);
+      field.replaceChildren(...cards.map((card,index) => {
+        const classification = classifyFailedProject(card);
+        const button = document.createElement('button');
+        button.type = 'button'; button.className = 'lost-star'; button.dataset.lostState = classification.state;
+        button.style.setProperty('--x',`${points[index][0]}%`); button.style.setProperty('--y',`${points[index][1]}%`);
+        button.setAttribute('aria-label',`${localText(card.title)} · ${translate(classification.labelKey)}`);
+        const visual = document.createElement('span'); visual.className = 'lost-star-visual'; visual.setAttribute('aria-hidden','true');
+        const name = document.createElement('span'); name.className = 'lost-star-name'; name.textContent = localText(card.title);
+        button.append(visual,name);
+        button.addEventListener('click',() => {
+          field.querySelectorAll('.lost-star').forEach((node) => node.classList.toggle('active',node === button));
+          const status = document.createElement('small'); status.textContent = translate(classification.labelKey);
+          const title = document.createElement('h3'); title.textContent = localText(card.title);
+          const summary = document.createElement('p'); summary.textContent = plainText(card.subtitle);
+          const reason = document.createElement('p'); reason.textContent = plainText(card.failedReason || card.role);
+          record.replaceChildren(status,title,summary,reason); record.hidden = false;
+        });
+        return button;
+      }));
+      record.hidden = true;
+    });
   }
 
   /* Two deliberate turns reveal the orrery's unlabelled eclipse event. */
@@ -647,9 +780,9 @@
       button.type = 'button';
       button.dataset.groupIndex = String(index);
       button.style.setProperty('--angle', `${index * 360 / projectState.groups.length}deg`);
-      button.setAttribute('aria-pressed', String(group.label === projectState.current));
+      button.setAttribute('aria-pressed', String(group.id === projectState.current));
       const year = document.createElement('b');
-      year.textContent = group.label;
+      year.textContent = projectGroupLabel(group);
       const count = document.createElement('small');
       count.textContent = `${group.cards.length}`;
       button.append(year,count);
@@ -698,6 +831,15 @@
     shell.addEventListener('pointerup',finish);
     shell.addEventListener('pointercancel',cancel);
     apply();
+  }
+  function refreshOrreryLanguage() {
+    document.querySelectorAll('[data-orbit-years] button').forEach((button) => {
+      const group = projectState.groups[Number(button.dataset.groupIndex)];
+      const label = button.querySelector('b');
+      const count = button.querySelector('small');
+      if (label && group) label.textContent = projectGroupLabel(group);
+      if (count && group) count.textContent = String(group.cards.length);
+    });
   }
   function checkCometUnlock() {
     if (projectState.visited.size < projectState.groups.length) return;
@@ -908,11 +1050,11 @@
     const focus=(name)=>{
       if(!desktop())return; const zone=world.querySelector(`[data-zone="${name}"]`); if(!zone)return;
       const centerX=zone.offsetLeft+zone.offsetWidth/2,centerY=zone.offsetTop+zone.offsetHeight/2;
-      camera.scale=name==='projects'?.86:name==='moon'?1:.9;
+      camera.scale=name==='projects'?.86:name==='moon'?1:name==='area51'?.94:.9;
       camera.x=viewport.clientWidth/2-centerX*camera.scale; camera.y=viewport.clientHeight/2-centerY*camera.scale; apply(true);
     };
     atlasApi={focus,apply,camera,viewport,world};
-    viewport.addEventListener('pointerdown',(event)=>{if(!desktop()||event.target.closest('button,a,[data-atlas-moon],[data-ophiuchus-trigger]'))return;camera.drag={x:event.clientX,y:event.clientY,cx:camera.x,cy:camera.y};viewport.setPointerCapture(event.pointerId);viewport.classList.add('dragging');});
+    viewport.addEventListener('pointerdown',(event)=>{if(!desktop()||event.target.closest('button,a,[data-atlas-moon],[data-ophiuchus-trigger],[data-area51-star]'))return;camera.drag={x:event.clientX,y:event.clientY,cx:camera.x,cy:camera.y};viewport.setPointerCapture(event.pointerId);viewport.classList.add('dragging');});
     viewport.addEventListener('pointermove',(event)=>{if(!camera.drag)return;camera.x=camera.drag.cx+event.clientX-camera.drag.x;camera.y=camera.drag.cy+event.clientY-camera.drag.y;apply();});
     const endDrag=()=>{camera.drag=null;viewport.classList.remove('dragging');}; viewport.addEventListener('pointerup',endDrag);viewport.addEventListener('pointercancel',endDrag);
     viewport.addEventListener('wheel',(event)=>{if(!desktop())return;event.preventDefault();const old=camera.scale;const next=clamp(old*(event.deltaY>0?.9:1.1),.55,1.35);const rect=viewport.getBoundingClientRect(),px=event.clientX-rect.left,py=event.clientY-rect.top;camera.x=px-(px-camera.x)*(next/old);camera.y=py-(py-camera.y)*(next/old);camera.scale=next;apply();},{passive:false});
@@ -926,9 +1068,10 @@
     const shell=document.querySelector('[data-atlas-stations]'); if(!shell)return;
     const points=[[18,26],[67,19],[40,51],[76,67],[26,79]];
     shell.replaceChildren(...projectState.groups.map((group,index)=>{
-      const button=document.createElement('button');button.type='button';button.className='atlas-station';button.textContent=group.label;
+      const button=document.createElement('button');button.type='button';button.className='atlas-station';button.textContent=projectGroupLabel(group);
       button.style.setProperty('--x',`${points[index%points.length][0]}%`);button.style.setProperty('--y',`${points[index%points.length][1]}%`);
-      button.addEventListener('click',()=>{projectState.visited.add(group.label);button.classList.add('visited');openAtlasDrawer(group.label,`${group.cards.length}개의 프로젝트 기록`, 'PROJECT OBSERVATORY',group.cards);checkCometUnlock();});return button;
+      button.classList.toggle('visited',projectState.visited.has(group.id));
+      button.addEventListener('click',()=>{projectState.visited.add(group.id);button.classList.add('visited');openAtlasDrawer(projectGroupLabel(group),translate('records',{count:group.cards.length}), 'PROJECT OBSERVATORY',group.cards);checkCometUnlock();});return button;
     }));
   }
   function openAtlasDrawer(title,description,kicker='OBSERVATORY',cards=[]) {
@@ -936,8 +1079,8 @@
     drawer.querySelector('[data-drawer-kicker]').textContent=kicker;drawer.querySelector('[data-drawer-title]').textContent=title;drawer.querySelector('[data-drawer-description]').textContent=description;
     const grid=drawer.querySelector('[data-drawer-projects]');grid.replaceChildren(...cards.slice(0,7).map((card)=>{
       const detailHref=projectDetailHref(card),record=document.createElement(detailHref?'a':'article');record.className='drawer-project-record';
-      if(detailHref){record.href=detailHref;record.setAttribute('aria-label',`${card.title} 상세 기록 열기`);}
-      const strong=document.createElement('b');strong.textContent=card.title;const small=document.createElement('small');small.textContent=card.subtitle||card.role||'';record.append(strong,small);return record;
+      if(detailHref){record.href=detailHref;record.setAttribute('aria-label',translate('openDetail',{title:localText(card.title)}));}
+      const strong=document.createElement('b');strong.textContent=localText(card.title);const small=document.createElement('small');small.textContent=plainText(card.subtitle||card.role);record.append(strong,small);return record;
     }));drawer.classList.add('open');
   }
   function initAtlasMoon() {
@@ -945,6 +1088,79 @@
     let drag=null;moon.addEventListener('pointerdown',(event)=>{event.stopPropagation();drag={x:event.clientX,y:event.clientY,left:moon.offsetLeft,top:moon.offsetTop};moon.setPointerCapture(event.pointerId);});
     moon.addEventListener('pointermove',(event)=>{if(!drag)return;const scale=atlasApi?.camera.scale||1;moon.style.left=`${drag.left+(event.clientX-drag.x)/scale}px`;moon.style.top=`${drag.top+(event.clientY-drag.y)/scale}px`;});
     moon.addEventListener('pointerup',()=>{if(!drag)return;drag=null;const a=moon.getBoundingClientRect(),b=target.getBoundingClientRect();if(Math.hypot(a.left+a.width/2-b.left-b.width/2,a.top+a.height/2-b.top-b.height/2)<95)revealEclipse(moon.closest('.atlas-zone'));});
+  }
+
+  /* Dragging the unnamed anomaly through the broken boundary reveals Area 51. */
+  function area51Cards() {
+    const failed = failedProjectGroup();
+    if (!failed) return [];
+    const brawlCraft = failed.cards.find((card) => localText(card.title,'ko') === 'BrawlCraft');
+    return brawlCraft ? [brawlCraft] : failed.cards.slice(-1);
+  }
+  function renderArea51Records() {
+    const shell = document.querySelector('[data-area51-records]');
+    if (!shell) return;
+    shell.replaceChildren(...area51Cards().map((card) => {
+      const record = document.createElement('article'); record.className = 'area51-record';
+      const title = document.createElement('b'); title.textContent = localText(card.title);
+      const summary = document.createElement('span'); summary.textContent = plainText(card.subtitle);
+      const reason = document.createElement('span'); reason.textContent = plainText(card.failedReason || card.role);
+      record.append(title,summary,reason); return record;
+    }));
+  }
+  function revealArea51() {
+    const world = document.querySelector('[data-atlas-world]');
+    const zone = document.querySelector('[data-area51-zone]');
+    if (!world || !zone || world.classList.contains('area51-revealed')) return;
+    world.classList.add('area51-revealed'); zone.setAttribute('aria-hidden','false');
+    renderArea51Records(); playEffect('danger');
+    window.setTimeout(() => {
+      if (window.matchMedia('(min-width:901px)').matches) atlasApi?.focus('area51');
+      else zone.scrollIntoView({behavior:reducedMotion()?'auto':'smooth',block:'center'});
+    },420);
+    window.setTimeout(() => openAtlasDrawer(translate('area51'),translate('area51Description'),'CLASSIFIED',area51Cards()),920);
+  }
+  function initArea51() {
+    const star=document.querySelector('[data-area51-star]'),target=document.querySelector('[data-area51-target]');
+    if(!star||!target)return;
+    let drag=null,offsetX=0,offsetY=0,keyboardMoved=false;
+    const scale=()=>window.matchMedia('(min-width:901px)').matches ? atlasApi?.camera.scale||1 : 1;
+    const apply=()=>{star.style.transform=`translate3d(${offsetX}px,${offsetY}px,0)`;};
+    const closeEnough=()=>{
+      const a=star.getBoundingClientRect(),b=target.getBoundingClientRect();
+      return Math.hypot(a.left+a.width/2-b.left-b.width/2,a.top+a.height/2-b.top-b.height/2)<=58;
+    };
+    const reset=()=>{
+      offsetX=0;offsetY=0;
+      if(reducedMotion()||typeof star.animate!=='function'){apply();return;}
+      const animation=star.animate([{transform:star.style.transform||'none'},{transform:'translate3d(0,0,0)'}],{duration:520,easing:'cubic-bezier(.2,.78,.24,1)'});
+      animation.addEventListener('finish',apply,{once:true});
+    };
+    star.addEventListener('pointerdown',(event)=>{
+      if(event.pointerType==='mouse'&&event.button!==0)return;
+      event.preventDefault();event.stopPropagation();
+      drag={pointerId:event.pointerId,x:event.clientX,y:event.clientY,startX:offsetX,startY:offsetY,moved:false};
+      try{star.setPointerCapture(event.pointerId);}catch(_){/* Window listeners retain the drag. */}
+      star.classList.add('dragging');
+    });
+    star.addEventListener('pointermove',(event)=>{
+      if(!drag||event.pointerId!==drag.pointerId)return;
+      event.preventDefault();
+      const divisor=scale();offsetX=drag.startX+(event.clientX-drag.x)/divisor;offsetY=drag.startY+(event.clientY-drag.y)/divisor;
+      drag.moved=drag.moved||Math.hypot(event.clientX-drag.x,event.clientY-drag.y)>6;apply();
+    });
+    const finish=()=>{
+      if(!drag)return;
+      const moved=drag.moved;drag=null;star.classList.remove('dragging');
+      if(moved&&closeEnough())revealArea51();
+      else{if(!moved){star.classList.remove('touched');void star.offsetWidth;star.classList.add('touched');}reset();}
+    };
+    star.addEventListener('pointerup',finish);star.addEventListener('pointercancel',()=>{drag=null;star.classList.remove('dragging');reset();});
+    star.addEventListener('keydown',(event)=>{
+      const movement={ArrowLeft:[-14,0],ArrowRight:[14,0],ArrowUp:[0,-14],ArrowDown:[0,14]}[event.key];
+      if(!movement)return;event.preventDefault();keyboardMoved=true;offsetX+=movement[0];offsetY+=movement[1];apply();
+      if(keyboardMoved&&closeEnough())revealArea51();
+    });
   }
 
   /* The detail prototype compares real planning material with the photographed MVP. */
@@ -965,12 +1181,14 @@
 
   /* Boot only the interactions present on the current prototype page. */
   async function boot() {
+    initLanguage();
     createCosmosCanvases();createIntroConstellation();createStarfields();createGrowthConstellations();createZodiacBelt();
-    document.querySelectorAll('[data-sound-stop]').forEach((button)=>{button.textContent='소리 끄기 ×';button.setAttribute('aria-label','재생 중인 소리 끄기');button.addEventListener('click',stopAudio);});
-    if(pageType==='story'){initStoryScroll();initStoryEclipse();projectState.groups=await loadProjectGroups();renderProjectArchive();}
-    if(pageType==='atlas'){projectState.groups=await loadProjectGroups();createAtlasStations();initAtlas();document.querySelector('[data-drawer-close]')?.addEventListener('click',()=>document.querySelector('[data-atlas-drawer]')?.classList.remove('open'));}
-    if(pageType==='celestial'){projectState.groups=await loadProjectGroups();renderProjectArchive();initOrrery();}
+    document.querySelectorAll('[data-sound-stop]').forEach((button)=>button.addEventListener('click',stopAudio));
+    if(pageType==='story'){initStoryScroll();initStoryEclipse();projectState.groups=await loadProjectGroups();renderProjectArchive();renderLostStarArchive();}
+    if(pageType==='atlas'){projectState.groups=await loadProjectGroups();createAtlasStations();initAtlas();initArea51();document.querySelector('[data-drawer-close]')?.addEventListener('click',()=>document.querySelector('[data-atlas-drawer]')?.classList.remove('open'));}
+    if(pageType==='celestial'){projectState.groups=await loadProjectGroups();renderProjectArchive();renderLostStarArchive();initOrrery();}
     if(pageType==='wall')initWallCompare();
+    bootComplete = true;
   }
   boot().catch((error)=>console.error('Prototype initialization failed:',error));
 })();
