@@ -1,11 +1,13 @@
 name: v2.6 KGA live media refresh
 
 on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, reopened, synchronize]
   push:
     branches:
       - agent/v26-structure-media-runner
-    paths:
-      - .github/workflows/v26-kga-live-capture.yml
 
 permissions:
   contents: write
@@ -20,12 +22,12 @@ jobs:
           ref: agent/v26-structure-media-runner
           fetch-depth: 0
 
-      - name: Capture deployed KGA and rebuild target atomically
+      - name: Capture deployed KGA shuttle and update target
         shell: bash
         run: |
           set -euo pipefail
           target='agent/v26-structure-media-followup'
-          live='https://herbal-miscellaneous-phrases-environmental.trycloudflare.com/web'
+          live='https://herbal-miscellaneous-phrases-environmental.trycloudflare.com/web#/shuttle'
 
           git fetch origin main "$target"
           old_target=$(git rev-parse "origin/$target")
@@ -50,7 +52,7 @@ jobs:
           from selenium.webdriver.chrome.options import Options
           from selenium.webdriver.chrome.service import Service
 
-          base = os.environ['LIVE_URL']
+          url = os.environ['LIVE_URL']
           chrome = shutil.which('google-chrome') or shutil.which('chromium') or shutil.which('chromium-browser')
           driver_bin = shutil.which('chromedriver') or shutil.which('chromium-driver')
           if not chrome:
@@ -69,61 +71,51 @@ jobs:
           d = webdriver.Chrome(service=Service(driver_bin) if driver_bin else Service(), options=opts)
           d.set_window_size(1440, 1100)
           d.set_page_load_timeout(45)
+          try:
+              d.get(url)
+          except TimeoutException:
+              pass
 
-          def capture(route, out_name, must_contain):
-              url = f'{base}#/{route}'
+          deadline = time.time() + 40
+          text = ''
+          while time.time() < deadline:
               try:
-                  d.get(url)
-              except TimeoutException:
+                  text = d.execute_script('return document.body ? document.body.innerText : ""') or ''
+                  ready = d.execute_script('return document.readyState') in ('interactive', 'complete')
+                  if ready and len(text.strip()) > 250 and any(k in text for k in ('셔틀', 'Shuttle', '노선', '시간표')):
+                      break
+              except Exception:
                   pass
-              deadline = time.time() + 35
-              text = ''
-              while time.time() < deadline:
-                  try:
-                      text = d.execute_script('return document.body ? document.body.innerText : ""') or ''
-                      ready = d.execute_script('return document.readyState') in ('interactive', 'complete')
-                      if ready and len(text.strip()) > 250 and any(k in text for k in must_contain):
-                          break
-                  except Exception:
-                      pass
-                  time.sleep(1)
-              else:
-                  raise SystemExit(f'KGA {route} did not become usable; body={text[:500]!r}')
+              time.sleep(1)
+          else:
+              raise SystemExit(f'KGA shuttle did not become usable: {text[:600]!r}')
 
-              # Let API-fed cards/maps settle after the route itself is visible.
-              time.sleep(8)
-              text = d.execute_script('return document.body ? document.body.innerText : ""') or ''
-              lower = text.lower()
-              bad = ['bad gateway', 'cloudflare tunnel error', 'application error', 'internal server error']
-              if any(x in lower for x in bad):
-                  raise SystemExit(f'KGA {route} rendered an error page: {text[:500]!r}')
+          time.sleep(8)
+          text = d.execute_script('return document.body ? document.body.innerText : ""') or ''
+          lower = text.lower()
+          if any(x in lower for x in ('bad gateway', 'cloudflare tunnel error', 'application error', 'internal server error')):
+              raise SystemExit(f'KGA shuttle rendered an error page: {text[:600]!r}')
 
-              png = Path(f'/tmp/{out_name}.png')
-              if not d.save_screenshot(str(png)) or png.stat().st_size < 60000:
-                  raise SystemExit(f'KGA {route} screenshot unexpectedly small')
-              out = Path(f'/tmp/{out_name}.webp')
-              with Image.open(png) as im:
-                  im = im.convert('RGB')
-                  im.save(out, 'WEBP', quality=84, method=6)
-              print(route, out.stat().st_size, text[:240].replace('\n', ' | '), flush=True)
-
-          capture('home', 'web-home', ['KOREATECH', '코리아텍', '공지', '홈'])
-          capture('shuttle', 'web-shuttle', ['셔틀', 'Shuttle', '노선', '시간표'])
+          png = Path('/tmp/web-shuttle.png')
+          if not d.save_screenshot(str(png)) or png.stat().st_size < 60000:
+              raise SystemExit('KGA shuttle screenshot unexpectedly small')
           d.quit()
+
+          out = Path('/tmp/web-shuttle.webp')
+          with Image.open(png) as im:
+              im = im.convert('RGB')
+              im.save(out, 'WEBP', quality=84, method=6)
+          print('CAPTURED', out.stat().st_size, text[:400].replace('\n', ' | '), flush=True)
           PY
 
           mkdir -p projects/koreatechGongjiAgent/assets/images
-          cp /tmp/web-home.webp projects/koreatechGongjiAgent/assets/images/web-home.webp
-          git add -- projects/koreatechGongjiAgent/assets/images/web-home.webp
-          if ! git diff --cached --quiet; then
-            git commit -m 'feat: refresh deployed KGA home media'
-          fi
-
           cp /tmp/web-shuttle.webp projects/koreatechGongjiAgent/assets/images/web-shuttle.webp
           git add -- projects/koreatechGongjiAgent/assets/images/web-shuttle.webp
-          if ! git diff --cached --quiet; then
-            git commit -m 'feat: add deployed KGA shuttle media'
-          fi
+          git commit -m 'feat: add deployed KGA shuttle media'
+
+          base=$(git merge-base origin/main HEAD)
+          index_commit=$(git rev-list "$base"..HEAD -- projects/koreatechGongjiAgent/index.html | tail -1)
+          test -n "$index_commit"
 
           python3 - <<'PY'
           from pathlib import Path
@@ -131,145 +123,87 @@ jobs:
           s = p.read_text(encoding='utf-8')
           if 'assets/images/web-shuttle.webp' not in s:
               needle = '''                <figure class="detail-figure">\n                  <img src="assets/images/web-admin.webp" width="1440" height="1100" loading="lazy" decoding="async" alt="코리아텍 통합 알림 시스템 관리자 일정 관리 화면" />\n                  <figcaption data-en="Admin schedule management" data-ko="관리자 일정 관리">관리자 일정 관리</figcaption>\n                </figure>'''
-              insert = '''                <figure class="detail-figure">\n                  <img src="assets/images/web-shuttle.webp" width="1440" height="1100" loading="lazy" decoding="async" alt="코리아텍 통합 알림 시스템 실운영 셔틀 조회 화면" />\n                  <figcaption data-en="Live shuttle dashboard" data-ko="실운영 셔틀 조회 화면">실운영 셔틀 조회 화면</figcaption>\n                </figure>\n''' + needle
+              shuttle = '''                <figure class="detail-figure">\n                  <img src="assets/images/web-shuttle.webp" width="1440" height="1100" loading="lazy" decoding="async" alt="코리아텍 통합 알림 시스템 실운영 셔틀 조회 화면" />\n                  <figcaption data-en="Live shuttle dashboard" data-ko="실운영 셔틀 조회 화면">실운영 셔틀 조회 화면</figcaption>\n                </figure>\n'''
               if needle not in s:
                   raise SystemExit('KGA gallery insertion anchor not found')
-              s = s.replace(needle, insert, 1)
-              p.write_text(s, encoding='utf-8')
+              p.write_text(s.replace(needle, shuttle + needle, 1), encoding='utf-8')
           PY
           git add -- projects/koreatechGongjiAgent/index.html
-          if ! git diff --cached --quiet; then
-            git commit -m 'feat: show deployed KGA shuttle media'
-          fi
+          git commit --fixup="$index_commit"
 
-          final_sha=$(git rev-parse HEAD)
-          git fetch origin main "$target"
-          merge_base=$(git merge-base origin/main "$final_sha")
+          GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash "$base"
 
-          python3 - "$merge_base" "$final_sha" <<'PY'
+          set +e
+          GIT_EDITOR=true git rebase origin/main
+          rc=$?
+          set -e
+          while [ -d .git/rebase-merge ] || [ -d .git/rebase-apply ]; do
+            conflicts=$(git diff --name-only --diff-filter=U)
+            if [ -z "$conflicts" ]; then
+              set +e
+              GIT_EDITOR=true git rebase --continue
+              rc=$?
+              set -e
+              continue
+            fi
+            while IFS= read -r f; do
+              case "$f" in
+                docs/v3-constellation-prototypes/index.html|docs/v3-constellation-prototypes/home-a-story.html|docs/v3-constellation-prototypes/home-b-atlas.html|docs/v3-constellation-prototypes/wall-sina.html)
+                  git checkout --ours -- "$f"
+                  FILE="$f" python3 - <<'PY'
+          import os, re
           from pathlib import Path
-          import re, subprocess, sys
-
-          root = Path.cwd()
-          merge_base, final_sha = sys.argv[1:3]
-
-          def git(*args, capture=False, check=True):
-              p = subprocess.run(
-                  ['git', *args], cwd=root, check=check,
-                  stdout=subprocess.PIPE if capture else None,
-                  stderr=subprocess.STDOUT if capture else None,
-              )
-              return p.stdout if capture else b''
-
-          def records(base, head):
-              raw = git('diff', '--name-status', '-M', '-z', base, head, capture=True)
-              parts = raw.split(b'\0')
-              if parts and parts[-1] == b'': parts.pop()
-              out=[]; i=0
-              while i < len(parts):
-                  status=parts[i].decode(); i+=1
-                  if status.startswith(('R','C')):
-                      old=parts[i].decode(); new=parts[i+1].decode(); i+=2
-                      out.append((status,old,new))
-                  else:
-                      path=parts[i].decode(); i+=1
-                      out.append((status,path,None))
-              return out
-
-          recs = records(merge_base, final_sha)
-          main_changed = set(git('diff','--name-only',merge_base,'origin/main',capture=True).decode().splitlines())
-          target_changed=set()
-          for status,p1,p2 in recs:
-              target_changed.add(p1)
-              if p2: target_changed.add(p2)
-          overlap = main_changed & target_changed
-          allowed_overlap = {
-              'docs/v3-constellation-prototypes/index.html',
-              'docs/v3-constellation-prototypes/home-a-story.html',
-              'docs/v3-constellation-prototypes/home-b-atlas.html',
-              'docs/v3-constellation-prototypes/wall-sina.html',
-          }
-          unexpected = sorted(overlap - allowed_overlap)
-          print('TARGET_RECORDS', len(recs), flush=True)
-          print('MAIN_CHANGED', sorted(main_changed), flush=True)
-          print('OVERLAP', sorted(overlap), flush=True)
-          if unexpected:
-              raise SystemExit(f'unexpected concurrent overlap: {unexpected}')
-
-          git('reset','--hard','origin/main')
-
-          def msg(status,path):
-              p=Path(path)
-              if status.startswith('R'): return f'refactor: colocate {p.name} with project'
-              if path=='style.css': return 'fix: stop project media cards from stretching'
-              if path=='assets/favicon.svg': return 'fix: add shared chicken favicon'
-              if path=='AGENTS.md': return 'docs: document project-local asset layout'
-              if path=='assets/README.md': return 'docs: clarify global asset ownership'
-              if path=='tools/verify-build.js': return 'chore: verify favicon and project-local assets'
-              if p.suffix.lower() in {'.webp','.png','.jpg','.jpeg','.mp4','.webm'} and 'projects' in p.parts:
-                  project=p.parts[p.parts.index('projects')+1]
-                  return f'feat: add {project} project media'
-              if p.suffix.lower()=='.html':
-                  if path.startswith('projects/'):
-                      project=p.parts[1] if len(p.parts)>1 else p.parent.name
-                      text=(root/path).read_text(encoding='utf-8') if (root/path).exists() else ''
-                      if 'data-media-followup=' in text: return f'feat: update {project} project media'
-                      if 'assets/images/' in text or 'assets/video/' in text: return f'refactor: update {project} project asset paths'
-                  return f'fix: use shared favicon in {path}'
-              return f'chore: update {path}'
-
-          def add_favicon(path):
-              f=root/path
-              text=f.read_text(encoding='utf-8')
-              text=re.sub(r'\s*<link\s+rel=["\']icon["\'][^>]*>\s*','\n',text,flags=re.I)
-              line='  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />\n'
-              if '/assets/favicon.svg' not in text:
-                  m=re.search(r'(^\s*<title>.*?</title>\s*\n)',text,flags=re.M)
-                  if not m: m=re.search(r'(^\s*<meta\s+name="color-scheme"[^>]*>\s*\n)',text,flags=re.M)
-                  if not m: raise SystemExit(f'cannot place favicon in {path}')
-                  text=text[:m.end()]+line+text[m.end():]
-              f.write_text(text,encoding='utf-8')
-              git('add','--',path)
-
-          for status,p1,p2 in recs:
-              target=p2 if p2 else p1
-              if target in allowed_overlap:
-                  add_favicon(target)
-              elif status.startswith(('R','C')):
-                  git('checkout',final_sha,'--',p2)
-                  git('rm','-f','--',p1,check=False)
-              elif status=='D':
-                  git('rm','-f','--',p1)
-              else:
-                  git('checkout',final_sha,'--',p1)
-
-              staged=git('diff','--cached','--name-only',capture=True).decode().strip().splitlines()
-              if not staged:
-                  print('SKIP', target, flush=True)
-                  continue
-              git('commit','-m',msg(status,target))
-              one=git('diff-tree','--no-commit-id','--name-status','-r','-M','HEAD^','HEAD',capture=True).decode().strip().splitlines()
-              if len(one)!=1:
-                  raise SystemExit(f'non-atomic commit for {target}: {one}')
-
-          final_recs=records('origin/main','HEAD')
-          commits=int(git('rev-list','--count','origin/main..HEAD',capture=True).decode().strip())
-          print(f'ATOMIC records={len(final_recs)} commits={commits}', flush=True)
-          if len(final_recs)!=commits:
-              raise SystemExit(f'atomicity mismatch records={len(final_recs)} commits={commits}')
-          for path in sorted(allowed_overlap):
-              if '/assets/favicon.svg' not in (root/path).read_text(encoding='utf-8'):
-                  raise SystemExit(f'favicon missing after main integration: {path}')
+          p = Path(os.environ['FILE'])
+          s = p.read_text(encoding='utf-8')
+          s = re.sub(r'\s*<link\s+rel=["\']icon["\'][^>]*>\s*', '\n', s, flags=re.I)
+          line = '  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />\n'
+          if '/assets/favicon.svg' not in s:
+              m = re.search(r'(^\s*<title>.*?</title>\s*\n)', s, flags=re.M)
+              if not m:
+                  m = re.search(r'(^\s*<meta\s+name="color-scheme"[^>]*>\s*\n)', s, flags=re.M)
+              if not m:
+                  raise SystemExit(f'cannot place favicon in {p}')
+              s = s[:m.end()] + line + s[m.end():]
+          p.write_text(s, encoding='utf-8')
           PY
+                  git add -- "$f"
+                  ;;
+                *)
+                  echo "Unexpected rebase conflict: $f" >&2
+                  exit 1
+                  ;;
+              esac
+            done <<< "$conflicts"
+            set +e
+            GIT_EDITOR=true git rebase --continue
+            rc=$?
+            set -e
+          done
+          test "$rc" -eq 0
 
           node --check script.js
           node build.js
           test -z "$(git status --porcelain index.html)"
           node tools/verify-build.js
           git diff --check origin/main...HEAD
-          test -s projects/koreatechGongjiAgent/assets/images/web-home.webp
           test -s projects/koreatechGongjiAgent/assets/images/web-shuttle.webp
           grep -q 'assets/images/web-shuttle.webp' projects/koreatechGongjiAgent/index.html
-          test -z "$(git status --porcelain)"
 
+          records=$(git diff --name-status -M -z origin/main...HEAD | python3 -c 'import sys; p=sys.stdin.buffer.read().split(b"\0"); p=p[:-1] if p and p[-1]==b"" else p; i=n=0\nwhile i<len(p):\n s=p[i].decode(); i+=1; i+=2 if s.startswith(("R","C")) else 1; n+=1\nprint(n)')
+          commits=$(git rev-list --count origin/main..HEAD)
+          echo "ATOMIC records=$records commits=$commits"
+          test "$records" -eq "$commits"
+
+          while read -r sha; do
+            test "$(git diff-tree --no-commit-id --name-status -r -M "$sha^" "$sha" | wc -l)" -eq 1
+          done < <(git rev-list --reverse origin/main..HEAD)
+
+          test -z "$(git status --porcelain)"
           git push --force-with-lease="refs/heads/$target:$old_target" origin HEAD:"$target"
+
+      - name: Upload KGA shuttle capture
+        uses: actions/upload-artifact@v4
+        with:
+          name: kga-live-shuttle
+          path: projects/koreatechGongjiAgent/assets/images/web-shuttle.webp
+          retention-days: 2
