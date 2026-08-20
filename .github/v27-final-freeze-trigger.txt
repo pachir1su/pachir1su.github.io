@@ -1,1 +1,1 @@
-trigger PR #167 implementation runner
+trigger PR #167 read-only preparer
