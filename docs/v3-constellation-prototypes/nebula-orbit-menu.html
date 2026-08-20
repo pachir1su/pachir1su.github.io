@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="진행 중·궤도를 잃은 별을 연도 축에 어떻게 둘지 비교한 세 가지 배치안 기록">
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <title>전환 화면 배치안 3종</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+  <style>
+    :root {
+      --page:#e8eaf2; --page-deep:#dfe2ec; --surface:#f1f2f7;
+      --ink:#242636; --muted:#606579; --subtle:#777c8f; --line:#cbd0df;
+      --violet:#706994; --violet-strong:#554d7d; --gold:#a9914d;
+      --sans:"IBM Plex Sans KR","Pretendard","Segoe UI",system-ui,sans-serif;
+      --mono:"IBM Plex Mono",ui-monospace,monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --page:#11151d; --page-deep:#0d1118; --surface:#181d27;
+        --ink:#e0e3eb; --muted:#a2a8b8; --subtle:#858c9e; --line:#303848;
+        --violet:#968dbb; --violet-strong:#b0a7d0; --gold:#bda969;
+      }
+    }
+    :root[data-theme="dark"] {
+      --page:#11151d; --page-deep:#0d1118; --surface:#181d27;
+      --ink:#e0e3eb; --muted:#a2a8b8; --subtle:#858c9e; --line:#303848;
+      --violet:#968dbb; --violet-strong:#b0a7d0; --gold:#bda969;
+    }
+
+    * { box-sizing:border-box; }
+    body {
+      margin:0; background:var(--page); color:var(--ink);
+      font-family:var(--sans); font-size:14px; line-height:1.75;
+      -webkit-font-smoothing:antialiased;
+    }
+    .wrap { max-width:1240px; margin:0 auto; padding:0 clamp(16px,3.5vw,40px); }
+
+    .masthead { padding:clamp(46px,8vw,88px) 0 clamp(20px,3vw,32px); }
+    .kicker { margin:0 0 18px; font-family:var(--mono); font-size:11px; letter-spacing:.16em; color:var(--gold); }
+    .masthead h1 {
+      margin:0 0 18px; font-weight:200; font-size:clamp(30px,5vw,54px);
+      letter-spacing:-.035em; line-height:1.14; text-wrap:balance;
+    }
+    .masthead p { max-width:64ch; margin:0 0 12px; color:var(--muted); font-size:15px; }
+    .masthead p:last-child { margin-bottom:0; }
+    .masthead b { color:var(--ink); font-weight:500; }
+
+    /* 별의 생애 — 네 상태가 하나의 연속선임을 보여주는 표 */
+    .life { margin:30px 0 0; border-top:1px solid var(--line); }
+    .life-row { display:grid; gap:2px 24px; padding:13px 0; border-bottom:1px solid var(--line); align-items:baseline; }
+    @media (min-width:780px) { .life-row { grid-template-columns:130px 150px minmax(0,1fr) 44px; } }
+    .life-row b { font-size:12.5px; font-weight:500; }
+    .life-row i { font-style:normal; color:var(--gold); font-size:12.5px; }
+    .life-row span { color:var(--muted); font-size:12.5px; }
+    .life-row u { text-decoration:none; font-family:var(--mono); font-size:11.5px; color:var(--subtle);
+                  font-variant-numeric:tabular-nums; }
+    @media (min-width:780px) { .life-row u { text-align:right; } }
+
+    /* ---------- frames ---------- */
+    .frame { margin:clamp(34px,5vw,62px) 0 0; }
+    .frame-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 14px; margin-bottom:16px; }
+    .frame-id { font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--gold); }
+    .frame-head h2 { margin:0; font-size:16px; font-weight:500; letter-spacing:-.015em; }
+    .frame-head span { color:var(--subtle); font-size:12.5px; }
+
+    .kv {
+      container-type:inline-size;
+      position:relative; aspect-ratio:16/9; overflow:hidden;
+      border:1px solid var(--line);
+      --f-ink:#e6e9f1; --f-muted:#a2a8b8; --f-subtle:#858c9e; --f-gold:#c9b477;
+    }
+    .kv canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+
+    .kv-mini { position:absolute; left:7.5%; top:11%; display:flex; flex-direction:column; }
+    .kv-mini b { color:var(--f-muted); font-weight:300; font-size:1.9cqw; letter-spacing:-.02em; line-height:1; }
+    .kv-mini i { font-style:normal; margin-top:.7cqw; color:var(--f-subtle); font-weight:300;
+                 font-size:.86cqw; letter-spacing:.3em; }
+
+    /* ===== 안 A — 하나의 궤도, 이탈로 표현 ===== */
+    .ma { position:absolute; right:8%; bottom:12%; }
+    .ma-axis {
+      position:absolute; right:.31cqw; top:-1cqw; bottom:3.4cqw; width:1px;
+      background:linear-gradient(to bottom,
+        transparent 0%, rgba(201,180,119,.42) 22%, rgba(201,180,119,.42) 78%, transparent 100%);
+    }
+    .ma-row {
+      position:relative; display:flex; align-items:center; justify-content:flex-end;
+      gap:1.3cqw; margin-bottom:1.7cqw; color:var(--f-subtle);
+    }
+    .ma-row:last-child { margin-bottom:0; }
+    .ma-row b { font-weight:200; font-size:2.4cqw; letter-spacing:-.02em; line-height:1; }
+    .ma-row i {
+      display:block; flex:none; width:.5cqw; height:.5cqw; border-radius:50%;
+      background:currentColor; opacity:.7;
+    }
+    .ma-row.now { color:var(--f-ink); }
+    .ma-row.now b { font-weight:300; font-size:3.1cqw; }
+    .ma-row.now i { width:.68cqw; height:.68cqw; background:var(--f-gold); opacity:1; }
+    /* 아직 켜지지 않은 별 — 축 위에 있지만 속이 비어 있다 */
+    .ma-row.unlit { color:var(--f-subtle); opacity:.72; margin-bottom:2.4cqw; }
+    .ma-row.unlit b { font-size:1.5cqw; font-weight:300; letter-spacing:-.01em; }
+    .ma-row.unlit i { background:transparent; box-shadow:inset 0 0 0 1px currentColor; opacity:.85; }
+    /* 궤도를 잃은 별 — 점이 축에서 벗어나 있고, 끊어진 흔적만 남는다 */
+    .ma-row.lost { color:var(--f-subtle); opacity:.8; margin-top:2.6cqw; }
+    .ma-row.lost b { font-size:1.5cqw; font-weight:300; letter-spacing:-.01em; }
+    .ma-row.lost i { transform:translate(1.5cqw, .55cqw); opacity:.95; }
+    .ma-row.lost::after {
+      content:""; position:absolute; right:-1.1cqw; top:-1.5cqw;
+      width:1px; height:2.1cqw; transform:rotate(-26deg); transform-origin:top;
+      background:repeating-linear-gradient(to bottom,
+        rgba(201,180,119,.5) 0 2px, transparent 2px 5px);
+    }
+
+    /* ===== 안 B — 시간축과 상태축을 직각으로 ===== */
+    .mb { position:absolute; right:8%; bottom:12%; }
+    .mb-axis {
+      position:absolute; right:.31cqw; top:2.2cqw; bottom:2.2cqw; width:1px;
+      background:linear-gradient(to bottom, transparent, rgba(201,180,119,.45) 18%, rgba(201,180,119,.45) 82%, transparent);
+    }
+    .mb-row {
+      position:relative; display:flex; align-items:center; justify-content:flex-end;
+      gap:1.3cqw; margin-bottom:1.7cqw; color:var(--f-subtle);
+    }
+    .mb-row b { font-weight:200; font-size:2.4cqw; letter-spacing:-.02em; line-height:1; }
+    .mb-row i { display:block; flex:none; width:.5cqw; height:.5cqw; border-radius:50%;
+                background:currentColor; opacity:.7; }
+    .mb-row.now { color:var(--f-ink); }
+    .mb-row.now b { font-weight:300; font-size:3.1cqw; }
+    .mb-row.now i { width:.68cqw; height:.68cqw; background:var(--f-gold); opacity:1; }
+    /* 축에서 가로로 뻗은 가지 — 방향이 다르므로 시간이 아님이 즉시 읽힌다 */
+    .mb-branch {
+      position:relative; display:flex; align-items:center; justify-content:flex-end;
+      gap:1.3cqw; color:var(--f-subtle); opacity:.82;
+    }
+    .mb-branch.top { margin-bottom:2.5cqw; }
+    .mb-branch.bottom { margin-top:2.5cqw; }
+    .mb-branch b { font-weight:300; font-size:1.5cqw; letter-spacing:-.01em; }
+    .mb-branch i { display:block; flex:none; width:.5cqw; height:.5cqw; border-radius:50%;
+                   background:currentColor; opacity:.8; }
+    .mb-branch.top i { background:transparent; box-shadow:inset 0 0 0 1px currentColor; }
+    .mb-branch::before {
+      content:""; position:absolute; right:.31cqw; width:4.6cqw; height:1px;
+      background:linear-gradient(to left, rgba(201,180,119,.45), transparent);
+    }
+    .mb-branch.top::before    { top:-1.3cqw; }
+    .mb-branch.bottom::before { bottom:-1.3cqw; }
+
+    /* ===== 안 C — 목록에서 빼고 공간에 배치 ===== */
+    .mc { position:absolute; right:8%; bottom:12%; }
+    .mc-axis {
+      position:absolute; right:.31cqw; top:.4cqw; bottom:.4cqw; width:1px;
+      background:linear-gradient(to bottom, transparent, rgba(201,180,119,.45) 20%, rgba(201,180,119,.45) 80%, transparent);
+    }
+    .mc-row { position:relative; display:flex; align-items:center; justify-content:flex-end;
+              gap:1.3cqw; margin-bottom:1.7cqw; color:var(--f-subtle); }
+    .mc-row:last-child { margin-bottom:0; }
+    .mc-row b { font-weight:200; font-size:2.4cqw; letter-spacing:-.02em; line-height:1; }
+    .mc-row i { display:block; flex:none; width:.5cqw; height:.5cqw; border-radius:50%;
+                background:currentColor; opacity:.7; }
+    .mc-row.now { color:var(--f-ink); }
+    .mc-row.now b { font-weight:300; font-size:3.1cqw; }
+    .mc-row.now i { width:.68cqw; height:.68cqw; background:var(--f-gold); opacity:1; }
+    /* 화면 안에 떠 있는 두 무리에 붙는 아주 작은 이름 */
+    .mc-tag { position:absolute; color:var(--f-subtle); font-weight:300;
+              font-size:1.05cqw; letter-spacing:-.005em; opacity:.8; }
+    .mc-tag.unlit { right:13%; top:40%; }
+    .mc-tag.lost  { left:6.5%; bottom:7%; }
+
+    /* ---------- notes ---------- */
+    .notes { display:grid; gap:10px 30px; margin-top:18px; }
+    @media (min-width:760px) { .notes { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); } }
+    .note { display:flex; flex-direction:column; gap:3px; }
+    .note b { font-size:12.5px; font-weight:500; letter-spacing:-.01em; }
+    .note span { color:var(--muted); font-size:12.5px; line-height:1.7; }
+    .note.warn b { color:var(--gold); }
+
+    section { margin-top:clamp(52px,7vw,92px); padding-top:clamp(34px,4.5vw,52px); border-top:1px solid var(--line); }
+    section h2 { margin:0 0 8px; font-weight:300; font-size:clamp(21px,3vw,28px); letter-spacing:-.03em; }
+    section > p { max-width:64ch; margin:0 0 24px; color:var(--muted); font-size:14px; }
+
+    .ask { padding:22px 24px; border:1px solid var(--line); background:var(--surface); }
+    .ask h3 { margin:0 0 10px; font-size:13px; font-weight:500; }
+    .ask ol { margin:0; padding-left:19px; color:var(--muted); font-size:13.5px; }
+    .ask li { margin-bottom:10px; }
+    .ask li:last-child { margin-bottom:0; }
+    .ask li b { color:var(--ink); font-weight:500; }
+    .ask code { font-family:var(--mono); font-size:12px; color:var(--ink); }
+
+    footer { margin-top:clamp(40px,5vw,64px); padding:clamp(28px,4vw,40px) 0 clamp(60px,8vw,100px); border-top:1px solid var(--line); }
+    footer p { max-width:64ch; margin:0 0 10px; color:var(--muted); font-size:13.5px; }
+    footer p:last-child { margin-bottom:0; }
+    footer b { color:var(--ink); font-weight:500; }
+
+    @media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; } }
+  </style>
+  <style>
+    .board-back { display:inline-block; margin-bottom:24px; color:var(--muted); font-size:12.5px;
+                  text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:2px; }
+    .board-back:hover { color:var(--ink); border-bottom-color:var(--gold); }
+  </style>
+</head>
+<body data-page="nebula-orbit-menu">
+<div class="wrap">
+
+  <header class="masthead">
+    <a class="board-back" href="index.html">← 시안 목록</a>
+    <p class="kicker">V3 KEY VISUAL · KV-3 후속</p>
+    <h1>연도는 시간이고,<br>나머지 둘은 상태입니다.</h1>
+    <p>지금 KV-3가 걸리는 이유입니다. <b>2026 · 2025 · 2024</b>는 시간축인데 <b>진행 중 · 궤도를 잃은 별들</b>은 상태라, 같은 목록에 나란히 두면 읽는 사람이 한 번 걸립니다.</p>
+    <p>그런데 <code>projects.json</code>을 보니 이 둘은 새로 만든 분류가 아니라 <b>별의 생애 그대로</b>였습니다. 이름을 지어낼 필요가 없습니다.</p>
+
+    <div class="life">
+      <div class="life-row"><b>진행 예정</b><i>성운뿐 — 아직 별이 아님</i><span>한맵 · 마법 아카데미 · DelphiRec</span><u>3</u></div>
+      <div class="life-row"><b>개발 중</b><i>켜지는 중</i><span>승기봇 · HTML Viewer · CentrifugeAI</span><u>3</u></div>
+      <div class="life-row"><b>완료</b><i>안정된 별 — 별자리에 속함</i><span>2024 · 2025 · 2026 연도 그룹</span><u>20</u></div>
+      <div class="life-row"><b>지연</b><i>궤도 이탈</i><span>한기대 지도 (초기 버전)</span><u>1</u></div>
+      <div class="life-row"><b>실패</b><i>잔해 · 소실</i><span>InfoCatch · InvestAI · 건영운세</span><u>3</u></div>
+      <div class="life-row"><b>격리</b><i>제51구역 — 일반 메뉴에 없음</i><span>BrawlCraft</span><u>1</u></div>
+    </div>
+  </header>
+
+  <div class="frame">
+    <div class="frame-head">
+      <span class="frame-id">안 A</span>
+      <h2>하나의 궤도, 벗어난 점</h2>
+      <span>목록은 유지하고 위치로 구분</span>
+    </div>
+    <div class="kv">
+      <canvas data-scene="transit"></canvas>
+      <div class="kv-mini"><b>이건영</b><i>LEE GEON YEONG</i></div>
+      <div class="ma">
+        <div class="ma-axis"></div>
+        <div class="ma-row unlit"><b>아직 켜지지 않은 별</b><i></i></div>
+        <div class="ma-row now"><b>2026</b><i></i></div>
+        <div class="ma-row"><b>2025</b><i></i></div>
+        <div class="ma-row"><b>2024</b><i></i></div>
+        <div class="ma-row lost"><b>궤도를 잃은 별</b><i></i></div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="note"><b>점이 이름을 대신합니다</b><span>맨 위는 <b>속이 빈 점</b> — 아직 안 켜졌습니다. 맨 아래는 점이 <b>축에서 벗어나</b> 있고 끊어진 흔적만 남습니다. “궤도를 잃었다”를 글자로 설명할 필요가 없어집니다.</span></div>
+      <div class="note"><b>궤도선이 위아래로 흐려집니다</b><span>축이 세 연도 구간에서만 진하고 양끝에서 사라집니다. 위는 아직 안 온 시간, 아래는 벗어난 자리입니다.</span></div>
+      <div class="note warn"><b>약점</b><span>여전히 한 줄에 섞여 있어서, 빠르게 훑으면 다섯 개가 다 같은 층위로 보일 수 있습니다.</span></div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head">
+      <span class="frame-id">안 B</span>
+      <h2>시간축과 상태축을 직각으로</h2>
+      <span>방향을 꺾어서 층위를 나눔</span>
+    </div>
+    <div class="kv">
+      <canvas data-scene="transit"></canvas>
+      <div class="kv-mini"><b>이건영</b><i>LEE GEON YEONG</i></div>
+      <div class="mb">
+        <div class="mb-branch top"><b>진행 중</b><i></i></div>
+        <div class="mb-axis"></div>
+        <div class="mb-row now"><b>2026</b><i></i></div>
+        <div class="mb-row"><b>2025</b><i></i></div>
+        <div class="mb-row"><b>2024</b><i></i></div>
+        <div class="mb-branch bottom"><b>궤도를 잃은 별</b><i></i></div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="note"><b>선의 방향이 다릅니다</b><span>연도는 세로로 이어지고, 두 상태는 축에서 <b>가로로 뻗은 가지</b>에 붙습니다. 시간이 아니라는 게 읽기 전에 보입니다.</span></div>
+      <div class="note"><b>이름을 그대로 씁니다</b><span>“진행 중”이라는 v2의 말을 그대로 두었습니다. 구조가 이미 구분해 주니 이름까지 우주말로 바꿀 필요가 없습니다.</span></div>
+      <div class="note warn"><b>약점</b><span>가로 가지 두 개가 생기면서 A보다 선이 늘었습니다. 조용함이 조금 깎입니다.</span></div>
+    </div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head">
+      <span class="frame-id">안 C</span>
+      <h2>목록에서 빼고 하늘에 둡니다</h2>
+      <span>메뉴 항목이 아니라 장소</span>
+    </div>
+    <div class="kv">
+      <canvas data-scene="transit" data-extras="drift"></canvas>
+      <div class="kv-mini"><b>이건영</b><i>LEE GEON YEONG</i></div>
+      <span class="mc-tag unlit">아직 켜지지 않은</span>
+      <span class="mc-tag lost">궤도를 잃은</span>
+      <div class="mc">
+        <div class="mc-axis"></div>
+        <div class="mc-row now"><b>2026</b><i></i></div>
+        <div class="mc-row"><b>2025</b><i></i></div>
+        <div class="mc-row"><b>2024</b><i></i></div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="note"><b>메뉴는 순수하게 시간만</b><span>목록에는 연도 셋뿐입니다. 나머지 둘은 화면 안에 <b>실제로 떠 있는 별 무리</b>가 됩니다. 오른쪽 성운 속 여섯 개가 아직 안 켜진 것들, 왼쪽 아래 흩어진 넷이 궤도를 잃은 것들입니다.</span></div>
+      <div class="note"><b>개수가 그대로 보입니다</b><span>목록이면 “진행 중”이라고만 쓰이지만, 별로 두면 여섯 개인 게 그냥 보입니다. 클릭하면 그 무리로 들어갑니다.</span></div>
+      <div class="note warn"><b>약점</b><span>발견성이 가장 낮습니다. 처음 온 사람은 왼쪽 아래 넷을 못 보고 지나갈 수 있습니다. 세계관은 가장 강합니다.</span></div>
+    </div>
+  </div>
+
+  <section>
+    <h2>물어볼 것</h2>
+    <p>세 안이 같은 화면 위에 있으니 바로 비교하실 수 있을 겁니다. 섞으셔도 됩니다.</p>
+    <div class="ask">
+      <h3>답은 짧게 주셔도 됩니다</h3>
+      <ol>
+        <li><b>어느 안</b> — A / B / C. “A인데 이름은 B처럼”처럼 섞으셔도 됩니다.</li>
+        <li><b>이름</b> — <code>진행 중</code>을 그대로 쓸지, <code>아직 켜지지 않은 별</code>로 바꿀지. 후자는 예쁘지만 처음 본 사람이 뜻을 바로 못 잡을 수 있습니다. <code>궤도를 잃은 별</code>은 이미 확정하신 이름이라 그대로 뒀습니다.</li>
+        <li><b>진행 예정과 개발 중을 나눌지</b> — 지금은 여섯 개를 한 덩어리로 뒀습니다. 안에서 <b>기획 단계 3</b>과 <b>개발 중 3</b>을 밝기로 갈라 보여줄 수도 있습니다.</li>
+        <li><b>지연 하나를 어디에 둘지</b> — 한기대 지도 초기 버전은 “실패”가 아니라 “지연”입니다. 궤도를 잃은 별에 같이 둘지, 아직 켜지지 않은 쪽에 둘지 애매합니다. 제 생각은 <b>궤도를 잃은 쪽</b>인데, 실제로 다시 할 생각이 있으신지에 따라 달라집니다.</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer>
+    <p><b>제 추천은 안 A입니다.</b> C가 가장 아름답지만 궤도를 잃은 별 넷을 못 보고 지나가면 “실패도 숨기지 않는다”는 태도 자체가 전달이 안 됩니다. B는 정확한데 선이 두 개 늘어서 화면이 살짝 시끄러워집니다. A는 점 하나를 축에서 밀어내는 것만으로 같은 말을 하면서 선이 안 늘어납니다.</p>
+    <p>KV-1·KV-2는 통과하셨으니 그대로 갑니다. 이 결정만 나오면 첫 화면 HTML 구현으로 넘어가겠습니다.</p>
+    <p>저장소 코드는 아직 그대로입니다. 커밋·푸시 없고 Draft PR #162는 보류 상태입니다.</p>
+  </footer>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* KV-1~3과 같은 다크 팔레트. 이 페이지의 프레임은 전부 다크로 고정한다. */
+  const T = {
+    mode:'dark',
+    sky0:'#12161f', sky1:'#0f131b', sky2:'#0b0e15',
+    neb:'#4a4468', neb2:'#6d648f', lane:'#080b11',
+    ink:'#e6e9f1', gold:'#c9b477', glow:'#cfd3e4',
+    vignette:'#05070c',
+  };
+
+  const rng = (seed) => { let s = seed >>> 0; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; };
+  const rgba = (hex, a) => {
+    const n = parseInt(hex.slice(1), 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+  };
+
+  let noiseTile = null;
+  function noise() {
+    if (noiseTile) return noiseTile;
+    noiseTile = document.createElement('canvas');
+    noiseTile.width = noiseTile.height = 256;
+    const nc = noiseTile.getContext('2d');
+    const img = nc.createImageData(256, 256), d = img.data, r = rng(4242);
+    for (let i = 0; i < d.length; i += 4) { const v = (r() * 255) | 0; d[i] = d[i+1] = d[i+2] = v; d[i+3] = 255; }
+    nc.putImageData(img, 0, 0);
+    return noiseTile;
+  }
+
+  const DIPPER = {
+    pts: [[.125,.617],[.250,.550],[.365,.600],[.480,.525],[.650,.408],[.810,.567],[.620,.725]],
+    edges: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,3]],
+    gold: [4, 5],
+  };
+  const LIGHT_DIR = [0.62, -0.78];
+
+  function volume(c, cx, cy, rx, ry, rot, col, alpha) {
+    c.save();
+    c.translate(cx, cy); c.rotate(rot); c.scale(1, ry / rx);
+    const ox = LIGHT_DIR[0] * rx * .30, oy = LIGHT_DIR[1] * rx * .30;
+    const g = c.createRadialGradient(ox, oy, rx * .04, 0, 0, rx);
+    g.addColorStop(0, rgba(col, alpha));
+    g.addColorStop(.30, rgba(col, alpha * .62));
+    g.addColorStop(.62, rgba(col, alpha * .24));
+    g.addColorStop(.86, rgba(col, alpha * .06));
+    g.addColorStop(1, rgba(col, 0));
+    c.fillStyle = g;
+    c.beginPath(); c.arc(0, 0, rx, 0, 7); c.fill();
+    c.restore();
+  }
+
+  function softCurve(c, p, width, col, alpha, passes) {
+    c.save();
+    c.lineCap = 'round'; c.lineJoin = 'round';
+    c.strokeStyle = rgba(col, alpha / passes);
+    for (let i = passes; i >= 1; i--) {
+      c.lineWidth = width * (i / passes);
+      c.beginPath();
+      c.moveTo(p[0], p[1]);
+      c.bezierCurveTo(p[2], p[3], p[4], p[5], p[6], p[7]);
+      c.stroke();
+    }
+    c.restore();
+  }
+
+  function star(c, x, y, r, col, alpha, haloR, haloA) {
+    if (haloR > 0) {
+      const g = c.createRadialGradient(x, y, 0, x, y, haloR);
+      g.addColorStop(0, rgba(col, haloA));
+      g.addColorStop(.45, rgba(col, haloA * .38));
+      g.addColorStop(1, rgba(col, 0));
+      c.fillStyle = g;
+      c.beginPath(); c.arc(x, y, haloR, 0, 7); c.fill();
+    }
+    c.globalAlpha = alpha; c.fillStyle = col;
+    c.beginPath(); c.arc(x, y, r, 0, 7); c.fill();
+    c.globalAlpha = 1;
+  }
+
+  /* 안 C 전용 — 아직 안 켜진 여섯과, 궤도를 잃은 넷. 실제 개수를 그대로 그린다. */
+  function drift(c, w, h, S) {
+    const r = rng(303);
+
+    /* 성운 안쪽에 묻힌 여섯. 속이 빈 원으로 그려 '아직 별이 아님'을 보여준다. */
+    const uc = [w * .745, h * .295];
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2 + .6;
+      const d = S * (.035 + r() * .045);
+      const x = uc[0] + Math.cos(a) * d * 1.5, y = uc[1] + Math.sin(a) * d;
+      const hg = c.createRadialGradient(x, y, 0, x, y, S * .016);
+      hg.addColorStop(0, rgba(T.glow, .10)); hg.addColorStop(1, rgba(T.glow, 0));
+      c.fillStyle = hg; c.beginPath(); c.arc(x, y, S * .016, 0, 7); c.fill();
+      c.strokeStyle = rgba(T.glow, .40); c.lineWidth = 1;
+      c.beginPath(); c.arc(x, y, S * .0042, 0, 7); c.stroke();
+    }
+
+    /* 왼쪽 아래로 표류하는 넷. 각자 짧은 궤도 잔흔을 끌고 있다. */
+    const lost = [[.115,.735],[.185,.800],[.085,.855],[.215,.700]];
+    for (const [fx, fy] of lost) {
+      const x = fx * w, y = fy * h;
+      const ang = -0.5 + r() * 1.0;
+      c.save();
+      c.strokeStyle = rgba(T.gold, .26);
+      c.lineWidth = 1;
+      c.setLineDash([2, 5]);
+      c.beginPath();
+      c.moveTo(x - Math.cos(ang) * S * .075, y - Math.sin(ang) * S * .075);
+      c.lineTo(x, y);
+      c.stroke();
+      c.restore();
+      star(c, x, y, S * .0028, T.ink, .62, S * .017, .09);
+    }
+  }
+
+  function scene(c, w, h, box, extras) {
+    const S = Math.min(w, h);
+
+    const base = c.createLinearGradient(w, 0, 0, h);
+    base.addColorStop(0, T.sky0); base.addColorStop(.52, T.sky1); base.addColorStop(1, T.sky2);
+    c.fillStyle = base; c.fillRect(0, 0, w, h);
+
+    volume(c, w * .70, h * .30, S * .78, S * .46, -0.42, T.neb,  .50);
+    volume(c, w * .52, h * .52, S * .58, S * .40,  0.30, T.neb2, .30);
+    volume(c, w * .86, h * .12, S * .34, S * .26, -0.15, T.neb2, .38);
+    volume(c, w * .22, h * .74, S * .46, S * .28,  0.52, T.neb,  .22);
+
+    softCurve(c, [w*.34, h*.12, w*.58, h*.30, w*.74, h*.30, w*1.02, h*.52], S * .16, T.lane, .40, 5);
+    softCurve(c, [w*.46, h*.96, w*.62, h*.74, w*.84, h*.70, w*1.04, h*.80], S * .10, T.lane, .26, 5);
+    softCurve(c, [w*.58, h*.06, w*.72, h*.16, w*.80, h*.28, w*.96, h*.34], S * .022, T.glow, .13, 3);
+
+    const rf = rng(101);
+    for (let i = 0; i < 340; i++) {
+      const x = rf() * w, y = rf() * h, m = rf();
+      c.globalAlpha = .16 * (.25 + m * .75);
+      c.fillStyle = T.ink;
+      c.beginPath(); c.arc(x, y, .35 + m * .45, 0, 7); c.fill();
+    }
+    c.globalAlpha = 1;
+
+    const rs = rng(77);
+    for (let i = 0; i < 72; i++) {
+      const x = rs() * w, y = rs() * h * .94, m = rs();
+      const isGold = m > .93;
+      star(c, x, y, .55 + m * 1.15, isGold ? T.gold : T.ink, .34 + m * .40, m > .7 ? 2 + m * 3 : 0, .10);
+    }
+
+    const P = DIPPER.pts.map(([x, y]) => [box.x + x * box.w, box.y + y * box.h]);
+    c.save();
+    c.lineCap = 'round';
+    c.strokeStyle = rgba(T.gold, .60);
+    c.lineWidth = Math.max(1, S * .0016);
+    for (const [a, z] of DIPPER.edges) {
+      c.beginPath(); c.moveTo(P[a][0], P[a][1]); c.lineTo(P[z][0], P[z][1]); c.stroke();
+    }
+    c.restore();
+    P.forEach(([x, y], i) => {
+      const isGold = DIPPER.gold.includes(i);
+      star(c, x, y, S * (isGold ? .0034 : .0028) * .82, isGold ? T.gold : T.ink, .92, S * .022 * .82, .15);
+    });
+
+    if (extras === 'drift') drift(c, w, h, S);
+
+    const v = c.createRadialGradient(w * .62, h * .34, S * .18, w * .40, h * .60, S * 1.18);
+    v.addColorStop(0, rgba(T.vignette, 0));
+    v.addColorStop(1, rgba(T.vignette, .58));
+    c.fillStyle = v; c.fillRect(0, 0, w, h);
+
+    c.save();
+    c.globalAlpha = .036;
+    c.globalCompositeOperation = 'overlay';
+    c.fillStyle = c.createPattern(noise(), 'repeat');
+    c.fillRect(0, 0, w, h);
+    c.restore();
+  }
+
+  function render(canvas) {
+    const r = canvas.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.round(r.width), h = Math.round(r.height);
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    const c = canvas.getContext('2d');
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    c.clearRect(0, 0, w, h);
+    scene(c, w, h, { x: w * .07, y: h * .30, w: w * .40, h: h * .38 }, canvas.dataset.extras);
+  }
+
+  const canvases = Array.from(document.querySelectorAll('canvas[data-scene]'));
+  const renderAll = () => canvases.forEach(render);
+
+  if ('ResizeObserver' in window) {
+    let frame = 0;
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(renderAll);
+    });
+    canvases.forEach((cv) => ro.observe(cv));
+  } else {
+    window.addEventListener('resize', renderAll);
+  }
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
