@@ -1,0 +1,277 @@
+/* =====================================================================
+   v3 「차가운 성운」 시안 공용 스타일
+   대상: nebula-keyvisual.html(첫 화면 키비주얼 2장)
+         nebula-transit.html(상호작용 전환 화면)
+         nebula-taste-board.html(취향 캘리브레이션 근거)
+
+   확정된 시각 언어 (#114)
+   - 배경  : 엷은 성운 · 방향광 · 어두운 먼지 띠
+   - 선    : 낡은 금빛 실선
+   - 서체  : 산세리프. 이름은 얇은 웨이트를 크게
+   - 구도  : 왼쪽 아래 이름 · 오른쪽 위 별자리
+   테마는 수동 토글 없이 시스템 설정만 따른다.
+   ===================================================================== */
+
+:root {
+  --page:#e8eaf2; --page-deep:#dfe2ec; --surface:#f1f2f7;
+  --ink:#242636; --muted:#606579; --subtle:#777c8f; --line:#cbd0df;
+  --violet:#706994; --violet-strong:#554d7d; --gold:#a9914d;
+  --sans:"IBM Plex Sans KR","Pretendard","Malgun Gothic","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page:#11151d; --page-deep:#0d1118; --surface:#181d27;
+    --ink:#e0e3eb; --muted:#a2a8b8; --subtle:#858c9e; --line:#303848;
+    --violet:#968dbb; --violet-strong:#b0a7d0; --gold:#bda969;
+  }
+}
+:root[data-theme="dark"] {
+  --page:#11151d; --page-deep:#0d1118; --surface:#181d27;
+  --ink:#e0e3eb; --muted:#a2a8b8; --subtle:#858c9e; --line:#303848;
+  --violet:#968dbb; --violet-strong:#b0a7d0; --gold:#bda969;
+}
+
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  margin:0; min-width:320px; background:var(--page); color:var(--ink);
+  font-family:var(--sans); font-size:14px; line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+a:focus-visible, button:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
+
+.wrap { max-width:1240px; margin:0 auto; padding:0 clamp(16px,3.5vw,40px); }
+
+/* ---------------------------------------------------------------------
+   문서 셸 — 시안을 설명하는 바깥 영역. 프레임 안에는 설명을 두지 않는다.
+   --------------------------------------------------------------------- */
+.masthead { padding:clamp(46px,8vw,88px) 0 clamp(22px,3vw,34px); }
+.kicker { margin:0 0 18px; font-family:var(--mono); font-size:11px; letter-spacing:.16em; color:var(--gold); }
+.masthead h1 {
+  margin:0 0 18px; font-weight:200; font-size:clamp(30px,5vw,56px);
+  letter-spacing:-.035em; line-height:1.13; text-wrap:balance;
+}
+.masthead p { max-width:64ch; margin:0 0 12px; color:var(--muted); font-size:15px; }
+.masthead p:last-child { margin-bottom:0; }
+.masthead b { color:var(--ink); font-weight:500; }
+.back-link {
+  display:inline-block; margin-bottom:26px; color:var(--muted);
+  font-size:12.5px; text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:2px;
+}
+.back-link:hover { color:var(--ink); border-bottom-color:var(--gold); }
+
+.doc { margin-top:clamp(46px,6vw,84px); padding-top:clamp(30px,4vw,48px); border-top:1px solid var(--line); }
+.doc h2 { margin:0 0 8px; font-weight:300; font-size:clamp(20px,2.8vw,27px); letter-spacing:-.03em; }
+.doc > p { max-width:64ch; margin:0 0 24px; color:var(--muted); font-size:14px; }
+
+.rows { border-top:1px solid var(--line); }
+.row { display:grid; gap:3px 26px; padding:15px 0; border-bottom:1px solid var(--line); align-items:baseline; }
+@media (min-width:760px) { .row { grid-template-columns:minmax(120px,.55fr) minmax(0,1.6fr); } }
+.row > b { font-size:12.5px; font-weight:500; letter-spacing:-.01em; }
+.row > span { color:var(--muted); font-size:12.5px; }
+.row > span em { font-style:normal; color:var(--ink); font-weight:500; }
+.row.drop > b { color:var(--subtle); text-decoration:line-through; text-decoration-thickness:1px; }
+
+.notes { display:grid; gap:10px 30px; margin-top:18px; }
+@media (min-width:760px) { .notes { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); } }
+.note { display:flex; flex-direction:column; gap:3px; }
+.note b { font-size:12.5px; font-weight:500; letter-spacing:-.01em; }
+.note span { color:var(--muted); font-size:12.5px; line-height:1.7; }
+.note code { font-family:var(--mono); font-size:11.5px; color:var(--ink); }
+.note.warn b { color:var(--gold); }
+
+footer { margin-top:clamp(40px,5vw,64px); padding:clamp(28px,4vw,40px) 0 clamp(56px,8vw,96px); border-top:1px solid var(--line); }
+footer p { max-width:64ch; margin:0 0 10px; color:var(--muted); font-size:13.5px; }
+footer p:last-child { margin-bottom:0; }
+footer b { color:var(--ink); font-weight:500; }
+
+/* ---------------------------------------------------------------------
+   정적 키비주얼 프레임 — 16:9. 내부는 페이지 테마와 무관하게 팔레트 고정.
+   --------------------------------------------------------------------- */
+.frame { margin:clamp(30px,5vw,58px) 0 0; }
+.frame-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 14px; margin-bottom:16px; }
+.frame-id { font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--gold); }
+.frame-head h2 { margin:0; font-size:16px; font-weight:500; letter-spacing:-.015em; }
+.frame-head > span { color:var(--subtle); font-size:12.5px; }
+
+.kv {
+  container-type:inline-size;
+  position:relative; aspect-ratio:16/9; overflow:hidden;
+  border:1px solid var(--line);
+}
+.kv canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+.kv--light { --f-ink:#242636; --f-muted:#606579; --f-subtle:#7b8093; --f-gold:#8f7736; }
+.kv--dark  { --f-ink:#e6e9f1; --f-muted:#a2a8b8; --f-subtle:#858c9e; --f-gold:#c9b477; }
+
+.kv-copy { position:absolute; left:7.5%; bottom:13%; display:flex; flex-direction:column; }
+.kv-name { margin:0; color:var(--f-ink); font-weight:200; font-size:6.4cqw; letter-spacing:-.035em; line-height:1; }
+.kv-en { margin:.9cqw 0 0; color:var(--f-muted); font-weight:300; font-size:1.18cqw; letter-spacing:.36em; }
+.kv-line { margin:2.4cqw 0 0; max-width:30cqw; color:var(--f-ink); font-weight:300; font-size:1.36cqw; line-height:1.85; }
+.kv-mail { margin:1.9cqw 0 0; color:var(--f-subtle); font-family:var(--mono); font-size:.98cqw; letter-spacing:.05em; }
+
+/* ---------------------------------------------------------------------
+   상호작용 무대 — 실제 화면 느낌을 보려고 전체 높이를 쓴다.
+   --------------------------------------------------------------------- */
+.stage {
+  position:relative; width:100%; height:100vh; height:100svh; min-height:520px; overflow:hidden;
+  --f-ink:#242636; --f-muted:#606579; --f-subtle:#7b8093; --f-gold:#8f7736;
+  --f-shadow:0 1px 3px rgba(236,238,245,.85), 0 0 10px rgba(236,238,245,.6);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .stage { --f-ink:#e6e9f1; --f-muted:#a2a8b8; --f-subtle:#858c9e; --f-gold:#c9b477;
+    --f-shadow:0 1px 3px rgba(8,11,17,.9), 0 0 10px rgba(8,11,17,.7); }
+}
+:root[data-theme="dark"] .stage { --f-ink:#e6e9f1; --f-muted:#a2a8b8; --f-subtle:#858c9e; --f-gold:#c9b477;
+  --f-shadow:0 1px 3px rgba(8,11,17,.9), 0 0 10px rgba(8,11,17,.7); }
+.stage canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+
+/* 물러난 이름 — 여기가 누구의 우주인지는 계속 남는다. */
+.stage-name { position:absolute; left:7%; top:9%; display:flex; flex-direction:column; }
+.stage-name b { color:var(--f-muted); font-weight:300; font-size:clamp(17px,2vw,26px); letter-spacing:-.02em; line-height:1; }
+.stage-name i { font-style:normal; margin-top:8px; color:var(--f-subtle); font-weight:300;
+                font-size:clamp(8px,.9vw,11px); letter-spacing:.3em; }
+
+/* 연도 궤도 — 세로 축 위의 시간. 상태는 이 축에 올리지 않는다. */
+.orbit { position:absolute; right:7%; bottom:11%; }
+.orbit-axis {
+  position:absolute; right:5px; top:6px; bottom:6px; width:1px;
+  background:linear-gradient(to bottom, transparent, var(--f-gold) 20%, var(--f-gold) 80%, transparent);
+  opacity:.45;
+}
+.orbit-year {
+  position:relative; display:flex; align-items:center; justify-content:flex-end; gap:16px;
+  margin:0 0 clamp(14px,2vh,24px); padding:0; border:0; background:none;
+  color:var(--f-subtle); font-family:inherit; cursor:pointer;
+  transition:color .28s ease;
+}
+.orbit-year:last-child { margin-bottom:0; }
+.orbit-year b { font-weight:200; font-size:clamp(20px,2.6vw,34px); letter-spacing:-.02em; line-height:1;
+                font-variant-numeric:tabular-nums; }
+.orbit-year i { display:block; flex:none; width:6px; height:6px; border-radius:50%;
+                background:currentColor; opacity:.7; transition:all .28s ease; }
+.orbit-year:hover, .orbit-year:focus-visible { color:var(--f-ink); }
+.orbit-year[aria-current="true"] { color:var(--f-ink); }
+.orbit-year[aria-current="true"] b { font-weight:300; font-size:clamp(26px,3.4vw,44px); }
+.orbit-year[aria-current="true"] i { width:9px; height:9px; background:var(--f-gold); opacity:1; }
+
+/* ---------------------------------------------------------------------
+   하늘 위의 프로젝트 — 포트폴리오이므로 이름은 언제나 보여야 한다.
+   성도가 밝은 별에 이름을 붙여 두는 방식이다. 눌렀을 때 펼쳐지는 것은
+   역할과 한 줄 설명뿐이다.
+   --------------------------------------------------------------------- */
+.sky-body {
+  --dot: 26px;
+  position:absolute; z-index:2;
+  display:flex; align-items:flex-start; gap:10px;
+  max-width:min(38vw,320px); padding:0; border:0; background:none;
+  color:var(--f-muted); font-family:inherit; text-align:left; cursor:pointer;
+}
+.sky-body[data-side="right"] { transform:translate(calc(var(--dot) / -2), -50%); }
+.sky-body[data-side="left"]  { transform:translate(calc(-100% + var(--dot) / 2), -50%);
+                               flex-direction:row-reverse; text-align:right; }
+.sky-body[data-side="left"] .sky-text { align-items:flex-end; }
+
+/* 캔버스가 그린 별이 이 자리에 온다. 최소 터치 영역을 여기서 확보한다. */
+.sky-dot { display:block; flex:none; width:var(--dot); height:var(--dot); }
+
+.sky-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-width:0; padding-top:3px; }
+.sky-name {
+  font-weight:300; font-size:clamp(11px,1.02vw,14px); line-height:1.4; letter-spacing:-.01em;
+  color:var(--f-ink); text-shadow:var(--f-shadow);
+}
+/* 접혀 있는 부분. 이름과 달리 이건 눌러야 나온다. */
+.sky-more, .sky-link {
+  max-height:0; overflow:hidden; opacity:0;
+  font-weight:300; font-size:clamp(10px,.88vw,12px); line-height:1.5;
+  color:var(--f-muted); text-shadow:var(--f-shadow);
+  transition:max-height .3s ease, opacity .25s ease;
+}
+.sky-link { color:var(--f-gold); }
+.sky-body[aria-expanded="true"] { z-index:5; }
+.sky-body[aria-expanded="true"] .sky-more { max-height:6em; opacity:1; margin-top:3px; }
+.sky-body[aria-expanded="true"] .sky-link { max-height:2em; opacity:1; margin-top:5px; }
+
+.sky-body:hover .sky-name,
+.sky-body:focus-visible .sky-name { color:var(--f-gold); }
+.sky-body:focus-visible { outline:1px solid var(--f-gold); outline-offset:4px; }
+
+/* 진행 중과 궤도를 잃은 별은 그 해의 별자리보다 한 단계 조용하다. */
+.sky-body--wip .sky-name, .sky-body--failed .sky-name { color:var(--f-muted); font-size:clamp(10px,.92vw,12.5px); }
+.sky-body--wip:hover .sky-name, .sky-body--failed:hover .sky-name { color:var(--f-ink); }
+
+@media (max-width:720px) {
+  /* 세 무리를 한 화면에 욱여넣지 않고 세로로 벌린다.
+     본격적인 모바일 UX는 별도 기획 대상이며 여기서는 읽히는 것까지만 맞춘다. */
+  .stage { height:auto; min-height:0; aspect-ratio:9/20; }
+  .stage-name { left:6%; top:2.5%; }
+  .orbit { position:absolute; left:6%; right:6%; top:9%; bottom:auto;
+           display:flex; align-items:flex-end; gap:24px; }
+  .orbit-axis { left:0; right:0; top:auto; bottom:-10px;
+                width:auto; height:1px;
+                background:linear-gradient(to right, transparent, var(--f-gold) 18%, var(--f-gold) 82%, transparent); }
+  .orbit-year { flex-direction:column-reverse; gap:8px; margin:0; }
+  .orbit-year b { font-size:clamp(17px,4.6vw,24px); }
+  .orbit-year[aria-current="true"] b { font-size:clamp(21px,5.6vw,30px); }
+  .sky-body { --dot:24px; max-width:58vw; }
+  .sky-name { font-size:clamp(11px,3vw,13px); }
+  .sky-more, .sky-link { font-size:clamp(10px,2.6vw,11.5px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior:auto; }
+  .orbit-year, .orbit-year i, .sky-more, .sky-link { transition:none; }
+}
+
+/* =====================================================================
+   진입점 — v2 노트 위에 뚫린 창
+
+   v2는 그대로 두고, 홈 섹션에 이 창 하나만 얹는다.
+   종이에 구멍이 나 있고 그 너머로 우주가 보이는 형태다.
+   v2(종이)와 v3(우주) 두 세계가 만나는 유일한 지점이므로,
+   설명 문구 없이 형태만으로 "여기 다른 데가 있다"를 말해야 한다.
+   ===================================================================== */
+.gate {
+  position:relative; display:block; width:100%; max-width:260px;
+  aspect-ratio:7/5; padding:0; border:0; background:none;
+  cursor:pointer; isolation:isolate;
+  /* 종이를 찢어낸 자국. 반듯한 사각형이면 위젯처럼 보인다. */
+  clip-path:polygon(
+    2% 6%, 14% 2%, 31% 5%, 48% 1%, 66% 4%, 82% 1%, 97% 5%,
+    99% 22%, 96% 41%, 99% 60%, 97% 79%, 99% 95%,
+    84% 98%, 67% 95%, 49% 99%, 32% 96%, 15% 99%, 3% 94%,
+    1% 78%, 4% 59%, 1% 40%, 3% 21%
+  );
+  transition:transform .5s cubic-bezier(.2,.8,.2,1);
+}
+.gate canvas { display:block; width:100%; height:100%; }
+
+/* 찢긴 가장자리 안쪽의 종이 두께. 구멍처럼 보이게 하는 핵심이다. */
+.gate::after {
+  content:""; position:absolute; inset:0; z-index:2; pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.28), inset 0 3px 14px rgba(0,0,0,.42);
+}
+.gate:hover, .gate:focus-visible { transform:scale(1.035); }
+.gate:focus-visible { outline:2px solid #c9b477; outline-offset:6px; }
+
+/* 창 밖에 놓이는 아주 작은 안내. 조작 설명이 아니라 이름표다. */
+.gate-wrap { display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
+.gate-name {
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.22em;
+  color:#8a8fa3; transition:color .35s ease;
+}
+.gate-wrap:hover .gate-name { color:#a9914d; }
+
+/* 눌렀을 때 창이 화면을 덮으며 우주로 넘어간다. */
+.gate-veil {
+  position:fixed; inset:0; z-index:9999; pointer-events:none;
+  background:#0b0e15; opacity:0;
+  clip-path:circle(0% at var(--gx,50%) var(--gy,50%));
+  transition:clip-path .85s cubic-bezier(.65,0,.35,1), opacity .3s ease;
+}
+.gate-veil.open { opacity:1; clip-path:circle(150% at var(--gx,50%) var(--gy,50%)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .gate, .gate-name { transition:none; }
+  .gate-veil { transition:opacity .2s ease; clip-path:none; }
+}
