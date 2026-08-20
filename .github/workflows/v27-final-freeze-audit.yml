@@ -1,4 +1,4 @@
-name: v2.7.x narrow footer diagnostic
+name: v2.7.x footer CSSOM diagnostic
 
 on:
   pull_request:
@@ -18,12 +18,12 @@ jobs:
         with:
           ref: agent/v27-final-freeze
 
-      - name: Verify min-width root cause at 320px
+      - name: Inspect footer rule in CSSOM
         shell: bash
         run: |
           set -euo pipefail
           python3 -m pip install --quiet selenium
-          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/v27-diag-http.log 2>&1 &
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/v27-cssom-http.log 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           sleep 1
@@ -41,30 +41,47 @@ jobs:
           d=webdriver.Chrome(service=Service(driver_bin) if driver_bin else Service(),options=opts)
           d.set_window_size(320,1000)
           d.get('http://127.0.0.1:8000/'); time.sleep(.5)
-          before=d.execute_script('''
-            const sels=['.footer','.footer-inner','.social-links','.contact-email','.email-addr','.copy-hint'];
-            const rows={};
-            for(const s of sels){const e=document.querySelector(s);if(!e)continue;const r=e.getBoundingClientRect(),c=getComputedStyle(e);rows[s]={left:r.left,right:r.right,width:r.width,display:c.display,minWidth:c.minWidth,maxWidth:c.maxWidth,flexWrap:c.flexWrap,flexDirection:c.flexDirection,whiteSpace:c.whiteSpace,overflowWrap:c.overflowWrap};}
-            return {scrollWidth:document.documentElement.scrollWidth,rows};
+          diag=d.execute_script('''
+            function walk(rules, chain, out){
+              for(const r of [...rules]){
+                const next=(r.conditionText!==undefined)?chain.concat([r.conditionText]):chain;
+                if(r.selectorText && r.selectorText.includes('.footer .social-links')) out.push({selector:r.selectorText,css:r.cssText,chain:next});
+                if(r.cssRules) walk(r.cssRules,next,out);
+              }
+            }
+            const found=[]; const sheets=[];
+            for(const s of [...document.styleSheets]){
+              let count=null,error=null;
+              try{count=s.cssRules.length;walk(s.cssRules,[],found);}catch(e){error=String(e)}
+              sheets.push({href:s.href,count,error});
+            }
+            const el=document.querySelector('.footer .social-links');
+            const c=getComputedStyle(el); const r=el.getBoundingClientRect();
+            return {
+              innerWidth,
+              outerWidth,
+              media340:matchMedia('(max-width: 340px)').matches,
+              scrollWidth:document.documentElement.scrollWidth,
+              computed:{width:c.width,minWidth:c.minWidth,maxWidth:c.maxWidth,flexWrap:c.flexWrap,gap:c.gap,left:r.left,right:r.right},
+              found,
+              sheets
+            };
           ''')
-          print('BEFORE',json.dumps(before,ensure_ascii=False,indent=2))
+          print(json.dumps(diag,ensure_ascii=False,indent=2))
 
-          after_min=d.execute_script('''
-            const s=document.createElement('style');
-            s.textContent='@media(max-width:340px){.footer .social-links{min-width:0!important}}';
-            document.head.appendChild(s);
-            return {scrollWidth:document.documentElement.scrollWidth,social:getComputedStyle(document.querySelector('.footer .social-links')).minWidth};
-          ''')
-          print('AFTER_MIN_WIDTH',json.dumps(after_min,ensure_ascii=False,indent=2))
-
-          after_column=d.execute_script('''
-            const s=document.createElement('style');
-            s.textContent='@media(max-width:340px){.footer .social-links{min-width:0!important;flex-direction:column!important;align-items:flex-start!important}.footer .contact-email{width:100%!important;min-width:0!important}.footer .email-addr{overflow-wrap:anywhere!important;min-width:0!important}}';
-            document.head.appendChild(s);
-            return {scrollWidth:document.documentElement.scrollWidth};
-          ''')
-          print('AFTER_COLUMN_FALLBACK',json.dumps(after_column,ensure_ascii=False,indent=2))
+          # Prove candidate fixes independently of the committed stylesheet.
+          candidates={
+            'minWidth':'@media(max-width:340px){.footer .social-links{min-width:0!important}}',
+            'wrapMin':'@media(max-width:340px){.footer .social-links{min-width:0!important;width:100%!important;max-width:100%!important;flex-wrap:wrap!important}}',
+            'column':'@media(max-width:340px){.footer .social-links{min-width:0!important;width:100%!important;max-width:100%!important;flex-direction:column!important;align-items:flex-start!important}.footer .contact-email{min-width:0!important;max-width:100%!important}}'
+          }
+          for name,css in candidates.items():
+              d.refresh(); time.sleep(.2)
+              result=d.execute_script('''
+                const st=document.createElement('style'); st.textContent=arguments[0]; document.head.appendChild(st);
+                const e=document.querySelector('.footer .social-links'),c=getComputedStyle(e),r=e.getBoundingClientRect();
+                return {scrollWidth:document.documentElement.scrollWidth,flexWrap:c.flexWrap,minWidth:c.minWidth,width:r.width,right:r.right};
+              ''',css)
+              print(name,json.dumps(result,ensure_ascii=False))
           d.quit()
-          if after_min['scrollWidth']>321:
-              raise SystemExit('min-width:0 alone did not fix overflow')
           PY
