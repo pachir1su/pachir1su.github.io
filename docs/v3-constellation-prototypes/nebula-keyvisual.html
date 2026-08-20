@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="이건영 v3 포트폴리오 「차가운 성운」 첫 화면 키비주얼">
+  <title>차가운 성운 · 첫 화면 키비주얼</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="nebula.css">
+  <script src="nebula.js" defer></script>
+</head>
+<body data-page="nebula-keyvisual">
+  <div class="wrap">
+
+    <header class="masthead">
+      <a class="back-link" href="index.html">← 시안 목록</a>
+      <p class="kicker">V3 KEY VISUAL · 승인</p>
+      <h1>차가운 성운.<br>빛은 한 방향에서 옵니다.</h1>
+      <p>취향 캘리브레이션에서 고른 시각 언어를 그대로 옮긴 첫 화면입니다. 배경은 <b>엷은 성운</b>, 선은 <b>낡은 금빛 실선</b>, 서체는 <b>산세리프</b>, 구도는 <b>왼쪽 아래 이름 · 오른쪽 위 별자리</b>입니다.</p>
+      <p>흔한 우주 배경이 되지 않도록 성운을 균일하게 깔지 않았습니다. 화면 밖 오른쪽 위에 광원이 하나 있고, 성운은 그 빛을 받는 <b>덩어리</b>로 그렸습니다. 안을 가로지르는 어두운 먼지 띠도 넣었습니다.</p>
+    </header>
+
+    <div class="frame">
+      <div class="frame-head">
+        <span class="frame-id">KV-1</span>
+        <h2>데스크톱 · 라이트</h2>
+        <span>시스템이 라이트일 때 그대로 나오는 화면</span>
+      </div>
+      <div class="kv kv--light">
+        <canvas data-mode="light" aria-hidden="true"></canvas>
+        <div class="kv-copy">
+          <p class="kv-name">이건영</p>
+          <p class="kv-en">LEE GEON YEONG</p>
+          <p class="kv-line">이윤을 넘어 혁신을 추구하는<br>기업가를 꿈꿉니다.</p>
+          <p class="kv-mail">capybara@koreatech.ac.kr</p>
+        </div>
+      </div>
+      <div class="notes">
+        <div class="note"><b>라이트에서 우주를 만드는 법</b><span>흰 바탕에 별을 뿌리지 않았습니다. 성운이 배경보다 살짝 어둡고, 별은 어두운 점에 아주 옅은 흰 무리를 둘렀습니다. 새벽에 아직 안 사라진 하늘입니다.</span></div>
+        <div class="note"><b>글자와 별자리가 겹치지 않습니다</b><span>이름 덩어리와 별자리가 대각선으로 마주 봅니다.</span></div>
+        <div class="note"><b>보이는 컨트롤이 없습니다</b><span>로고, 메뉴, 스크롤 안내, 테마 버튼을 두지 않았습니다.</span></div>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-head">
+        <span class="frame-id">KV-2</span>
+        <h2>데스크톱 · 다크</h2>
+        <span>같은 좌표, 같은 별자리. 팔레트만 바뀝니다</span>
+      </div>
+      <div class="kv kv--dark">
+        <canvas data-mode="dark" aria-hidden="true"></canvas>
+        <div class="kv-copy">
+          <p class="kv-name">이건영</p>
+          <p class="kv-en">LEE GEON YEONG</p>
+          <p class="kv-line">이윤을 넘어 혁신을 추구하는<br>기업가를 꿈꿉니다.</p>
+          <p class="kv-mail">capybara@koreatech.ac.kr</p>
+        </div>
+      </div>
+      <div class="notes">
+        <div class="note"><b>순검정이 아닙니다</b><span>가장 어두운 곳이 <code>#0d1118</code>입니다. 오래 봐도 눈이 덜 아픈 깊이입니다.</span></div>
+        <div class="note"><b>금빛은 세 군데뿐</b><span>별자리 선, 그리고 별 일곱 중 둘. 나머지는 회백색입니다.</span></div>
+        <div class="note"><b>다크용 별도 화면이 아닙니다</b><span>KV-1과 완전히 같은 좌표에 색만 갈아 끼웠습니다.</span></div>
+      </div>
+    </div>
+
+    <section class="doc">
+      <h2>확정된 시각 언어</h2>
+      <p>취향 보드에서 고른 결과와, 위임받은 항목을 판단한 근거입니다.</p>
+      <div class="rows">
+        <div class="row"><b>배경</b><span><em>엷은 성운</em> — 방향광 + 어두운 먼지 띠 + 입자 2층. 균일하게 깐 안개가 아닙니다.</span></div>
+        <div class="row drop"><b>수묵 번짐</b><span>탈락. 「달빛을 받은 수묵 우주」라는 기존 아트 디렉션 가칭도 함께 폐기했습니다.</span></div>
+        <div class="row drop"><b>그레인 필드</b><span>탈락. 재질용 미세 입자(불투명도 3%)만 성운 위에 남겼습니다.</span></div>
+        <div class="row"><b>별</b><span>하나로 정하지 않고 <em>세 계층</em>. 먼 먼지 340 · 일반 별 72(점) · 별자리 별 7(옅은 달무리). 강한 글로우는 없습니다.</span></div>
+        <div class="row"><b>선</b><span><em>낡은 금빛 실선</em>. 굵기 1.1px 안팎, 불투명도 0.6 안팎.</span></div>
+        <div class="row drop"><b>점선</b><span>탈락. 성장 별자리에서 아직 연결되지 않은 구간은 점선 대신 어두운 실선으로 표시합니다.</span></div>
+        <div class="row"><b>서체</b><span><em>IBM Plex Sans KR</em>. 이름은 얇은 200을 크게, 영문은 자간을 넓게 씁니다.</span></div>
+        <div class="row"><b>구도</b><span>왼쪽 아래 이름 · 오른쪽 위 별자리.</span></div>
+        <div class="row drop"><b>지평선 구도</b><span>탈락. 전환 화면을 포함한 이후 모든 장면에서 쓰지 않습니다.</span></div>
+        <div class="row"><b>회피 확정</b><span>네온 글로우 · 둥근 알약 · 같은 크기 카드 반복 · 흩뿌린 별 + 영문 대문자 키커 + 이스터에그 사전 안내.</span></div>
+      </div>
+
+      <div class="notes">
+        <div class="note"><b>배경은 전부 Canvas입니다</b><span>생성형 이미지 텍스처를 쓸 수 있었지만 코드로 그렸습니다. 라이트·다크·화면 크기별로 자산을 다시 만들 필요가 없고 용량이 들지 않습니다.</span></div>
+        <div class="note"><b>문구는 v2 원문입니다</b><span>임의로 만든 문장을 넣지 않았습니다. 첫 화면 한 문장은 아직 확정 전입니다.</span></div>
+        <div class="note"><b>다음 화면</b><span>별자리가 완성된 뒤의 전환은 <a href="nebula-transit.html">상호작용 시안</a>에 있습니다.</span></div>
+      </div>
+    </section>
+
+    <footer>
+      <p><b>범위.</b> 실제 v3.0.0 제품 코드가 아니라 <code>docs/v3-constellation-prototypes/</code> 안의 디자인 시안입니다. 운영 <code>index.html</code>과 <code>projects.json</code>은 변경하지 않았습니다.</p>
+      <p>테마는 수동 토글 없이 운영체제의 라이트·다크 설정만 따릅니다.</p>
+    </footer>
+
+  </div>
+</body>
+</html>
