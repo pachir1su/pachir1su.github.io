@@ -1,4 +1,4 @@
-name: v2.7.x Final Freeze corrected implementation
+name: v2.7.x Final Freeze independent validation
 
 on:
   pull_request:
@@ -6,86 +6,27 @@ on:
     types: [opened, reopened, synchronize]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  implement:
+  validate:
     if: github.head_ref == 'agent/v27-final-freeze-validation'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
           ref: agent/v27-final-freeze
           fetch-depth: 0
 
-      - name: Rebuild exact four-file Final Freeze branch
+      - name: Static and build gates
         shell: bash
         run: |
           set -euo pipefail
           expected_base='306f1d9c1fc07c0f8f6035d0706d25cb495c0eec'
-          test "$(git rev-parse HEAD)" = "$expected_base"
-          git config user.name 'pachir1su'
-          git config user.email 'crong3323@naver.com'
-
-          python3 - <<'PY'
-          from pathlib import Path
-
-          p=Path('style.css'); s=p.read_text(encoding='utf-8')
-          marker='/* v2.7.x Final Freeze — 320px footer contact overflow regression */'
-          if marker in s: raise SystemExit('style marker already exists')
-          s=s.rstrip()+'''\n\n/* v2.7.x Final Freeze — 320px footer contact overflow regression */\n@media (max-width: 340px) {\n  footer .social-links {\n    width: 100%;\n    min-width: 0;\n    max-width: 100%;\n    flex-wrap: wrap;\n    gap: 10px;\n  }\n  footer .contact-email {\n    min-width: 0;\n    max-width: 100%;\n  }\n  footer .contact-email .email-addr {\n    min-width: 0;\n    overflow-wrap: anywhere;\n  }\n}\n'''
-          p.write_text(s,encoding='utf-8')
-
-          p=Path('script.js'); s=p.read_text(encoding='utf-8')
-          old='pachir1su.github.io — v2.6.x interactions'; new='pachir1su.github.io — v2.7.x interactions'
-          if s.count(old)!=1: raise SystemExit(f'script marker count={s.count(old)}')
-          p.write_text(s.replace(old,new),encoding='utf-8')
-
-          p=Path('README.md'); s=p.read_text(encoding='utf-8')
-          reps={
-            '<br>v2.5.0 : 현재 공개 릴리즈 — #117 머지 기준':'<br>v2.5.0 : #117 머지 기준 안정 릴리즈',
-            '<br>v2.6.0 (Release 준비) : Final Note — MBTI·불필요 인터랙션 제거, 재학 정보·상단 연락처·메뉴·반응형 UI 정리 (#114, #118, #119, #121, #122, #123, #16). [Release notes](docs/v2.6.0-release-notes.md)':'<br>v2.6.0 : Final Note — MBTI·불필요 인터랙션 제거, 재학 정보·상단 연락처·메뉴·반응형 UI 정리 (#114, #118, #119, #121, #122, #123, #16). [Release notes](docs/v2.6.0-release-notes.md)',
-            '<br>v2.6.x (예정) : Freeze / Refactor — 정적 dead-code 제거, 실제 기기 반응형·성능 회귀 QA. [Freeze plan](docs/v2.6.x-freeze.md)':'<br>v2.6.x : Freeze / Refactor — 정적 dead-code 제거, 실제 기기 반응형·성능 회귀 QA. [Freeze plan](docs/v2.6.x-freeze.md)',
-            '<br>v3.0.0 ~ (예정) : 디자인 컨셉 변경 — [docs/design-concept-v3.md](docs/design-concept-v3.md)':'<br>v2.7.0 : 현재 공개 릴리즈 — Visual / Media Pass와 상세 페이지 반응형 안정화\n<br>v2.7.x : Final Freeze / release hygiene — v3 전 마지막 v2 안정화 계열. [Final Freeze](docs/v2.7.x-final-freeze.md)\n<br>v3.0.0 ~ (예정) : 디자인 컨셉 변경 — [docs/design-concept-v3.md](docs/design-concept-v3.md)'
-          }
-          for old,new in reps.items():
-              if s.count(old)!=1: raise SystemExit(f'README target mismatch count={s.count(old)}: {old[:50]}')
-              s=s.replace(old,new)
-          p.write_text(s,encoding='utf-8')
-
-          p=Path('tools/verify-build.js'); s=p.read_text(encoding='utf-8')
-          anchor='\nif (failures.length === 0) {'
-          if s.count(anchor)!=1: raise SystemExit(f'verify anchor count={s.count(anchor)}')
-          lines=[
-            '',
-            '/* --- 6) v2.7.x Final Freeze regression gates --- */',
-            'const rootIndex = fs.readFileSync(indexPath, "utf8");',
-            'const rootScript = fs.readFileSync(path.join(root, "script.js"), "utf8");',
-            'const rootStyle = fs.readFileSync(path.join(root, "style.css"), "utf8");',
-            '',
-            'for (const match of rootIndex.matchAll(/<img\\b[^>]*\\bsrc="([^\"]+)"[^>]*>/gi)) {',
-            '  const ref = match[1];',
-            '  if (/^(?:https?:|data:|\\/)/i.test(ref)) continue;',
-            '  check(fs.existsSync(path.join(root, ref)), `메인 페이지 로컬 이미지 없음: ${ref}`);',
-            '}',
-            '',
-            'const retiredUiPatterns = [',
-            "  [rootIndex, 'id=\"mbti-section\"', \"폐기된 MBTI 섹션이 메인 markup에 돌아왔습니다.\"],",
-            "  [rootIndex, 'id=\"sectionNav\"', \"폐기된 sectionNav가 메인 markup에 돌아왔습니다.\"],",
-            '  [rootIndex, "floating-icons", "폐기된 floating-icons가 메인 markup에 돌아왔습니다."],',
-            '  [rootScript, "normalizeV26Markup", "폐기된 v2.6 runtime normalize 코드가 돌아왔습니다."],',
-            '  [rootScript, "v26-runtime-layout", "폐기된 v2.6 runtime layout 주입이 돌아왔습니다."],',
-            '  [rootStyle, ".chicken-drop", "폐기된 chicken-drop 스타일이 돌아왔습니다."],',
-            '];',
-            'for (const [source, pattern, message] of retiredUiPatterns) {',
-            '  check(!source.includes(pattern), message);',
-            '}',
-            ''
-          ]
-          p.write_text(s.replace(anchor,'\n'+'\n'.join(lines)+anchor),encoding='utf-8')
-          PY
-
+          test "$(git merge-base HEAD "$expected_base")" = "$expected_base"
+          test "$(git rev-list --count "$expected_base"..HEAD)" -eq 4
+          test "$(git diff --name-only "$expected_base"..HEAD | wc -l)" -eq 4
           node --check script.js
           node --check tools/verify-build.js
           cp index.html /tmp/index.before
@@ -93,21 +34,300 @@ jobs:
           cmp /tmp/index.before index.html
           node tools/verify-build.js
           git diff --check
-          test "$(git diff --name-only | wc -l)" -eq 4
-          test "$(git diff --numstat -- style.css | awk '{print $1+$2}')" -lt 40
-
-          git add -- style.css && test "$(git diff --cached --name-only | wc -l)" -eq 1
-          git commit -m 'fix: wrap footer contacts on narrow screens'
-          git add -- script.js && test "$(git diff --cached --name-only | wc -l)" -eq 1
-          git commit -m 'chore: mark interactions for v2.7 freeze'
-          git add -- README.md && test "$(git diff --cached --name-only | wc -l)" -eq 1
-          git commit -m 'docs: sync release history through v2.7'
-          git add -- tools/verify-build.js && test "$(git diff --cached --name-only | wc -l)" -eq 1
-          git commit -m 'chore: extend final freeze regression gates'
-
           test -z "$(git status --porcelain)"
-          test "$(git rev-list --count "$expected_base"..HEAD)" -eq 4
-          test "$(git diff --name-only "$expected_base"..HEAD | wc -l)" -eq 4
-          git log --oneline "$expected_base"..HEAD
-          git diff --stat "$expected_base"..HEAD
-          git push origin HEAD:agent/v27-final-freeze
+
+      - name: Install temporary QA tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/v27qa
+          cd /tmp/v27qa
+          npm init -y >/dev/null 2>&1
+          npm install --no-audit --no-fund playwright@1.55.0 lighthouse@12.8.2 >/dev/null
+          command -v google-chrome
+          google-chrome --version
+
+      - name: Serve Final Freeze branch
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/v27qa/http.log 2>&1 &
+          echo $! >/tmp/v27qa/http.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/v27qa/http.log
+          exit 1
+
+      - name: Run 189-case responsive and interaction QA
+        shell: bash
+        env:
+          NODE_PATH: /tmp/v27qa/node_modules
+        run: |
+          cat >/tmp/v27qa/qa.cjs <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const { chromium } = require('playwright');
+
+          const root = process.cwd();
+          const widths = [320, 360, 390, 768, 1024, 1280, 1440];
+          const failures = [];
+          const pageErrors = [];
+          const consoleErrors = [];
+          const cases = [];
+          const representative = new Set([
+            'index.html@320', 'index.html@768', 'index.html@1440'
+          ]);
+
+          function walk(dir) {
+            const out = [];
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const p = path.join(dir, entry.name);
+              if (entry.isDirectory()) out.push(...walk(p));
+              else if (entry.isFile() && entry.name === 'index.html') out.push(p);
+            }
+            return out;
+          }
+
+          const detailFiles = walk(path.join(root, 'projects'))
+            .filter((file) => fs.readFileSync(file, 'utf8').includes('detail-body'))
+            .map((file) => path.relative(root, file).replaceAll(path.sep, '/'))
+            .sort();
+          const files = ['index.html', ...detailFiles];
+          if (files.length !== 27) failures.push(`expected 27 pages, found ${files.length}`);
+
+          (async () => {
+            const browser = await chromium.launch({
+              executablePath: '/usr/bin/google-chrome',
+              headless: true,
+              args: ['--no-sandbox', '--disable-dev-shm-usage']
+            });
+
+            for (const width of widths) {
+              const context = await browser.newContext({
+                viewport: { width, height: width <= 390 ? 844 : 1000 },
+                colorScheme: 'light'
+              });
+              for (const file of files) {
+                const page = await context.newPage();
+                const key = `${file}@${width}`;
+                const url = `http://127.0.0.1:4173/${file === 'index.html' ? '' : file}`;
+                page.on('pageerror', (error) => pageErrors.push(`${key}: ${error.message}`));
+                page.on('console', (msg) => {
+                  if (msg.type() === 'error') consoleErrors.push(`${key}: ${msg.text()}`);
+                });
+                await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
+                await page.evaluate(() => {
+                  localStorage.removeItem('lang');
+                  localStorage.removeItem('theme');
+                  document.querySelectorAll('img[loading="lazy"]').forEach((img) => { img.loading = 'eager'; });
+                });
+                await page.waitForTimeout(250);
+                await page.evaluate(async () => {
+                  const max = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+                  const step = Math.max(500, window.innerHeight * 0.8);
+                  for (let y = 0; y < max; y += step) {
+                    window.scrollTo(0, y);
+                    await new Promise((resolve) => setTimeout(resolve, 15));
+                  }
+                  window.scrollTo(0, 0);
+                  await new Promise((resolve) => setTimeout(resolve, 100));
+                });
+
+                const result = await page.evaluate(() => {
+                  const viewport = window.innerWidth;
+                  const docWidth = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
+                  const brokenImages = [...document.images]
+                    .filter((img) => img.complete && img.naturalWidth === 0 && !img.src.startsWith('data:'))
+                    .map((img) => img.currentSrc || img.src);
+                  const mediaOverflow = [...document.querySelectorAll('img, video, iframe, figure')]
+                    .filter((el) => {
+                      const style = getComputedStyle(el);
+                      if (style.display === 'none' || style.visibility === 'hidden') return false;
+                      const r = el.getBoundingClientRect();
+                      if (r.width === 0 || r.height === 0) return false;
+                      return r.left < -1 || r.right > viewport + 1;
+                    })
+                    .map((el) => `${el.tagName.toLowerCase()}.${el.className || ''}`.slice(0, 160));
+                  const icon = document.querySelector('link[rel~="icon"]')?.href || '';
+                  return {
+                    docWidth,
+                    viewport,
+                    brokenImages,
+                    mediaOverflow,
+                    faviconOk: /\/assets\/favicon\.svg(?:[?#]|$)/.test(icon),
+                    contextMenuBlocked: typeof document.oncontextmenu === 'function',
+                    selectBlocked: typeof document.onselectstart === 'function' || getComputedStyle(document.body).userSelect === 'none',
+                    domNodes: document.getElementsByTagName('*').length,
+                    resourceCount: performance.getEntriesByType('resource').length,
+                    decodedBytes: performance.getEntriesByType('resource').reduce((sum, e) => sum + (e.decodedBodySize || 0), 0)
+                  };
+                });
+
+                if (result.docWidth > result.viewport + 1) failures.push(`${key}: horizontal overflow ${result.docWidth} > ${result.viewport}`);
+                if (result.brokenImages.length) failures.push(`${key}: broken images ${result.brokenImages.join(', ')}`);
+                if (result.mediaOverflow.length) failures.push(`${key}: media overflow ${result.mediaOverflow.join(', ')}`);
+                if (!result.faviconOk) failures.push(`${key}: favicon mismatch`);
+                if (result.contextMenuBlocked) failures.push(`${key}: context menu blocked`);
+                if (result.selectBlocked) failures.push(`${key}: text selection blocked`);
+
+                if (file === 'index.html' && width === 320) {
+                  const hamburger = page.locator('#hamburger');
+                  const menu = page.locator('#mobileMenu');
+                  await hamburger.click();
+                  if (!(await menu.evaluate((el) => el.classList.contains('open')))) failures.push('index@320: mobile menu did not open');
+                  if ((await hamburger.getAttribute('aria-expanded')) !== 'true') failures.push('index@320: hamburger aria-expanded did not become true');
+                  await page.keyboard.press('Escape');
+                  if (await menu.evaluate((el) => el.classList.contains('open'))) failures.push('index@320: Escape did not close mobile menu');
+                  if ((await hamburger.getAttribute('aria-expanded')) !== 'false') failures.push('index@320: hamburger aria-expanded did not reset');
+                }
+
+                if (file === 'index.html' && width === 390) {
+                  await page.locator('#langToggle').click();
+                  if ((await page.locator('html').getAttribute('lang')) !== 'en') failures.push('index@390: language toggle did not switch to EN');
+                  if ((await page.evaluate(() => localStorage.getItem('lang'))) !== 'en') failures.push('index@390: EN preference not persisted');
+                  await page.reload({ waitUntil: 'domcontentloaded' });
+                  if ((await page.locator('html').getAttribute('lang')) !== 'en') failures.push('index@390: EN preference lost after reload');
+                  await page.locator('#themeToggle').click();
+                  const theme = await page.locator('html').getAttribute('data-theme');
+                  if (!['light', 'dark'].includes(theme)) failures.push('index@390: theme toggle produced invalid state');
+                  if ((await page.evaluate(() => localStorage.getItem('theme'))) !== theme) failures.push('index@390: theme preference not persisted');
+                }
+
+                if (representative.has(key)) {
+                  await page.screenshot({ path: `/tmp/v27qa/${key.replaceAll('/', '_').replace('@', '-')}.png`, fullPage: true });
+                }
+                cases.push({ key, ...result });
+                await page.close();
+              }
+              await context.close();
+            }
+
+            for (const mode of [
+              { name: 'dark', colorScheme: 'dark', reducedMotion: 'no-preference', hasTouch: false },
+              { name: 'reduced-motion', colorScheme: 'light', reducedMotion: 'reduce', hasTouch: false },
+              { name: 'coarse-pointer', colorScheme: 'light', reducedMotion: 'no-preference', hasTouch: true }
+            ]) {
+              const context = await browser.newContext({
+                viewport: { width: 390, height: 844 },
+                colorScheme: mode.colorScheme,
+                reducedMotion: mode.reducedMotion,
+                hasTouch: mode.hasTouch,
+                isMobile: mode.hasTouch
+              });
+              const page = await context.newPage();
+              let localError = null;
+              page.on('pageerror', (error) => { localError = error.message; });
+              await page.goto('http://127.0.0.1:4173/', { waitUntil: 'domcontentloaded', timeout: 20000 });
+              await page.waitForTimeout(250);
+              const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+              if (overflow > 1) failures.push(`${mode.name}: main horizontal overflow +${overflow}px`);
+              if (localError) failures.push(`${mode.name}: pageerror ${localError}`);
+              await context.close();
+            }
+
+            await browser.close();
+            if (pageErrors.length) failures.push(...pageErrors.map((v) => `pageerror ${v}`));
+            const severeConsole = consoleErrors.filter((v) => !/favicon|Failed to load resource.*404/i.test(v));
+            if (severeConsole.length) failures.push(...severeConsole.map((v) => `console ${v}`));
+
+            const summary = {
+              pageCount: files.length,
+              detailPageCount: detailFiles.length,
+              widths,
+              caseCount: files.length * widths.length,
+              failures,
+              pageErrors,
+              consoleErrors,
+              cases
+            };
+            fs.writeFileSync('/tmp/v27qa/results.json', JSON.stringify(summary, null, 2));
+            console.log(`pages=${files.length} details=${detailFiles.length} cases=${summary.caseCount} failures=${failures.length}`);
+            if (failures.length) {
+              console.error(failures.join('\n'));
+              process.exit(1);
+            }
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
+          node /tmp/v27qa/qa.cjs
+
+      - name: Run Lighthouse mobile and desktop
+        shell: bash
+        run: |
+          set -euo pipefail
+          LH=/tmp/v27qa/node_modules/.bin/lighthouse
+          "$LH" http://127.0.0.1:4173/ \
+            --quiet \
+            --chrome-path=/usr/bin/google-chrome \
+            --chrome-flags='--headless --no-sandbox --disable-dev-shm-usage' \
+            --output=json --output=html \
+            --output-path=/tmp/v27qa/lighthouse-mobile
+          "$LH" http://127.0.0.1:4173/ \
+            --quiet \
+            --preset=desktop \
+            --chrome-path=/usr/bin/google-chrome \
+            --chrome-flags='--headless --no-sandbox --disable-dev-shm-usage' \
+            --output=json --output=html \
+            --output-path=/tmp/v27qa/lighthouse-desktop
+          node <<'NODE'
+          const fs=require('fs');
+          for (const kind of ['mobile','desktop']) {
+            const r=JSON.parse(fs.readFileSync(`/tmp/v27qa/lighthouse-${kind}.report.json`,'utf8'));
+            const c=r.categories;
+            const a=r.audits;
+            const row={
+              kind,
+              performance:Math.round(c.performance.score*100),
+              accessibility:Math.round(c.accessibility.score*100),
+              bestPractices:Math.round(c['best-practices'].score*100),
+              seo:Math.round(c.seo.score*100),
+              fcp:a['first-contentful-paint'].displayValue,
+              lcp:a['largest-contentful-paint'].displayValue,
+              tbt:a['total-blocking-time'].displayValue,
+              cls:a['cumulative-layout-shift'].displayValue,
+              transfer:a['total-byte-weight'].displayValue
+            };
+            console.log(JSON.stringify(row));
+            fs.appendFileSync('/tmp/v27qa/lighthouse-summary.jsonl', JSON.stringify(row)+'\n');
+          }
+          NODE
+
+      - name: Record Final Freeze branch atomicity and network snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='306f1d9c1fc07c0f8f6035d0706d25cb495c0eec'
+          {
+            echo '## commits'
+            git log --oneline "$base"..HEAD
+            echo
+            echo '## diff stat'
+            git diff --stat "$base"..HEAD
+            echo
+            echo '## changed files'
+            git diff --name-only "$base"..HEAD
+            echo
+            echo '## responsive summary'
+            node -e "const r=require('/tmp/v27qa/results.json'); console.log(JSON.stringify({pages:r.pageCount,details:r.detailPageCount,widths:r.widths,cases:r.caseCount,failures:r.failures.length},null,2))"
+            echo
+            echo '## lighthouse'
+            cat /tmp/v27qa/lighthouse-summary.jsonl
+          } | tee /tmp/v27qa/final-freeze-summary.txt
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v27-final-freeze-independent-validation
+          path: |
+            /tmp/v27qa/results.json
+            /tmp/v27qa/final-freeze-summary.txt
+            /tmp/v27qa/lighthouse-summary.jsonl
+            /tmp/v27qa/lighthouse-mobile.report.json
+            /tmp/v27qa/lighthouse-mobile.report.html
+            /tmp/v27qa/lighthouse-desktop.report.json
+            /tmp/v27qa/lighthouse-desktop.report.html
+            /tmp/v27qa/*.png
+          if-no-files-found: warn
