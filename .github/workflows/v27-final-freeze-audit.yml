@@ -1,4 +1,4 @@
-name: v2.7.x footer CSSOM diagnostic
+name: v2.7.x Final Freeze corrected implementation
 
 on:
   pull_request:
@@ -6,82 +6,108 @@ on:
     types: [opened, reopened, synchronize]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  diagnose:
+  implement:
     if: github.head_ref == 'agent/v27-final-freeze-validation'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           ref: agent/v27-final-freeze
+          fetch-depth: 0
 
-      - name: Inspect footer rule in CSSOM
+      - name: Rebuild exact four-file Final Freeze branch
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet selenium
-          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/v27-cssom-http.log 2>&1 &
-          server_pid=$!
-          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
-          sleep 1
+          expected_base='306f1d9c1fc07c0f8f6035d0706d25cb495c0eec'
+          test "$(git rev-parse HEAD)" = "$expected_base"
+          git config user.name 'pachir1su'
+          git config user.email 'crong3323@naver.com'
+
           python3 - <<'PY'
-          import json, shutil, time
-          from selenium import webdriver
-          from selenium.webdriver.chrome.options import Options
-          from selenium.webdriver.chrome.service import Service
+          from pathlib import Path
 
-          chrome=shutil.which('google-chrome') or shutil.which('chromium') or shutil.which('chromium-browser')
-          driver_bin=shutil.which('chromedriver') or shutil.which('chromium-driver')
-          opts=Options(); opts.binary_location=chrome
-          for a in ['--headless=new','--no-sandbox','--disable-dev-shm-usage','--force-device-scale-factor=1']:
-              opts.add_argument(a)
-          d=webdriver.Chrome(service=Service(driver_bin) if driver_bin else Service(),options=opts)
-          d.set_window_size(320,1000)
-          d.get('http://127.0.0.1:8000/'); time.sleep(.5)
-          diag=d.execute_script('''
-            function walk(rules, chain, out){
-              for(const r of [...rules]){
-                const next=(r.conditionText!==undefined)?chain.concat([r.conditionText]):chain;
-                if(r.selectorText && r.selectorText.includes('.footer .social-links')) out.push({selector:r.selectorText,css:r.cssText,chain:next});
-                if(r.cssRules) walk(r.cssRules,next,out);
-              }
-            }
-            const found=[]; const sheets=[];
-            for(const s of [...document.styleSheets]){
-              let count=null,error=null;
-              try{count=s.cssRules.length;walk(s.cssRules,[],found);}catch(e){error=String(e)}
-              sheets.push({href:s.href,count,error});
-            }
-            const el=document.querySelector('.footer .social-links');
-            const c=getComputedStyle(el); const r=el.getBoundingClientRect();
-            return {
-              innerWidth,
-              outerWidth,
-              media340:matchMedia('(max-width: 340px)').matches,
-              scrollWidth:document.documentElement.scrollWidth,
-              computed:{width:c.width,minWidth:c.minWidth,maxWidth:c.maxWidth,flexWrap:c.flexWrap,gap:c.gap,left:r.left,right:r.right},
-              found,
-              sheets
-            };
-          ''')
-          print(json.dumps(diag,ensure_ascii=False,indent=2))
+          p=Path('style.css'); s=p.read_text(encoding='utf-8')
+          marker='/* v2.7.x Final Freeze — 320px footer contact overflow regression */'
+          if marker in s: raise SystemExit('style marker already exists')
+          s=s.rstrip()+'''\n\n/* v2.7.x Final Freeze — 320px footer contact overflow regression */\n@media (max-width: 340px) {\n  footer .social-links {\n    width: 100%;\n    min-width: 0;\n    max-width: 100%;\n    flex-wrap: wrap;\n    gap: 10px;\n  }\n  footer .contact-email {\n    min-width: 0;\n    max-width: 100%;\n  }\n  footer .contact-email .email-addr {\n    min-width: 0;\n    overflow-wrap: anywhere;\n  }\n}\n'''
+          p.write_text(s,encoding='utf-8')
 
-          # Prove candidate fixes independently of the committed stylesheet.
-          candidates={
-            'minWidth':'@media(max-width:340px){.footer .social-links{min-width:0!important}}',
-            'wrapMin':'@media(max-width:340px){.footer .social-links{min-width:0!important;width:100%!important;max-width:100%!important;flex-wrap:wrap!important}}',
-            'column':'@media(max-width:340px){.footer .social-links{min-width:0!important;width:100%!important;max-width:100%!important;flex-direction:column!important;align-items:flex-start!important}.footer .contact-email{min-width:0!important;max-width:100%!important}}'
+          p=Path('script.js'); s=p.read_text(encoding='utf-8')
+          old='pachir1su.github.io — v2.6.x interactions'; new='pachir1su.github.io — v2.7.x interactions'
+          if s.count(old)!=1: raise SystemExit(f'script marker count={s.count(old)}')
+          p.write_text(s.replace(old,new),encoding='utf-8')
+
+          p=Path('README.md'); s=p.read_text(encoding='utf-8')
+          reps={
+            '<br>v2.5.0 : 현재 공개 릴리즈 — #117 머지 기준':'<br>v2.5.0 : #117 머지 기준 안정 릴리즈',
+            '<br>v2.6.0 (Release 준비) : Final Note — MBTI·불필요 인터랙션 제거, 재학 정보·상단 연락처·메뉴·반응형 UI 정리 (#114, #118, #119, #121, #122, #123, #16). [Release notes](docs/v2.6.0-release-notes.md)':'<br>v2.6.0 : Final Note — MBTI·불필요 인터랙션 제거, 재학 정보·상단 연락처·메뉴·반응형 UI 정리 (#114, #118, #119, #121, #122, #123, #16). [Release notes](docs/v2.6.0-release-notes.md)',
+            '<br>v2.6.x (예정) : Freeze / Refactor — 정적 dead-code 제거, 실제 기기 반응형·성능 회귀 QA. [Freeze plan](docs/v2.6.x-freeze.md)':'<br>v2.6.x : Freeze / Refactor — 정적 dead-code 제거, 실제 기기 반응형·성능 회귀 QA. [Freeze plan](docs/v2.6.x-freeze.md)',
+            '<br>v3.0.0 ~ (예정) : 디자인 컨셉 변경 — [docs/design-concept-v3.md](docs/design-concept-v3.md)':'<br>v2.7.0 : 현재 공개 릴리즈 — Visual / Media Pass와 상세 페이지 반응형 안정화\n<br>v2.7.x : Final Freeze / release hygiene — v3 전 마지막 v2 안정화 계열. [Final Freeze](docs/v2.7.x-final-freeze.md)\n<br>v3.0.0 ~ (예정) : 디자인 컨셉 변경 — [docs/design-concept-v3.md](docs/design-concept-v3.md)'
           }
-          for name,css in candidates.items():
-              d.refresh(); time.sleep(.2)
-              result=d.execute_script('''
-                const st=document.createElement('style'); st.textContent=arguments[0]; document.head.appendChild(st);
-                const e=document.querySelector('.footer .social-links'),c=getComputedStyle(e),r=e.getBoundingClientRect();
-                return {scrollWidth:document.documentElement.scrollWidth,flexWrap:c.flexWrap,minWidth:c.minWidth,width:r.width,right:r.right};
-              ''',css)
-              print(name,json.dumps(result,ensure_ascii=False))
-          d.quit()
+          for old,new in reps.items():
+              if s.count(old)!=1: raise SystemExit(f'README target mismatch count={s.count(old)}: {old[:50]}')
+              s=s.replace(old,new)
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('tools/verify-build.js'); s=p.read_text(encoding='utf-8')
+          anchor='\nif (failures.length === 0) {'
+          if s.count(anchor)!=1: raise SystemExit(f'verify anchor count={s.count(anchor)}')
+          lines=[
+            '',
+            '/* --- 6) v2.7.x Final Freeze regression gates --- */',
+            'const rootIndex = fs.readFileSync(indexPath, "utf8");',
+            'const rootScript = fs.readFileSync(path.join(root, "script.js"), "utf8");',
+            'const rootStyle = fs.readFileSync(path.join(root, "style.css"), "utf8");',
+            '',
+            'for (const match of rootIndex.matchAll(/<img\\b[^>]*\\bsrc="([^\"]+)"[^>]*>/gi)) {',
+            '  const ref = match[1];',
+            '  if (/^(?:https?:|data:|\\/)/i.test(ref)) continue;',
+            '  check(fs.existsSync(path.join(root, ref)), `메인 페이지 로컬 이미지 없음: ${ref}`);',
+            '}',
+            '',
+            'const retiredUiPatterns = [',
+            "  [rootIndex, 'id=\"mbti-section\"', \"폐기된 MBTI 섹션이 메인 markup에 돌아왔습니다.\"],",
+            "  [rootIndex, 'id=\"sectionNav\"', \"폐기된 sectionNav가 메인 markup에 돌아왔습니다.\"],",
+            '  [rootIndex, "floating-icons", "폐기된 floating-icons가 메인 markup에 돌아왔습니다."],',
+            '  [rootScript, "normalizeV26Markup", "폐기된 v2.6 runtime normalize 코드가 돌아왔습니다."],',
+            '  [rootScript, "v26-runtime-layout", "폐기된 v2.6 runtime layout 주입이 돌아왔습니다."],',
+            '  [rootStyle, ".chicken-drop", "폐기된 chicken-drop 스타일이 돌아왔습니다."],',
+            '];',
+            'for (const [source, pattern, message] of retiredUiPatterns) {',
+            '  check(!source.includes(pattern), message);',
+            '}',
+            ''
+          ]
+          p.write_text(s.replace(anchor,'\n'+'\n'.join(lines)+anchor),encoding='utf-8')
           PY
+
+          node --check script.js
+          node --check tools/verify-build.js
+          cp index.html /tmp/index.before
+          node build.js
+          cmp /tmp/index.before index.html
+          node tools/verify-build.js
+          git diff --check
+          test "$(git diff --name-only | wc -l)" -eq 4
+          test "$(git diff --numstat -- style.css | awk '{print $1+$2}')" -lt 40
+
+          git add -- style.css && test "$(git diff --cached --name-only | wc -l)" -eq 1
+          git commit -m 'fix: wrap footer contacts on narrow screens'
+          git add -- script.js && test "$(git diff --cached --name-only | wc -l)" -eq 1
+          git commit -m 'chore: mark interactions for v2.7 freeze'
+          git add -- README.md && test "$(git diff --cached --name-only | wc -l)" -eq 1
+          git commit -m 'docs: sync release history through v2.7'
+          git add -- tools/verify-build.js && test "$(git diff --cached --name-only | wc -l)" -eq 1
+          git commit -m 'chore: extend final freeze regression gates'
+
+          test -z "$(git status --porcelain)"
+          test "$(git rev-list --count "$expected_base"..HEAD)" -eq 4
+          test "$(git diff --name-only "$expected_base"..HEAD | wc -l)" -eq 4
+          git log --oneline "$expected_base"..HEAD
+          git diff --stat "$expected_base"..HEAD
+          git push origin HEAD:agent/v27-final-freeze
