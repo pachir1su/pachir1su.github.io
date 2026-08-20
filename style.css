@@ -3003,3 +3003,22 @@ html {
 .detail-body .detail-section code {
   overflow-wrap: anywhere;
 }
+
+/* v2.7.x Final Freeze — 320px footer contact overflow regression */
+@media (max-width: 340px) {
+  footer .social-links {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  footer .contact-email {
+    min-width: 0;
+    max-width: 100%;
+  }
+  footer .contact-email .email-addr {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
