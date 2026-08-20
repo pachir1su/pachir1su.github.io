@@ -1,4 +1,4 @@
-name: v2.7.x Final Freeze read-only preparer
+name: v2.7.x Final Freeze implementation runner
 
 on:
   pull_request:
@@ -6,10 +6,10 @@ on:
     types: [opened, reopened, synchronize]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  prepare:
+  implement:
     if: github.head_ref == 'agent/v27-final-freeze-validation'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -19,12 +19,14 @@ jobs:
           ref: agent/v27-final-freeze
           fetch-depth: 0
 
-      - name: Prepare exact Final Freeze files
+      - name: Apply exact Final Freeze files with atomic commits
         shell: bash
         run: |
           set -euo pipefail
           expected_base='306f1d9c1fc07c0f8f6035d0706d25cb495c0eec'
           test "$(git rev-parse HEAD)" = "$expected_base"
+          git config user.name 'pachir1su'
+          git config user.email 'crong3323@naver.com'
 
           python3 - <<'PY'
           from pathlib import Path
@@ -92,18 +94,28 @@ jobs:
           cmp /tmp/index.before index.html
           node tools/verify-build.js
           git diff --check
-
           test "$(git diff --name-only | wc -l)" -eq 4
           test "$(git diff --numstat -- style.css | awk '{print $1+$2}')" -lt 40
-          git diff --stat
 
-          mkdir -p /tmp/v27-prepared/tools
-          cp style.css script.js README.md /tmp/v27-prepared/
-          cp tools/verify-build.js /tmp/v27-prepared/tools/
-          git diff > /tmp/v27-prepared/final-freeze.patch
+          git add -- style.css
+          test "$(git diff --cached --name-only | wc -l)" -eq 1
+          git commit -m 'fix: wrap footer contacts on narrow screens'
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: v27-final-freeze-prepared-files
-          path: /tmp/v27-prepared
-          retention-days: 5
+          git add -- script.js
+          test "$(git diff --cached --name-only | wc -l)" -eq 1
+          git commit -m 'chore: mark interactions for v2.7 freeze'
+
+          git add -- README.md
+          test "$(git diff --cached --name-only | wc -l)" -eq 1
+          git commit -m 'docs: sync release history through v2.7'
+
+          git add -- tools/verify-build.js
+          test "$(git diff --cached --name-only | wc -l)" -eq 1
+          git commit -m 'chore: extend final freeze regression gates'
+
+          test -z "$(git status --porcelain)"
+          test "$(git rev-list --count "$expected_base"..HEAD)" -eq 4
+          test "$(git diff --name-only "$expected_base"..HEAD | wc -l)" -eq 4
+          git log --oneline "$expected_base"..HEAD
+          git diff --stat "$expected_base"..HEAD
+          git push origin HEAD:agent/v27-final-freeze
