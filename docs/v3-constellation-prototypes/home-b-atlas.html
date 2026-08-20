@@ -12,47 +12,69 @@
 <body data-page="atlas">
   <header class="site-header atlas-header">
     <a class="brand-mark" href="index.html">PACHIR1SU <span>✦</span></a>
-    <a class="header-mail" href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
+    <div class="header-actions">
+      <a class="header-mail" href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
+      <div class="language-switch" role="group" aria-label="언어 선택">
+        <button type="button" data-language-switch="ko" aria-pressed="true">KO</button>
+        <span aria-hidden="true">/</span>
+        <button type="button" data-language-switch="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
   </header>
 
   <main class="atlas-page">
     <section class="atlas-intro">
-      <p class="atlas-greeting">안녕하세요.</p>
+      <p class="atlas-greeting" data-ko="안녕하세요." data-en="Hello.">안녕하세요.</p>
       <h1>이건영<small>Lee Geon Yeong</small></h1>
-      <p class="atlas-role">혁신의 기업가 &amp; 풀스택 개발자</p>
-      <p class="atlas-vision">이윤을 넘어 혁신을 추구합니다.<br>월 100만 명이 사용하는 서비스를 만드는 것이 목표입니다.</p>
+      <p class="atlas-role" data-ko="혁신의 기업가 &amp; 풀스택 개발자" data-en="Innovator &amp; Full-Stack Developer">혁신의 기업가 &amp; 풀스택 개발자</p>
+      <p class="atlas-vision" data-ko-html="이윤을 넘어 혁신을 추구합니다.&lt;br&gt;월 100만 명이 사용하는 서비스를 만드는 것이 목표입니다." data-en-html="I pursue innovation beyond profit.&lt;br&gt;My goal is to build a service used by one million people every month.">이윤을 넘어 혁신을 추구합니다.<br>월 100만 명이 사용하는 서비스를 만드는 것이 목표입니다.</p>
       <div class="atlas-identity-links">
         <a href="https://github.com/pachir1su">GitHub</a>
-        <span>한국기술교육대학교 26학번</span>
+        <span data-ko="한국기술교육대학교 26학번" data-en="KOREATECH · Class of 2026">한국기술교육대학교 26학번</span>
+      </div>
+      <div class="observation-record atlas-observation-record" aria-label="포트폴리오 요약">
+        <span><strong>20+</strong><em data-ko="프로젝트" data-en="Projects">프로젝트</em></span>
+        <span><strong>4</strong><em data-ko="수상" data-en="Awards">수상</em></span>
+        <span><strong data-ko="8위" data-en="8th">8위</strong><em>SFPC</em></span>
       </div>
     </section>
 
     <div class="atlas-toolbar" aria-label="우주 지도 조작">
-      <button type="button" data-atlas-reset>처음으로</button>
-      <button type="button" data-atlas-focus="growth">성장 별자리</button>
-      <button type="button" data-atlas-focus="projects">프로젝트 은하</button>
-      <button type="button" data-atlas-focus="moon">달 관측소</button>
+      <button type="button" data-atlas-reset data-ko="처음으로" data-en="Origin">처음으로</button>
+      <button type="button" data-atlas-focus="growth" data-ko="성장 별자리" data-en="Growth">성장 별자리</button>
+      <button type="button" data-atlas-focus="projects" data-ko="프로젝트 은하" data-en="Projects">프로젝트 은하</button>
+      <button type="button" data-atlas-focus="moon" data-ko="달 관측소" data-en="Moon">달 관측소</button>
     </div>
 
     <section class="atlas-viewport" data-atlas-viewport aria-label="드래그 가능한 개인 우주 지도">
       <div class="atlas-world" data-atlas-world>
         <div class="ambient-stars atlas-stars" data-starfield aria-hidden="true"></div>
         <section class="atlas-zone atlas-growth-zone" data-zone="growth">
-          <h2>실제 사건으로<br>연결된 별자리</h2>
+          <h2 data-ko-html="실제 사건으로&lt;br&gt;연결된 별자리" data-en-html="A constellation&lt;br&gt;linked by real events">실제 사건으로<br>연결된 별자리</h2>
           <div class="atlas-growth-map" data-growth-constellation></div>
         </section>
 
         <section class="atlas-zone atlas-project-zone" data-zone="projects">
-          <h2>연도별 관측소</h2>
+          <h2 data-ko="연도별 관측소" data-en="Observatories by year">연도별 관측소</h2>
           <div class="orbit-rings" aria-hidden="true"><i></i><i></i><i></i></div>
           <div class="atlas-stations" data-atlas-stations></div>
         </section>
 
         <section class="atlas-zone atlas-moon-zone" data-zone="moon">
           <div class="atlas-moon" data-atlas-moon aria-hidden="true"></div>
-          <h2>가장 빠른 연락</h2>
+          <h2 data-ko="가장 빠른 연락" data-en="Fastest contact">가장 빠른 연락</h2>
           <a href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
           <div class="atlas-eclipse-target" data-atlas-eclipse-target aria-hidden="true"></div>
+        </section>
+
+        <div class="area51-boundary" data-area51-boundary>
+          <button class="area51-anomaly" data-area51-star type="button" aria-label="불안정한 별"><span></span></button>
+          <div class="area51-rift" data-area51-target aria-hidden="true"><i></i><i></i><i></i></div>
+        </div>
+
+        <section class="atlas-zone area51-zone" data-zone="area51" data-area51-zone aria-hidden="true">
+          <h2 data-ko="제51구역" data-en="Area 51">제51구역</h2>
+          <div class="area51-records" data-area51-records></div>
         </section>
 
         <div class="comet-event atlas-comet" data-comet-event aria-hidden="true">
@@ -66,8 +88,8 @@
     <aside class="atlas-drawer" data-atlas-drawer aria-live="polite">
       <button type="button" data-drawer-close aria-label="정보 패널 닫기">×</button>
       <p class="section-kicker" data-drawer-kicker hidden>OBSERVATORY</p>
-      <h2 data-drawer-title>별이나 관측소를 선택하세요.</h2>
-      <p data-drawer-description>선택한 기록이 이곳에 표시됩니다.</p>
+      <h2 data-drawer-title data-ko="별이나 관측소를 선택하세요." data-en="Select a star or observatory.">별이나 관측소를 선택하세요.</h2>
+      <p data-drawer-description data-ko="선택한 기록이 이곳에 표시됩니다." data-en="The selected record appears here.">선택한 기록이 이곳에 표시됩니다.</p>
       <div class="drawer-projects" data-drawer-projects></div>
     </aside>
   </main>
