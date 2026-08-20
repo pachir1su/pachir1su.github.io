@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="천구의를 직접 돌려 연도별 프로젝트를 탐색하는 이건영 포트폴리오 시안">
+  <title>이건영 · Celestial Room Prototype</title>
+  <link rel="stylesheet" href="prototype.css">
+  <script src="prototype.js" defer></script>
+</head>
+<body data-page="celestial" class="celestial-page">
+  <header class="space-header celestial-header">
+    <a class="space-brand" href="index.html" aria-label="프로토타입 목록으로">PACHIR1SU <span>✦</span></a>
+    <a class="celestial-github" href="https://github.com/pachir1su">GitHub</a>
+  </header>
+
+  <main>
+    <section class="celestial-hero" aria-labelledby="celestial-name">
+      <canvas class="cosmos-canvas" data-cosmos-canvas aria-hidden="true"></canvas>
+      <div class="celestial-copy">
+        <p>안녕하세요.</p>
+        <h1 id="celestial-name">이건영<small>Lee Geon Yeong</small></h1>
+        <p class="hero-role-line">혁신의 기업가 &amp; 풀스택 개발자</p>
+        <p class="hero-vision">이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다.<br>월 100만 명이 사용하는 서비스를 만드는 것이 목표입니다.</p>
+        <div class="hero-links">
+          <a href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
+          <a href="https://github.com/pachir1su">github.com/pachir1su</a>
+        </div>
+        <p class="hero-school">한국기술교육대학교 26학번</p>
+      </div>
+
+      <div class="orrery-shell" data-orrery aria-label="드래그해서 회전하는 연도별 프로젝트 천구의">
+        <div class="orrery-halo" aria-hidden="true"></div>
+        <div class="orrery-ring ring-one" aria-hidden="true"></div>
+        <div class="orrery-ring ring-two" aria-hidden="true"></div>
+        <div class="orrery-ring ring-three" aria-hidden="true"></div>
+        <div class="orrery-core" aria-hidden="true"><span></span></div>
+        <div class="orrery-years" data-orbit-years></div>
+      </div>
+    </section>
+
+    <section class="celestial-archive" aria-labelledby="celestial-project-title">
+      <div class="celestial-selection">
+        <h2 id="celestial-project-title" data-archive-label>2026</h2>
+        <p data-project-count>불러오는 중</p>
+      </div>
+      <div class="year-tabs space-year-tabs celestial-tabs" data-year-tabs role="tablist" aria-label="프로젝트 연도"></div>
+      <section class="project-grid space-project-grid celestial-grid" data-project-grid aria-live="polite"></section>
+    </section>
+
+    <section class="celestial-growth" aria-labelledby="celestial-growth-title">
+      <header>
+        <h2 id="celestial-growth-title">여덟 번의<br>방향 전환.</h2>
+        <p data-growth-summary>별을 누르면 사건이 열립니다.</p>
+        <div class="sequence-status" aria-live="polite">
+          <span data-sequence-count>1 / 8</span>
+          <span data-sequence-message>첫 번째 별에서 시작합니다</span>
+        </div>
+      </header>
+      <div class="growth-constellation" data-growth-constellation aria-label="성장 사건 별자리"></div>
+    </section>
+  </main>
+
+  <button class="sound-stop" data-sound-stop type="button" hidden aria-label="재생 중인 소리 끄기">소리 끄기</button>
+  <script type="application/json" id="prototype-config">{"source":"../../projects.json","defaultGroup":"2026"}</script>
+</body>
+</html>

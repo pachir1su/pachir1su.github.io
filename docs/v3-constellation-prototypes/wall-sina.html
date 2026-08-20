@@ -4,105 +4,89 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <title>해안 장벽 시스템 · Interactive Detail</title>
+  <meta name="description" content="2024 지속 가능한 발전 프로젝트 해안 장벽 시스템 상세 시안">
+  <title>해안 장벽 시스템 · Project Detail Prototype</title>
   <link rel="stylesheet" href="prototype.css">
   <script src="prototype.js" defer></script>
 </head>
-<body data-page="wall">
-  <header class="site-header">
-    <a class="brand-mark" href="index.html">MISSION ARCHIVE <span>04</span></a>
-    <a class="header-mail" href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
+<body data-page="wall" class="wall-document-page">
+  <header class="space-header wall-header">
+    <a class="space-brand" href="index.html" aria-label="프로토타입 목록으로">PACHIR1SU <span>✦</span></a>
+    <a href="home-a-story.html">홈 시안</a>
   </header>
 
-  <main class="wall-page">
-    <section class="wall-hero">
-      <div class="wall-hero-copy">
-        <p class="section-kicker">2024 · SUSTAINABLE DEVELOPMENT PROJECT</p>
-        <h1>해안 장벽<br>시스템</h1>
-        <p>수조 안의 도시와 바다를 분리하고, 수분 센서가 물을 감지하면 장벽과 단계별 경고가 작동하는 MVP입니다.</p>
-        <div class="wall-badges"><span>진규야 밥먹자 시즌 1</span><span>4인 팀</span><span>아두이노 개발 총괄</span></div>
+  <main class="wall-document">
+    <section class="wall-photo-hero" aria-labelledby="wall-title">
+      <img src="../../assets/media/Wall_Sina/prototype-1.webp" width="1050" height="1400" alt="수조 안에 설치된 해안 장벽 시제품">
+      <div class="wall-photo-shade" aria-hidden="true"></div>
+      <div class="wall-title-block">
+        <p>2024 지속 가능한 발전 프로젝트</p>
+        <h1 id="wall-title">해안 장벽<br>시스템</h1>
+        <p class="wall-role">팀원 · 아두이노 개발 총괄 · 4인 팀</p>
       </div>
-      <div class="tidal-planet" aria-hidden="true"><div class="planet-ocean"></div><div class="planet-city"></div><div class="planet-barrier"></div></div>
+      <a class="wall-repo-link" href="https://github.com/pachir1su/Wall_Sina">GitHub 저장소 ↗</a>
     </section>
 
-    <section class="simulator" aria-labelledby="simulator-title">
-      <header class="simulator-heading">
-        <div><p class="section-kicker">INTERACTIVE DEFENSE MODEL</p><h2 id="simulator-title">수위 상승 시뮬레이터</h2></div>
-        <p>물이 센서 높이에 닿는 순간, 실제 110초 제어 흐름을 11초로 압축한 시퀀스가 시작됩니다.</p>
+    <section class="wall-overview" aria-labelledby="overview-title">
+      <h2 id="overview-title">바다가 높아질 때,<br>도시 앞의 장벽도 올라갑니다.</h2>
+      <div>
+        <p>기후 위기로 인한 해수면 상승에 대비한 해안 장벽 MVP입니다. 수조 안에 가상의 도시와 바다를 만들고, 이를 분리하는 장벽을 설계해 해수면 상승 시나리오를 구현했습니다.</p>
+        <p>센서와 장벽의 제어를 맡아 아두이노 프로그래밍과 배선, 방수 처리, QA와 디버깅을 진행했습니다.</p>
+      </div>
+    </section>
+
+    <section class="wall-compare" aria-labelledby="compare-title" data-wall-compare>
+      <header>
+        <h2 id="compare-title">아이디어가<br>실물로 바뀐 순간.</h2>
+        <p>손으로 그린 작동 구조와 실제 수조 속 시제품을 한 화면에서 비교합니다.</p>
       </header>
-      <div class="simulator-layout">
-        <div class="tank" data-tank>
-          <div class="tank-sky"><span class="mini-sun"></span><span class="mini-cloud"></span></div>
-          <div class="mini-city"><i></i><i></i><i></i><i></i></div>
-          <div class="water" data-water><span class="water-line"></span></div>
-          <div class="physical-barrier" data-barrier><span></span></div>
-          <div class="water-sensor" data-water-sensor><span>SENSOR</span></div>
-          <div class="traffic-light" data-traffic-light><i data-light="red"></i><i data-light="yellow"></i><i data-light="green"></i></div>
-          <div class="alert-beacon" data-alert-beacon></div>
-          <div class="aux-led-bank" aria-label="보조 경고 LED"><i data-alert-led="red"></i><i data-alert-led="blue"></i></div>
+      <div class="compare-frame" style="--reveal:52%">
+        <img class="compare-base" src="../../assets/media/Wall_Sina/plan-3.webp" width="1200" height="540" alt="물 감지 센서와 방수천, 모터 구조를 그린 해안 장벽 시스템 구조도">
+        <div class="compare-after" aria-hidden="true">
+          <img src="../../assets/media/Wall_Sina/prototype-3.webp" width="1050" height="1400" alt="">
         </div>
-        <aside class="control-console">
-          <div class="console-status"><span class="status-dot" data-status-dot></span><div><small>SYSTEM STATE</small><strong data-system-state>전원 꺼짐</strong></div></div>
-          <div class="tm-display" aria-label="TM1637 시간 표시기"><small>TM1637</small><output data-tm-display>----</output></div>
-          <button class="system-switch" data-system-switch type="button" aria-pressed="false">시스템 전원 켜기</button>
-          <label for="waterLevel">수위 <output data-water-output>0%</output></label>
-          <input id="waterLevel" data-water-slider type="range" min="0" max="100" value="0" disabled>
-          <p class="sensor-threshold">센서 높이 <strong>24%</strong> · 한 번 감지되면 시스템을 끌 때까지 유지</p>
-          <button class="simulation-run" data-simulation-run type="button" disabled>11초 물 붓기 데모</button>
-          <div class="hardware-telemetry" aria-label="장치 상태">
-            <div><small>STEPPER</small><strong data-motor-state>정지</strong></div>
-            <div><small>BUZZER</small><strong data-buzzer-state>OFF</strong></div>
-            <div><small>LASER</small><strong data-laser-state>OFF</strong></div>
-          </div>
-          <div class="phase-list" aria-label="경고 단계">
-            <div data-phase="idle"><b>00</b><span>감지 대기</span><small>수위 &lt; 24%</small></div>
-            <div data-phase="deploy"><b>01</b><span>방벽 상승</span><small>0–27초</small></div>
-            <div data-phase="hold"><b>02</b><span>방벽 유지</span><small>27–47초</small></div>
-            <div data-phase="yellow-pulse"><b>03</b><span>황색 점멸</span><small>47–70초</small></div>
-            <div data-phase="red-yellow"><b>04</b><span>적·황 경고</span><small>70–90초</small></div>
-            <div data-phase="retract"><b>05</b><span>방벽 복귀</span><small>90–110초</small></div>
-            <div data-phase="complete"><b>06</b><span>시퀀스 완료</span><small>110초 이후</small></div>
-          </div>
-        </aside>
+        <span class="compare-divider" aria-hidden="true"></span>
+        <input data-compare-range type="range" min="0" max="100" value="52" aria-label="기획도와 완성 시제품 비교 비율">
       </div>
     </section>
 
-    <section class="circuit-section" aria-labelledby="circuit-title">
-      <header><p class="section-kicker">ORBITAL CIRCUIT MAP</p><h2 id="circuit-title">장치를 누르면 역할이 열립니다.</h2></header>
-      <div class="circuit-orbit">
-        <div class="circuit-core"><span>Arduino</span><small>CONTROL CORE</small></div>
-        <button style="--angle:0deg" data-component="수분 센서|A0 아날로그 입력으로 물 감지를 시작합니다." type="button">Water<br>Sensor</button>
-        <button style="--angle:60deg" data-component="스테퍼 모터|28BYJ-48 모터로 장벽의 정회전·정지·역회전을 제어합니다." type="button">Stepper<br>Motor</button>
-        <button style="--angle:120deg" data-component="3색 신호등|녹색·황색·적색으로 현재 위험 단계를 표시합니다." type="button">Traffic<br>Light</button>
-        <button style="--angle:180deg" data-component="경고 부저|센서 감지와 위험 단계에 짧은 경고음을 냅니다." type="button">Buzzer</button>
-        <button style="--angle:240deg" data-component="상태 LED|시스템 전원과 경고 상태를 시각적으로 구분합니다." type="button">Status<br>LED</button>
-        <button style="--angle:300deg" data-component="레이저 모듈|장치가 켜진 동안 기준선을 표시합니다." type="button">Laser<br>Module</button>
+    <section class="wall-process" aria-labelledby="process-title">
+      <h2 id="process-title">그림에서 수조까지.</h2>
+      <div class="process-grid">
+        <figure class="process-card process-card-wide">
+          <img src="../../assets/media/Wall_Sina/plan-2.webp" width="1200" height="900" loading="lazy" decoding="async" alt="해안 장벽 프로젝트 초기 아이디어를 정리한 화이트보드">
+          <figcaption><strong>처음엔 화이트보드였습니다.</strong><span>팀의 아이디어를 수조와 장벽 구조로 구체화했습니다.</span></figcaption>
+        </figure>
+        <figure class="process-card">
+          <img src="../../assets/media/Wall_Sina/plan-1.webp" width="1200" height="806" loading="lazy" decoding="async" alt="해수면 상승에 따라 장벽이 올라가는 작동 개념도">
+          <figcaption><strong>움직임을 정리했습니다.</strong><span>해수면 상승과 장벽 상승의 관계를 한 장에 담았습니다.</span></figcaption>
+        </figure>
+        <figure class="process-card process-card-tall">
+          <img src="../../assets/media/Wall_Sina/prototype-2.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="수조 안 해안 장벽 시제품의 측면 모습">
+          <figcaption><strong>실제로 세웠습니다.</strong><span>장벽 구조와 배선, 방수 처리를 반복해서 손봤습니다.</span></figcaption>
+        </figure>
       </div>
-      <aside class="component-readout" aria-live="polite"><small>SELECTED COMPONENT</small><h3 data-component-title>Arduino control core</h3><p data-component-description>각 센서와 출력 장치의 상태를 하나의 시퀀스로 제어합니다.</p></aside>
     </section>
 
-    <section class="wall-facts">
-      <article><small>REFERENCE</small><h2>네덜란드 델타웍스</h2><p>해수면 상승과 홍수에 대응하는 실제 방재 시스템을 참고했습니다.</p></article>
-      <article><small>MY ROLE</small><h2>아두이노 개발 총괄</h2><p>프로그래밍, 배선, 장벽 방수 처리를 담당했습니다.</p></article>
-      <article><small>PROTOTYPE</small><h2>수조 기반 MVP</h2><p>가상의 도시와 바다를 분리하고 수위 상승 상황을 재현했습니다.</p></article>
+    <section class="wall-contribution" aria-labelledby="contribution-title">
+      <h2 id="contribution-title">제가 맡은 것.</h2>
+      <ul>
+        <li>서브 기획</li>
+        <li>아두이노 프로그래밍</li>
+        <li>아두이노 배선</li>
+        <li>장벽 방수 처리</li>
+        <li>물자 파밍 및 조달</li>
+        <li>간식 지원</li>
+        <li>발표</li>
+        <li>QA와 디버깅</li>
+        <li>그 외 다수</li>
+      </ul>
     </section>
 
-    <section class="wall-gallery" aria-label="해안 장벽 프로젝트 도식">
-      <article class="gallery-panel gallery-tank" role="img" aria-label="수조, 도시, 방벽으로 이루어진 전체 모형 도식">
-        <span class="gallery-water"></span><span class="gallery-city"></span><span class="gallery-barrier"></span>
-        <p>01 · PHYSICAL MODEL</p><strong>수조에서 검증한<br>도시와 방벽</strong>
-      </article>
-      <article class="gallery-panel gallery-sensor" role="img" aria-label="수위 센서 감지 범위 도식">
-        <span class="sensor-ripple"></span><span class="sensor-probe"></span>
-        <p>02 · WATER SENSOR</p><strong>수위 변화를<br>단계로 읽기</strong>
-      </article>
-      <article class="gallery-panel gallery-system" role="img" aria-label="아두이노 제어 시스템 도식">
-        <span class="system-board">UNO</span><span class="system-wire wire-one"></span><span class="system-wire wire-two"></span>
-        <p>03 · CONTROL LOGIC</p><strong>센서에서 모터까지<br>하나의 흐름</strong>
-      </article>
+    <section class="wall-final-photo" aria-label="물이 채워진 수조에서 작동을 확인하는 해안 장벽 시제품">
+      <img src="../../assets/media/Wall_Sina/prototype-3.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="물이 채워진 수조 속 해안 장벽 시제품">
+      <p>아이디어를 설명하는 데서 끝내지 않고,<br>물이 들어간 수조 안에서 직접 확인했습니다.</p>
     </section>
   </main>
-  <button class="sound-stop" data-sound-stop type="button" hidden aria-label="재생 중인 소리 멈추기">소리 멈춤 ×</button>
 </body>
 </html>
-
