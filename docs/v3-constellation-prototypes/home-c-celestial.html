@@ -13,22 +13,34 @@
 <body data-page="celestial" class="celestial-page">
   <header class="space-header celestial-header">
     <a class="space-brand" href="index.html" aria-label="프로토타입 목록으로">PACHIR1SU <span>✦</span></a>
-    <a class="celestial-github" href="https://github.com/pachir1su">GitHub</a>
+    <div class="header-actions">
+      <a class="celestial-github" href="https://github.com/pachir1su">GitHub</a>
+      <div class="language-switch" role="group" aria-label="언어 선택">
+        <button type="button" data-language-switch="ko" aria-pressed="true">KO</button>
+        <span aria-hidden="true">/</span>
+        <button type="button" data-language-switch="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
   </header>
 
   <main>
     <section class="celestial-hero" aria-labelledby="celestial-name">
       <canvas class="cosmos-canvas" data-cosmos-canvas aria-hidden="true"></canvas>
       <div class="celestial-copy">
-        <p>안녕하세요.</p>
+        <p data-ko="안녕하세요." data-en="Hello.">안녕하세요.</p>
         <h1 id="celestial-name">이건영<small>Lee Geon Yeong</small></h1>
-        <p class="hero-role-line">혁신의 기업가 &amp; 풀스택 개발자</p>
-        <p class="hero-vision">이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다.<br>월 100만 명이 사용하는 서비스를 만드는 것이 목표입니다.</p>
+        <p class="hero-role-line" data-ko="혁신의 기업가 &amp; 풀스택 개발자" data-en="Innovator &amp; Full-Stack Developer">혁신의 기업가 &amp; 풀스택 개발자</p>
+        <p class="hero-vision" data-ko-html="이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다.&lt;br&gt;월 100만 명이 사용하는 서비스를 만드는 것이 목표입니다." data-en-html="I pursue innovation beyond profit.&lt;br&gt;My goal is to build a service used by one million people every month.">이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다.<br>월 100만 명이 사용하는 서비스를 만드는 것이 목표입니다.</p>
         <div class="hero-links">
           <a href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
           <a href="https://github.com/pachir1su">github.com/pachir1su</a>
         </div>
-        <p class="hero-school">한국기술교육대학교 26학번</p>
+        <p class="hero-school" data-ko="한국기술교육대학교 26학번" data-en="KOREATECH · Class of 2026">한국기술교육대학교 26학번</p>
+        <div class="observation-record celestial-observation-record" aria-label="포트폴리오 요약">
+          <span><strong>20+</strong><em data-ko="프로젝트" data-en="Projects">프로젝트</em></span>
+          <span><strong>4</strong><em data-ko="수상" data-en="Awards">수상</em></span>
+          <span><strong data-ko="8위" data-en="8th">8위</strong><em>SFPC</em></span>
+        </div>
       </div>
 
       <div class="orrery-shell" data-orrery aria-label="드래그해서 회전하는 연도별 프로젝트 천구의">
@@ -44,7 +56,7 @@
     <section class="celestial-archive" aria-labelledby="celestial-project-title">
       <div class="celestial-selection">
         <h2 id="celestial-project-title" data-archive-label>2026</h2>
-        <p data-project-count>불러오는 중</p>
+        <p data-project-count data-ko="불러오는 중" data-en="Loading">불러오는 중</p>
       </div>
       <div class="year-tabs space-year-tabs celestial-tabs" data-year-tabs role="tablist" aria-label="프로젝트 연도"></div>
       <section class="project-grid space-project-grid celestial-grid" data-project-grid aria-live="polite"></section>
@@ -52,14 +64,22 @@
 
     <section class="celestial-growth" aria-labelledby="celestial-growth-title">
       <header>
-        <h2 id="celestial-growth-title">여덟 번의<br>방향 전환.</h2>
-        <p data-growth-summary>별을 누르면 사건이 열립니다.</p>
+        <h2 id="celestial-growth-title" data-ko-html="여덟 번의&lt;br&gt;방향 전환." data-en-html="Eight turns&lt;br&gt;in direction.">여덟 번의<br>방향 전환.</h2>
+        <p data-growth-summary data-ko="별을 누르면 사건이 열립니다." data-en="Select a star to open an event.">별을 누르면 사건이 열립니다.</p>
         <div class="sequence-status" aria-live="polite">
           <span data-sequence-count>1 / 8</span>
-          <span data-sequence-message>첫 번째 별에서 시작합니다</span>
+          <span data-sequence-message data-ko="첫 번째 별에서 시작합니다" data-en="Begin with the first star">첫 번째 별에서 시작합니다</span>
         </div>
       </header>
       <div class="growth-constellation" data-growth-constellation aria-label="성장 사건 별자리"></div>
+    </section>
+
+    <section class="lost-stars-section celestial-lost-stars" data-lost-stars aria-labelledby="celestial-lost-title">
+      <header>
+        <h2 id="celestial-lost-title" data-ko-html="궤도를 잃은&lt;br&gt;별들." data-en-html="Stars that lost&lt;br&gt;their orbit.">궤도를 잃은<br>별들.</h2>
+      </header>
+      <div class="lost-star-field" data-lost-star-field></div>
+      <aside class="lost-star-record" data-lost-star-record hidden aria-live="polite"></aside>
     </section>
   </main>
 
