@@ -217,6 +217,30 @@ for (const htmlFile of collectHtmlFiles(projectRoot)) {
   }
 }
 
+
+/* --- 6) v2.7.x Final Freeze regression gates --- */
+const rootIndex = fs.readFileSync(indexPath, "utf8");
+const rootScript = fs.readFileSync(path.join(root, "script.js"), "utf8");
+const rootStyle = fs.readFileSync(path.join(root, "style.css"), "utf8");
+
+for (const match of rootIndex.matchAll(/<img\b[^>]*\bsrc="([^"]+)"[^>]*>/gi)) {
+  const ref = match[1];
+  if (/^(?:https?:|data:|\/)/i.test(ref)) continue;
+  check(fs.existsSync(path.join(root, ref)), `메인 페이지 로컬 이미지 없음: ${ref}`);
+}
+
+const retiredUiPatterns = [
+  [rootIndex, 'id="mbti-section"', "폐기된 MBTI 섹션이 메인 markup에 돌아왔습니다."],
+  [rootIndex, 'id="sectionNav"', "폐기된 sectionNav가 메인 markup에 돌아왔습니다."],
+  [rootIndex, "floating-icons", "폐기된 floating-icons가 메인 markup에 돌아왔습니다."],
+  [rootScript, "normalizeV26Markup", "폐기된 v2.6 runtime normalize 코드가 돌아왔습니다."],
+  [rootScript, "v26-runtime-layout", "폐기된 v2.6 runtime layout 주입이 돌아왔습니다."],
+  [rootStyle, ".chicken-drop", "폐기된 chicken-drop 스타일이 돌아왔습니다."],
+];
+for (const [source, pattern, message] of retiredUiPatterns) {
+  check(!source.includes(pattern), message);
+}
+
 if (failures.length === 0) {
   console.log(`✅ 검증 통과: 카드 ${actualCount}개, 재실행 idempotent, 상세 경로·미디어 크기 정합.`);
   process.exit(0);
