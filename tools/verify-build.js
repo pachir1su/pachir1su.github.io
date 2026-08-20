@@ -130,8 +130,95 @@ for (const group of data.groups) {
   }
 }
 
+/* --- 5) 프로젝트 래스터 이미지의 실제 크기 == HTML width/height --- */
+function rasterDimensions(file) {
+  const b = fs.readFileSync(file);
+
+  if (b.length >= 24 && b[0] === 0x89 && b.toString("ascii", 1, 4) === "PNG") {
+    return [b.readUInt32BE(16), b.readUInt32BE(20)];
+  }
+
+  if (b.length >= 4 && b[0] === 0xff && b[1] === 0xd8) {
+    let i = 2;
+    while (i + 9 < b.length) {
+      if (b[i] !== 0xff) {
+        i += 1;
+        continue;
+      }
+      while (i < b.length && b[i] === 0xff) i += 1;
+      const marker = b[i++];
+      if (marker === 0xd8 || marker === 0xd9 || marker === 0x01) continue;
+      if (i + 1 >= b.length) break;
+      const len = b.readUInt16BE(i);
+      if (len < 2 || i + len > b.length) break;
+      if ([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf].includes(marker)) {
+        return [b.readUInt16BE(i + 5), b.readUInt16BE(i + 3)];
+      }
+      i += len;
+    }
+  }
+
+  if (b.length >= 30 && b.toString("ascii", 0, 4) === "RIFF" && b.toString("ascii", 8, 12) === "WEBP") {
+    let i = 12;
+    while (i + 8 <= b.length) {
+      const kind = b.toString("ascii", i, i + 4);
+      const size = b.readUInt32LE(i + 4);
+      const payload = i + 8;
+
+      if (kind === "VP8X" && payload + 10 <= b.length) {
+        const width = 1 + b[payload + 4] + (b[payload + 5] << 8) + (b[payload + 6] << 16);
+        const height = 1 + b[payload + 7] + (b[payload + 8] << 8) + (b[payload + 9] << 16);
+        return [width, height];
+      }
+      if (
+        kind === "VP8 " && payload + 10 <= b.length &&
+        b[payload + 3] === 0x9d && b[payload + 4] === 0x01 && b[payload + 5] === 0x2a
+      ) {
+        return [b.readUInt16LE(payload + 6) & 0x3fff, b.readUInt16LE(payload + 8) & 0x3fff];
+      }
+      if (kind === "VP8L" && payload + 5 <= b.length && b[payload] === 0x2f) {
+        const bits = b.readUInt32LE(payload + 1);
+        return [(bits & 0x3fff) + 1, ((bits >>> 14) & 0x3fff) + 1];
+      }
+
+      i = payload + size + (size % 2);
+    }
+  }
+
+  return null;
+}
+
+const projectRoot = path.join(root, "projects");
+for (const htmlFile of collectHtmlFiles(projectRoot)) {
+  const html = fs.readFileSync(htmlFile, "utf8");
+  const relHtml = path.relative(root, htmlFile).replaceAll("\\", "/");
+  const imageTags = [...html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"[^>]*>/gi)];
+
+  for (const match of imageTags) {
+    const tag = match[0];
+    const ref = match[1];
+    if (!/^assets\/.+\.(?:png|webp|jpe?g)$/i.test(ref)) continue;
+
+    const widthMatch = tag.match(/\bwidth="(\d+)"/i);
+    const heightMatch = tag.match(/\bheight="(\d+)"/i);
+    check(!!widthMatch && !!heightMatch, `이미지 width/height 누락: ${relHtml} → ${ref}`);
+    if (!widthMatch || !heightMatch) continue;
+
+    const file = path.join(path.dirname(htmlFile), ref);
+    if (!fs.existsSync(file)) continue;
+    const actual = rasterDimensions(file);
+    check(!!actual, `이미지 크기 판독 실패: ${relHtml} → ${ref}`);
+    if (!actual) continue;
+
+    check(
+      Number(widthMatch[1]) === actual[0] && Number(heightMatch[1]) === actual[1],
+      `이미지 크기 불일치: ${relHtml} → ${ref} HTML=${widthMatch[1]}x${heightMatch[1]} 실제=${actual[0]}x${actual[1]}`
+    );
+  }
+}
+
 if (failures.length === 0) {
-  console.log(`✅ 검증 통과: 카드 ${actualCount}개, 재실행 idempotent, 상세 경로 정합.`);
+  console.log(`✅ 검증 통과: 카드 ${actualCount}개, 재실행 idempotent, 상세 경로·미디어 크기 정합.`);
   process.exit(0);
 }
 
