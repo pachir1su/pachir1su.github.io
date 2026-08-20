@@ -155,6 +155,9 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
 .atlas-vision { margin:0; color:var(--muted); font-size:12px; line-height:1.65; }
 .atlas-identity-links { display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:18px; color:var(--muted); font-size:11px; font-weight:650; pointer-events:auto; }
 .atlas-identity-links a { color:var(--ink); text-underline-offset:4px; text-decoration-color:var(--gold); }
+.atlas-observation-record { margin-top: 18px; }
+.atlas-observation-record span { min-width: 82px; padding-top: 8px; padding-bottom: 7px; }
+.atlas-observation-record strong { font-size: 17px; }
 .atlas-coordinate { margin:0; color:var(--subtle); font-size:10px; letter-spacing:.1em; }
 .atlas-toolbar { position:absolute; z-index:20; left:4vw; bottom:26px; display:flex; gap:7px; max-width:70vw; flex-wrap:wrap; }
 .atlas-toolbar button { padding:9px 11px; border:1px solid var(--line); border-radius:999px; background:var(--surface-raised); color:var(--muted); font-size:11px; cursor:pointer; box-shadow:0 8px 22px color-mix(in srgb,var(--ink),transparent 93%); }
@@ -199,6 +202,156 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
 .atlas-unknown-zone { left:150px; top:500px; width:300px; min-height:130px; opacity:.72; }
 .atlas-unknown-zone p:last-child { color:var(--muted); font-size:12px; line-height:1.55; }
 .atlas-capy { position:absolute; left:290px; top:20px; width:330px; }
+
+/* Area 51 has no navigation label or pre-unlock instructions. The only key is direct manipulation. */
+.area51-boundary {
+  position: absolute;
+  z-index: 7;
+  left: 1515px;
+  top: 120px;
+  width: 300px;
+  height: 190px;
+  border-right: 1px dashed color-mix(in srgb, var(--danger), transparent 46%);
+  border-top: 1px solid color-mix(in srgb, var(--line), transparent 62%);
+  border-radius: 0 88px 0 0;
+  pointer-events: none;
+  transition: opacity .55s ease, filter .55s ease;
+}
+
+.area51-boundary::before,
+.area51-boundary::after {
+  position: absolute;
+  right: -7px;
+  width: 13px;
+  height: 1px;
+  background: var(--danger);
+  opacity: .55;
+  content: "";
+}
+
+.area51-boundary::before { top: 22%; transform: rotate(42deg); }
+.area51-boundary::after { top: 68%; transform: rotate(-36deg); }
+
+.area51-anomaly {
+  position: absolute;
+  z-index: 3;
+  left: 20px;
+  top: 112px;
+  width: 54px;
+  height: 54px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: none;
+  filter: drop-shadow(0 0 16px color-mix(in srgb, var(--violet), transparent 50%));
+  transition: filter .35s ease;
+}
+
+.area51-anomaly::before,
+.area51-anomaly::after,
+.area51-anomaly span::before,
+.area51-anomaly span::after {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  content: "";
+}
+
+.area51-anomaly::before {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--violet-strong);
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--violet), transparent 86%), 0 0 27px var(--violet);
+}
+
+.area51-anomaly::after {
+  width: 43px;
+  height: 17px;
+  border-top: 1px solid color-mix(in srgb, var(--violet), transparent 35%);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold), transparent 55%);
+  border-radius: 50%;
+  transform: rotate(-18deg);
+}
+
+.area51-anomaly span::before { width: 2px; height: 43px; background: linear-gradient(transparent, var(--violet), transparent); transform: rotate(33deg); opacity: .55; }
+.area51-anomaly span::after { width: 43px; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); transform: rotate(-43deg); opacity: .42; }
+.area51-anomaly.dragging { cursor: grabbing; filter: drop-shadow(0 0 26px color-mix(in srgb, var(--gold), transparent 25%)); }
+.area51-anomaly.touched { animation: anomaly-flinch .42s ease; }
+
+.area51-rift {
+  position: absolute;
+  z-index: 2;
+  right: -19px;
+  top: 41px;
+  width: 62px;
+  height: 112px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--danger), transparent 88%), transparent 68%);
+}
+
+.area51-rift i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 76%;
+  background: color-mix(in srgb, var(--danger), transparent 26%);
+  transform-origin: center;
+}
+
+.area51-rift i:nth-child(1) { transform: translate(-50%,-50%) rotate(7deg); }
+.area51-rift i:nth-child(2) { transform: translate(-50%,-50%) rotate(-14deg) translateX(8px); }
+.area51-rift i:nth-child(3) { transform: translate(-50%,-50%) rotate(22deg) translateX(-10px); opacity: .5; }
+
+.area51-zone {
+  left: 1425px;
+  top: 88px;
+  width: 405px;
+  min-height: 330px;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(.84) rotate(-2deg);
+  transform-origin: 92% 38%;
+  border-color: color-mix(in srgb, var(--danger), transparent 56%);
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--surface), transparent 8%), color-mix(in srgb, var(--danger), transparent 93%)),
+    var(--surface);
+  transition: opacity .8s ease, transform .9s cubic-bezier(.2,.8,.2,1), visibility 0s linear .9s;
+}
+
+.area51-zone::before {
+  position: absolute;
+  inset: 15px;
+  border: 1px dashed color-mix(in srgb, var(--danger), transparent 63%);
+  border-radius: 18px;
+  content: "";
+  pointer-events: none;
+}
+
+.area51-zone h2 { position: relative; z-index: 2; margin: 4px 0 27px; font-family: var(--space-serif); font-size: 42px; font-weight: 500; }
+.area51-records { position: relative; z-index: 2; display: grid; gap: 9px; }
+.area51-record {
+  padding: 15px 17px;
+  border-left: 1px solid var(--danger);
+  background: color-mix(in srgb, var(--surface-raised), transparent 18%);
+}
+.area51-record b { display: block; font-size: 15px; }
+.area51-record span { display: block; margin-top: 6px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+
+.atlas-world.area51-revealed .area51-boundary { opacity: 0; filter: blur(8px); pointer-events: none; }
+.atlas-world.area51-revealed .area51-zone { opacity: 1; visibility: visible; pointer-events: auto; transform: none; transition-delay: .18s, .1s, 0s; }
+
+@keyframes anomaly-flinch {
+  25% { transform: translateX(-5px) scale(.88); }
+  65% { transform: translateX(4px) scale(1.08); }
+}
+
 .atlas-drawer { position:absolute; z-index:25; top:92px; right:22px; width:min(390px,calc(100vw - 44px)); max-height:calc(100vh - 140px); overflow:auto; padding:25px; border:1px solid var(--line); border-radius:22px; background:color-mix(in srgb,var(--surface-raised),transparent 4%); box-shadow:var(--shadow); transform:translateX(calc(100% + 50px)); opacity:0; transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .3s ease; }
 .atlas-drawer.open { transform:none; opacity:1; }
 .atlas-drawer>button { position:absolute; top:14px; right:14px; width:32px; height:32px; border:1px solid var(--line); border-radius:50%; background:transparent; color:var(--ink); cursor:pointer; }
@@ -207,11 +360,11 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
 
 /* Responsive adaptations keep reading and touch targets intact. */
 @media (max-width:900px) {
-  .site-nav { display:none; }.site-header{padding:0 18px}.header-mail{font-size:10px;padding:8px 9px}.atlas-header{display:flex!important}.atlas-header .brand-mark,.atlas-header .header-mail{display:block!important;visibility:visible!important}
+  .site-nav { display:none; }.site-header{padding:0 18px}.header-mail{font-size:10px;padding:8px 9px}.atlas-header{display:flex!important}.atlas-header .brand-mark,.atlas-header .header-mail{display:block!important;visibility:visible!important}.atlas-header .header-actions{gap:10px}
   .story-hero{padding:90px 24px 55px;align-items:flex-end}.intro-sky{right:-38vw;top:2vh;width:135vw;height:72%}.story-hero-copy{max-width:520px}.hero-coordinate{display:none}
   .growth-stage{grid-template-columns:1fr;align-content:center;padding:70px 20px}.growth-copy{max-width:540px}.growth-constellation{min-height:520px}.growth-label{width:150px}
   .archive-heading{grid-template-columns:1fr}.project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.moon-observatory{grid-template-columns:1fr}.eclipse-scene{min-height:530px}
-  .atlas-header .atlas-coordinate{display:none}.atlas-intro{position:relative;top:auto;left:auto;padding:45px 20px 20px;width:auto}.atlas-toolbar{position:relative;left:auto;bottom:auto;padding:0 20px 18px;max-width:none}.atlas-viewport{height:auto;overflow:visible;cursor:default;padding:0 20px 30px;touch-action:auto}.atlas-world{position:relative;width:auto;height:auto;transform:none!important;display:grid;gap:15px;background:none}.atlas-stars,.zodiac-belt{display:none}.zodiac-belt-mobile{display:block;width:100%;height:auto;overflow:visible;border:1px solid color-mix(in srgb,var(--line),transparent 25%);border-radius:25px;background:color-mix(in srgb,var(--surface),transparent 13%);touch-action:pan-y}.zodiac-belt-mobile .zodiac-secret-trigger{pointer-events:stroke}.atlas-world.ophiuchus-revealed .zodiac-belt-mobile .zodiac-glyph{opacity:.16;transition:opacity .65s ease}.atlas-zone{position:relative!important;left:auto!important;top:auto!important;width:auto!important;height:auto!important;min-height:330px}.atlas-growth-map{position:relative;inset:auto;min-height:330px}.atlas-project-zone{min-height:510px}.atlas-moon-zone{padding:170px 25px 30px}.atlas-unknown-zone{min-height:140px}.atlas-drawer{position:fixed;top:auto;bottom:12px;right:12px;left:12px;width:auto;max-height:65vh;transform:translateY(calc(100% + 30px))}.atlas-drawer.open{transform:none}.atlas-capy{left:50%;top:20px;translate:-50% 0}.atlas-comet{position:fixed}
+  .atlas-header .atlas-coordinate{display:none}.atlas-intro{position:relative;top:auto;left:auto;padding:45px 20px 20px;width:auto}.atlas-toolbar{position:relative;left:auto;bottom:auto;padding:0 20px 18px;max-width:none}.atlas-viewport{height:auto;overflow:visible;cursor:default;padding:0 20px 30px;touch-action:auto}.atlas-world{position:relative;width:auto;height:auto;transform:none!important;display:grid;gap:15px;background:none}.atlas-stars,.zodiac-belt{display:none}.zodiac-belt-mobile{display:block;width:100%;height:auto;overflow:visible;border:1px solid color-mix(in srgb,var(--line),transparent 25%);border-radius:25px;background:color-mix(in srgb,var(--surface),transparent 13%);touch-action:pan-y}.zodiac-belt-mobile .zodiac-secret-trigger{pointer-events:stroke}.atlas-world.ophiuchus-revealed .zodiac-belt-mobile .zodiac-glyph{opacity:.16;transition:opacity .65s ease}.atlas-zone{position:relative!important;left:auto!important;top:auto!important;width:auto!important;height:auto!important;min-height:330px}.atlas-growth-map{position:relative;inset:auto;min-height:330px}.atlas-project-zone{min-height:510px}.atlas-moon-zone{padding:170px 25px 30px}.atlas-unknown-zone{min-height:140px}.area51-boundary{position:relative;left:auto;top:auto;width:100%;height:190px;border:1px solid color-mix(in srgb,var(--line),transparent 38%);border-radius:25px;touch-action:pan-y}.area51-boundary::before,.area51-boundary::after{right:17px}.area51-rift{right:4px}.atlas-world:not(.area51-revealed) .area51-zone{display:none}.area51-zone{min-height:300px!important}.atlas-drawer{position:fixed;top:auto;bottom:12px;right:12px;left:12px;width:auto;max-height:65vh;transform:translateY(calc(100% + 30px))}.atlas-drawer.open{transform:none}.atlas-capy{left:50%;top:20px;translate:-50% 0}.atlas-comet{position:fixed}
 }
 @media (max-width:600px) {
   .prototype-gallery{padding:48px 18px}.prototype-choice-grid{grid-template-columns:1fr}.prototype-choice-wide{grid-column:auto}.prototype-choice{min-height:280px}
@@ -293,6 +446,38 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
 
 .space-brand span { color: var(--gold); }
 
+.header-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.2vw, 34px);
+}
+
+.language-switch {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--subtle);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.language-switch button {
+  min-width: 25px;
+  padding: 5px 2px;
+  border: 0;
+  background: transparent;
+  color: var(--subtle);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .08em;
+}
+
+.language-switch button[aria-pressed="true"] { color: var(--ink); }
+
 .space-header nav {
   display: flex;
   align-items: center;
@@ -300,7 +485,8 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
 }
 
 .space-header nav a,
-.space-header > a:not(.space-brand) {
+.space-header > a:not(.space-brand),
+.space-header .header-actions > a {
   position: relative;
   z-index: 1;
   color: var(--muted);
@@ -310,7 +496,8 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
 }
 
 .space-header nav a::after,
-.space-header > a:not(.space-brand)::after {
+.space-header > a:not(.space-brand)::after,
+.space-header .header-actions > a::after {
   position: absolute;
   left: 0;
   right: 100%;
@@ -322,7 +509,8 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
 }
 
 .space-header nav a:hover::after,
-.space-header > a:not(.space-brand):hover::after { right: 0; }
+.space-header > a:not(.space-brand):hover::after,
+.space-header .header-actions > a:hover::after { right: 0; }
 
 /* Identity-first story hero. */
 .cosmos-hero {
@@ -436,6 +624,50 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
 
 .hero-school { margin: 13px 0 0; color: var(--muted); }
 
+.observation-record {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  width: max-content;
+  border-top: 1px solid var(--space-stroke);
+  border-bottom: 1px solid var(--space-stroke);
+  color: var(--muted);
+}
+
+.observation-record span {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  min-width: 94px;
+  padding: 11px 14px 10px;
+  border-right: 1px solid var(--space-stroke);
+}
+
+.observation-record span:first-child { padding-left: 0; }
+.observation-record span:last-child { border-right: 0; padding-right: 0; }
+
+.observation-record strong {
+  color: var(--ink);
+  font-family: var(--space-serif);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -.05em;
+}
+
+.observation-record em {
+  color: var(--muted);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.story-observation-record {
+  position: absolute;
+  right: clamp(24px, 6vw, 96px);
+  bottom: clamp(76px, 9vh, 108px);
+}
+
 .hero-facts {
   position: absolute;
   z-index: 3;
@@ -489,6 +721,158 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
 @keyframes scroll-star {
   0%, 100% { transform: translateY(-11px); opacity: .35; }
   50% { transform: translateY(11px); opacity: 1; }
+}
+
+/* Failed experiments remain factual records, translated into distinct celestial states. */
+.lost-stars-section {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(280px, .55fr) minmax(620px, 1.45fr);
+  gap: clamp(35px, 6vw, 92px);
+  align-items: center;
+  min-height: 100svh;
+  padding: clamp(105px, 12vw, 170px) clamp(24px, 6vw, 96px);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 74% 46%, color-mix(in srgb, var(--violet-soft), transparent 66%), transparent 33%),
+    linear-gradient(150deg, var(--page-deep), color-mix(in srgb, var(--page), var(--surface) 28%));
+}
+
+.lost-stars-section > header { position: relative; z-index: 3; }
+
+.lost-stars-section h2 {
+  margin: 0;
+  font-family: var(--space-serif);
+  font-size: clamp(52px, 6.6vw, 104px);
+  font-weight: 500;
+  letter-spacing: -.08em;
+  line-height: .93;
+}
+
+.lost-star-field {
+  position: relative;
+  min-height: 620px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--space-stroke), transparent 16%);
+  border-radius: 48% 52% 42% 58% / 54% 43% 57% 46%;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 18%, color-mix(in srgb, var(--violet), transparent 91%) 18.3% 18.6%, transparent 19%),
+    radial-gradient(circle at 48% 52%, transparent 0 35%, color-mix(in srgb, var(--gold), transparent 92%) 35.3% 35.6%, transparent 36%),
+    color-mix(in srgb, var(--surface), transparent 32%);
+  box-shadow: inset 0 0 90px color-mix(in srgb, var(--ink), transparent 96%);
+}
+
+.lost-star {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  display: grid;
+  justify-items: center;
+  gap: 13px;
+  width: 128px;
+  translate: -50% -50%;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.lost-star-visual {
+  position: relative;
+  display: block;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  transition: transform .45s cubic-bezier(.2,.8,.2,1), filter .45s ease;
+}
+
+.lost-star-visual::before,
+.lost-star-visual::after { position: absolute; content: ""; }
+
+.lost-star:hover .lost-star-visual,
+.lost-star:focus-visible .lost-star-visual,
+.lost-star.active .lost-star-visual { transform: scale(1.12); filter: brightness(1.08); }
+
+.lost-star-name {
+  max-width: 124px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.lost-star.active .lost-star-name { color: var(--ink); }
+
+.lost-star[data-lost-state="orbit"] .lost-star-visual {
+  border: 1px dashed color-mix(in srgb, var(--violet), transparent 18%);
+  animation: lost-orbit-drift 7s ease-in-out infinite;
+}
+
+.lost-star[data-lost-state="orbit"] .lost-star-visual::before {
+  left: 50%;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: var(--violet);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--violet), transparent 34%);
+}
+
+.lost-star[data-lost-state="supernova"] .lost-star-visual {
+  background: repeating-conic-gradient(from 8deg, color-mix(in srgb, var(--gold), transparent 28%) 0 1deg, transparent 1deg 17deg);
+  animation: supernova-breathe 5.5s ease-in-out infinite;
+}
+
+.lost-star[data-lost-state="supernova"] .lost-star-visual::before {
+  inset: 27px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--gold), transparent 35%);
+}
+
+.lost-star[data-lost-state="vanished"] .lost-star-visual {
+  border: 1px solid color-mix(in srgb, var(--line), transparent 23%);
+  box-shadow: inset 0 0 30px color-mix(in srgb, var(--ink), transparent 87%);
+  opacity: .65;
+}
+
+.lost-star[data-lost-state="vanished"] .lost-star-visual::before {
+  inset: 34px;
+  border-radius: 50%;
+  background: var(--ink);
+  opacity: .4;
+}
+
+.lost-star-record {
+  position: absolute;
+  z-index: 6;
+  right: clamp(42px, 7vw, 112px);
+  bottom: clamp(54px, 7vh, 90px);
+  width: min(430px, calc(100vw - 48px));
+  padding: 24px 26px;
+  border: 1px solid var(--space-stroke);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface-raised), transparent 6%);
+  box-shadow: var(--space-shadow);
+  backdrop-filter: blur(18px);
+}
+
+.lost-star-record[hidden] { display: none; }
+.lost-star-record small { color: var(--violet-strong); font-size: 10px; font-weight: 850; }
+.lost-star-record h3 { margin: 12px 0 8px; font-size: 25px; letter-spacing: -.05em; }
+.lost-star-record p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+.lost-star-record p + p { margin-top: 8px; color: var(--ink); }
+
+@keyframes lost-orbit-drift {
+  0%, 100% { transform: translate3d(-5px, 3px, 0) rotate(-7deg); }
+  50% { transform: translate3d(7px, -5px, 0) rotate(8deg); }
+}
+
+@keyframes supernova-breathe {
+  0%, 100% { opacity: .55; transform: rotate(0deg) scale(.94); }
+  50% { opacity: .92; transform: rotate(8deg) scale(1.04); }
 }
 
 /* Year archive: clear information with no decorative micro-labels. */
@@ -825,6 +1209,7 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
 
 .celestial-copy { position: relative; z-index: 3; }
 .celestial-copy h1 { font-size: clamp(70px, 8.4vw, 132px); }
+.celestial-observation-record { margin-top: 30px; }
 .celestial-intro {
   margin: 38px 0 0;
   color: var(--ink);
@@ -1232,6 +1617,9 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
   .silent-eclipse .eclipse-scene { min-height: 620px; }
   .celestial-hero { grid-template-columns: 1fr; padding-top: 130px; }
   .celestial-copy { max-width: 720px; }
+  .lost-stars-section { grid-template-columns: 1fr; align-content: center; }
+  .lost-stars-section > header { max-width: 620px; }
+  .lost-star-field { min-height: 560px; }
   .orrery-shell { width: min(680px, 84vw); justify-self: center; }
   .orrery-years button { transform: rotate(var(--angle)) translateY(-277px) rotate(calc(-1 * var(--angle))) rotate(calc(-1 * var(--rotation))); }
   .wall-compare { grid-template-columns: 1fr; }
@@ -1246,6 +1634,9 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
   .space-header::after { left: 18px; right: 18px; }
   .space-header nav { gap: 16px; }
   .space-header nav a { font-size: 12px; }
+  .header-actions { gap: 13px; }
+  .language-switch { gap: 2px; }
+  .language-switch button { min-width: 23px; }
   .cosmos-hero { min-height: 100svh; padding: 110px 20px 88px; align-items: end; }
   .cosmos-hero::before { background: radial-gradient(circle at 68% 23%, color-mix(in srgb,var(--violet-soft),transparent 30%), transparent 34%), var(--page); }
   .hero-identity { width: 100%; }
@@ -1253,9 +1644,12 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
   .hero-role-line { margin-top: 25px; }
   .hero-vision br { display: none; }
   .hero-links { display: grid; gap: 10px; }
-  .hero-facts { position: relative; right: auto; bottom: auto; width: 100%; margin-top: 28px; grid-template-columns: repeat(3, 1fr); }
-  .hero-facts span { display: grid; justify-items: start; gap: 5px; padding: 14px 7px; border-top: 1px solid var(--space-stroke); border-bottom: 0; }
-  .hero-facts strong { font-size: 26px; }
+  .story-observation-record { position: relative; right: auto; bottom: auto; margin-top: 29px; }
+  .observation-record { width: 100%; }
+  .observation-record span { flex: 1; min-width: 0; padding: 10px 8px; }
+  .observation-record span:first-child { padding-left: 0; }
+  .observation-record strong { font-size: 18px; }
+  .observation-record em { font-size: 9px; }
   .scroll-orbit { display: none; }
   .space-projects { padding: 95px 18px; }
   .space-section-heading { grid-template-columns: 1fr; gap: 28px; margin-bottom: 42px; }
@@ -1296,10 +1690,18 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
   .silent-eclipse .moon-drag { width: 78px; height: 78px; }
   .closing-note h2 { font-size: 50px; }
   .capy-nebula { width: 69%; height: 43%; }
+  .lost-stars-section { min-height: auto; padding: 100px 18px 130px; }
+  .lost-stars-section h2 { font-size: 51px; }
+  .lost-star-field { min-height: 500px; margin-top: 36px; border-radius: 38px; }
+  .lost-star { width: 102px; }
+  .lost-star-visual { width: 65px; height: 65px; }
+  .lost-star-name { font-size: 10px; }
+  .lost-star-record { position: relative; right: auto; bottom: auto; width: 100%; margin-top: -20px; }
   .celestial-header .celestial-github { display: block; }
   .celestial-hero { min-height: auto; padding: 115px 18px 80px; }
   .celestial-copy h1 { font-size: clamp(68px, 22vw, 102px); }
   .celestial-copy .hero-links { margin-top: 24px; }
+  .celestial-observation-record { margin-top: 26px; }
   .orrery-shell { width: 94vw; margin: 48px -8vw 0; touch-action: pan-y; }
   .orrery-years button { min-width: 61px; min-height: 61px; transform: rotate(var(--angle)) translateY(-38vw) rotate(calc(-1 * var(--angle))) rotate(calc(-1 * var(--rotation))); font-size: 11px; }
   .celestial-archive { padding: 100px 18px; }
@@ -1345,12 +1747,20 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var
   .prototype-index-card > p { left: 25px; right: 25px; bottom: 24px; }
 }
 
+@media (max-width: 560px) {
+  .space-header nav { display: none; }
+  .atlas-header .header-mail { display: none !important; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scroll-orbit span { animation: none; }
   .prototype-index-card,
   .space-project-grid .project-record,
   .capy-nebula,
   .orrery-ring,
-  .orrery-years { transition: none; }
+  .orrery-years,
+  .lost-star-visual,
+  .area51-zone,
+  .area51-boundary { transition: none; animation: none !important; }
 }
 
