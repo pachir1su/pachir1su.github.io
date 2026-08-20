@@ -172,3 +172,11 @@ ChatGPT는 변경 범위에 따라 다음을 독립적으로 확인합니다.
   임의로 새 버전을 만들거나 올리지 않습니다.
 - 사용자가 목표 버전을 명시한 경우에만 해당 버전을 변경 범위에 반영합니다.
 - GitHub Pages 배포 결과는 PR 검증과 merge 이후 별도로 판단합니다.
+
+
+## Project-local assets
+
+- 프로젝트 하나에서만 쓰는 사진·영상·데이터는 `projects/<project>/assets/{images,video,data}/` 아래에 둔다.
+- 전역 `assets/`에는 favicon, 사이트 로고, GitHub 활동 카드처럼 여러 페이지가 공유하는 자산만 둔다.
+- 새 프로젝트 미디어를 `assets/media/<project>/`에 만들지 않는다. 상세 페이지 URL은 `projects/<project>/`를 유지한다.
+- 모든 HTML 페이지는 공용 `/assets/favicon.svg` 닭 favicon을 사용한다.
