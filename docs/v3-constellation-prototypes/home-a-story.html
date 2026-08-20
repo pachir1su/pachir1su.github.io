@@ -13,11 +13,18 @@
 <body data-page="story" class="space-story-page">
   <header class="space-header">
     <a class="space-brand" href="index.html" aria-label="프로토타입 목록으로">PACHIR1SU <span>✦</span></a>
-    <nav aria-label="주요 영역">
-      <a href="#projects">프로젝트</a>
-      <a href="#growth">성장</a>
-      <a href="https://github.com/pachir1su">GitHub</a>
-    </nav>
+    <div class="header-actions">
+      <nav aria-label="주요 영역">
+        <a href="#projects" data-ko="프로젝트" data-en="Projects">프로젝트</a>
+        <a href="#growth" data-ko="성장" data-en="Growth">성장</a>
+        <a href="https://github.com/pachir1su">GitHub</a>
+      </nav>
+      <div class="language-switch" role="group" aria-label="언어 선택">
+        <button type="button" data-language-switch="ko" aria-pressed="true">KO</button>
+        <span aria-hidden="true">/</span>
+        <button type="button" data-language-switch="en" aria-pressed="false">EN</button>
+      </div>
+    </div>
   </header>
 
   <main>
@@ -25,33 +32,33 @@
       <canvas class="cosmos-canvas" data-cosmos-canvas aria-hidden="true"></canvas>
       <div class="cosmos-grain" aria-hidden="true"></div>
       <div class="hero-identity">
-        <p class="hero-greeting">안녕하세요.</p>
+        <p class="hero-greeting" data-ko="안녕하세요." data-en="Hello.">안녕하세요.</p>
         <h1 id="hero-name"><span>이건영</span><small>Lee Geon Yeong</small></h1>
-        <p class="hero-role-line">혁신의 기업가 &amp; 풀스택 개발자</p>
-        <p class="hero-vision">이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다.<br>월 100만 명이 사용하는 서비스를 만드는 것이 목표입니다.</p>
+        <p class="hero-role-line" data-ko="혁신의 기업가 &amp; 풀스택 개발자" data-en="Innovator &amp; Full-Stack Developer">혁신의 기업가 &amp; 풀스택 개발자</p>
+        <p class="hero-vision" data-ko-html="이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다.&lt;br&gt;월 100만 명이 사용하는 서비스를 만드는 것이 목표입니다." data-en-html="I pursue innovation beyond profit.&lt;br&gt;My goal is to build a service used by one million people every month.">이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다.<br>월 100만 명이 사용하는 서비스를 만드는 것이 목표입니다.</p>
         <div class="hero-links">
           <a href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
           <a href="https://github.com/pachir1su">github.com/pachir1su</a>
         </div>
-        <p class="hero-school">한국기술교육대학교 26학번</p>
+        <p class="hero-school" data-ko="한국기술교육대학교 26학번" data-en="KOREATECH · Class of 2026">한국기술교육대학교 26학번</p>
       </div>
-      <div class="hero-facts" aria-label="포트폴리오 요약">
-        <span><strong>20+</strong> 프로젝트</span>
-        <span><strong>4</strong> 수상</span>
-        <span><strong>8위</strong> 581팀 중</span>
+      <div class="observation-record story-observation-record" aria-label="포트폴리오 요약">
+        <span><strong>20+</strong><em data-ko="프로젝트" data-en="Projects">프로젝트</em></span>
+        <span><strong>4</strong><em data-ko="수상" data-en="Awards">수상</em></span>
+        <span><strong data-ko="8위" data-en="8th">8위</strong><em>SFPC</em></span>
       </div>
       <a class="scroll-orbit" href="#projects" aria-label="프로젝트로 이동"><span></span></a>
     </section>
 
     <section class="space-projects" id="projects" aria-labelledby="project-title">
       <header class="space-section-heading">
-        <h2 id="project-title">프로젝트는<br>연도로 찾습니다.</h2>
-        <p>별자리는 성장에 남겨 두고, 만든 것들은 빠르게 꺼내 볼 수 있게 묶었습니다.</p>
+        <h2 id="project-title" data-ko-html="프로젝트는&lt;br&gt;연도로 찾습니다." data-en-html="Find projects&lt;br&gt;by year.">프로젝트는<br>연도로 찾습니다.</h2>
+        <p data-ko="별자리는 성장에 남겨 두고, 만든 것들은 빠르게 꺼내 볼 수 있게 묶었습니다." data-en="Constellations hold the story of growth; projects stay grouped for quick exploration.">별자리는 성장에 남겨 두고, 만든 것들은 빠르게 꺼내 볼 수 있게 묶었습니다.</p>
       </header>
       <div class="year-tabs space-year-tabs" data-year-tabs role="tablist" aria-label="프로젝트 연도"></div>
       <div class="archive-meta space-archive-meta">
         <strong data-archive-label>2026</strong>
-        <span data-project-count>불러오는 중</span>
+        <span data-project-count data-ko="불러오는 중" data-en="Loading">불러오는 중</span>
       </div>
       <section class="project-grid space-project-grid" data-project-grid aria-live="polite"></section>
     </section>
@@ -59,15 +66,23 @@
     <section class="growth-scroll space-growth" id="growth" aria-labelledby="growth-title">
       <div class="growth-stage">
         <div class="growth-copy">
-          <h2 id="growth-title">성장은<br>사건으로 남습니다.</h2>
-          <p data-growth-summary>별 하나를 누르면 그때의 기록이 열립니다.</p>
+          <h2 id="growth-title" data-ko-html="성장은&lt;br&gt;사건으로 남습니다." data-en-html="Growth remains&lt;br&gt;as events.">성장은<br>사건으로 남습니다.</h2>
+          <p data-growth-summary data-ko="별 하나를 누르면 그때의 기록이 열립니다." data-en="Select a star to open that moment.">별 하나를 누르면 그때의 기록이 열립니다.</p>
           <div class="sequence-status" aria-live="polite">
             <span data-sequence-count>1 / 8</span>
-            <span data-sequence-message>첫 번째 별에서 시작합니다</span>
+            <span data-sequence-message data-ko="첫 번째 별에서 시작합니다" data-en="Begin with the first star">첫 번째 별에서 시작합니다</span>
           </div>
         </div>
         <div class="growth-constellation" data-growth-constellation aria-label="클릭하거나 드래그해 연결하는 성장 사건 별자리"></div>
       </div>
+    </section>
+
+    <section class="lost-stars-section" data-lost-stars aria-labelledby="story-lost-title">
+      <header>
+        <h2 id="story-lost-title" data-ko-html="궤도를 잃은&lt;br&gt;별들." data-en-html="Stars that lost&lt;br&gt;their orbit.">궤도를 잃은<br>별들.</h2>
+      </header>
+      <div class="lost-star-field" data-lost-star-field></div>
+      <aside class="lost-star-record" data-lost-star-record hidden aria-live="polite"></aside>
     </section>
 
     <section class="silent-eclipse" aria-label="달과 태양이 있는 우주 장면">
@@ -79,7 +94,7 @@
         <canvas class="capy-nebula" data-capy-nebula aria-hidden="true"></canvas>
       </div>
       <div class="closing-note">
-        <h2>다음 우주도<br>계속 만듭니다.</h2>
+        <h2 data-ko-html="다음 우주도&lt;br&gt;계속 만듭니다." data-en-html="I keep building&lt;br&gt;the next universe.">다음 우주도<br>계속 만듭니다.</h2>
         <a href="mailto:capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</a>
       </div>
     </section>
