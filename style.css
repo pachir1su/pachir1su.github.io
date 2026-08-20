@@ -2986,3 +2986,20 @@ html {
 .sidebar-util-btn:hover i {
   color: var(--red-text);
 }
+
+/* 프로젝트 상세 페이지: AOS의 수평 진입 transform이 실제 문서 폭을
+   100px 밀어내던 문제를 막는다. 모션은 수직 fade로 유지한다. */
+.detail-sidebar .sidebar-card[data-aos="fade-left"] {
+  transform: translate3d(0, 20px, 0);
+}
+.detail-sidebar .sidebar-card[data-aos="fade-left"].aos-animate {
+  transform: translate3d(0, 0, 0);
+}
+
+/* 상세 본문의 긴 영문 토큰/도구명은 작은 화면에서 필요한 지점에만 줄바꿈한다. */
+.detail-body .detail-section p,
+.detail-body .detail-section li,
+.detail-body .detail-section a,
+.detail-body .detail-section code {
+  overflow-wrap: anywhere;
+}
