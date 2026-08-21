@@ -1,4 +1,4 @@
-name: v2 media demos performance phase
+name: portfolio release candidate integration
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  apply-and-qa:
+  build-and-qa:
     if: github.head_ref == 'agent/v2-media-demos-performance-runner'
     runs-on: ubuntu-latest
     steps:
@@ -20,162 +20,181 @@ jobs:
           path: runner
           fetch-depth: 1
 
-      - name: Checkout v2 target
+      - name: Checkout clean main snapshot
         uses: actions/checkout@v4
         with:
-          ref: agent/v2-media-demos-performance
-          path: target
+          ref: main
+          path: final
           fetch-depth: 80
           token: ${{ github.token }}
 
-      - name: Verify clean base
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git -C target rev-parse HEAD)" = "4791c0b828b6382f26b74af7ca121e41e23904ec"
-          test -z "$(git -C target status --porcelain)"
+      - name: Checkout verified v2 snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v2-media-demos-performance
+          path: v2
+          fetch-depth: 80
 
-      - name: Install temporary QA dependencies
+      - name: Checkout latest v3 production direction
+        uses: actions/checkout@v4
+        with:
+          ref: Codex/fix-nebula-regressions-11
+          path: v3
+          fetch-depth: 80
+
+      - name: Verify expected bases
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m pip install --disable-pip-version-check pillow >/dev/null
-          mkdir -p /tmp/v2-phase-node
-          cd /tmp/v2-phase-node
+          BASE="4791c0b828b6382f26b74af7ca121e41e23904ec"
+          test "$(git -C final rev-parse HEAD)" = "$BASE"
+          test "$(git -C v2 merge-base "$BASE" HEAD)" = "$BASE"
+          test "$(git -C v3 merge-base "$BASE" HEAD)" = "$BASE"
+          test "$(git -C v2 diff --name-only "$BASE"...HEAD | wc -l)" -eq 35
+          test "$(git -C v3 diff --name-only "$BASE"...HEAD | wc -l)" -eq 9
+
+      - name: Compose v2 and v3 snapshots without history stacking
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="4791c0b828b6382f26b74af7ca121e41e23904ec"
+          git -C v2 diff --name-only "$BASE"...HEAD > /tmp/v2-files
+          while IFS= read -r f; do
+            mkdir -p "final/$(dirname "$f")"
+            cp -a "v2/$f" "final/$f"
+          done < /tmp/v2-files
+
+          git -C v3 diff --name-only "$BASE"...HEAD > /tmp/v3-files
+          while IFS= read -r f; do
+            case "$f" in
+              index.html|script.js|style.css) continue ;;
+            esac
+            mkdir -p "final/$(dirname "$f")"
+            cp -a "v3/$f" "final/$f"
+          done < /tmp/v3-files
+
+          for f in index.html script.js style.css; do
+            git -C final show "$BASE:$f" > "/tmp/base-${f}"
+            set +e
+            git merge-file -p "v2/$f" "/tmp/base-${f}" "v3/$f" > "final/$f.merged"
+            rc=$?
+            set -e
+            test "$rc" -eq 0
+            mv "final/$f.merged" "final/$f"
+          done
+          ! grep -R -n -E '^(<<<<<<<|=======|>>>>>>>)' final/index.html final/script.js final/style.css
+
+      - name: Apply return-state, performance, and accessibility fixes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 runner/tools/release-candidate-patch.py
+          git -C final diff --check
+          node --check final/script.js
+          node --check final/detail.js
+          node --check final/assets/project-demos.js
+          node --check final/docs/v3-constellation-prototypes/nebula.js
+          node final/tools/verify-build.js
+          ! grep -q 'stamp-pop' final/script.js
+          ! grep -q 'stamp-pop' final/style.css
+          ! grep -q 'Stamp feedback' final/script.js
+          ! grep -R -E 'unpkg.com/aos@|vanilla-tilt/1.8.0' final/projects/*/index.html
+          ! grep -q 'devicons/devicon' final/index.html
+          grep -q 'function resetV3Gateway' final/script.js
+          grep -q 'function resetGate' final/docs/v3-constellation-prototypes/nebula.js
+          grep -q '<main id="main-content">' final/index.html
+
+      - name: Install temporary browser QA dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/portfolio-rc-node
+          cd /tmp/portfolio-rc-node
           npm init -y >/dev/null
           npm install playwright@1.55.0 lighthouse >/dev/null
           CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME_PATH"
           echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
-          echo "NODE_PATH=/tmp/v2-phase-node/node_modules" >> "$GITHUB_ENV"
+          echo "NODE_PATH=/tmp/portfolio-rc-node/node_modules" >> "$GITHUB_ENV"
 
-      - name: Start temporary source-snapshot server
+      - name: Serve release candidate
         shell: bash
         run: |
-          python3 -m http.server 4175 --directory runner >/tmp/v2-runner-http.log 2>&1 &
+          python3 -m http.server 4176 --directory final >/tmp/portfolio-rc-http.log 2>&1 &
           for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:4175/tools/kga-source-snapshots.html >/dev/null; then exit 0; fi
+            if curl -fsS http://127.0.0.1:4176/ >/dev/null; then exit 0; fi
             sleep 1
           done
-          cat /tmp/v2-runner-http.log
+          cat /tmp/portfolio-rc-http.log
           exit 1
 
-      - name: Capture public Health Notion and KGA source-design screens
+      - name: Run full v2 regression and live-demo QA
         shell: bash
         env:
-          CAPTURE_OUT: ${{ github.workspace }}/captures
-          HEALTH_NOTION_URL: https://pachir1su.notion.site/2025-SDGs-1b9f776d60dc8058976bc03379ceaf06
-          RUNNER_BASE: http://127.0.0.1:4175
-        run: |
-          set -euo pipefail
-          NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node runner/tools/v2-capture-media.cjs
-          test -f captures/health-1.png
-          test -f captures/kga-home.png
-          test -f captures/kga-shuttle.png
-
-      - name: Align KGA media labels with source-design provenance
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('runner/tools/v2-apply-phase.py')
-          s=p.read_text(encoding='utf-8')
-          s=s.replace("'kga-home.png': TARGET / 'projects/koreatechGongjiAgent/assets/images/web-home.webp',", "'kga-home.png': TARGET / 'projects/koreatechGongjiAgent/assets/images/source-design-hub.webp',")
-          s=s.replace("'kga-shuttle.png': TARGET / 'projects/koreatechGongjiAgent/assets/images/web-shuttle-ui.webp',", "'kga-shuttle.png': TARGET / 'projects/koreatechGongjiAgent/assets/images/source-mobile-proposal.webp',")
-          s=s.replace("('web-home.webp', '현재 KGA 소스에서 렌더링한 홈 대시보드', 'Home dashboard rendered from the current KGA source'),", "('source-design-hub.webp', 'KGA 저장소의 디자인 검토 허브 소스 렌더', 'Source render of the KGA repository design review hub'),")
-          s=s.replace("('web-shuttle-ui.webp', '현재 KGA 소스의 셔틀 화면 UI', 'Shuttle view rendered from the current KGA source'),", "('source-mobile-proposal.webp', 'KGA 저장소의 모바일 우선 시안 소스 렌더', 'Source render of the KGA repository mobile-first proposal'),")
-          p.write_text(s,encoding='utf-8')
-          PY
-
-      - name: Apply consolidated v2 phase
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 runner/tools/v2-apply-phase.py
-          python3 runner/tools/v2-postapply-fixes.py
-          git -C target diff --check
-          node --check target/script.js
-          node --check target/detail.js
-          node --check target/assets/project-demos.js
-          node --check target/build.js
-          node target/tools/verify-build.js
-          ! grep -R -E 'unpkg.com/aos@|vanilla-tilt/1.8.0' target/projects/*/index.html
-          ! grep -q 'devicons/devicon' target/index.html
-          ! grep -q 'stamp-pop' target/script.js
-          ! grep -q 'stamp-pop' target/style.css
-          ! grep -q 'Stamp feedback' target/script.js
-          grep -q 'detail.js' target/projects/Wall_Sina/index.html
-          grep -q 'data-project-demo="wall"' target/projects/Wall_Sina/index.html
-          grep -q 'data-project-demo="ucast"' target/projects/2026_U-CAST/index.html
-          grep -q 'data-project-demo="health"' target/projects/HEALTH_CHECK_PROJECT/index.html
-          grep -q 'data-project-demo="berry"' target/projects/BerryIno/index.html
-          grep -q 'data-project-demo="plant"' target/projects/PlantClock/index.html
-          grep -q 'source-design-hub.webp' target/projects/koreatechGongjiAgent/index.html
-          grep -q 'source-mobile-proposal.webp' target/projects/koreatechGongjiAgent/index.html
-
-      - name: Start modified portfolio server
-        shell: bash
-        run: |
-          python3 -m http.server 4173 --directory target >/tmp/v2-phase-http.log 2>&1 &
-          for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
-            sleep 1
-          done
-          cat /tmp/v2-phase-http.log
-          exit 1
-
-      - name: Run broad browser regression and demo QA
-        shell: bash
-        env:
-          QA_BASE: http://127.0.0.1:4173
-          TARGET_DIR: ${{ github.workspace }}/target
-          QA_OUT: ${{ github.workspace }}/v2-phase-qa-artifacts
+          QA_BASE: http://127.0.0.1:4176
+          TARGET_DIR: ${{ github.workspace }}/final
+          QA_OUT: ${{ github.workspace }}/rc-v2-qa
         run: |
           set -euo pipefail
           NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node runner/tools/v2-phase-qa.cjs
 
-      - name: Measure Lighthouse after optimization
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p lighthouse
-          /tmp/v2-phase-node/node_modules/.bin/lighthouse http://127.0.0.1:4173/ \
-            --chrome-path="$CHROME_PATH" --output=json --output-path=lighthouse/mobile.json \
-            --quiet --chrome-flags="--headless --no-sandbox" || true
-          /tmp/v2-phase-node/node_modules/.bin/lighthouse http://127.0.0.1:4173/ \
-            --chrome-path="$CHROME_PATH" --preset=desktop --output=json --output-path=lighthouse/desktop.json \
-            --quiet --chrome-flags="--headless --no-sandbox" || true
-          node - <<'NODE'
-          const fs=require('fs'); const out={};
-          for(const mode of ['mobile','desktop']) { const p=`lighthouse/${mode}.json`; if(!fs.existsSync(p)) continue; const j=JSON.parse(fs.readFileSync(p)); out[mode]={performance:Math.round(j.categories.performance.score*100),accessibility:Math.round(j.categories.accessibility.score*100),bestPractices:Math.round(j.categories['best-practices'].score*100),seo:Math.round(j.categories.seo.score*100),lcp:j.audits['largest-contentful-paint'].displayValue,tbt:j.audits['total-blocking-time'].displayValue,cls:j.audits['cumulative-layout-shift'].displayValue}; }
-          fs.writeFileSync('lighthouse/summary.json',JSON.stringify(out,null,2)); console.log(JSON.stringify(out,null,2));
-          NODE
-
-      - name: Commit target atomically
+      - name: Run production gateway and universe QA
         shell: bash
         env:
-          GH_TOKEN: ${{ github.token }}
+          QA_BASE: http://127.0.0.1:4176
+          QA_OUT: ${{ github.workspace }}/rc-v3-qa
         run: |
           set -euo pipefail
-          cd target
-          git config user.name "v2 phase runner"
+          NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node runner/tools/v3-release-qa.cjs
+
+      - name: Measure and gate Lighthouse
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p lighthouse-rc
+          /tmp/portfolio-rc-node/node_modules/.bin/lighthouse http://127.0.0.1:4176/ \
+            --chrome-path="$CHROME_PATH" --output=json --output-path=lighthouse-rc/mobile.json \
+            --quiet --chrome-flags="--headless --no-sandbox"
+          /tmp/portfolio-rc-node/node_modules/.bin/lighthouse http://127.0.0.1:4176/ \
+            --chrome-path="$CHROME_PATH" --preset=desktop --output=json --output-path=lighthouse-rc/desktop.json \
+            --quiet --chrome-flags="--headless --no-sandbox"
+          node - <<'NODE'
+          const fs=require('fs'); const out={};
+          for(const mode of ['mobile','desktop']) {
+            const j=JSON.parse(fs.readFileSync(`lighthouse-rc/${mode}.json`));
+            out[mode]={performance:Math.round(j.categories.performance.score*100),accessibility:Math.round(j.categories.accessibility.score*100),bestPractices:Math.round(j.categories['best-practices'].score*100),seo:Math.round(j.categories.seo.score*100),fcp:j.audits['first-contentful-paint'].displayValue,lcp:j.audits['largest-contentful-paint'].displayValue,tbt:j.audits['total-blocking-time'].displayValue,cls:j.audits['cumulative-layout-shift'].displayValue};
+          }
+          fs.writeFileSync('lighthouse-rc/summary.json',JSON.stringify(out,null,2));
+          console.log(JSON.stringify(out,null,2));
+          if(out.mobile.performance < 74) throw new Error(`mobile performance regressed: ${out.mobile.performance}`);
+          if(out.desktop.performance < 80) throw new Error(`desktop performance regressed: ${out.desktop.performance}`);
+          if(out.mobile.accessibility < 100 || out.desktop.accessibility < 100) throw new Error('accessibility must return to 100');
+          NODE
+
+      - name: Commit clean release candidate atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd final
+          git config user.name "portfolio release runner"
           git config user.email "actions@users.noreply.github.com"
           BASE="4791c0b828b6382f26b74af7ca121e41e23904ec"
           mapfile -d '' FILES < <(git status --porcelain=v1 -z | sed -z 's/^...//')
-          test "${#FILES[@]}" -gt 10
+          test "${#FILES[@]}" -ge 40
           for f in "${FILES[@]}"; do
             git add -- "$f"
             case "$f" in
+              index.html) msg="feat: integrate optimized home with v3 gateway" ;;
+              script.js) msg="fix: harden home interactions and gateway return" ;;
+              style.css) msg="perf: stabilize responsive home rendering" ;;
               detail.js) msg="perf: add lightweight detail runtime" ;;
               assets/project-demos.js) msg="feat: add interactive project demos" ;;
-              index.html) msg="perf: reduce home render dependencies" ;;
-              script.js) msg="perf: streamline home interactions" ;;
-              style.css) msg="perf: optimize v2 rendering styles" ;;
-              projects.json) msg="feat: link health project notion" ;;
+              projects.json) msg="feat: link verified project sources" ;;
+              assets/images/nebula-gateway/*) msg="feat: add v3 gateway artwork" ;;
+              docs/v3-constellation-prototypes/*) msg="fix: finalize v3 constellation runtime" ;;
               projects/*/assets/images/*) msg="feat: add verified project media" ;;
               projects/*/index.html) msg="feat: enhance project detail experience" ;;
-              *) msg="chore: update v2 portfolio asset" ;;
+              *) msg="chore: finalize portfolio release candidate" ;;
             esac
             git commit -m "$msg" -- "$f"
           done
@@ -184,15 +203,15 @@ jobs:
           echo "changed=$changed commits=$commits"
           test "$changed" -eq "$commits"
           test "$changed" -eq "${#FILES[@]}"
-          git push origin HEAD:agent/v2-media-demos-performance
+          git push origin HEAD:agent/portfolio-release-candidate
 
-      - name: Upload QA evidence
+      - name: Upload release evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v2-media-demos-performance-evidence
+          name: portfolio-release-candidate-evidence
           path: |
-            captures
-            v2-phase-qa-artifacts
-            lighthouse
+            rc-v2-qa
+            rc-v3-qa
+            lighthouse-rc
           if-no-files-found: warn
