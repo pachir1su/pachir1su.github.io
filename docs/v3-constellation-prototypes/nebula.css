@@ -166,7 +166,7 @@ footer b { color:var(--ink); font-weight:500; }
   --dot: 38px;
   position:absolute; z-index:2;
   display:flex; width:fit-content; align-items:flex-start; gap:8px; min-height:44px;
-  max-width:min(38vw,320px); padding:0; border:0; background:none;
+  max-width:min(38vw,320px); padding:0; border:0; background:none; overflow:visible;
   color:var(--f-muted); font-family:inherit; text-align:left; cursor:pointer;
 }
 .sky-body[data-side="right"] { transform:translate(calc(var(--dot) / -2), -50%); }
@@ -177,7 +177,7 @@ footer b { color:var(--ink); font-weight:500; }
 /* 캔버스가 그린 별이 이 자리에 온다. 최소 터치 영역을 여기서 확보한다. */
 .sky-dot { display:block; flex:none; width:var(--dot); height:var(--dot); }
 
-.sky-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-width:0; padding-top:3px; }
+.sky-text { position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-width:0; padding-top:3px; }
 .sky-name {
   font-weight:300; font-size:clamp(11px,1.02vw,14px); line-height:1.4; letter-spacing:-.01em;
   color:var(--f-ink); text-shadow:var(--f-shadow); white-space:nowrap;
@@ -193,8 +193,18 @@ footer b { color:var(--ink); font-weight:500; }
 .sky-body:not([aria-expanded="true"]) .sky-more,
 .sky-body:not([aria-expanded="true"]) .sky-link { display:none; }
 .sky-body[aria-expanded="true"] { z-index:5; }
-.sky-body[aria-expanded="true"] .sky-more { max-height:6em; opacity:1; margin-top:3px; }
-.sky-body[aria-expanded="true"] .sky-link { max-height:2em; opacity:1; margin-top:5px; }
+/* 설명은 별 버튼의 레이아웃에 참여하지 않는 작은 관측 메모다. 따라서 눌러도
+   별·선·다른 클릭 영역이 한 픽셀도 이동하지 않는다. 두 번째 클릭은 그대로 상세 이동이다. */
+.sky-body[aria-expanded="true"] .sky-more {
+  position:absolute; z-index:1; top:calc(100% + 7px); width:min(250px,42vw); max-height:8em;
+  padding:7px 9px; opacity:1; overflow:visible; pointer-events:none;
+  background:color-mix(in srgb, var(--surface) 86%, transparent);
+  border:1px solid color-mix(in srgb, var(--f-gold) 42%, transparent);
+  box-shadow:0 5px 14px rgba(8,12,20,.12);
+}
+.sky-body[data-side="right"][aria-expanded="true"] .sky-more { left:0; text-align:left; }
+.sky-body[data-side="left"][aria-expanded="true"] .sky-more { right:0; text-align:right; }
+.sky-body[aria-expanded="true"] .sky-link { display:none; }
 
 .sky-body:hover .sky-name,
 .sky-body:focus-visible .sky-name { color:var(--f-gold); }
@@ -289,8 +299,8 @@ footer b { color:var(--ink); font-weight:500; }
 .gate:focus-visible { outline:2px solid #c9b477; outline-offset:6px; }
 /* 클릭 뒤에는 찢긴 면을 중심으로 종이가 들리며 우주가 그 자리를 차지한다.
    원래 홈페이지의 문체를 깨지 않는 짧은 전환으로, 애니메이션의 시작점도 명확하다. */
-.gate-field.is-opening { transform:translate(-50%,-50%) rotate(var(--gate-rot)) scale(1.82); filter:brightness(.68) saturate(1.24); transition-duration:1.08s, .42s; }
-.gate-field.is-opening .gate { transform:scale(1.11); transition-duration:.82s; }
+.gate-field.is-opening { transform:translate(-50%,-50%) rotate(var(--gate-rot)) scale(1.82); filter:brightness(.68) saturate(1.24); transition-duration:3.5s, .72s; }
+.gate-field.is-opening .gate { transform:scale(1.11); transition-duration:2.8s; }
 .gate-field.is-opening .gate-art { filter:drop-shadow(0 22px 24px rgba(20,17,13,.28)) brightness(.92) saturate(1.24); }
 .gate-field.is-opening .gate-glint { opacity:1; transform:scale(5.6); transition-duration:.76s; }
 
@@ -344,7 +354,7 @@ footer b { color:var(--ink); font-weight:500; }
     #080b12;
   opacity:0;
   clip-path:circle(0% at var(--gx,50%) var(--gy,50%));
-  transition:clip-path 1.08s cubic-bezier(.65,0,.25,1), opacity .22s ease;
+  transition:clip-path 3.75s cubic-bezier(.55,0,.22,1), opacity .28s ease;
 }
 .gate-veil.open { opacity:1; clip-path:circle(150% at var(--gx,50%) var(--gy,50%)); }
 
