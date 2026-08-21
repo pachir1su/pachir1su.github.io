@@ -14,32 +14,33 @@
 
 :root {
   --page:#e8eaf2; --page-deep:#dfe2ec; --surface:#f1f2f7;
-  --ink:#242636; --muted:#606579; --subtle:#777c8f; --line:#cbd0df;
-  --violet:#706994; --violet-strong:#554d7d; --gold:#a9914d;
+  --neb-ink:#242636; --muted:#606579; --subtle:#777c8f; --neb-line:#cbd0df;
+  --violet:#706994; --violet-strong:#554d7d; --neb-gold:#a9914d;
   --sans:"IBM Plex Sans KR","Pretendard","Malgun Gothic","Segoe UI",system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --page:#11151d; --page-deep:#0d1118; --surface:#181d27;
-    --ink:#e0e3eb; --muted:#a2a8b8; --subtle:#858c9e; --line:#303848;
-    --violet:#968dbb; --violet-strong:#b0a7d0; --gold:#bda969;
+    --neb-ink:#e0e3eb; --muted:#a2a8b8; --subtle:#858c9e; --neb-line:#303848;
+    --violet:#968dbb; --violet-strong:#b0a7d0; --neb-gold:#bda969;
   }
 }
 :root[data-theme="dark"] {
   --page:#11151d; --page-deep:#0d1118; --surface:#181d27;
-  --ink:#e0e3eb; --muted:#a2a8b8; --subtle:#858c9e; --line:#303848;
-  --violet:#968dbb; --violet-strong:#b0a7d0; --gold:#bda969;
+  --neb-ink:#e0e3eb; --muted:#a2a8b8; --subtle:#858c9e; --neb-line:#303848;
+  --violet:#968dbb; --violet-strong:#b0a7d0; --neb-gold:#bda969;
 }
 
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; }
-body {
-  margin:0; min-width:320px; background:var(--page); color:var(--ink);
+body:not([data-page="nebula-gateway"]) {
+  margin:0; min-width:320px; background:var(--page); color:var(--neb-ink);
   font-family:var(--sans); font-size:14px; line-height:1.75;
   -webkit-font-smoothing:antialiased;
 }
-a:focus-visible, button:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
+body:not([data-page="nebula-gateway"]) a:focus-visible,
+body:not([data-page="nebula-gateway"]) button:focus-visible { outline:2px solid var(--neb-gold); outline-offset:3px; }
 
 .wrap { max-width:1240px; margin:0 auto; padding:0 clamp(16px,3.5vw,40px); }
 
@@ -47,30 +48,30 @@ a:focus-visible, button:focus-visible { outline:2px solid var(--gold); outline-o
    문서 셸 — 시안을 설명하는 바깥 영역. 프레임 안에는 설명을 두지 않는다.
    --------------------------------------------------------------------- */
 .masthead { padding:clamp(46px,8vw,88px) 0 clamp(22px,3vw,34px); }
-.kicker { margin:0 0 18px; font-family:var(--mono); font-size:11px; letter-spacing:.16em; color:var(--gold); }
+.kicker { margin:0 0 18px; font-family:var(--mono); font-size:11px; letter-spacing:.16em; color:var(--neb-gold); }
 .masthead h1 {
   margin:0 0 18px; font-weight:200; font-size:clamp(30px,5vw,56px);
   letter-spacing:-.035em; line-height:1.13; text-wrap:balance;
 }
 .masthead p { max-width:64ch; margin:0 0 12px; color:var(--muted); font-size:15px; }
 .masthead p:last-child { margin-bottom:0; }
-.masthead b { color:var(--ink); font-weight:500; }
+.masthead b { color:var(--neb-ink); font-weight:500; }
 .back-link {
   display:inline-block; margin-bottom:26px; color:var(--muted);
-  font-size:12.5px; text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:2px;
+  font-size:12.5px; text-decoration:none; border-bottom:1px solid var(--neb-line); padding-bottom:2px;
 }
-.back-link:hover { color:var(--ink); border-bottom-color:var(--gold); }
+.back-link:hover { color:var(--neb-ink); border-bottom-color:var(--neb-gold); }
 
-.doc { margin-top:clamp(46px,6vw,84px); padding-top:clamp(30px,4vw,48px); border-top:1px solid var(--line); }
+.doc { margin-top:clamp(46px,6vw,84px); padding-top:clamp(30px,4vw,48px); border-top:1px solid var(--neb-line); }
 .doc h2 { margin:0 0 8px; font-weight:300; font-size:clamp(20px,2.8vw,27px); letter-spacing:-.03em; }
 .doc > p { max-width:64ch; margin:0 0 24px; color:var(--muted); font-size:14px; }
 
-.rows { border-top:1px solid var(--line); }
-.row { display:grid; gap:3px 26px; padding:15px 0; border-bottom:1px solid var(--line); align-items:baseline; }
+.rows { border-top:1px solid var(--neb-line); }
+.row { display:grid; gap:3px 26px; padding:15px 0; border-bottom:1px solid var(--neb-line); align-items:baseline; }
 @media (min-width:760px) { .row { grid-template-columns:minmax(120px,.55fr) minmax(0,1.6fr); } }
 .row > b { font-size:12.5px; font-weight:500; letter-spacing:-.01em; }
 .row > span { color:var(--muted); font-size:12.5px; }
-.row > span em { font-style:normal; color:var(--ink); font-weight:500; }
+.row > span em { font-style:normal; color:var(--neb-ink); font-weight:500; }
 .row.drop > b { color:var(--subtle); text-decoration:line-through; text-decoration-thickness:1px; }
 
 .notes { display:grid; gap:10px 30px; margin-top:18px; }
@@ -78,27 +79,27 @@ a:focus-visible, button:focus-visible { outline:2px solid var(--gold); outline-o
 .note { display:flex; flex-direction:column; gap:3px; }
 .note b { font-size:12.5px; font-weight:500; letter-spacing:-.01em; }
 .note span { color:var(--muted); font-size:12.5px; line-height:1.7; }
-.note code { font-family:var(--mono); font-size:11.5px; color:var(--ink); }
-.note.warn b { color:var(--gold); }
+.note code { font-family:var(--mono); font-size:11.5px; color:var(--neb-ink); }
+.note.warn b { color:var(--neb-gold); }
 
-footer { margin-top:clamp(40px,5vw,64px); padding:clamp(28px,4vw,40px) 0 clamp(56px,8vw,96px); border-top:1px solid var(--line); }
+footer { margin-top:clamp(40px,5vw,64px); padding:clamp(28px,4vw,40px) 0 clamp(56px,8vw,96px); border-top:1px solid var(--neb-line); }
 footer p { max-width:64ch; margin:0 0 10px; color:var(--muted); font-size:13.5px; }
 footer p:last-child { margin-bottom:0; }
-footer b { color:var(--ink); font-weight:500; }
+footer b { color:var(--neb-ink); font-weight:500; }
 
 /* ---------------------------------------------------------------------
    정적 키비주얼 프레임 — 16:9. 내부는 페이지 테마와 무관하게 팔레트 고정.
    --------------------------------------------------------------------- */
 .frame { margin:clamp(30px,5vw,58px) 0 0; }
 .frame-head { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 14px; margin-bottom:16px; }
-.frame-id { font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--gold); }
+.frame-id { font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--neb-gold); }
 .frame-head h2 { margin:0; font-size:16px; font-weight:500; letter-spacing:-.015em; }
 .frame-head > span { color:var(--subtle); font-size:12.5px; }
 
 .kv {
   container-type:inline-size;
   position:relative; aspect-ratio:16/9; overflow:hidden;
-  border:1px solid var(--line);
+  border:1px solid var(--neb-line);
 }
 .kv canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
 .kv--light { --f-ink:#242636; --f-muted:#606579; --f-subtle:#7b8093; --f-gold:#8f7736; }
@@ -155,16 +156,31 @@ footer b { color:var(--ink); font-weight:500; }
 .orbit-year[aria-current="true"] b { font-weight:300; font-size:clamp(26px,3.4vw,44px); }
 .orbit-year[aria-current="true"] i { width:9px; height:9px; background:var(--f-gold); opacity:1; }
 
+/* 무대의 최소 제품 내비게이션. 설명이 아니라 돌아갈 출구와 로딩 상태만 둔다. */
+.stage-back {
+  position:absolute; z-index:7; left:7%; bottom:8%;
+  display:inline-flex; align-items:center; min-width:44px; min-height:44px;
+  color:var(--f-subtle); font-family:var(--mono); font-size:11px; letter-spacing:.08em;
+  text-decoration:none; text-shadow:var(--f-shadow);
+}
+.stage-back:hover, .stage-back:focus-visible { color:var(--f-gold); }
+.stage-loading {
+  position:absolute; z-index:6; left:50%; top:50%; transform:translate(-50%,-50%);
+  color:var(--f-subtle); font-family:var(--mono); font-size:11px; letter-spacing:.08em;
+  text-shadow:var(--f-shadow);
+}
+.stage-loading[hidden] { display:none; }
+
 /* ---------------------------------------------------------------------
    하늘 위의 프로젝트 — 포트폴리오이므로 이름은 언제나 보여야 한다.
    성도가 밝은 별에 이름을 붙여 두는 방식이다. 눌렀을 때 펼쳐지는 것은
    역할과 한 줄 설명뿐이다.
    --------------------------------------------------------------------- */
 .sky-body {
-  --dot: 26px;
+  --dot: 44px;
   position:absolute; z-index:2;
-  display:flex; align-items:flex-start; gap:10px;
-  max-width:min(38vw,320px); padding:0; border:0; background:none;
+  display:flex; align-items:flex-start; gap:4px;
+  min-width:44px; min-height:44px; max-width:min(44vw,380px); padding:0; border:0; background:none;
   color:var(--f-muted); font-family:inherit; text-align:left; cursor:pointer;
 }
 .sky-body[data-side="right"] { transform:translate(calc(var(--dot) / -2), -50%); }
@@ -177,6 +193,7 @@ footer b { color:var(--ink); font-weight:500; }
 
 .sky-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-width:0; padding-top:3px; }
 .sky-name {
+  max-width:34ch; overflow-wrap:anywhere; text-wrap:pretty;
   font-weight:300; font-size:clamp(11px,1.02vw,14px); line-height:1.4; letter-spacing:-.01em;
   color:var(--f-ink); text-shadow:var(--f-shadow);
 }
@@ -205,6 +222,7 @@ footer b { color:var(--ink); font-weight:500; }
      본격적인 모바일 UX는 별도 기획 대상이며 여기서는 읽히는 것까지만 맞춘다. */
   .stage { height:auto; min-height:0; aspect-ratio:9/20; }
   .stage-name { left:6%; top:2.5%; }
+  .stage-back { left:6%; bottom:2.5%; }
   .orbit { position:absolute; left:6%; right:6%; top:9%; bottom:auto;
            display:flex; align-items:flex-end; gap:24px; }
   .orbit-axis { left:0; right:0; top:auto; bottom:-10px;
@@ -213,8 +231,8 @@ footer b { color:var(--ink); font-weight:500; }
   .orbit-year { flex-direction:column-reverse; gap:8px; margin:0; }
   .orbit-year b { font-size:clamp(17px,4.6vw,24px); }
   .orbit-year[aria-current="true"] b { font-size:clamp(21px,5.6vw,30px); }
-  .sky-body { --dot:24px; max-width:58vw; }
-  .sky-name { font-size:clamp(11px,3vw,13px); }
+  .sky-body { --dot:44px; max-width:72vw; }
+  .sky-name { max-width:calc(100vw - 88px); font-size:clamp(11px,3vw,13px); }
   .sky-more, .sky-link { font-size:clamp(10px,2.6vw,11.5px); }
 }
 
