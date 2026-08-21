@@ -1,0 +1,149 @@
+name: v2 final release QA
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  final-qa:
+    if: github.head_ref == 'agent/v2-final-qa-runner'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout runner
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v2-final-qa-runner
+          path: runner
+          fetch-depth: 1
+
+      - name: Checkout v2 release target
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v2-performance-final
+          path: target
+          fetch-depth: 120
+
+      - name: Static release contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd target
+          git fetch origin main --depth=120
+          test "$(git merge-base origin/main HEAD)" = "$(git rev-parse origin/main)"
+          FORBIDDEN="$(git diff --name-only origin/main...HEAD | grep -E '^(docs/v3-|assets/images/nebula-gateway/|\.github/workflows/|tools/v2-|tools/release-candidate|tools/v3-release)' || true)"
+          if [ -n "$FORBIDDEN" ]; then echo "$FORBIDDEN"; exit 1; fi
+          node --check script.js
+          node --check detail.js
+          node --check assets/project-demos.js
+          node tools/verify-build.js
+          node build.js
+          git diff --exit-code
+          git diff --check origin/main...HEAD
+          node <<'NODE'
+          const fs=require('fs');
+          const projects=JSON.parse(fs.readFileSync('projects.json','utf8'));
+          if(projects.length!==31) throw new Error(`expected 31 projects, got ${projects.length}`);
+          const script=fs.readFileSync('script.js','utf8');
+          const style=fs.readFileSync('style.css','utf8');
+          if(/Stamp feedback|stamp-pop/.test(script+style)) throw new Error('stamp feedback returned');
+          const forbidden=[
+            'projects/HEALTH_CHECK_PROJECT/assets/images/notion-1.webp',
+            'projects/koreatechGongjiAgent/assets/images/source-design-hub.webp',
+            'projects/koreatechGongjiAgent/assets/images/source-mobile-proposal.webp'
+          ];
+          for(const p of forbidden) if(fs.existsSync(p)) throw new Error(`forbidden generated media exists: ${p}`);
+          const actual='projects/swordmaster/assets/images/media-swordmaster-live.webp';
+          if(!fs.existsSync(actual)||fs.statSync(actual).size<1000) throw new Error('verified Media Swordmaster image missing');
+          console.log({projects:projects.length,actualMediaBytes:fs.statSync(actual).size});
+          NODE
+
+      - name: Install browser QA dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/v2-final-node
+          cd /tmp/v2-final-node
+          npm init -y >/dev/null
+          npm install playwright@1.55.0 lighthouse >/dev/null
+          CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+          echo "NODE_PATH=/tmp/v2-final-node/node_modules" >> "$GITHUB_ENV"
+
+      - name: Serve release target
+        shell: bash
+        run: |
+          python3 -m http.server 4180 --directory target >/tmp/v2-final-http.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4180/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/v2-final-http.log
+          exit 1
+
+      - name: Run 131-case integrated browser QA
+        env:
+          BASE_URL: http://127.0.0.1:4180
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p v2-final-evidence/screens
+          NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node <<'NODE'
+          const fs=require('fs'); const path=require('path'); const {chromium}=require('playwright');
+          const base=process.env.BASE_URL; const target=path.resolve('target'); const out=path.resolve('v2-final-evidence');
+          const failures=[]; const cases=[]; const widths=[320,360,390,768,1024,1280,1440];
+          const fail=(name,detail)=>failures.push({name,detail:String(detail||'failed')});
+          const check=(ok,name,detail)=>{if(!ok)fail(name,detail)};
+          const height=w=>w<=390?844:w<=768?1024:900;
+          function walk(d){return fs.readdirSync(d,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(d,e.name)):[path.join(d,e.name)])}
+          const detailPages=walk(path.join(target,'projects')).filter(p=>p.endsWith('.html')&&path.basename(p)!=='_archive.html'&&fs.readFileSync(p,'utf8').includes('class="detail-body"')).sort().map(p=>'/' + path.relative(target,p).split(path.sep).join('/'));
+          if(detailPages.length!==28) throw new Error(`expected 28 live details, got ${detailPages.length}`);
+          (async()=>{
+            const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH,args:['--no-sandbox']});
+            async function open(w,theme='light',reduced=false){const context=await browser.newContext({viewport:{width:w,height:height(w)},colorScheme:theme,reducedMotion:reduced?'reduce':'no-preference',hasTouch:w<=390,isMobile:w<=390}); const page=await context.newPage(); const errors=[]; const forbidden=[]; page.on('pageerror',e=>errors.push(`pageerror:${e.message}`)); page.on('console',m=>{if(m.type()==='error')errors.push(`console:${m.text()}`)}); page.on('request',r=>{if(/aos@|vanilla-tilt|devicons\/devicon/i.test(r.url()))forbidden.push(r.url())}); await page.addInitScript(({theme})=>{localStorage.setItem('theme',theme);localStorage.setItem('lang','ko')},{theme}); return {context,page,errors,forbidden};}
+            async function common(page,label){await page.waitForTimeout(120); const s=await page.evaluate(()=>({overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1,broken:[...document.images].filter(i=>i.complete&&i.naturalWidth===0).map(i=>i.src),main:document.querySelectorAll('main').length})); check(!s.overflow,`${label}:overflow`,JSON.stringify(s)); check(s.broken.length===0,`${label}:broken`,s.broken.join('\n')); check(s.main===1,`${label}:main`,s.main);}
+
+            for(const w of widths)for(const theme of ['light','dark']){const label=`root-${w}-${theme}`; const reduced=w===320&&theme==='dark'; const {context,page,errors,forbidden}=await open(w,theme,reduced); try{await page.goto(base+'/',{waitUntil:'networkidle',timeout:60000}); await common(page,label); check((await page.locator('.project-card').count())===31,`${label}:project cards`,await page.locator('.project-card').count()); check((await page.locator('.stamp-pop').count())===0,`${label}:stamp`); check(errors.length===0,`${label}:errors`,errors.join('\n')); check(forbidden.length===0,`${label}:forbidden`,forbidden.join('\n'));
+              if(w===390&&theme==='light'){const lang=page.locator('#langToggle'); await lang.click(); check((await page.locator('html').getAttribute('lang'))==='en',`${label}:lang switch`); check(((await lang.getAttribute('aria-label'))||'').includes('KO'),`${label}:lang name`); const ham=page.locator('#hamburger'); await ham.click(); check(await page.locator('#mobileMenu').evaluate(el=>el.classList.contains('open')),`${label}:mobile open`); await page.keyboard.press('Escape'); check(!(await page.locator('#mobileMenu').evaluate(el=>el.classList.contains('open'))),`${label}:mobile escape`);}
+              if([320,768,1440].includes(w)&&theme==='light') await page.screenshot({path:path.join(out,'screens',`${label}.png`),fullPage:false}); cases.push(label);}catch(e){fail(label,e.stack||e)} await context.close();}
+
+            for(const url of detailPages)for(const w of [390,1440])for(const theme of ['light','dark']){const label=`detail-${path.basename(path.dirname(url))}-${path.basename(url)}-${w}-${theme}`; const {context,page,errors,forbidden}=await open(w,theme); try{await page.goto(base+url,{waitUntil:'networkidle',timeout:60000}); await common(page,label); const s=await page.evaluate(()=>({detail:[...document.scripts].some(x=>/\/detail\.js(?:$|\?)/.test(x.src)),root:[...document.scripts].some(x=>/\/script\.js(?:$|\?)/.test(x.src)),lang:document.querySelector('#langToggle')?.getAttribute('aria-label')||'',badHeading:[...document.querySelectorAll('.detail-sidebar h4')].filter(h=>h.getAttribute('aria-level')!=='3').length})); check(s.detail&&!s.root,`${label}:runtime`,JSON.stringify(s)); check(s.lang.includes('EN'),`${label}:lang name`,s.lang); check(s.badHeading===0,`${label}:heading`,s.badHeading); check(errors.length===0,`${label}:errors`,errors.join('\n')); check(forbidden.length===0,`${label}:forbidden`,forbidden.join('\n')); cases.push(label);}catch(e){fail(label,e.stack||e)} await context.close();}
+
+            const demos={
+              'Wall_Sina':async p=>{const r=p.locator('[data-project-demo="wall"] input[type="range"]');await r.fill('85');check((await p.locator('.demo-status').innerText()).length>3,'wall:status')},
+              '2026_U-CAST':async p=>{await p.locator('[data-project-demo="ucast"] .demo-channel .demo-btn').first().click();check(await p.locator('.demo-warning').evaluate(el=>el.classList.contains('active')),'ucast:warning')},
+              'HEALTH_CHECK_PROJECT':async p=>{await p.locator('[data-project-demo="health"] input[type="range"]').first().fill('130');check((await p.locator('.demo-status').innerText()).length>3,'health:status')},
+              'BerryIno':async p=>{await p.locator('[data-project-demo="berry"] .demo-btn').first().click();check((await p.locator('.demo-log li').count())===1,'berry:log')},
+              'PlantClock':async p=>{await p.locator('[data-project-demo="plant"] input[type="range"]').first().fill('20');check(await p.locator('.demo-status').evaluate(el=>el.classList.contains('warn')),'plant:alert')}
+            };
+            for(const [d,test] of Object.entries(demos)){const label=`demo-${d}`;const {context,page,errors}=await open(390,'dark',true);try{await page.goto(`${base}/projects/${d}/`,{waitUntil:'networkidle'});await page.waitForSelector('[data-project-demo]');await test(page);await page.locator('#langToggle').click();check((await page.locator('[data-project-demo]').count())===1,`${label}:lang rerender`);check(errors.length===0,`${label}:errors`,errors.join('\n'));cases.push(label);await page.screenshot({path:path.join(out,'screens',`${label}.png`),fullPage:false});}catch(e){fail(label,e.stack||e)}await context.close();}
+
+            {const {context,page}=await open(1440,'light');await page.goto(base+'/projects/koreatechGongjiAgent/',{waitUntil:'networkidle'});const media=page.locator('[data-media-followup="v27-kga-audit"] img');const srcs=await media.evaluateAll(xs=>xs.map(x=>x.getAttribute('src')||''));check(await media.count()===1,'kga:verified live only',srcs.join(','));check(srcs.every(s=>!/source-design-hub|source-mobile-proposal/i.test(s)),'kga:no generated',srcs.join(','));await context.close();}
+            {const {context,page}=await open(1440,'light');await page.goto(base+'/projects/HEALTH_CHECK_PROJECT/',{waitUntil:'networkidle'});check((await page.locator('a[href*="pachir1su.notion.site/2025-SDGs"]').count())>=2,'health:notion links');check((await page.locator('[data-media-source="health-notion"],img[src*="notion-1.webp"]').count())===0,'health:no generated');check((await page.locator('[data-project-demo="health"]').count())===1,'health:demo');await context.close();}
+            {const {context,page}=await open(1280,'light');await page.goto(base+'/projects/swordmaster/media_swordmaster.html',{waitUntil:'networkidle'});const img=page.locator('[data-media-source="media-swordmaster-local"] img');const m=await img.evaluate(el=>({complete:el.complete,nw:el.naturalWidth,nh:el.naturalHeight,w:Number(el.getAttribute('width')),h:Number(el.getAttribute('height'))}));check(m.complete&&m.nw>0,'media-swordmaster:actual image',JSON.stringify(m));check(m.nw===m.w&&m.nh===m.h,'media-swordmaster:dimensions',JSON.stringify(m));await page.screenshot({path:path.join(out,'screens','media-swordmaster-final.png'),fullPage:false});await context.close();}
+
+            await browser.close(); const result={cases:cases.length,rootCases:14,detailPages:detailPages.length,detailCases:112,demoCases:5,failures}; fs.writeFileSync(path.join(out,'browser-results.json'),JSON.stringify(result,null,2)); console.log(JSON.stringify(result,null,2)); if(cases.length!==131)throw new Error(`expected 131 cases, got ${cases.length}`); if(failures.length)process.exit(1);
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+
+      - name: Final Lighthouse gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          LH=/tmp/v2-final-node/node_modules/.bin/lighthouse
+          mkdir -p v2-final-evidence/lighthouse
+          "$LH" http://127.0.0.1:4180/ --chrome-path="$CHROME_PATH" --output=json --output-path=v2-final-evidence/lighthouse/root-mobile.json --quiet --chrome-flags="--headless --no-sandbox"
+          "$LH" http://127.0.0.1:4180/ --chrome-path="$CHROME_PATH" --preset=desktop --output=json --output-path=v2-final-evidence/lighthouse/root-desktop.json --quiet --chrome-flags="--headless --no-sandbox"
+          "$LH" http://127.0.0.1:4180/projects/swordmaster/media_swordmaster.html --chrome-path="$CHROME_PATH" --output=json --output-path=v2-final-evidence/lighthouse/media-mobile.json --quiet --chrome-flags="--headless --no-sandbox"
+          "$LH" http://127.0.0.1:4180/projects/swordmaster/media_swordmaster.html --chrome-path="$CHROME_PATH" --preset=desktop --output=json --output-path=v2-final-evidence/lighthouse/media-desktop.json --quiet --chrome-flags="--headless --no-sandbox"
+          node <<'NODE'
+          const fs=require('fs');const out={};for(const k of ['root-mobile','root-desktop','media-mobile','media-desktop']){const j=JSON.parse(fs.readFileSync(`v2-final-evidence/lighthouse/${k}.json`));const failed=j.categories.accessibility.auditRefs.map(r=>({id:r.id,w:r.weight,a:j.audits[r.id]})).filter(x=>x.w>0&&x.a&&x.a.score!==1).map(x=>x.id);out[k]={performance:Math.round(j.categories.performance.score*100),accessibility:Math.round(j.categories.accessibility.score*100),bestPractices:Math.round(j.categories['best-practices'].score*100),seo:Math.round(j.categories.seo.score*100),fcp:j.audits['first-contentful-paint'].displayValue,lcp:j.audits['largest-contentful-paint'].displayValue,tbt:j.audits['total-blocking-time'].displayValue,cls:j.audits['cumulative-layout-shift'].displayValue,bytes:j.audits['total-byte-weight'].displayValue,failedA11y:failed};}fs.writeFileSync('v2-final-evidence/lighthouse-summary.json',JSON.stringify(out,null,2));console.log(out);if(out['root-mobile'].performance<85)throw new Error('root mobile perf');if(out['root-desktop'].performance<95)throw new Error('root desktop perf');if(out['media-mobile'].performance<80)throw new Error('media mobile perf');if(out['media-desktop'].performance<90)throw new Error('media desktop perf');for(const k of Object.keys(out))if(out[k].accessibility<100)throw new Error(`${k} a11y ${out[k].failedA11y.join(',')}`);
+          NODE
+
+      - name: Upload final evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-final-release-evidence
+          path: v2-final-evidence
