@@ -522,6 +522,12 @@
     const canvas = stage && stage.querySelector('canvas');
     const axis = stage && stage.querySelector('[data-orbit]');
     const loading = stage && stage.querySelector('[data-loading]');
+    const mobilePanel = stage && stage.querySelector('[data-mobile-observation]');
+    const mobileTitle = mobilePanel && mobilePanel.querySelector('[data-mobile-title]');
+    const mobileNote = mobilePanel && mobilePanel.querySelector('[data-mobile-note]');
+    const mobileLink = mobilePanel && mobilePanel.querySelector('[data-mobile-link]');
+    const mobileClose = mobilePanel && mobilePanel.querySelector('[data-mobile-close]');
+    const mobileQuery = window.matchMedia('(max-width:720px)');
     if (!stage || !canvas || !axis) return;
 
     const configNode = document.getElementById('nebula-config');
@@ -602,6 +608,24 @@
       return body;
     }
 
+    function syncMobilePanel(target) {
+      if (!mobilePanel) return;
+      if (!mobileQuery.matches || !target) {
+        mobilePanel.hidden = true;
+        return;
+      }
+      mobileTitle.textContent = target.item.name || '';
+      mobileNote.textContent = target.item.note || '';
+      if (target.item.detail) {
+        mobileLink.hidden = false;
+        mobileLink.href = base + target.item.detail;
+      } else {
+        mobileLink.hidden = true;
+        mobileLink.removeAttribute('href');
+      }
+      mobilePanel.hidden = false;
+    }
+
     function toggle(next) {
       const target = state.open === next ? null : next;
       if (state.open && state.open !== target) {
@@ -614,9 +638,10 @@
       if (target) {
         target.hit.setAttribute('aria-expanded', 'true');
         target.hit.querySelectorAll('.sky-more, .sky-link')
-          .forEach((el) => el.setAttribute('aria-hidden', 'false'));
+          .forEach((el) => el.setAttribute('aria-hidden', String(mobileQuery.matches)));
         target.target = 1;
       }
+      syncMobilePanel(target);
       still();
     }
 
@@ -767,6 +792,14 @@
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && state.open) toggle(state.open);
     });
+    if (mobileClose) mobileClose.addEventListener('click', () => { if (state.open) toggle(state.open); });
+    const onMobileChange = () => {
+      if (!state.open) { syncMobilePanel(null); return; }
+      state.open.hit.querySelectorAll('.sky-more, .sky-link')
+        .forEach((el) => el.setAttribute('aria-hidden', String(mobileQuery.matches)));
+      syncMobilePanel(state.open);
+    };
+    if (mobileQuery.addEventListener) mobileQuery.addEventListener('change', onMobileChange); else mobileQuery.addListener(onMobileChange);
 
     observe([canvas], resize);
     window.addEventListener('resize', resize);
@@ -803,7 +836,51 @@
   function initGateway() {
     const gate = document.querySelector('[data-gate]');
     const canvas = gate && gate.querySelector('canvas');
-    if (!gate || !canvas) return;
+    const wrap = gate && gate.closest('[data-gate-wrap]');
+    const mote = wrap && wrap.querySelector('[data-gate-mote]');
+    if (!gate || !canvas || !wrap) return;
+
+    /* 새로고침마다 다르되 Hero의 안전 슬롯 밖으로는 나가지 않는다. */
+    const random = () => {
+      if (window.crypto && crypto.getRandomValues) { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] / 4294967296; }
+      return Math.random();
+    };
+    const mobile = window.matchMedia('(max-width:768px)').matches;
+    const slotWidth = mobile ? 170 : 220;
+    const width = Math.round((mobile ? 106 : 128) + random() * (mobile ? 42 : 52));
+    const ratio = 1.18 + random() * .42;
+    const rot = -1.6 + random() * 3.2;
+    const aligns = mobile ? ['flex-start','center'] : ['flex-start','center','flex-end'];
+    const align = aligns[Math.floor(random() * aligns.length)];
+    wrap.style.setProperty('--gate-align', align);
+    wrap.style.setProperty('--gate-slot-width', `${slotWidth}px`);
+    wrap.style.marginTop = `${Math.round(8 + random() * 12)}px`;
+    gate.style.setProperty('--gate-width', `${width}px`);
+    gate.style.setProperty('--gate-ratio', ratio.toFixed(3));
+    gate.style.setProperty('--gate-rot', `${rot.toFixed(2)}deg`);
+
+    /* 평행한 사각 테두리가 되지 않도록 상하좌우 흔들림을 서로 다르게 준다. */
+    const top = [], right = [], bottom = [], left = [];
+    [2,14,29,46,63,80,97].forEach((x,i) => top.push(`${x}% ${Math.round(1 + random()*(i%2 ? 13 : 8))}%`));
+    [18,39,61,82,96].forEach((y,i) => right.push(`${Math.round(91 + random()*(i%2 ? 9 : 6))}% ${y}%`));
+    [86,70,53,36,19,3].forEach((x,i) => bottom.push(`${x}% ${Math.round(88 + random()*(i%2 ? 11 : 8))}%`));
+    [82,62,42,23,8].forEach((y,i) => left.push(`${Math.round(random()*(i%2 ? 10 : 6))}% ${y}%`));
+    gate.style.setProperty('--tear-clip', `polygon(${[...top,...right,...bottom,...left].join(',')})`);
+
+    if (mote) {
+      const baseX = align === 'flex-end' ? slotWidth - width : align === 'center' ? (slotWidth - width) / 2 : 0;
+      const height = width / ratio;
+      const edge = Math.floor(random() * 3);
+      let localX = .65 + random()*.22, localY = .18 + random()*.35, dx = 8 + random()*9, dy = -(7 + random()*10);
+      if (edge === 1) { localX = .88 + random()*.07; localY = .38 + random()*.25; dx = 10 + random()*10; dy = -3 + random()*7; }
+      if (edge === 2) { localX = .55 + random()*.28; localY = .88 + random()*.07; dx = 5 + random()*9; dy = 8 + random()*10; }
+      mote.style.setProperty('--mote-left', `${(baseX + width*localX).toFixed(1)}px`);
+      mote.style.setProperty('--mote-top', `${(height*localY).toFixed(1)}px`);
+      mote.style.setProperty('--mote-x', `${dx.toFixed(1)}px`);
+      mote.style.setProperty('--mote-y', `${dy.toFixed(1)}px`);
+      mote.style.setProperty('--mote-duration', `${(9 + random()*5).toFixed(1)}s`);
+      mote.style.setProperty('--mote-delay', `${(1 + random()*4).toFixed(1)}s`);
+    }
 
     const cfg = document.getElementById('nebula-config');
     const target = (cfg ? (JSON.parse(cfg.textContent || '{}').target || '') : '') || 'nebula-transit.html';
