@@ -1,0 +1,121 @@
+name: v3 nebula QA fix PR runner
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/v3-nebula-qa-fix-pr.yml
+      - .github/scripts/v3-nebula-qa-patch.py
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout runner source
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v3-nebula-qa-fixes-runner
+          path: runner
+          fetch-depth: 1
+
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v3-nebula-qa-fixes
+          path: target
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Guard target baseline
+        working-directory: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "ec5e92b81991cb3c013010aeb90d3beb3c89a1e7"
+          test "$(git rev-parse HEAD)" = "ec5e92b81991cb3c013010aeb90d3beb3c89a1e7"
+
+      - name: Apply guarded QA fixes
+        working-directory: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          python ../runner/.github/scripts/v3-nebula-qa-patch.py
+
+      - name: Commit one file per commit
+        working-directory: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "chatgpt-actions"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          paths=(
+            docs/v3-constellation-prototypes/nebula.js
+            docs/v3-constellation-prototypes/nebula.css
+            docs/v3-constellation-prototypes/nebula-gateway.html
+            docs/v3-constellation-prototypes/nebula-transit.html
+            docs/v3-constellation-prototypes/nebula-assets.md
+          )
+          msgs=(
+            "fix: harden nebula runtime QA behavior"
+            "fix: isolate nebula styles and hit targets"
+            "fix: resync nebula gateway prototype"
+            "fix: add nebula loading and return path"
+            "docs: record nebula independent static QA"
+          )
+          for i in "${!paths[@]}"; do
+            test -n "$(git diff -- "${paths[$i]}")"
+            git add -- "${paths[$i]}"
+            test "$(git diff --cached --name-only | wc -l)" -eq 1
+            git commit -m "${msgs[$i]}"
+          done
+
+      - name: Static and regression gates
+        working-directory: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check docs/v3-constellation-prototypes/nebula.js
+          node --check tools/render-nebula-audio.js
+          node --check build.js
+          node --check script.js
+          node build.js
+          git diff --exit-code -- index.html
+          node tools/verify-build.js
+          git diff --check origin/main...HEAD
+
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('projects.json').read_text(encoding='utf-8'))
+          groups = data['groups']
+          years = [g for g in groups if g.get('kind') == 'year' or g.get('year')]
+          wip = next(g for g in groups if g.get('kind') == 'wip')
+          failed = next(g for g in groups if g.get('kind') == 'failed')
+          assert [str(g['year']) for g in years] == ['2026', '2025', '2024']
+          assert [len(g['cards']) for g in years] == [10, 5, 5]
+          assert len(wip['cards']) == 6
+          assert len(failed['cards']) == 5
+          titles = [c['title'] if isinstance(c['title'], str) else c['title'].get('ko') for c in failed['cards']]
+          assert 'BrawlCraft' in titles
+          print('projects mapping source verified')
+          PY
+
+          git fetch origin main
+          files=$(git diff --name-only origin/main...HEAD | wc -l)
+          commits=$(git rev-list --count origin/main..HEAD)
+          echo "changed_files=$files commits=$commits"
+          test "$files" -eq 5
+          test "$commits" -eq 5
+          test -z "$(git status --porcelain)"
+
+      - name: Push target branch
+        working-directory: target
+        shell: bash
+        run: |
+          set -euo pipefail
+          git push origin HEAD:agent/v3-nebula-qa-fixes
