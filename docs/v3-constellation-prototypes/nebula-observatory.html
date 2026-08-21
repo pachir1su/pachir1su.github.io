@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="이건영 v3 포트폴리오 — Arduino 프로젝트의 실제 제어 논리를 브라우저에서 관측하는 실험실">
+  <title>관측실 · v3 Universe</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="nebula.css">
+  <link rel="stylesheet" href="nebula-content.css">
+</head>
+<body class="universe-page">
+  <main class="universe-shell">
+    <nav class="universe-topbar" aria-label="우주 탐색">
+      <a class="universe-return" href="nebula-transit.html">← 프로젝트 별자리</a>
+      <div class="universe-siblings">
+        <a href="nebula-growth.html">성장 궤적</a>
+        <a href="nebula-observatory.html" aria-current="page">관측실</a>
+        <a href="../../index.html">v2 노트</a>
+      </div>
+    </nav>
+
+    <header class="universe-intro">
+      <p class="eyebrow">SOURCE-BACKED OBSERVATORY</p>
+      <h1>코드를 별 대신 움직여 봅니다.</h1>
+      <p>#159의 시뮬레이션을 정적인 모형이 아니라 원본 Arduino 스케치의 상수와 상태 전이를 따라가도록 다시 만들었습니다. 하드웨어는 연결하지 않고, 센서 입력과 시간만 브라우저에서 바꿉니다.</p>
+    </header>
+
+    <section class="universe-panel observatory-grid" aria-label="프로젝트 시뮬레이션">
+      <article class="sim-card" data-wall-sim>
+        <p class="eyebrow">OBSERVATORY 01</p>
+        <h2>해안 장벽 시스템</h2>
+        <span class="sim-source">Wall_Sina / main.ino</span>
+        <p class="sim-copy">A0 물 감지 센서가 500을 넘으면 감지를 한 번 고정하고, 110초 동안 신호등·부저·스텝모터 상태가 순서대로 바뀝니다. 원본의 시간 구간을 그대로 탐색할 수 있습니다.</p>
+
+        <div class="sim-controls">
+          <label class="sim-control">
+            <span>물 센서 A0 · <b data-wall-sensor-label>420</b> / 1023</span>
+            <input data-wall-sensor type="range" min="0" max="1023" value="420" step="1">
+          </label>
+          <label class="sim-control">
+            <span>감지 후 시간 · <b data-wall-time-label>0</b>초</span>
+            <input data-wall-time type="range" min="0" max="125" value="0" step="1" disabled>
+          </label>
+          <div class="sim-actions">
+            <button type="button" data-wall-power>시스템 ON</button>
+            <button type="button" data-wall-reset>리셋</button>
+          </div>
+        </div>
+
+        <div class="sim-stage">
+          <div class="sim-readout" aria-live="polite">
+            <span>상태<b data-wall-phase>OFF</b></span>
+            <span>표시<b data-wall-display>—</b></span>
+            <span>모터<b data-wall-motor>정지</b></span>
+            <span>부저<b data-wall-buzzer>OFF</b></span>
+            <span>감지 latch<b data-wall-latch>false</b></span>
+            <span>threshold<b>500</b></span>
+          </div>
+          <div class="wall-visual" aria-hidden="true">
+            <div class="wall-water" data-wall-water></div>
+            <div class="wall-barrier" data-wall-barrier data-motor="stop"></div>
+            <div class="wall-signal"><i class="g" data-wall-green></i><i class="y" data-wall-yellow></i><i class="r" data-wall-red></i></div>
+          </div>
+        </div>
+
+        <div class="source-facts">
+          <span><code>stepsPerRevolution = 2048</code></span>
+          <span><code>myStepper.setSpeed(15)</code></span>
+          <span><code>0–27 / 27–47 / 47–70 / 70–90 / 90–110s</code></span>
+          <span><code>tone(buzzer, 1000)</code></span>
+        </div>
+      </article>
+
+      <article class="sim-card" data-ucast-sim>
+        <p class="eyebrow">OBSERVATORY 02</p>
+        <h2>멈춰! · 2026 U-CAST</h2>
+        <span class="sim-source">2026_U-CAST / main.ino</span>
+        <p class="sim-copy">시작·끝 IR 센서 한 쌍과 NeoPixel 한 줄이 하나의 독립 채널입니다. 어느 한 채널이라도 활성 상태면 공용 경고 LED와 800–1800Hz 사이렌이 유지됩니다.</p>
+
+        <div class="ucast-lanes">
+          <section class="ucast-lane" data-ucast-lane="0">
+            <div class="ucast-lane-head"><b>CH 1 · D8 → D10</b><span data-ucast-state="0">IDLE</span></div>
+            <div class="ucast-strip" data-ucast-strip="0"></div>
+            <div class="sim-actions">
+              <button type="button" data-ucast-entry="0">시작 IR</button>
+              <button type="button" data-ucast-exit="0">끝 IR</button>
+            </div>
+          </section>
+          <section class="ucast-lane" data-ucast-lane="1">
+            <div class="ucast-lane-head"><b>CH 2 · D9 → D11</b><span data-ucast-state="1">IDLE</span></div>
+            <div class="ucast-strip" data-ucast-strip="1"></div>
+            <div class="sim-actions">
+              <button type="button" data-ucast-entry="1">시작 IR</button>
+              <button type="button" data-ucast-exit="1">끝 IR</button>
+            </div>
+          </section>
+        </div>
+
+        <div class="ucast-common" aria-live="polite">
+          <span class="warn-lamp" data-ucast-lamp></span>
+          <span>공용 출력 · <b data-ucast-common>IDLE</b> · <b data-ucast-siren>0 Hz</b></span>
+        </div>
+        <div class="sim-actions">
+          <button type="button" data-ucast-all-start>빨간 버튼 · 전체 시작</button>
+          <button type="button" data-ucast-all-stop>초록 버튼 · 전체 종료</button>
+        </div>
+
+        <div class="source-facts">
+          <span><code>WARNING_BLINK_MS = 300</code></span>
+          <span><code>SIREN_MIN/MAX = 800 / 1800Hz</code></span>
+          <span><code>SIREN_SWEEP_MS = 500</code></span>
+          <span><code>IR_CONFIRM_MS = 60</code></span>
+          <span><code>WARNING_TIMEOUT_MS = 0</code></span>
+          <span><code>delay() 미사용 · millis() 기반</code></span>
+        </div>
+      </article>
+    </section>
+
+    <section class="universe-panel" aria-label="이상 신호">
+      <div class="anomaly-field">
+        <button class="anomaly-star" type="button" data-anomaly-star aria-label="약한 이상 신호"></button>
+        <div class="area51-panel" data-area51-panel aria-hidden="true">
+          <b>AREA 51 · QUARANTINED ORBIT</b>
+          <p>프로젝트 성도에서 선 밖으로 밀려난 기록을 보관하는 격리 궤도입니다. 현재는 <strong>BrawlCraft</strong>의 실패 기록이 이곳에 남아 있습니다.</p>
+          <p><a href="nebula-transit.html">성도로 돌아가기</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc">
+      <h2>시뮬레이션과 원본의 경계</h2>
+      <p>이 화면은 Arduino 라이브러리나 물리 센서를 브라우저에서 에뮬레이션하지 않습니다. 대신 원본 스케치가 판단하는 입력값·시간 구간·독립 채널 상태를 같은 상수로 재현합니다.</p>
+      <div class="rows">
+        <div class="row"><b>Wall_Sina</b><span>A0 임계값 500, 27/47/70/90/110초 분기, 1000Hz 부저, 2048-step 모터 설정을 원본 기준으로 사용.</span></div>
+        <div class="row"><b>2026 U-CAST</b><span>D8/D10·D9/D11 독립 채널, 300ms 점멸, 800–1800Hz/500ms sweep, 60ms IR 확인 규칙을 원본 기준으로 사용.</span></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  (() => {
+    'use strict';
+
+    /* Wall_Sina ------------------------------------------------------ */
+    const wallRoot=document.querySelector('[data-wall-sim]');
+    const sensor=wallRoot.querySelector('[data-wall-sensor]');
+    const time=wallRoot.querySelector('[data-wall-time]');
+    const sensorLabel=wallRoot.querySelector('[data-wall-sensor-label]');
+    const timeLabel=wallRoot.querySelector('[data-wall-time-label]');
+    const phaseOut=wallRoot.querySelector('[data-wall-phase]');
+    const displayOut=wallRoot.querySelector('[data-wall-display]');
+    const motorOut=wallRoot.querySelector('[data-wall-motor]');
+    const buzzerOut=wallRoot.querySelector('[data-wall-buzzer]');
+    const latchOut=wallRoot.querySelector('[data-wall-latch]');
+    const water=wallRoot.querySelector('[data-wall-water]');
+    const barrier=wallRoot.querySelector('[data-wall-barrier]');
+    const lamps={g:wallRoot.querySelector('[data-wall-green]'),y:wallRoot.querySelector('[data-wall-yellow]'),r:wallRoot.querySelector('[data-wall-red]')};
+    const powerBtn=wallRoot.querySelector('[data-wall-power]');
+    let powered=false, latched=false;
+
+    function wallPhase(seconds){
+      if(!powered) return {name:'OFF', display:'—', motor:'stop', buzzer:false, lamps:[]};
+      if(!latched) return {name:'대기', display:'—', motor:'stop', buzzer:false, lamps:[]};
+      if(seconds<27) return {name:'초록', display:String(27-seconds), motor:'forward', buzzer:true, lamps:['g']};
+      if(seconds<47) return {name:'노랑', display:String(47-seconds), motor:'hold', buzzer:true, lamps:['y']};
+      if(seconds<70) return {name:'노랑 점멸', display:String(70-seconds), motor:'hold', buzzer:false, lamps:(seconds%2===0)?['y']:[]};
+      if(seconds<90) return {name:'빨강+노랑 점멸', display:String(90-seconds), motor:'hold', buzzer:false, lamps:(seconds%2===0)?['r','y']:[]};
+      if(seconds<110) return {name:'빨강', display:String(seconds), motor:'reverse', buzzer:false, lamps:['r']};
+      return {name:'3색 교차', display:String(seconds), motor:'stop', buzzer:false, lamps:[[ 'r' ],[ 'y' ],[ 'g' ]][seconds%3]};
+    }
+    function updateWall(){
+      const raw=Number(sensor.value), seconds=Number(time.value);
+      sensorLabel.textContent=raw; timeLabel.textContent=seconds;
+      water.style.height=`${Math.max(8,Math.min(86,8+raw/1023*78))}%`;
+      if(powered && !latched && raw>500){ latched=true; time.disabled=false; time.value='0'; }
+      const state=wallPhase(Number(time.value));
+      phaseOut.textContent=state.name; displayOut.textContent=state.display;
+      motorOut.textContent=state.motor==='forward'?'정방향':state.motor==='reverse'?'역방향':state.motor==='hold'?'추가 스텝 없음':'정지';
+      buzzerOut.textContent=state.buzzer?'1000 Hz':'OFF'; latchOut.textContent=String(latched);
+      barrier.dataset.motor=state.motor;
+      Object.entries(lamps).forEach(([key,lamp])=>lamp.classList.toggle('on',state.lamps.includes(key)));
+      powerBtn.textContent=powered?'시스템 OFF':'시스템 ON';
+    }
+    sensor.addEventListener('input',updateWall); time.addEventListener('input',updateWall);
+    powerBtn.addEventListener('click',()=>{ powered=!powered; if(!powered){latched=false;time.value='0';time.disabled=true;} updateWall(); });
+    wallRoot.querySelector('[data-wall-reset]').addEventListener('click',()=>{latched=false;time.value='0';time.disabled=true;updateWall();});
+    updateWall();
+
+    /* U-CAST --------------------------------------------------------- */
+    const ucastRoot=document.querySelector('[data-ucast-sim]');
+    const channels=[false,false];
+    const stateEls=[...ucastRoot.querySelectorAll('[data-ucast-state]')];
+    const strips=[...ucastRoot.querySelectorAll('[data-ucast-strip]')];
+    const lamp=ucastRoot.querySelector('[data-ucast-lamp]');
+    const common=ucastRoot.querySelector('[data-ucast-common]');
+    const siren=ucastRoot.querySelector('[data-ucast-siren]');
+    const any=()=>channels.some(Boolean);
+    let warningStartedAt=0, raf=0;
+    function sirenAt(now){
+      if(!any()) return 0;
+      const elapsed=(now-warningStartedAt)%1000;
+      const rising=elapsed<500, local=rising?elapsed:elapsed-500;
+      const moved=Math.round(1000*(local/500));
+      return rising?800+moved:1800-moved;
+    }
+    function paintUcast(now=performance.now()){
+      cancelAnimationFrame(raf); raf=0;
+      const active=any();
+      const elapsed=active?Math.max(0,now-warningStartedAt):0;
+      const phase=Math.floor(elapsed/300)%2===0;
+      channels.forEach((isActive,index)=>{
+        stateEls[index].textContent=isActive?'WARNING':'IDLE';
+        strips[index].classList.toggle('on',isActive&&phase);
+      });
+      lamp.classList.toggle('on',active&&phase);
+      common.textContent=active?'WARNING':'IDLE'; siren.textContent=`${sirenAt(now)} Hz`;
+      if(active && !matchMedia('(prefers-reduced-motion: reduce)').matches) raf=requestAnimationFrame(paintUcast);
+    }
+    function mutateChannels(mutator){
+      const wasActive=any(); mutator(); const active=any();
+      if(active&&!wasActive) warningStartedAt=performance.now();
+      if(!active) warningStartedAt=0;
+      paintUcast();
+    }
+    ucastRoot.querySelectorAll('[data-ucast-entry]').forEach(button=>button.addEventListener('click',()=>mutateChannels(()=>{channels[Number(button.dataset.ucastEntry)]=true;})));
+    ucastRoot.querySelectorAll('[data-ucast-exit]').forEach(button=>button.addEventListener('click',()=>mutateChannels(()=>{channels[Number(button.dataset.ucastExit)]=false;})));
+    ucastRoot.querySelector('[data-ucast-all-start]').addEventListener('click',()=>mutateChannels(()=>channels.fill(true)));
+    ucastRoot.querySelector('[data-ucast-all-stop]').addEventListener('click',()=>mutateChannels(()=>channels.fill(false)));
+    paintUcast();
+
+    /* Area 51 -------------------------------------------------------- */
+    const anomaly=document.querySelector('[data-anomaly-star]');
+    const area51=document.querySelector('[data-area51-panel]');
+    anomaly.addEventListener('click',()=>{
+      const open=!area51.classList.contains('open');
+      area51.classList.toggle('open',open); area51.setAttribute('aria-hidden',String(!open));
+      anomaly.setAttribute('aria-expanded',String(open));
+    });
+  })();
+  </script>
+</body>
+</html>
