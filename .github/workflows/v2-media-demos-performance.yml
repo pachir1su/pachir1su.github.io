@@ -1,0 +1,186 @@
+name: v2 media demos performance phase
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-qa:
+    if: github.head_ref == 'agent/v2-media-demos-performance-runner'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout runner
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v2-media-demos-performance-runner
+          path: runner
+          fetch-depth: 1
+
+      - name: Checkout v2 target
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v2-media-demos-performance
+          path: target
+          fetch-depth: 80
+          token: ${{ github.token }}
+
+      - name: Checkout current KGA source
+        uses: actions/checkout@v4
+        with:
+          repository: pachir1su/koreatechGongjiAgent
+          ref: main
+          path: kga
+          fetch-depth: 1
+
+      - name: Verify clean base
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C target rev-parse HEAD)" = "4791c0b828b6382f26b74af7ca121e41e23904ec"
+          test -z "$(git -C target status --porcelain)"
+
+      - name: Install temporary QA dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check pillow >/dev/null
+          mkdir -p /tmp/v2-phase-node
+          cd /tmp/v2-phase-node
+          npm init -y >/dev/null
+          npm install playwright@1.55.0 lighthouse >/dev/null
+          CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+          echo "NODE_PATH=/tmp/v2-phase-node/node_modules" >> "$GITHUB_ENV"
+
+      - name: Start real KGA frontend source server
+        shell: bash
+        run: |
+          python3 -m http.server 4174 --directory kga >/tmp/kga-source-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4174/web/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/kga-source-http.log
+          exit 1
+
+      - name: Capture public Health Notion and current KGA UI
+        shell: bash
+        env:
+          CAPTURE_OUT: ${{ github.workspace }}/captures
+          HEALTH_NOTION_URL: https://pachir1su.notion.site/2025-SDGs-1b9f776d60dc8058976bc03379ceaf06
+          KGA_BASE: http://127.0.0.1:4174
+        run: |
+          set -euo pipefail
+          NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node runner/tools/v2-capture-media.cjs
+          test -f captures/health-1.png
+          test -f captures/kga-home.png
+          test -f captures/kga-shuttle.png
+          test -f captures/kga-admin.png
+
+      - name: Apply consolidated v2 phase
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 runner/tools/v2-apply-phase.py
+          git -C target diff --check
+          node --check target/script.js
+          node --check target/detail.js
+          node --check target/assets/project-demos.js
+          node --check target/build.js
+          node target/tools/verify-build.js
+          ! grep -R -E 'unpkg.com/aos@|vanilla-tilt/1.8.0' target/projects/*/index.html
+          ! grep -q 'devicons/devicon' target/index.html
+          grep -q 'detail.js' target/projects/Wall_Sina/index.html
+          grep -q 'data-project-demo="wall"' target/projects/Wall_Sina/index.html
+          grep -q 'data-project-demo="ucast"' target/projects/2026_U-CAST/index.html
+          grep -q 'data-project-demo="health"' target/projects/HEALTH_CHECK_PROJECT/index.html
+          grep -q 'data-project-demo="berry"' target/projects/BerryIno/index.html
+          grep -q 'data-project-demo="plant"' target/projects/PlantClock/index.html
+
+      - name: Start modified portfolio server
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --directory target >/tmp/v2-phase-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/v2-phase-http.log
+          exit 1
+
+      - name: Run broad browser regression and demo QA
+        shell: bash
+        env:
+          QA_BASE: http://127.0.0.1:4173
+          TARGET_DIR: ${{ github.workspace }}/target
+          QA_OUT: ${{ github.workspace }}/v2-phase-qa-artifacts
+        run: |
+          set -euo pipefail
+          NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node runner/tools/v2-phase-qa.cjs
+
+      - name: Measure Lighthouse after optimization
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p lighthouse
+          /tmp/v2-phase-node/node_modules/.bin/lighthouse http://127.0.0.1:4173/ \
+            --chrome-path="$CHROME_PATH" --output=json --output-path=lighthouse/mobile.json \
+            --quiet --chrome-flags="--headless --no-sandbox" || true
+          /tmp/v2-phase-node/node_modules/.bin/lighthouse http://127.0.0.1:4173/ \
+            --chrome-path="$CHROME_PATH" --preset=desktop --output=json --output-path=lighthouse/desktop.json \
+            --quiet --chrome-flags="--headless --no-sandbox" || true
+          node - <<'NODE'
+          const fs=require('fs'); const out={};
+          for(const mode of ['mobile','desktop']) { const p=`lighthouse/${mode}.json`; if(!fs.existsSync(p)) continue; const j=JSON.parse(fs.readFileSync(p)); out[mode]={performance:Math.round(j.categories.performance.score*100),accessibility:Math.round(j.categories.accessibility.score*100),bestPractices:Math.round(j.categories['best-practices'].score*100),seo:Math.round(j.categories.seo.score*100),lcp:j.audits['largest-contentful-paint'].displayValue,tbt:j.audits['total-blocking-time'].displayValue,cls:j.audits['cumulative-layout-shift'].displayValue}; }
+          fs.writeFileSync('lighthouse/summary.json',JSON.stringify(out,null,2)); console.log(JSON.stringify(out,null,2));
+          NODE
+
+      - name: Commit target atomically
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cd target
+          git config user.name "v2 phase runner"
+          git config user.email "actions@users.noreply.github.com"
+          BASE="4791c0b828b6382f26b74af7ca121e41e23904ec"
+          mapfile -d '' FILES < <(git status --porcelain=v1 -z | sed -z 's/^...//')
+          test "${#FILES[@]}" -gt 10
+          for f in "${FILES[@]}"; do
+            git add -- "$f"
+            case "$f" in
+              detail.js) msg="perf: add lightweight detail runtime" ;;
+              assets/project-demos.js) msg="feat: add interactive project demos" ;;
+              index.html) msg="perf: reduce home render dependencies" ;;
+              script.js) msg="perf: throttle home interactions" ;;
+              style.css) msg="perf: optimize v2 rendering styles" ;;
+              projects.json) msg="feat: link health project notion" ;;
+              projects/*/assets/images/*) msg="feat: add verified project media" ;;
+              projects/*/index.html) msg="feat: enhance project detail experience" ;;
+              *) msg="chore: update v2 portfolio asset" ;;
+            esac
+            git commit -m "$msg" -- "$f"
+          done
+          changed="$(git diff --name-only "$BASE"...HEAD | wc -l)"
+          commits="$(git rev-list --count "$BASE"..HEAD)"
+          echo "changed=$changed commits=$commits"
+          test "$changed" -eq "$commits"
+          test "$changed" -eq "${#FILES[@]}"
+          git push origin HEAD:agent/v2-media-demos-performance
+
+      - name: Upload QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-media-demos-performance-evidence
+          path: |
+            captures
+            v2-phase-qa-artifacts
+            lighthouse
+          if-no-files-found: warn
