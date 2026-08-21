@@ -57,7 +57,8 @@ function heightFor(w) { return w <= 390 ? 844 : w <= 768 ? 1024 : 900; }
       await page.goto(`${base}/projects/${encodeURIComponent(d)}/`,{waitUntil:'domcontentloaded'});
       await page.waitForTimeout(80);
       if (redirectOnly.has(d)) {
-        check(new URL(page.url()).pathname === '/',`${label}:redirect target`,page.url());
+        const pathname = new URL(page.url()).pathname;
+        check(pathname === '/' || pathname === '/index.html',`${label}:redirect target`,page.url());
       } else {
         await verifyPage(page,label);
         check(errors.length===0,`${label}:errors`,errors.join('\n'));
