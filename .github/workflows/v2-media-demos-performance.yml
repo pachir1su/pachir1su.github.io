@@ -58,7 +58,7 @@ jobs:
             cp -a "source/$f" "final/$f"
           done < /tmp/v2-files
 
-          # Keep the useful detail/demo changes but remove only the generated-image blocks.
+          # Keep useful Health/KGA detail/runtime work, remove only generated-image blocks.
           python3 - <<'PY'
           from pathlib import Path
 
@@ -104,12 +104,16 @@ jobs:
           kga.write_text(''.join(out), encoding='utf-8')
           PY
 
+          # Re-apply only the v2 performance/accessibility portion of the former RC patch.
+          python3 runner/tools/v2-only-performance-patch.py
+
           ! grep -R -n -E 'notion-1\.webp|source-design-hub\.webp|source-mobile-proposal\.webp' \
             final/projects/HEALTH_CHECK_PROJECT final/projects/koreatechGongjiAgent
           test ! -e final/projects/HEALTH_CHECK_PROJECT/assets/images/notion-1.webp
           test ! -e final/projects/koreatechGongjiAgent/assets/images/source-design-hub.webp
           test ! -e final/projects/koreatechGongjiAgent/assets/images/source-mobile-proposal.webp
           test ! -d final/assets/images/nebula-gateway
+          ! grep -R -n -E 'v3-gateway|nebula-gateway|docs/v3-constellation-prototypes' final/index.html final/script.js final/style.css
           git -C final diff --check
           node --check final/script.js
           node --check final/detail.js
