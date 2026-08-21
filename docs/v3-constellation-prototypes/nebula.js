@@ -522,19 +522,30 @@
      같은 동작을 빠르게 연속 입력했을 때 파일이 겹쳐 울리지 않도록 cue별로
      바로 앞 재생을 멈춘다. 오디오 실패(자동 재생 정책 등)는 화면 동작을 막지 않는다. */
   const APPROVED_SFX = {
-    year: 'assets/audio/sfx-04-year-a-wood.wav',
+    /* SFX-01은 A/B/C 모두 채택됐으므로 진입 중 별이 생길 때마다 하나를 뽑는다. */
+    arrival: [
+      'assets/audio/sfx-01-star-a-glass-bell.wav',
+      'assets/audio/sfx-01-star-b-celesta.wav',
+      'assets/audio/sfx-01-star-c-harp.wav',
+    ],
     select: 'assets/audio/sfx-05-select-a-bell.wav',
     enter: 'assets/audio/sfx-06-enter-b-three-notes.wav',
   };
   const activeSfx = new Map();
+  function closeAudioContext(context, delay) {
+    window.setTimeout(() => { context.close().catch(() => {}); }, delay);
+  }
   function playApprovedSfx(cue) {
-    const source = APPROVED_SFX[cue];
+    const candidate = APPROVED_SFX[cue];
+    const source = Array.isArray(candidate)
+      ? candidate[Math.floor(Math.random() * candidate.length)]
+      : candidate;
     if (!source) return;
     const previous = activeSfx.get(cue);
     if (previous) { previous.pause(); previous.currentTime = 0; }
     const audio = new Audio(source);
     audio.preload = 'auto';
-    audio.volume = cue === 'year' ? .48 : .58;
+    audio.volume = cue === 'arrival' ? .42 : .58;
     activeSfx.set(cue, audio);
     audio.addEventListener('ended', () => {
       if (activeSfx.get(cue) === audio) activeSfx.delete(cue);
@@ -542,6 +553,143 @@
     audio.play().catch(() => {
       if (activeSfx.get(cue) === audio) activeSfx.delete(cue);
     });
+  }
+
+  /* SFX-04 A의 나무 질감은 유지하면서, 반복 클릭의 피로를 줄일 짧은 변주다.
+     원본 A와 이 변주를 무작위로 섞되 길이와 음량은 같은 조작감으로 맞춘다. */
+  function playYearVariation() {
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextCtor) return;
+    try {
+      const context = new AudioContextCtor();
+      const start = context.currentTime;
+      const output = context.createGain();
+      output.gain.setValueAtTime(.05, start);
+      output.gain.exponentialRampToValueAtTime(.001, start + .24);
+      output.connect(context.destination);
+      [0, .055].forEach((offset, index) => {
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+        oscillator.type = 'triangle';
+        oscillator.frequency.setValueAtTime(index ? 242 : 286, start + offset);
+        oscillator.frequency.exponentialRampToValueAtTime(index ? 136 : 162, start + offset + .16);
+        gain.gain.setValueAtTime(index ? .38 : .52, start + offset);
+        gain.gain.exponentialRampToValueAtTime(.001, start + offset + .17);
+        oscillator.connect(gain).connect(output);
+        oscillator.start(start + offset);
+        oscillator.stop(start + offset + .19);
+      });
+      closeAudioContext(context, 420);
+    } catch (_) { /* 브라우저 오디오 제한은 연도 전환을 막지 않는다. */ }
+  }
+
+  function playYearSfx() {
+    if (Math.random() < .56) {
+      const source = 'assets/audio/sfx-04-year-a-wood.wav';
+      const previous = activeSfx.get('year');
+      if (previous) { previous.pause(); previous.currentTime = 0; }
+      const audio = new Audio(source);
+      audio.preload = 'auto';
+      audio.volume = .48;
+      activeSfx.set('year', audio);
+      audio.addEventListener('ended', () => {
+        if (activeSfx.get('year') === audio) activeSfx.delete('year');
+      }, { once:true });
+      audio.play().catch(() => {
+        if (activeSfx.get('year') === audio) activeSfx.delete('year');
+      });
+      return;
+    }
+    playYearVariation();
+  }
+
+  /* v2 종이를 찢고 우주로 들어갈 때만 쓰는 별도 효과음. SFX-06 B(상세 이동)는
+     프로젝트 상세에 남겨 두고, 여기서는 종이 섬유가 열리고 별빛이 빨려 드는 결을 쓴다. */
+  function playGatewaySfx() {
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextCtor) return;
+    try {
+      const context = new AudioContextCtor();
+      const start = context.currentTime;
+      const master = context.createGain();
+      master.gain.setValueAtTime(.001, start);
+      master.gain.linearRampToValueAtTime(.10, start + .18);
+      master.gain.exponentialRampToValueAtTime(.001, start + 2.8);
+      master.connect(context.destination);
+      const oscillator = context.createOscillator();
+      const tone = context.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(154, start + .10);
+      oscillator.frequency.exponentialRampToValueAtTime(466, start + 1.75);
+      tone.gain.setValueAtTime(.001, start);
+      tone.gain.linearRampToValueAtTime(.34, start + .62);
+      tone.gain.exponentialRampToValueAtTime(.001, start + 2.55);
+      oscillator.connect(tone).connect(master);
+      oscillator.start(start); oscillator.stop(start + 2.7);
+
+      const length = Math.max(1, Math.ceil(context.sampleRate * 1.65));
+      const buffer = context.createBuffer(1, length, context.sampleRate);
+      const samples = buffer.getChannelData(0);
+      for (let i = 0; i < length; i++) samples[i] = Math.random() * 2 - 1;
+      const noise = context.createBufferSource();
+      const filter = context.createBiquadFilter();
+      const breath = context.createGain();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(620, start);
+      filter.frequency.exponentialRampToValueAtTime(2360, start + 1.45);
+      filter.Q.value = .72;
+      breath.gain.setValueAtTime(.001, start);
+      breath.gain.linearRampToValueAtTime(.18, start + .28);
+      breath.gain.exponentialRampToValueAtTime(.001, start + 1.65);
+      noise.buffer = buffer;
+      noise.connect(filter).connect(breath).connect(master);
+      noise.start(start); noise.stop(start + 1.7);
+      closeAudioContext(context, 3000);
+    } catch (_) { /* 오디오 실패는 4초 진입 연출을 막지 않는다. */ }
+  }
+
+  /* SFX-07 C′ — 진행 중인 원시성만 열 때 쓰는 짧은 공기·별가루 효과음이다.
+     완료 별의 선택음(SFX-05)과 분리해, 상태가 소리로도 읽히도록 한다. */
+  function playWipSfx() {
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextCtor) return;
+    try {
+      const context = new AudioContextCtor();
+      const start = context.currentTime;
+      const master = context.createGain();
+      master.gain.setValueAtTime(.001, start);
+      master.gain.linearRampToValueAtTime(.105, start + .25);
+      master.gain.exponentialRampToValueAtTime(.001, start + 1.18);
+      master.connect(context.destination);
+      const tone = context.createOscillator();
+      const toneGain = context.createGain();
+      tone.type = 'triangle';
+      tone.frequency.setValueAtTime(146.83, start + .12);
+      tone.frequency.exponentialRampToValueAtTime(220, start + 1.02);
+      toneGain.gain.setValueAtTime(.001, start);
+      toneGain.gain.linearRampToValueAtTime(.42, start + .36);
+      toneGain.gain.exponentialRampToValueAtTime(.001, start + 1.08);
+      tone.connect(toneGain).connect(master);
+      tone.start(start); tone.stop(start + 1.14);
+      const length = Math.max(1, Math.ceil(context.sampleRate * 1.05));
+      const buffer = context.createBuffer(1, length, context.sampleRate);
+      const samples = buffer.getChannelData(0);
+      for (let i = 0; i < length; i++) samples[i] = Math.random() * 2 - 1;
+      const noise = context.createBufferSource();
+      const filter = context.createBiquadFilter();
+      const breath = context.createGain();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(280, start);
+      filter.frequency.exponentialRampToValueAtTime(1780, start + .96);
+      filter.Q.value = 1.15;
+      breath.gain.setValueAtTime(.001, start);
+      breath.gain.linearRampToValueAtTime(.12, start + .38);
+      breath.gain.exponentialRampToValueAtTime(.001, start + 1.03);
+      noise.buffer = buffer;
+      noise.connect(filter).connect(breath).connect(master);
+      noise.start(start); noise.stop(start + 1.08);
+      closeAudioContext(context, 1400);
+    } catch (_) { /* 진행 중 별은 소리 없이도 열려야 한다. */ }
   }
 
   /* ------------------------------------------------------------------
@@ -570,19 +718,21 @@
 
   /* 연도 별자리 형태. 프로젝트 개수만큼 앞에서부터 쓰고 순서대로 선을 잇는다.
      좌표는 경로 순서로 적어 두었으므로 이어 그으면 별자리처럼 읽힌다. */
+  /* 완료 별은 어떤 화면에서도 같은 선을 유지한다. 이름 충돌을 피하려고
+     클릭할 때 좌표를 밀어내던 방식을 버리고, 처음부터 바깥쪽으로 읽히는 성도를 둔다. */
   const WIDE_YEAR = {
-    11: [[.100, .520], [.185, .365], [.300, .470], [.402, .255], [.518, .385], [.448, .565],
-         [.585, .665], [.422, .725], [.280, .610], [.165, .735], [.075, .620]],
-    10: [[.100, .520], [.185, .365], [.300, .470], [.402, .255], [.518, .385],
-         [.448, .565], [.585, .665], [.422, .725], [.280, .610], [.165, .735]],
-    5: [[.135, .520], [.270, .335], [.435, .455], [.360, .650], [.180, .675]],
+    11: [[.140, .280], [.410, .190], [.660, .300], [.520, .420], [.220, .410], [.100, .570],
+         [.340, .640], [.620, .710], [.450, .820], [.180, .760], [.270, .570]],
+    10: [[.140, .280], [.410, .190], [.660, .300], [.520, .420], [.220, .410],
+         [.100, .570], [.340, .640], [.620, .710], [.450, .820], [.180, .760]],
+    5: [[.150, .350], [.440, .255], [.680, .410], [.480, .620], [.170, .600]],
   };
   const TABLET_YEAR = {
-    11: [[.125, .315], [.290, .245], [.435, .350], [.310, .460], [.475, .535], [.330, .625],
-         [.485, .705], [.315, .785], [.165, .695], [.105, .560], [.185, .440]],
-    10: [[.125, .315], [.290, .245], [.435, .350], [.310, .460], [.475, .535],
-         [.330, .625], [.485, .705], [.315, .785], [.165, .695], [.105, .560]],
-    5: [[.150, .385], [.330, .300], [.490, .435], [.340, .635], [.145, .600]],
+    11: [[.120, .240], [.550, .190], [.780, .300], [.560, .400], [.180, .385], [.080, .545],
+         [.360, .625], [.700, .705], [.440, .810], [.160, .740], [.280, .555]],
+    10: [[.120, .240], [.550, .190], [.780, .300], [.560, .400], [.180, .385],
+         [.080, .545], [.360, .625], [.700, .705], [.440, .810], [.160, .740]],
+    5: [[.145, .320], [.555, .255], [.770, .425], [.460, .630], [.135, .605]],
   };
   /* 폰은 화면 폭이 좁은 대신 무대를 세로로 쓴다. 별 사이의 세로 간격은
      44px 터치 영역보다 항상 크게 잡는다. 이전 좌표(.035 간격)는 폴드에서
@@ -610,28 +760,28 @@
       wip: [[.790, .120], [.880, .168], [.805, .224], [.900, .262], [.775, .312], [.870, .356]],
       failed: [[.095, .800], [.185, .862], [.275, .812], [.360, .876]],
       /* 가까운 별끼리의 이름이 겹치지 않도록 완료 별은 좌우로 번갈아 편다. */
-      side: { year: 'balanced', wip: 'left', failed: 'right' },
+      side: { year: 'outward', wip: 'left', failed: 'right' },
       scale: 1,
     },
     tablet: {
       year: TABLET_YEAR,
       wip: [[.760, .465], [.875, .540], [.750, .615], [.885, .690], [.765, .765], [.875, .840]],
       failed: [[.100, .845], [.245, .920], [.110, .970]],
-      side: { year: 'balanced', wip: 'left', failed: 'right' },
+      side: { year: 'outward', wip: 'left', failed: 'right' },
       scale: .86,
     },
     mobile: {
       year: MOBILE_YEAR,
       wip: [[.100, .800], [.100, .835], [.100, .870], [.100, .905], [.100, .940], [.100, .975]],
       failed: [[.900, .820], [.900, .890], [.900, .960]],
-      side: { year: 'alternate', wip: 'right', failed: 'left' },
+      side: { year: 'outward', wip: 'right', failed: 'left' },
       scale: .76,
     },
     fold: {
       year: FOLD_YEAR,
       wip: [[.105, .810], [.105, .842], [.105, .874], [.105, .906], [.105, .938], [.105, .970]],
       failed: [[.895, .830], [.895, .900], [.895, .965]],
-      side: { year: 'alternate', wip: 'right', failed: 'left' },
+      side: { year: 'outward', wip: 'right', failed: 'left' },
       scale: .70,
     },
   };
@@ -737,7 +887,8 @@
           window.setTimeout(() => { window.location.href = base + item.detail; }, 140);
           return;
         }
-        playApprovedSfx('select');
+        if (group === 'wip') playWipSfx();
+        else playApprovedSfx('select');
         toggle(body);
       });
       return body;
@@ -754,8 +905,7 @@
         target.hit.setAttribute('aria-expanded', 'true');
         target.target = 1;
       }
-      /* 카드가 펼쳐진 실제 높이까지 다시 재서 다른 클릭 영역을 비킨다. */
-      place();
+      /* 카드 정보만 열고, 별·선·클릭 영역의 좌표는 절대 다시 배치하지 않는다. */
       still();
     }
 
@@ -856,7 +1006,7 @@
         btn.append(label, mark);
         btn.addEventListener('click', () => {
           if (state.year === i && !state.yearTransition) return;
-          playApprovedSfx('year');
+          playYearSfx();
           Array.from(axis.querySelectorAll('.orbit-year'))
             .forEach((other, k) => other.setAttribute('aria-current', String(k === i)));
           rebuildYear(i, true);
@@ -886,8 +1036,8 @@
       return a.left < b.right + pad && a.right > b.left - pad && a.top < b.bottom + pad && a.bottom > b.top - pad;
     }
 
-    /* 레이아웃 좌표만 믿지 않고 실제 라벨 폭까지 계산해 궤도·메모·다른 별과
-       겹치는 천체를 옮긴다. 화면 폭과 글꼴이 달라도 클릭 영역은 겹치지 않는다. */
+    /* 완료 별은 성도의 꼭짓점이므로 어떤 경우에도 밀어내지 않는다. 대신
+       선에 속하지 않는 진행/실패 천체만 연도 축·메모·완료 별을 피해 정리한다. */
     function resolveInteractiveCollisions(L) {
       if (!state.size) return;
       const root = stage.getBoundingClientRect();
@@ -895,8 +1045,9 @@
       const controls = Array.from(axis.querySelectorAll('.orbit-year'))
         .concat(Array.from(stage.querySelectorAll('.orbit-back-note')))
         .map((element) => stageRect(element, root));
-      const interactive = bodies.filter((body) => body.yearPhase !== 'leave');
-      const placed = controls.slice();
+      const fixedYearBodies = bodies.filter((body) => body.group === 'year' && body.yearPhase !== 'leave');
+      const interactive = bodies.filter((body) => body.group !== 'year' && body.yearPhase !== 'leave');
+      const placed = controls.concat(fixedYearBodies.map((body) => stageRect(body.hit, root)));
       const labelMargin = (L === LAYOUTS.mobile || L === LAYOUTS.fold) ? w * .40 : w * .27;
 
       interactive.forEach((body) => {
@@ -937,9 +1088,11 @@
           : L[body.group];
         const pos = shape[body.index % shape.length];
         const requestedSide = L.side[body.group];
-        body.hit.dataset.side = requestedSide === 'alternate'
+        body.hit.dataset.side = requestedSide === 'outward'
           ? (pos[0] > .5 ? 'left' : 'right')
-          : requestedSide === 'balanced'
+          : requestedSide === 'alternate'
+            ? (pos[0] > .5 ? 'left' : 'right')
+            : requestedSide === 'balanced'
             ? ((body.index % 2 && pos[0] > .16) || pos[0] > .68 ? 'left' : 'right')
             : requestedSide;
         positionBody(body, pos[0] * w, pos[1] * h);
@@ -1378,9 +1531,9 @@
     const target = (cfg ? (JSON.parse(cfg.textContent || '{}').target || '') : '') || 'nebula-transit.html';
     const random = rng((Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0);
     const variants = [
-      { src:'assets/gateway/torn-portal-wide-v1.png', scale:1.04, glint:[65,45] },
-      { src:'assets/gateway/torn-portal-trail-v1.png', scale:1.07, glint:[57,52] },
-      { src:'assets/gateway/torn-portal-diagonal-v1.png', scale:1.03, glint:[62,42] },
+      { src:'../../assets/images/nebula-gateway/torn-portal-wide-v1.png', scale:1.04, glint:[65,45] },
+      { src:'../../assets/images/nebula-gateway/torn-portal-trail-v1.png', scale:1.07, glint:[57,52] },
+      { src:'../../assets/images/nebula-gateway/torn-portal-diagonal-v1.png', scale:1.03, glint:[62,42] },
     ];
     const variant = variants[Math.floor(random() * variants.length)];
     const profile = { lane:Math.floor(random() * 3), size:.92 + random() * .24, rotation:(random() - .5) * 12 };
@@ -1474,10 +1627,9 @@
       const start = performance.now();
       burstCanvas.classList.add('is-active');
 
-      function easeInQuint(value) { return value * value * value * value * value; }
       function easeOutQuart(value) { return 1 - Math.pow(1 - value, 4); }
       function frame(now) {
-        const elapsed = Math.max(0, (now - start) / 1120);
+        const elapsed = Math.max(0, (now - start) / 3650);
         const progress = Math.min(1, elapsed);
         ctx.clearRect(0, 0, w, h);
         ctx.save();
@@ -1487,7 +1639,7 @@
            합쳐진다. 원형 링은 쓰지 않아 구멍이 인공적인 포털처럼 보이지 않는다. */
         particles.forEach((particle) => {
           const local = Math.max(0, Math.min(1, (progress - particle.delay) / (1 - particle.delay)));
-          const pull = easeInQuint(local);
+          const pull = 1 - Math.pow(1 - local, 2.7);
           const radius = particle.distance * (1 - pull) + 5 * pull;
           const angle = particle.angle + particle.twist * (1 - local) * Math.sin(local * Math.PI);
           const x = origin.x + Math.cos(angle) * radius;
@@ -1536,20 +1688,39 @@
     veil.className = 'gate-veil';
     document.body.append(veil);
     let entering = false;
+    function resetGate() {
+      entering = false;
+      gate.disabled = false;
+      field.classList.remove('is-opening');
+      veil.classList.remove('open');
+      burstCanvas.classList.remove('is-active');
+      cancelAnimationFrame(burstFrame);
+    }
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) resetGate();
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && gate.disabled) resetGate();
+    });
     gate.addEventListener('click', () => {
       if (entering) return;
       entering = true;
       gate.disabled = true;
       const box = gate.getBoundingClientRect();
-      playApprovedSfx('enter');
+      playGatewaySfx();
       veil.style.setProperty('--gx', `${box.left + box.width / 2}px`);
       veil.style.setProperty('--gy', `${box.top + box.height / 2}px`);
       field.classList.add('is-opening');
       drawEntryBurst({ x:box.left + box.width / 2, y:box.top + box.height / 2 });
       veil.classList.add('open');
-      /* SFX-06 B의 세 음과 마지막 잔향을 읽을 수 있도록, 기존 0.76초보다
-         전환을 길게 잡는다. 애니메이션과 소리가 같은 끝점으로 모인다. */
-      window.setTimeout(() => { window.location.href = target; }, prefersReduced() ? 200 : 1200);
+      /* 상세 이동의 SFX-06 B는 분리하고, 종이 찢김·별 등장·성운 진입을 네 박자로
+         쌓는다. 4초가 지나야 다음 화면으로 넘어가므로 장면이 끊겨 보이지 않는다. */
+      if (!prefersReduced()) {
+        window.setTimeout(() => playApprovedSfx('arrival'), 900);
+        window.setTimeout(() => playApprovedSfx('arrival'), 1500);
+        window.setTimeout(() => playApprovedSfx('arrival'), 2100);
+      }
+      window.setTimeout(() => { window.location.href = target; }, prefersReduced() ? 200 : 4000);
     });
   }
 
