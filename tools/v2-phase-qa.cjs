@@ -82,13 +82,30 @@ function heightFor(w) { return w <= 390 ? 844 : w <= 768 ? 1024 : 900; }
     try { await page.goto(`${base}/projects/${d}/`,{waitUntil:'domcontentloaded'}); await page.waitForSelector('[data-project-demo]'); await test(page); await page.locator('#langToggle').click(); check((await page.locator('[data-project-demo]').count())===1,`${label}:lang rerender`); check(errors.length===0,`${label}:errors`,errors.join('\n')); cases.push(label); await page.screenshot({path:path.join(out,`${label}.png`),fullPage:false}); } catch(e){failures.push({name:label,detail:e.stack||String(e)});} await context.close();
   }
 
+  // KGA keeps only the previously verified live web screen. Browser-generated
+  // Korean text screenshots are explicitly forbidden after the v2 media audit.
   {
     const {context,page}=await open(1440,'light');
-    await page.goto(`${base}/projects/koreatechGongjiAgent/`,{waitUntil:'domcontentloaded'}); const kga=await page.locator('[data-media-followup="v27-kga-audit"] img').count(); check(kga>=2,'kga:additional media',`count=${kga}`); await context.close();
+    await page.goto(`${base}/projects/koreatechGongjiAgent/`,{waitUntil:'domcontentloaded'});
+    const media = page.locator('[data-media-followup="v27-kga-audit"] img');
+    const count = await media.count();
+    const srcs = await media.evaluateAll(imgs => imgs.map(img => img.getAttribute('src') || ''));
+    check(count===1,'kga:verified live media only',`count=${count}; srcs=${srcs.join(',')}`);
+    check(srcs.every(src => !/source-design-hub|source-mobile-proposal/i.test(src)),'kga:no generated screenshots',srcs.join('\n'));
+    await context.close();
   }
+
+  // Keep the real Notion links and interactive demo, but do not ship a browser-
+  // generated screenshot whose Korean glyph rendering cannot be trusted.
   {
     const {context,page}=await open(1440,'light');
-    await page.goto(`${base}/projects/HEALTH_CHECK_PROJECT/`,{waitUntil:'domcontentloaded'}); const notion=await page.locator('a[href*="pachir1su.notion.site/2025-SDGs"]').count(); check(notion>=2,'health:notion links',`count=${notion}`); const media=await page.locator('[data-media-source="health-notion"] img').count(); check(media>=1,'health:notion media',`count=${media}`); await context.close();
+    await page.goto(`${base}/projects/HEALTH_CHECK_PROJECT/`,{waitUntil:'domcontentloaded'});
+    const notion=await page.locator('a[href*="pachir1su.notion.site/2025-SDGs"]').count();
+    check(notion>=2,'health:notion links',`count=${notion}`);
+    const generated=await page.locator('[data-media-source="health-notion"], img[src*="notion-1.webp"]').count();
+    check(generated===0,'health:no generated screenshot',`count=${generated}`);
+    check((await page.locator('[data-project-demo="health"]').count())===1,'health:interactive demo kept');
+    await context.close();
   }
 
   await browser.close();
