@@ -17,11 +17,26 @@ function scrollBehavior() {
 }
 
 /* ------------------------------------------------------------- */
-/* 2. AOS                                                        */
+/* 2. Native scroll reveal (AOS replacement)                     */
 /* ------------------------------------------------------------- */
-if (typeof AOS !== 'undefined') {
-  AOS.init({ once: true, duration: 400, easing: 'ease-out-cubic' });
-}
+(function initReveal() {
+  const items = [...document.querySelectorAll('[data-aos]')];
+  if (!items.length || prefersReducedMotion || typeof IntersectionObserver === 'undefined') {
+    items.forEach((el) => el.classList.add('is-revealed'));
+    return;
+  }
+  document.documentElement.classList.add('reveal-enabled');
+  const obs = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-revealed');
+    obs.unobserve(entry.target);
+  }), { rootMargin: '100px 0px', threshold: 0.05 });
+  items.forEach((el) => {
+    const delay = Math.min(240, Number(el.dataset.aosDelay || 0));
+    if (delay) el.style.setProperty('--reveal-delay', `${delay}ms`);
+    obs.observe(el);
+  });
+})();
 
 /* ------------------------------------------------------------- */
 /* 3. Back-to-top + scroll progress                              */
@@ -134,27 +149,7 @@ sidebarOverlay?.addEventListener('click', closeMobile);
 mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMobile));
 
 /* ------------------------------------------------------------- */
-/* 6. Stamp feedback                                            */
-/* ------------------------------------------------------------- */
-(function initStampClick() {
-  if (prefersReducedMotion) return;
-  const words = ['확인', 'OK', '!!', '@@', 'GOOD', '체크'];
-  document.querySelectorAll('.btn, .plink, .chip, .wip-badge, .stat-item, .nav-github, #btn-back-to-top').forEach((el) => {
-    el.addEventListener('click', (event) => {
-      const stamp = document.createElement('div');
-      stamp.className = 'stamp-pop';
-      stamp.textContent = words[Math.floor(Math.random() * words.length)];
-      stamp.style.setProperty('--stamp-rot', `${-8 + Math.random() * 16}deg`);
-      stamp.style.left = `${event.clientX}px`;
-      stamp.style.top = `${event.clientY}px`;
-      document.body.appendChild(stamp);
-      setTimeout(() => stamp.remove(), 500);
-    });
-  });
-})();
-
-/* ------------------------------------------------------------- */
-/* 7. Hero stat counter                                         */
+/* 6. Hero stat counter                                         */
 /* ------------------------------------------------------------- */
 (function initStatCounter() {
   const stats = document.querySelectorAll('.stat-num');
@@ -215,15 +210,23 @@ mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click
   }
   function move(event) {
     const card = event.currentTarget;
-    const rect = card._v26Rect || card.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
-    card.style.setProperty('--shadow-x', `${-x * 7}px`);
-    card.style.setProperty('--shadow-y', `${-y * 7 + 4}px`);
+    card._v27Pointer = { x: event.clientX, y: event.clientY };
+    if (card._v27Raf) return;
+    card._v27Raf = requestAnimationFrame(() => {
+      card._v27Raf = 0;
+      const rect = card._v26Rect || card.getBoundingClientRect();
+      const point = card._v27Pointer;
+      const x = (point.x - rect.left) / rect.width - 0.5;
+      const y = (point.y - rect.top) / rect.height - 0.5;
+      card.style.setProperty('--shadow-x', `${-x * 7}px`);
+      card.style.setProperty('--shadow-y', `${-y * 7 + 4}px`);
+    });
   }
   function leave(event) {
     const card = event.currentTarget;
     delete card._v26Rect;
+    if (card._v27Raf) cancelAnimationFrame(card._v27Raf);
+    card._v27Raf = 0;
     card.style.setProperty('--shadow-x', '0px');
     card.style.setProperty('--shadow-y', '6px');
   }
