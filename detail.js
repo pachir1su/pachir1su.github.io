@@ -78,7 +78,11 @@
     $$('meta[data-en][data-ko]').forEach((el) => { el.content = lang === 'en' ? el.dataset.en : el.dataset.ko; });
     const dl = langDesktop?.querySelector('.lang-label'); if (dl) dl.textContent = lang === 'ko' ? 'EN' : 'KO';
     const ml = $('.lang-label-mobile'); if (ml) ml.textContent = lang === 'ko' ? 'English' : '한국어';
-    if (langDesktop) langDesktop.title = lang === 'ko' ? 'English' : '한국어';
+    if (langDesktop) {
+      langDesktop.title = lang === 'ko' ? 'English' : '한국어';
+      langDesktop.setAttribute('aria-label', lang === 'ko' ? 'EN · English' : 'KO · 한국어');
+    }
+    if (langMobile) langMobile.setAttribute('aria-label', lang === 'ko' ? 'English · 언어 전환' : '한국어 · Switch language');
     applyTheme(document.documentElement.dataset.theme || 'light');
     dispatchEvent(new CustomEvent('portfolio:language', { detail: { lang } }));
   }
