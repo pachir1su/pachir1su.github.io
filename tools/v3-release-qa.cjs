@@ -28,36 +28,47 @@ const h = w => w <= 390 ? 844 : w <= 768 ? 1024 : 900;
     check(x.broken.length===0,`${label}:broken images`,x.broken.join('\n'));
   }
 
-  // Production v2 home gateway at every supported breakpoint.
+  // The gateway is randomized on every load. Stress four independent layouts per breakpoint/theme,
+  // and reject overlap with any visible hero-main or hero-stat content, not only the buttons.
   for (const w of [320,360,390,768,1024,1280,1440]) for (const theme of ['light','dark']) {
-    const label=`gateway-${w}-${theme}`; const {context,page,errors}=await open(w,theme,true);
+    const {context,page,errors}=await open(w,theme,true);
     try {
-      await page.goto(`${base}/`,{waitUntil:'domcontentloaded'}); await basics(page,label);
-      const data=await page.locator('[data-v3-gateway]').evaluate((slot)=>{
-        const link=slot.querySelector('[data-v3-gateway-link]');
-        const r=link.getBoundingClientRect();
-        const blockers=[...document.querySelectorAll('.hero-btns > *, .hero-stats > *')].map(x=>x.getBoundingClientRect());
-        const overlap=blockers.some(b=>r.left<b.right+1&&r.right>b.left-1&&r.top<b.bottom+1&&r.bottom>b.top-1);
-        return {w:r.width,h:r.height,overlap,text:(link.textContent||'').trim(),href:link.getAttribute('href'),img:!!link.querySelector('img[src]')};
-      });
-      check(data.w>=44&&data.h>=44,`${label}:touch target`,JSON.stringify(data));
-      check(!data.overlap,`${label}:hero overlap`,JSON.stringify(data));
-      check(data.text==='',`${label}:visual-only gateway`,data.text);
-      check(data.img,`${label}:gateway asset`);
-      check(errors.length===0,`${label}:errors`,errors.join('\n'));
-      cases.push(label);
-      if ([320,768,1440].includes(w)&&theme==='light') await page.screenshot({path:path.join(out,`${label}.png`),fullPage:false});
-    } catch(e){failures.push({name:label,detail:e.stack||String(e)});} await context.close();
+      for (let attempt=1; attempt<=4; attempt++) {
+        const label=`gateway-${w}-${theme}-r${attempt}`;
+        await page.goto(`${base}/?gatewayQa=${w}-${theme}-${attempt}-${Date.now()}`,{waitUntil:'load'});
+        await page.waitForTimeout(220);
+        await basics(page,label);
+        const data=await page.locator('[data-v3-gateway]').evaluate((slot)=>{
+          const link=slot.querySelector('[data-v3-gateway-link]');
+          const r=link.getBoundingClientRect();
+          const hero=document.querySelector('.hero').getBoundingClientRect();
+          const blockers=[...document.querySelectorAll('.hero-main > *, .hero-stats > *')]
+            .filter(x=>x!==slot&&x.getClientRects().length)
+            .map(x=>x.getBoundingClientRect());
+          const overlap=blockers.some(b=>r.left<b.right+10&&r.right>b.left-10&&r.top<b.bottom+10&&r.bottom>b.top-10);
+          const inside=r.left>=hero.left+4&&r.right<=hero.right-4&&r.top>=hero.top+52&&r.bottom<=hero.bottom-4;
+          return {w:r.width,h:r.height,overlap,inside,text:(link.textContent||'').trim(),href:link.getAttribute('href'),img:!!link.querySelector('img[src]')};
+        });
+        check(data.w>=44&&data.h>=44,`${label}:touch target`,JSON.stringify(data));
+        check(!data.overlap,`${label}:hero overlap`,JSON.stringify(data));
+        check(data.inside,`${label}:inside hero`,JSON.stringify(data));
+        check(data.text==='',`${label}:visual-only gateway`,data.text);
+        check(data.img,`${label}:gateway asset`);
+        cases.push(label);
+        if (attempt===1&&[320,768,1440].includes(w)&&theme==='light') await page.screenshot({path:path.join(out,`gateway-${w}-${theme}.png`),fullPage:false});
+      }
+      check(errors.length===0,`gateway-${w}-${theme}:errors`,errors.join('\n'));
+    } catch(e){failures.push({name:`gateway-${w}-${theme}`,detail:e.stack||String(e)});} await context.close();
   }
 
   // Reduced-motion navigation is 200ms: enter universe, go back, ensure bfcache/history return restores gateway state.
   {
     const {context,page,errors}=await open(390,'dark',true); const label='gateway-return-reset';
     try {
-      await page.goto(`${base}/`,{waitUntil:'domcontentloaded'});
+      await page.goto(`${base}/`,{waitUntil:'load'}); await page.waitForTimeout(180);
       await page.locator('[data-v3-gateway-link]').click();
       await page.waitForURL(/nebula-transit\.html/,{timeout:5000});
-      await page.goBack({waitUntil:'domcontentloaded'}); await page.waitForTimeout(150);
+      await page.goBack({waitUntil:'domcontentloaded'}); await page.waitForTimeout(180);
       const state=await page.evaluate(()=>({entering:document.body.classList.contains('v3-gateway-entering'),slot:document.querySelector('[data-v3-gateway]')?.classList.contains('is-entering'),veil:document.querySelector('.v3-gateway-veil')?.classList.contains('is-open')}));
       check(!state.entering&&!state.slot&&!state.veil,`${label}:reset`,JSON.stringify(state));
       check(await page.locator('[data-v3-gateway-link]').isEnabled(),`${label}:clickable`);
@@ -73,7 +84,6 @@ const h = w => w <= 390 ? 844 : w <= 768 ? 1024 : 900;
       await page.waitForSelector('.sky-body',{timeout:5000}); await basics(page,label);
       const hit=await page.locator('.sky-body').first().evaluate(el=>{const r=el.getBoundingClientRect();return {w:r.width,h:r.height};});
       check(hit.w>=44&&hit.h>=44,`${label}:44px project target`,JSON.stringify(hit));
-      const before=await page.locator('canvas').first().screenshot();
       await page.locator('.sky-body').first().click(); await page.waitForTimeout(80);
       check((await page.locator('.sky-body[aria-expanded="true"]').count())<=1,`${label}:single detail`);
       const years=page.locator('.orbit-year');
