@@ -32,7 +32,7 @@ jobs:
         run: |
           set -euo pipefail
           cd target
-          test "$(git rev-parse HEAD)" = "c003faaf0f41801f9562e7dad861a96112c9f34a"
+          test "$(git rev-parse HEAD)" = "6e5e681b057aaf60d8866b5337bda02919baffce"
           node --check docs/v3-constellation-prototypes/nebula.js
           node --check tools/render-nebula-audio.js
           node --check build.js
@@ -56,7 +56,6 @@ jobs:
         shell: bash
         run: |
           python3 -m http.server 4173 --directory target >/tmp/nebula-http.log 2>&1 &
-          echo $! >/tmp/nebula-http.pid
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:4173/docs/v3-constellation-prototypes/nebula-transit.html >/dev/null; then exit 0; fi
             sleep 1
