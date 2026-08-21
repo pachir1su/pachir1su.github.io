@@ -6,21 +6,17 @@
     <title>데일리 리포트 AI | 이건영 포트폴리오</title>
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=optional" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=optional" rel="stylesheet" /></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /></noscript>
     <link rel="stylesheet" href="../../style.css" />
   </head>
   <body>
     <div class="progress-container">
       <div class="progress-bar" id="myBar"></div>
     </div>
-    <button type="button" id="btn-back-to-top">
+    <button type="button" id="btn-back-to-top" aria-label="맨 위로">
       <i class="fas fa-arrow-up"></i>
     </button>
 
@@ -37,7 +33,7 @@
               href="https://github.com/pachir1su"
               target="_blank" rel="noopener noreferrer"
               class="nav-github"
-              ><i class="fab fa-github"></i
+               aria-label="GitHub 프로필"><i class="fab fa-github"></i
             ></a>
           </li>
         </ul>
@@ -73,6 +69,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 
+    <main id="main-content">
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
@@ -185,7 +182,7 @@
 
           <div class="detail-sidebar">
             <div class="sidebar-card" data-aos="fade-left">
-              <h4>Tech Stack</h4>
+              <h4 role="heading" aria-level="3">Tech Stack</h4>
               <div class="sidebar-stack">
                 <span>Gemini API</span>
                 <span>discord.py</span>
@@ -197,7 +194,7 @@
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
-              <h4>Links</h4>
+              <h4 role="heading" aria-level="3">Links</h4>
               <div style="display:flex; flex-direction:column; gap:10px;">
                 <a
                   href="https://github.com/pachir1su/computingSAGO"
@@ -208,13 +205,13 @@
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
+              <h4 role="heading" aria-level="3" data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.6;">
                 <span data-en="Discord bot · AI automation ·" data-ko="Discord 봇 · AI 자동화 ·">Discord 봇 · AI 자동화 ·</span> <span data-en="Personal project" data-ko="개인 프로젝트">개인 프로젝트</span>
               </p>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="200">
-              <h4 data-en="Highlights" data-ko="핵심 특징">핵심 특징</h4>
+              <h4 role="heading" aria-level="3" data-en="Highlights" data-ko="핵심 특징">핵심 특징</h4>
               <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.7;" data-en-html="Fully automated operation<br/>Gemini summarizes and explains the data to improve readability.">
                 완전 자동 운영<br/>
                 Gemini가 데이터를 요약·해설해 가독성을 높임.
@@ -224,6 +221,8 @@
         </div>
       </div>
     </section>
+
+    </main>
 
     <footer>
       <div class="container footer-inner">
@@ -236,10 +235,10 @@
         </p>
         <div class="social-links">
           <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" title="GitHub"
-            ><i class="fab fa-github"></i
+             aria-label="GitHub 프로필"><i class="fab fa-github"></i
           ></a>
           <a href="mailto:capybara@koreatech.ac.kr" title="Email"
-            ><i class="fas fa-envelope"></i
+             aria-label="이메일 보내기"><i class="fas fa-envelope"></i
           ></a>
         </div>
       </div>
