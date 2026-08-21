@@ -1,0 +1,103 @@
+name: v3 universe content phase QA
+
+on:
+  pull_request:
+    branches: [agent/portfolio-release-candidate]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  browser-qa:
+    if: github.head_ref == 'agent/v3-universe-content-runner'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout runner
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v3-universe-content-runner
+          path: runner
+          fetch-depth: 1
+
+      - name: Checkout Universe Content Phase
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v3-universe-content-phase
+          path: target
+          fetch-depth: 80
+
+      - name: Verify atomic phase and source contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd target
+          BASE="e67bc7a1d7880101510b321d063ade75dfc643df"
+          test "$(git merge-base "$BASE" HEAD)" = "$BASE"
+          test "$(git diff --name-only "$BASE"...HEAD | wc -l)" -eq 4
+          test "$(git rev-list --count "$BASE"..HEAD)" -eq 4
+          git diff --check "$BASE"...HEAD
+          grep -q '500' docs/v3-constellation-prototypes/nebula-observatory.html
+          grep -q '27–47' docs/v3-constellation-prototypes/nebula-observatory.html
+          grep -q '90–110' docs/v3-constellation-prototypes/nebula-observatory.html
+          grep -q 'WARNING_BLINK_MS = 300' docs/v3-constellation-prototypes/nebula-observatory.html
+          grep -q '800 / 1800Hz' docs/v3-constellation-prototypes/nebula-observatory.html
+          grep -q 'IR_CONFIRM_MS = 60' docs/v3-constellation-prototypes/nebula-observatory.html
+          grep -q '2025-08-19' docs/v3-constellation-prototypes/nebula-growth.html
+          grep -q '2026-08-18' docs/v3-constellation-prototypes/nebula-growth.html
+          grep -q 'nebula-growth.html' docs/v3-constellation-prototypes/nebula-transit.html
+          grep -q 'nebula-observatory.html' docs/v3-constellation-prototypes/nebula-transit.html
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          out = Path('/tmp/universe-inline')
+          out.mkdir(exist_ok=True)
+          for name in ['nebula-growth.html','nebula-observatory.html']:
+              text = (Path('docs/v3-constellation-prototypes') / name).read_text(encoding='utf-8')
+              for i, script in enumerate(re.findall(r'<script>(.*?)</script>', text, flags=re.S)):
+                  (out / f'{name}-{i}.js').write_text(script, encoding='utf-8')
+          PY
+          for f in /tmp/universe-inline/*.js; do node --check "$f"; done
+          node --check docs/v3-constellation-prototypes/nebula.js
+          node tools/verify-build.js
+
+      - name: Install temporary Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/universe-node
+          cd /tmp/universe-node
+          npm init -y >/dev/null
+          npm install playwright@1.55.0 >/dev/null
+          CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+          echo "NODE_PATH=/tmp/universe-node/node_modules" >> "$GITHUB_ENV"
+
+      - name: Serve phase
+        shell: bash
+        run: |
+          python3 -m http.server 4177 --directory target >/tmp/universe-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4177/docs/v3-constellation-prototypes/nebula-growth.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/universe-http.log
+          exit 1
+
+      - name: Run growth and observatory browser QA
+        shell: bash
+        env:
+          QA_BASE: http://127.0.0.1:4177
+          QA_OUT: ${{ github.workspace }}/universe-content-qa
+        run: |
+          set -euo pipefail
+          NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node runner/tools/v3-universe-content-qa.cjs
+
+      - name: Upload QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-universe-content-qa
+          path: universe-content-qa
+          if-no-files-found: warn
