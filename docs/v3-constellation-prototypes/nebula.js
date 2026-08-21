@@ -121,25 +121,27 @@
   }
 
   /* 성운 하늘 한 장. 움직이지 않으므로 크기가 바뀔 때만 다시 그린다. */
-  function paintSky(c, w, h, T, box, starScale) {
+  function paintSky(c, w, h, T, box, starScale, scene) {
     const S = Math.min(w, h);
     const L = T.mode === 'light';
+    const transitLight = scene === 'transit' && L;
+    const density = transitLight ? 1.35 : 1;
 
     const base = c.createLinearGradient(w, 0, 0, h);
     base.addColorStop(0, T.sky0); base.addColorStop(.52, T.sky1); base.addColorStop(1, T.sky2);
     c.fillStyle = base; c.fillRect(0, 0, w, h);
 
-    volume(c, w * .70, h * .30, S * .78, S * .46, -0.42, T.neb, L ? .17 : .50);
-    volume(c, w * .52, h * .52, S * .58, S * .40, 0.30, T.neb2, L ? .11 : .30);
-    volume(c, w * .86, h * .12, S * .34, S * .26, -0.15, T.neb2, L ? .13 : .38);
-    volume(c, w * .22, h * .74, S * .46, S * .28, 0.52, T.neb, L ? .07 : .22);
+    volume(c, w * .70, h * .30, S * .78, S * .46, -0.42, T.neb, L ? .17 * density : .50);
+    volume(c, w * .52, h * .52, S * .58, S * .40, 0.30, T.neb2, L ? .11 * density : .30);
+    volume(c, w * .86, h * .12, S * .34, S * .26, -0.15, T.neb2, L ? .13 * density : .38);
+    volume(c, w * .22, h * .74, S * .46, S * .28, 0.52, T.neb, L ? .07 * density : .22);
 
     softCurve(c, [w * .34, h * .12, w * .58, h * .30, w * .74, h * .30, w * 1.02, h * .52],
       S * .16, T.lane, L ? .16 : .40, 5);
     softCurve(c, [w * .46, h * .96, w * .62, h * .74, w * .84, h * .70, w * 1.04, h * .80],
       S * .10, T.lane, L ? .10 : .26, 5);
     softCurve(c, [w * .58, h * .06, w * .72, h * .16, w * .80, h * .28, w * .96, h * .34],
-      S * .022, L ? T.neb : T.glow, L ? .10 : .13, 3);
+      S * .012, L ? T.neb : T.glow, L ? .055 : .075, 3);
 
     /* 먼 먼지 — 거의 안 보이지만 표면의 재질을 만든다. */
     const rf = rng(101);
@@ -205,7 +207,7 @@
     const lit = o.stage === 'dev';
     const pulse = lit ? .5 + .5 * Math.sin(t * .9 + o.phase) : 0;
 
-    const gr = R * 2.6 * grow;
+    const gr = R * 2.0 * grow;
     const g = c.createRadialGradient(x, y, 0, x, y, gr);
     const a = (lit ? .17 : .11) + focus * .13 + pulse * .05;
     g.addColorStop(0, rgba(T.glow, a));
@@ -219,19 +221,19 @@
       c.translate(x, y);
       c.rotate(o.tilt + t * (.05 + i * .015));
       c.scale(1, .34);
-      c.strokeStyle = rgba(T.glow, Math.max(0, .17 - i * .045) + focus * .16);
+      c.strokeStyle = rgba(T.glow, Math.max(0, .14 - i * .035) + focus * .14);
       c.lineWidth = 1;
-      c.beginPath(); c.arc(0, 0, R * (1.5 + i * .58) * pull * grow, 0, 7); c.stroke();
+      c.beginPath(); c.arc(0, 0, R * (1.05 + i * .38) * pull * grow, 0, 7); c.stroke();
       c.restore();
     }
 
     if (lit) {
-      const cg = c.createRadialGradient(x, y, 0, x, y, R * 1.15);
-      cg.addColorStop(0, rgba(T.gold, .48 + pulse * .22 + focus * .20));
+      const cg = c.createRadialGradient(x, y, 0, x, y, R * .84);
+      cg.addColorStop(0, rgba(T.gold, .62 + pulse * .22 + focus * .20));
       cg.addColorStop(1, rgba(T.gold, 0));
-      c.fillStyle = cg; c.beginPath(); c.arc(x, y, R * 1.15, 0, 7); c.fill();
+      c.fillStyle = cg; c.beginPath(); c.arc(x, y, R * .84, 0, 7); c.fill();
       c.fillStyle = rgba(T.mode === 'light' ? T.ink : T.glow, .86);
-      c.beginPath(); c.arc(x, y, R * (.28 + pulse * .07), 0, 7); c.fill();
+      c.beginPath(); c.arc(x, y, R * (.34 + pulse * .07), 0, 7); c.fill();
     } else {
       /* 아직 점화 전 — 속이 빈 윤곽만 남긴다. */
       c.strokeStyle = rgba(T.mode === 'light' ? T.ink : T.glow, .36 + focus * .30);
@@ -242,7 +244,7 @@
 
   /* 초신성 잔해. 껍질이 바깥으로 퍼지고 일부가 끊겨 있으며 중심은 비어 있다. */
   function remnant(c, x, y, R, T, o, t, focus) {
-    const rr = R * 2.2 * (1 + Math.sin(t * .35 + o.phase) * .025 + focus * .10);
+    const rr = R * 1.72 * (1 + Math.sin(t * .35 + o.phase) * .025 + focus * .10);
 
     c.save();
     c.translate(x, y); c.rotate(o.tilt);
@@ -254,29 +256,30 @@
     c.fillStyle = g;
     c.beginPath(); c.ellipse(0, 0, rr, rr * .86, 0, 0, 7); c.fill();
 
-    /* 껍질 — 완전한 원이 아니라 찌그러지고 군데군데 끊긴다. */
+    /* 껍질 — 이어진 둥근 선이 아니라 폭발 뒤에 남은 짧은 파편 호들이다. */
     c.strokeStyle = rgba(T.gold, .32 + focus * .30);
-    c.lineWidth = 1.1;
-    c.beginPath();
-    const N = 110;
-    let lifted = true;
-    for (let i = 0; i <= N; i++) {
-      const ang = (i / N) * Math.PI * 2;
-      const wob = 1 + Math.sin(ang * 3 + o.phase) * .12 + Math.sin(ang * 7 + o.phase * 2) * .06;
-      const px = Math.cos(ang) * rr * wob, py = Math.sin(ang) * rr * wob * .86;
-      if (Math.sin(ang * 2 + o.phase * .7) > .80) { lifted = true; continue; }
-      if (lifted) { c.moveTo(px, py); lifted = false; } else c.lineTo(px, py);
+    c.lineWidth = .9;
+    for (let i = 0; i < 7; i++) {
+      const start = o.phase + i * .91 + Math.sin(i * 3.7 + o.phase) * .18;
+      const length = .30 + (i % 3) * .075;
+      c.beginPath();
+      for (let p = 0; p <= 10; p++) {
+        const ang = start + length * p / 10;
+        const wob = 1 + Math.sin(ang * 4 + o.phase) * .045 + Math.sin(ang * 9 + o.phase) * .025;
+        const px = Math.cos(ang) * rr * wob, py = Math.sin(ang) * rr * wob * .84;
+        if (p === 0) c.moveTo(px, py); else c.lineTo(px, py);
+      }
+      c.stroke();
     }
-    c.stroke();
 
     /* 필라멘트 — 중심에서 껍질로 뻗은 가는 줄기. */
     c.strokeStyle = rgba(T.gold, .17 + focus * .22);
     c.lineWidth = .8;
-    for (let i = 0; i < 5; i++) {
-      const ang = o.phase + i * 1.31;
+    for (let i = 0; i < 6; i++) {
+      const ang = o.phase + i * 1.07;
       c.beginPath();
-      c.moveTo(Math.cos(ang) * rr * .30, Math.sin(ang) * rr * .26);
-      c.lineTo(Math.cos(ang) * rr * .92, Math.sin(ang) * rr * .80);
+      c.moveTo(Math.cos(ang) * rr * .34, Math.sin(ang) * rr * .28);
+      c.lineTo(Math.cos(ang) * rr * (.72 + (i % 2) * .22), Math.sin(ang) * rr * (.62 + (i % 2) * .18));
       c.stroke();
     }
     c.restore();
@@ -345,6 +348,7 @@
       { name: 'CentrifugeAI', note: '마무리 단계', stage: 'dev', detail: 'projects/CentrifugeAI/' },
     ],
     failed: [
+      { name: 'BrawlCraft', note: '게임 시스템 구현 실패', stage: 'supernova' },
       { name: 'InfoCatch', note: 'AI 구현 실패 · 당시 웹서버 구축 몰랐음', stage: 'supernova' },
       { name: 'InvestAI', note: 'API 연동 실패', stage: 'supernova' },
       { name: '건영운세', note: '운세 로직 구현 실패', stage: 'supernova' },
@@ -352,16 +356,96 @@
     ],
   };
 
-  /* 제51구역으로 격리하기로 확정된 프로젝트는 일반 화면에 올리지 않는다(#114). */
-  const QUARANTINED = ['BrawlCraft'];
+  /* 사용자가 #114에서 직접 확정한 연도별 순서와 상태. 원본 projects.json은
+     운영 데이터라 바꾸지 않고, v3 시안 안에서만 이 성도를 만든다. 승기봇은
+     완료 별자리와 진행 중 무리에 모두 지정된 상태를 그대로 반영한다. */
+  const YEAR_PROJECTS = {
+    2026: {
+      complete: ['한기대 26학번 신입생 가이드', 'Swordmaster', '기술과사회', '데일리 리포트 AI', 'MultiMind', '성현봇', '승기봇', 'GithubRankInsight', '코리아텍 통합 알림 시스템', '라즈베리파이 마인크래프트 서버', '멈춰!'],
+      failed: ['BrawlCraft', '한기대 지도'],
+      wip: ['한맵', 'CentrifugeAI', '마법 아카데미', '승기봇', 'HTML Viewer', 'DelphiRec'],
+    },
+    2025: {
+      complete: ['헬스 케어 시스템', '공감 봇 & 레시피 AI', '식물 타이머', 'NFC 출석 체크 시스템', '면진봇'],
+      failed: ['InfoCatch', 'InvestAI', '건영운세'],
+      wip: [],
+    },
+    2024: {
+      complete: ['해안 장벽 프로젝트', '비밀번호 도어락', '졸음 방지 시스템', '산불 조기 감지 알림 시스템', '2024 SFPC'],
+      failed: [],
+      wip: [],
+    },
+  };
+  const YEAR_SEQUENCE = ['2026', '2025', '2024'];
+  const PROJECT_DISPLAY_NAMES = {
+    '성현봇': '성현봇',
+    '한맵': '한맵',
+    '한기대지도': '한기대 지도',
+    '멈춰': '멈춰!',
+  };
+  /* 같은 지도 계열이지만 한기대 지도는 실패한 초기 버전, 한맵은 현재 이어 가는
+     후속 기획이다. 이름만 보고 중복으로 읽히지 않게 펼친 정보에서 관계를 밝힌다. */
+  const PROJECT_LINEAGE = {
+    '한기대지도': '초기 버전 · 후속 기획은 한맵',
+    '한맵': '한기대 지도 초기 버전의 후속 기획',
+  };
 
   const ko = (v) => (v && typeof v === 'object' ? (v.ko || v.en || '') : (v || ''));
   const plain = (v) => ko(v).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  const projectKey = (v) => plain(v)
+    .replace(/\([^)]*\)/g, '')
+    .replace(/[^0-9a-z가-힣]/gi, '')
+    .toLowerCase();
+  const stableProjectKey = (v) => {
+    const key = projectKey(v);
+    if (key.indexOf('멈춰') === 0) return '멈춰';
+    return key;
+  };
+  const displayProjectName = (name) => PROJECT_DISPLAY_NAMES[stableProjectKey(name)] || plain(name);
 
   /* 카드 한 장을 화면에 올릴 최소 정보로 줄인다.
      이름은 항상 보이고, note 는 눌렀을 때 펼쳐진다. */
   function toBody(card, note) {
-    return { name: ko(card.title), note: note, detail: card.detail || '' };
+    const sourceName = card.name || ko(card.title);
+    const key = stableProjectKey(sourceName);
+    const sourceNote = note || card.note || '';
+    const lineage = PROJECT_LINEAGE[key] || '';
+    return {
+      name: displayProjectName(sourceName), key,
+      note: [sourceNote, lineage].filter(Boolean).join(sourceNote && lineage ? ' · ' : ''),
+      detail: card.detail || '', stage: card.stage,
+    };
+  }
+
+  /* 사용자가 적어 준 순서대로만 반환한다. 완료 목록에만 있는 승기봇은
+     진행 중 원본 카드를 참조해 같은 상세 링크를 유지한다. */
+  function inRequestedOrder(order, primary, all) {
+    const lookup = new Map();
+    primary.concat(all).forEach((item) => {
+      if (!lookup.has(item.key)) lookup.set(item.key, item);
+    });
+    return order.map((name) => lookup.get(stableProjectKey(name))).filter(Boolean)
+      .map((item) => ({ ...item }));
+  }
+
+  function organizeByYear(source) {
+    const prepare = (items) => items.map((item) => item.key ? item : toBody(item, item.note));
+    const years = source.years.map((group) => ({ ...group, cards: prepare(group.cards) }));
+    const wip = prepare(source.wip);
+    const failed = prepare(source.failed);
+    const all = years.flatMap((group) => group.cards).concat(wip, failed);
+    const yearLookup = new Map(years.map((group) => [group.label, group.cards]));
+    return {
+      years: YEAR_SEQUENCE.map((label) => {
+        const guide = YEAR_PROJECTS[label];
+        return {
+          label,
+          cards: inRequestedOrder(guide.complete, yearLookup.get(label) || [], all),
+          wip: inRequestedOrder(guide.wip, wip, all),
+          failed: inRequestedOrder(guide.failed, failed, all),
+        };
+      }).filter((group) => group.cards.length),
+    };
   }
 
   function mapProjects(json) {
@@ -389,26 +473,22 @@
       return body;
     });
 
-    const failed = (failedGroup.cards || [])
-      .filter((card) => QUARANTINED.indexOf(ko(card.title)) < 0)
-      .map((card) => {
+    const failed = (failedGroup.cards || []).map((card) => {
         const body = toBody(card, plain(card.failedReason));
         body.stage = plain(card.badge).indexOf('지연') >= 0 ? 'drift' : 'supernova';
         return body;
       });
 
     if (!wip.length || !failed.length) return null;
-    /* 궤도를 이탈한 별은 잔해 무리 바깥에 놓아야 형태 차이가 드러난다. */
-    failed.sort((a, b) => (a.stage === 'drift' ? 1 : 0) - (b.stage === 'drift' ? 1 : 0));
-    return { years, wip, failed };
+    return organizeByYear({ years, wip, failed });
   }
 
   function loadProjects(source) {
-    if (!source || !window.fetch) return Promise.resolve(FALLBACK);
+    if (!source || !window.fetch) return Promise.resolve(organizeByYear(FALLBACK));
     return fetch(source)
       .then((res) => (res.ok ? res.json() : null))
-      .then((json) => (json && mapProjects(json)) || FALLBACK)
-      .catch(() => FALLBACK);
+      .then((json) => (json && mapProjects(json)) || organizeByYear(FALLBACK))
+      .catch(() => organizeByYear(FALLBACK));
   }
 
   /* ------------------------------------------------------------------
@@ -438,6 +518,32 @@
     }
   }
 
+  /* #114 사운드 2차 판정에서 실제 우주 동작에 연결된 세 개만 재생한다.
+     같은 동작을 빠르게 연속 입력했을 때 파일이 겹쳐 울리지 않도록 cue별로
+     바로 앞 재생을 멈춘다. 오디오 실패(자동 재생 정책 등)는 화면 동작을 막지 않는다. */
+  const APPROVED_SFX = {
+    year: 'assets/audio/sfx-04-year-a-wood.wav',
+    select: 'assets/audio/sfx-05-select-a-bell.wav',
+    enter: 'assets/audio/sfx-06-enter-b-three-notes.wav',
+  };
+  const activeSfx = new Map();
+  function playApprovedSfx(cue) {
+    const source = APPROVED_SFX[cue];
+    if (!source) return;
+    const previous = activeSfx.get(cue);
+    if (previous) { previous.pause(); previous.currentTime = 0; }
+    const audio = new Audio(source);
+    audio.preload = 'auto';
+    audio.volume = cue === 'year' ? .48 : .58;
+    activeSfx.set(cue, audio);
+    audio.addEventListener('ended', () => {
+      if (activeSfx.get(cue) === audio) activeSfx.delete(cue);
+    }, { once:true });
+    audio.play().catch(() => {
+      if (activeSfx.get(cue) === audio) activeSfx.delete(cue);
+    });
+  }
+
   /* ------------------------------------------------------------------
      페이지 1 — 정적 키비주얼
      ------------------------------------------------------------------ */
@@ -465,14 +571,37 @@
   /* 연도 별자리 형태. 프로젝트 개수만큼 앞에서부터 쓰고 순서대로 선을 잇는다.
      좌표는 경로 순서로 적어 두었으므로 이어 그으면 별자리처럼 읽힌다. */
   const WIDE_YEAR = {
-    10: [[.100, .330], [.175, .505], [.262, .410], [.238, .225], [.352, .262],
-         [.398, .430], [.352, .618], [.470, .560], [.520, .372], [.478, .205]],
-    5: [[.115, .315], [.215, .480], [.318, .360], [.412, .545], [.505, .300]],
+    11: [[.100, .520], [.185, .365], [.300, .470], [.402, .255], [.518, .385], [.448, .565],
+         [.585, .665], [.422, .725], [.280, .610], [.165, .735], [.075, .620]],
+    10: [[.100, .520], [.185, .365], [.300, .470], [.402, .255], [.518, .385],
+         [.448, .565], [.585, .665], [.422, .725], [.280, .610], [.165, .735]],
+    5: [[.135, .520], [.270, .335], [.435, .455], [.360, .650], [.180, .675]],
   };
-  const NARROW_YEAR = {
-    10: [[.140, .170], [.300, .200], [.160, .240], [.320, .272], [.150, .312],
-         [.310, .344], [.170, .384], [.330, .414], [.160, .448], [.300, .478]],
-    5: [[.150, .180], [.310, .226], [.160, .292], [.320, .348], [.170, .412]],
+  const TABLET_YEAR = {
+    11: [[.125, .315], [.290, .245], [.435, .350], [.310, .460], [.475, .535], [.330, .625],
+         [.485, .705], [.315, .785], [.165, .695], [.105, .560], [.185, .440]],
+    10: [[.125, .315], [.290, .245], [.435, .350], [.310, .460], [.475, .535],
+         [.330, .625], [.485, .705], [.315, .785], [.165, .695], [.105, .560]],
+    5: [[.150, .385], [.330, .300], [.490, .435], [.340, .635], [.145, .600]],
+  };
+  /* 폰은 화면 폭이 좁은 대신 무대를 세로로 쓴다. 별 사이의 세로 간격은
+     44px 터치 영역보다 항상 크게 잡는다. 이전 좌표(.035 간격)는 폴드에서
+     약 46px밖에 안 되어 긴 프로젝트 이름이 만나는 근본 원인이었다. */
+  const MOBILE_YEAR = {
+    11: [[.145, .185], [.715, .240], [.145, .295], [.715, .350], [.145, .405], [.715, .460],
+         [.145, .515], [.715, .570], [.145, .625], [.715, .680], [.145, .735]],
+    10: [[.145, .195], [.715, .255], [.145, .315], [.715, .375], [.145, .435],
+         [.715, .495], [.145, .555], [.715, .615], [.145, .675], [.715, .735]],
+    5: [[.155, .275], [.710, .385], [.155, .495], [.710, .605], [.155, .715]],
+  };
+  /* 접힌 폴드는 이름이 두 줄이 되는 경우가 많으므로, 모바일보다 한 단계
+     더 길게 벌린 전용 성도다. 양쪽을 번갈아 읽을 수 있게 궤적도 지그재그로 둔다. */
+  const FOLD_YEAR = {
+    11: [[.135, .180], [.760, .240], [.135, .300], [.760, .360], [.135, .420], [.760, .480],
+         [.135, .540], [.760, .600], [.135, .660], [.760, .720], [.135, .780]],
+    10: [[.135, .190], [.760, .255], [.135, .320], [.760, .385], [.135, .450],
+         [.760, .515], [.135, .580], [.760, .645], [.135, .710], [.760, .775]],
+    5: [[.145, .285], [.755, .405], [.145, .525], [.755, .645], [.145, .765]],
   };
 
   const LAYOUTS = {
@@ -480,16 +609,30 @@
       year: WIDE_YEAR,
       wip: [[.790, .120], [.880, .168], [.805, .224], [.900, .262], [.775, .312], [.870, .356]],
       failed: [[.095, .800], [.185, .862], [.275, .812], [.360, .876]],
-      /* 라벨이 화면 안쪽을 향하도록 편다. 오른쪽 무리는 왼쪽으로 편다. */
-      side: { year: 'right', wip: 'left', failed: 'right' },
+      /* 가까운 별끼리의 이름이 겹치지 않도록 완료 별은 좌우로 번갈아 편다. */
+      side: { year: 'balanced', wip: 'left', failed: 'right' },
       scale: 1,
     },
-    narrow: {
-      year: NARROW_YEAR,
-      wip: [[.150, .560], [.330, .596], [.160, .636], [.340, .672], [.150, .712], [.330, .748]],
-      failed: [[.150, .820], [.330, .856], [.160, .896], [.340, .930]],
-      side: { year: 'right', wip: 'right', failed: 'right' },
-      scale: .8,
+    tablet: {
+      year: TABLET_YEAR,
+      wip: [[.760, .465], [.875, .540], [.750, .615], [.885, .690], [.765, .765], [.875, .840]],
+      failed: [[.100, .845], [.245, .920], [.110, .970]],
+      side: { year: 'balanced', wip: 'left', failed: 'right' },
+      scale: .86,
+    },
+    mobile: {
+      year: MOBILE_YEAR,
+      wip: [[.100, .800], [.100, .835], [.100, .870], [.100, .905], [.100, .940], [.100, .975]],
+      failed: [[.900, .820], [.900, .890], [.900, .960]],
+      side: { year: 'alternate', wip: 'right', failed: 'left' },
+      scale: .76,
+    },
+    fold: {
+      year: FOLD_YEAR,
+      wip: [[.105, .810], [.105, .842], [.105, .874], [.105, .906], [.105, .938], [.105, .970]],
+      failed: [[.895, .830], [.895, .900], [.895, .965]],
+      side: { year: 'alternate', wip: 'right', failed: 'left' },
+      scale: .70,
     },
   };
 
@@ -518,7 +661,10 @@
     const skyCtx = sky.getContext('2d');
     const seeded = rng(9001);
 
-    const state = { t: 0, size: null, dpr: 1, open: null, year: 0, data: null };
+    const state = {
+      t: 0, size: null, dpr: 1, open: null, year: 0, data: null,
+      yearTransition: null,
+    };
     let bodies = [];
 
     function theme() {
@@ -530,7 +676,11 @@
 
     function layout() {
       const s = state.size;
-      return (s && s.w / s.h >= 1.35) ? LAYOUTS.wide : LAYOUTS.narrow;
+      if (!s) return LAYOUTS.wide;
+      if (s.w <= 390) return LAYOUTS.fold;
+      if (s.w <= 640) return LAYOUTS.mobile;
+      if (s.w <= 1200 || s.w / s.h < 1.35) return LAYOUTS.tablet;
+      return LAYOUTS.wide;
     }
 
     /* 별 하나에 붙는 버튼. 이름은 항상 보이고 설명만 접혀 있다. */
@@ -571,6 +721,8 @@
         focus: 0, target: 0,
         phase: seeded() * 6.283,
         tilt: seeded() * 6.283,
+        yearPhase: 'steady',
+        yearAlpha: 1,
         x: 0, y: 0,
       };
       const enter = () => { body.target = 1; still(); };
@@ -580,7 +732,12 @@
       hit.addEventListener('focus', enter);
       hit.addEventListener('blur', leave);
       hit.addEventListener('click', () => {
-        if (state.open === body && item.detail) { window.location.href = base + item.detail; return; }
+        if (state.open === body && item.detail) {
+          playApprovedSfx('enter');
+          window.setTimeout(() => { window.location.href = base + item.detail; }, 140);
+          return;
+        }
+        playApprovedSfx('select');
         toggle(body);
       });
       return body;
@@ -597,6 +754,8 @@
         target.hit.setAttribute('aria-expanded', 'true');
         target.target = 1;
       }
+      /* 카드가 펼쳐진 실제 높이까지 다시 재서 다른 클릭 영역을 비킨다. */
+      place();
       still();
     }
 
@@ -604,41 +763,166 @@
        상호작용이 일어난 순간에만 한 장을 다시 그린다. */
     function still() { if (prefersReduced()) frame(1); }
 
-    /* 연도를 바꾸면 그 해 프로젝트 별만 새로 만든다. 나머지 무리는 그대로 둔다. */
-    function rebuildYear() {
+    function setYearAlpha(body, alpha) {
+      body.yearAlpha = Math.max(0, Math.min(1, alpha));
+      body.hit.style.opacity = String(body.yearAlpha);
+      body.hit.style.filter = `blur(${((1 - body.yearAlpha) * 1.6).toFixed(2)}px)`;
+    }
+
+    function appendYearBodies(phase) {
+      const cards = state.data.years[state.year].cards;
+      cards.forEach((item, i) => {
+        const body = makeBody(item, 'year', i);
+        body.yearPhase = phase;
+        setYearAlpha(body, phase === 'enter' ? 0 : 1);
+        bodies.push(body);
+      });
+    }
+
+    function appendStatusBodies() {
+      const group = state.data.years[state.year];
+      group.wip.forEach((item, i) => bodies.push(makeBody(item, 'wip', i)));
+      group.failed.forEach((item, i) => bodies.push(makeBody(item, 'failed', i)));
+    }
+
+    function discardStatusBodies() {
+      bodies.filter((body) => body.group === 'wip' || body.group === 'failed')
+        .forEach((body) => body.hit.remove());
+      bodies = bodies.filter((body) => body.group === 'year');
+    }
+
+    function discardYearBodies() {
       bodies.filter((b) => b.group === 'year').forEach((b) => b.hit.remove());
       bodies = bodies.filter((b) => b.group !== 'year');
+      state.yearTransition = null;
+      stage.classList.remove('year-changing');
+    }
+
+    /* 연도 전환은 이전 별자리가 흐려져 빠져나가고 새 별자리가 들어오는 방식이다. */
+    function rebuildYear(nextYear, animate) {
+      if (state.yearTransition) discardYearBodies();
+      const previous = bodies.filter((b) => b.group === 'year');
       if (state.open && state.open.group === 'year') state.open = null;
-      const cards = state.data.years[state.year].cards;
-      cards.forEach((item, i) => bodies.push(makeBody(item, 'year', i)));
+      state.year = nextYear;
+      discardStatusBodies();
+      appendStatusBodies();
+
+      if (!animate || prefersReduced()) {
+        previous.forEach((b) => b.hit.remove());
+        bodies = bodies.filter((b) => b.group !== 'year');
+        appendYearBodies('steady');
+        place();
+        return;
+      }
+
+      previous.forEach((body) => {
+        body.yearPhase = 'leave';
+        body.hit.setAttribute('aria-hidden', 'true');
+        body.hit.style.pointerEvents = 'none';
+        body.hit.classList.add('year-leaving');
+        setYearAlpha(body, 1);
+      });
+      appendYearBodies('enter');
+      state.yearTransition = { speed: 3.6 };
       place();
+      stage.classList.remove('year-changing');
+      void stage.offsetWidth;
+      stage.classList.add('year-changing');
+    }
+
+    function clearBodies() {
+      bodies.forEach((body) => body.hit.remove());
+      bodies = [];
+      axis.querySelectorAll('.orbit-year').forEach((button) => button.remove());
+      state.open = null;
+      state.yearTransition = null;
+      stage.classList.remove('year-changing');
     }
 
     function build(data) {
+      clearBodies();
       state.data = data;
+      state.year = Math.min(state.year, Math.max(0, data.years.length - 1));
 
       data.years.forEach((group, i) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'orbit-year';
-        btn.setAttribute('aria-current', String(i === 0));
+        btn.setAttribute('aria-current', String(i === state.year));
         const label = document.createElement('b');
         label.textContent = group.label;
         const mark = document.createElement('i');
         mark.setAttribute('aria-hidden', 'true');
         btn.append(label, mark);
         btn.addEventListener('click', () => {
-          state.year = i;
+          if (state.year === i && !state.yearTransition) return;
+          playApprovedSfx('year');
           Array.from(axis.querySelectorAll('.orbit-year'))
             .forEach((other, k) => other.setAttribute('aria-current', String(k === i)));
-          rebuildYear();
+          rebuildYear(i, true);
         });
         axis.append(btn);
       });
 
-      data.wip.forEach((item, i) => bodies.push(makeBody(item, 'wip', i)));
-      data.failed.forEach((item, i) => bodies.push(makeBody(item, 'failed', i)));
-      rebuildYear();
+      rebuildYear(state.year, false);
+    }
+
+    function positionBody(body, x, y) {
+      body.x = x; body.y = y;
+      body.hit.style.left = `${x}px`;
+      body.hit.style.top = `${y}px`;
+    }
+
+    function stageRect(element, root) {
+      const rect = element.getBoundingClientRect();
+      return {
+        left: rect.left - root.left, top: rect.top - root.top,
+        right: rect.right - root.left, bottom: rect.bottom - root.top,
+      };
+    }
+
+    function collides(a, b, gap) {
+      const pad = gap || 10;
+      return a.left < b.right + pad && a.right > b.left - pad && a.top < b.bottom + pad && a.bottom > b.top - pad;
+    }
+
+    /* 레이아웃 좌표만 믿지 않고 실제 라벨 폭까지 계산해 궤도·메모·다른 별과
+       겹치는 천체를 옮긴다. 화면 폭과 글꼴이 달라도 클릭 영역은 겹치지 않는다. */
+    function resolveInteractiveCollisions(L) {
+      if (!state.size) return;
+      const root = stage.getBoundingClientRect();
+      const { w, h } = state.size;
+      const controls = Array.from(axis.querySelectorAll('.orbit-year'))
+        .concat(Array.from(stage.querySelectorAll('.orbit-back-note')))
+        .map((element) => stageRect(element, root));
+      const interactive = bodies.filter((body) => body.yearPhase !== 'leave');
+      const placed = controls.slice();
+      const labelMargin = (L === LAYOUTS.mobile || L === LAYOUTS.fold) ? w * .40 : w * .27;
+
+      interactive.forEach((body) => {
+        const side = body.hit.dataset.side;
+        const minX = side === 'left' ? labelMargin : 18;
+        const maxX = side === 'right' ? w - labelMargin : w - 18;
+        for (let attempt = 0; attempt < 72; attempt++) {
+          const rect = stageRect(body.hit, root);
+          const conflict = placed.find((other) => collides(rect, other));
+          if (!conflict) { placed.push(rect); break; }
+
+          const direction = side === 'left' ? -1 : 1;
+          const horizontal = direction > 0
+            ? conflict.right - rect.left + 18
+            : conflict.left - rect.right - 18;
+          const nextX = Math.max(minX, Math.min(maxX, body.x + horizontal));
+          const stuck = Math.abs(nextX - body.x) < 1;
+          const down = rect.bottom - conflict.top + 24;
+          const up = conflict.bottom - rect.top + 24;
+          /* 휴대 기기에서는 좌우 여백이 이미 라벨 폭으로 꽉 차 있으므로
+             수평 이동이 막히면 빈 세로 행으로 보낸다. 위/아래 중 덜 먼 쪽을 쓴다. */
+          const vertical = down <= up || body.y - up < 36 ? down : -up;
+          const nextY = Math.min(h - 32, Math.max(32, body.y + (stuck ? vertical : 0)));
+          positionBody(body, nextX, nextY);
+        }
+      });
     }
 
     /* 버튼을 별 좌표에 맞춘다. 별은 캔버스가 그리므로 버튼은 그 자리를 감쌀 뿐이다. */
@@ -647,16 +931,20 @@
       const { w, h } = state.size;
       const L = layout();
       bodies.forEach((body) => {
+        if (body.group === 'year' && body.yearPhase === 'leave') return;
         const shape = body.group === 'year'
           ? pickShape(L.year, state.data.years[state.year].cards.length)
           : L[body.group];
         const pos = shape[body.index % shape.length];
-        body.x = pos[0] * w;
-        body.y = pos[1] * h;
-        body.hit.style.left = `${pos[0] * 100}%`;
-        body.hit.style.top = `${pos[1] * 100}%`;
-        body.hit.dataset.side = L.side[body.group];
+        const requestedSide = L.side[body.group];
+        body.hit.dataset.side = requestedSide === 'alternate'
+          ? (pos[0] > .5 ? 'left' : 'right')
+          : requestedSide === 'balanced'
+            ? ((body.index % 2 && pos[0] > .16) || pos[0] > .68 ? 'left' : 'right')
+            : requestedSide;
+        positionBody(body, pos[0] * w, pos[1] * h);
       });
+      resolveInteractiveCollisions(L);
     }
 
     function resize() {
@@ -672,7 +960,7 @@
       /* 배경 하늘에는 프로젝트 별을 넣지 않는다. 그쪽은 매 프레임 다시 그린다. */
       skyCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
       skyCtx.clearRect(0, 0, w, h);
-      paintSky(skyCtx, w, h, theme(), null, 1);
+      paintSky(skyCtx, w, h, theme(), null, 1, 'transit');
 
       place();
       frame(0);
@@ -693,26 +981,52 @@
       c.drawImage(sky, 0, 0);
       c.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
 
+      if (state.yearTransition && dt) {
+        const entering = [];
+        const leaving = [];
+        bodies.forEach((body) => {
+          if (body.group !== 'year') return;
+          if (body.yearPhase === 'enter') {
+            setYearAlpha(body, Math.min(1, body.yearAlpha + dt * state.yearTransition.speed));
+            entering.push(body);
+            if (body.yearAlpha >= 1) body.yearPhase = 'steady';
+          } else if (body.yearPhase === 'leave') {
+            setYearAlpha(body, Math.max(0, body.yearAlpha - dt * state.yearTransition.speed));
+            leaving.push(body);
+          }
+        });
+        leaving.filter((body) => body.yearAlpha <= 0).forEach((body) => body.hit.remove());
+        bodies = bodies.filter((body) => body.yearPhase !== 'leave' || body.yearAlpha > 0);
+        if (!bodies.some((body) => body.yearPhase === 'enter' || body.yearPhase === 'leave')) {
+          state.yearTransition = null;
+          stage.classList.remove('year-changing');
+        }
+      }
+
       /* 그 해의 별자리 — 프로젝트를 순서대로 낡은 금빛 실선으로 잇는다. */
       const yearBodies = bodies.filter((b) => b.group === 'year');
-      if (yearBodies.length > 1) {
+      const drawYearLine = (lineBodies) => {
+        if (lineBodies.length < 2) return;
+        const alpha = lineBodies.reduce((sum, body) => sum + body.yearAlpha, 0) / lineBodies.length;
         c.save();
         c.lineCap = 'round';
-        c.strokeStyle = rgba(T.gold, T.mode === 'light' ? .40 : .46);
+        c.strokeStyle = rgba(T.gold, (T.mode === 'light' ? .40 : .46) * alpha);
         c.lineWidth = Math.max(1, Math.min(w, h) * .0014);
         c.beginPath();
-        yearBodies.forEach((b, i) => (i ? c.lineTo(b.x, b.y) : c.moveTo(b.x, b.y)));
+        lineBodies.forEach((b, i) => (i ? c.lineTo(b.x, b.y) : c.moveTo(b.x, b.y)));
         c.stroke();
         c.restore();
-      }
+      };
+      drawYearLine(yearBodies.filter((b) => b.yearPhase === 'leave'));
+      drawYearLine(yearBodies.filter((b) => b.yearPhase !== 'leave'));
 
       bodies.forEach((body) => {
         body.focus = lerp(body.focus, body.target, k);
         if (body.group === 'year') {
           const f = body.focus;
           star(c, body.x, body.y, R * (.30 + f * .10), T.ink,
-            (T.mode === 'light' ? .84 : .94), R * (1.5 + f * .9),
-            (T.mode === 'light' ? .34 : .13) + f * .12, T);
+            (T.mode === 'light' ? .84 : .94) * body.yearAlpha, R * (1.5 + f * .9),
+            ((T.mode === 'light' ? .34 : .13) + f * .12) * body.yearAlpha, T);
         } else if (body.group === 'wip') {
           protostar(c, body.x, body.y, R, T, body, state.t, body.focus);
         } else if (body.item.stage === 'drift') {
@@ -740,12 +1054,16 @@
       if (event.key === 'Escape' && state.open) toggle(state.open);
     });
 
+    /* fallback으로 먼저 그린 뒤 실제 데이터가 오면 같은 자리에 교체한다. */
+    build(organizeByYear(FALLBACK));
+    observe([canvas], resize);
+    window.addEventListener('resize', resize);
+    resize();
+    if (prefersReduced()) frame(1); else requestAnimationFrame(loop);
+
     loadProjects(config.source).then((data) => {
       build(data);
-      observe([canvas], resize);
-      window.addEventListener('resize', resize);
       resize();
-      if (prefersReduced()) frame(1); else requestAnimationFrame(loop);
     });
 
     const dark = window.matchMedia('(prefers-color-scheme: dark)');
@@ -764,7 +1082,7 @@
      - 가까이 갈수록 별자리 선이 그어진다. 다 그어지면 완성된 모양이 보인다.
      - 가끔 유성이 하나 지나간다. 가만히 둬도 살아 있다.
      ------------------------------------------------------------------ */
-  function initGateway() {
+  function initGatewayLegacyCanvas() {
     const gate = document.querySelector('[data-gate]');
     const canvas = gate && gate.querySelector('canvas');
     if (!gate || !canvas) return;
@@ -774,7 +1092,10 @@
 
     /* 창 안은 언제나 밤이다. 페이지가 라이트여도 우주는 어둡다. */
     const T = PALETTE.dark;
-    const seeded = rng(613);
+    const visitSeed = (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0;
+    const seeded = rng(visitSeed);
+    const tearSeeded = rng(visitSeed ^ 0x9e3779b9);
+    const leakSeeded = rng(visitSeed ^ 0x7f4a7c15);
     const stars = [];
     for (let i = 0; i < 46; i++) stars.push([seeded(), seeded(), seeded(), seeded()]);
 
@@ -788,8 +1109,132 @@
       canvas.width = state.w * state.dpr; canvas.height = state.h * state.dpr;
     }
 
-    /* 창 안에 담을 작은 별자리. 북두칠성을 창 비율에 맞게 눕혔다. */
-    const SHAPE = DIPPER.pts.map(([x, y]) => [.10 + x * .80, .18 + y * .64]);
+    /* 창 안에 담을 작은 별자리. 배경을 가두는 찢긴 선보다 더 오른쪽에
+       놓아 일부가 종이 바깥으로 튀어나오게 한다. */
+    const SHAPE = DIPPER.pts.map(([x, y]) => [.10 + x * 1.08, .12 + y * .76]);
+
+    /* 방문마다 형태 자체가 달라지는 찢긴 구멍. 네 변을 흔든 사각형이 아니라
+       종이 한가운데를 손으로 뜯어 낸 비대칭 타원이라서 규칙적인 창처럼 보이지 않는다. */
+    function makeGateTear(random) {
+      const count = 27 + Math.floor(random() * 15);
+      const weights = Array.from({ length: count }, () => .38 + random() * 1.85);
+      const total = weights.reduce((sum, weight) => sum + weight, 0);
+      const cx = .50 + (random() - .5) * .08;
+      const cy = .50 + (random() - .5) * .07;
+      const rx = .43 + (random() - .5) * .06;
+      const ry = .42 + (random() - .5) * .08;
+      const points = [];
+      let angle = -Math.PI / 2;
+      weights.forEach((weight, index) => {
+        angle += Math.PI * 2 * weight / total;
+        const coarse = (random() - .5) * .16;
+        const tear = random() < .17 ? (random() - .5) * .34 : 0;
+        const ripple = Math.sin(index * 2.31 + random() * 2) * .035;
+        const radius = Math.max(.66, Math.min(1.18, 1 + coarse + tear + ripple));
+        points.push([
+          Math.max(.025, Math.min(.975, cx + Math.cos(angle) * rx * radius)),
+          Math.max(.025, Math.min(.975, cy + Math.sin(angle) * ry * radius)),
+        ]);
+      });
+      return points;
+    }
+
+    /* 배경만 찢어진 종이 안에 가둔다. 별과 선은 경계를 넘어 나올 수 있어야 한다. */
+    const GATE_TEAR = makeGateTear(tearSeeded);
+    const gateClip = `polygon(${GATE_TEAR.map(([x, y]) => `${(x * 100).toFixed(2)}% ${(y * 100).toFixed(2)}%`).join(', ')})`;
+    gate.style.setProperty('--gate-clip', gateClip);
+
+    const edgeSeeded = rng(visitSeed ^ 0x2468ace1);
+    const outwardNormal = (x, y) => {
+      const dx = x - .5, dy = y - .5;
+      const len = Math.max(.001, Math.hypot(dx, dy));
+      return { nx: dx / len, ny: dy / len };
+    };
+
+    /* 종이 섬유는 윤곽을 따라 일렬로 그리지 않는다. 일부만 길고 일부는
+       안쪽으로 꺾여 실제 뜯긴 단면처럼 흐트러지게 만든다. */
+    const fibres = Array.from({ length: 34 }, () => {
+      const index = Math.floor(edgeSeeded() * GATE_TEAR.length);
+      const [x, y] = GATE_TEAR[index];
+      const normal = outwardNormal(x, y);
+      return {
+        x, y, nx: normal.nx, ny: normal.ny,
+        length: .012 + edgeSeeded() * .040,
+        side: edgeSeeded() > .28 ? 1 : -1,
+        bend: (edgeSeeded() - .5) * .018,
+      };
+    });
+
+    /* 찢김의 바깥쪽에서 작은 입자들이 흘러나온다. 둥근 구멍의 방사형 법선을
+       따라 움직이므로 별이 경계 밖으로 샌다. */
+    const leaks = Array.from({ length: 20 }, () => GATE_TEAR[Math.floor(leakSeeded() * GATE_TEAR.length)])
+      .map(([x, y]) => {
+        const normal = outwardNormal(x, y);
+        return {
+          x, y, nx: normal.nx, ny: normal.ny,
+          phase: leakSeeded(), speed: .18 + leakSeeded() * .22,
+          size: .42 + leakSeeded() * .70, bend: (leakSeeded() - .5) * .024,
+        };
+      });
+
+    function drawTornEdge(c, w, h, S) {
+      c.save();
+      c.lineJoin = 'round';
+      c.strokeStyle = 'rgba(230, 220, 195, .30)';
+      c.lineWidth = .55;
+      c.beginPath();
+      GATE_TEAR.forEach(([x, y], index) => {
+        if (index === 0) c.moveTo(x * w, y * h); else c.lineTo(x * w, y * h);
+      });
+      c.closePath();
+      c.stroke();
+
+      fibres.forEach((fibre) => {
+        const x = fibre.x * w, y = fibre.y * h;
+        const length = fibre.length * S * fibre.side;
+        const bendX = -fibre.ny * fibre.bend * S;
+        const bendY = fibre.nx * fibre.bend * S;
+        c.strokeStyle = fibre.side > 0 ? 'rgba(237, 228, 207, .36)' : 'rgba(18, 17, 20, .46)';
+        c.lineWidth = fibre.side > 0 ? .48 : .72;
+        c.beginPath();
+        c.moveTo(x, y);
+        c.quadraticCurveTo(x + fibre.nx * length * .45 + bendX, y + fibre.ny * length * .45 + bendY,
+          x + fibre.nx * length, y + fibre.ny * length);
+        c.stroke();
+      });
+      c.restore();
+    }
+
+    function drawLeaks(c, w, h, S, near) {
+      leaks.forEach((leak) => {
+        const travel = (state.t * leak.speed + leak.phase) % 1;
+        const distance = S * (.008 + travel * .065);
+        const x = leak.x * w + leak.nx * distance;
+        const y = leak.y * h + leak.ny * distance;
+        const bendX = leak.ny * leak.bend * S;
+        const bendY = -leak.nx * leak.bend * S;
+        c.save();
+        c.globalAlpha = .28 + near * .34;
+        c.strokeStyle = rgba(T.gold, .32);
+        c.lineWidth = .38;
+        c.beginPath();
+        c.moveTo(leak.x * w, leak.y * h);
+        c.quadraticCurveTo((leak.x * w + x) / 2 + bendX, (leak.y * h + y) / 2 + bendY, x, y);
+        c.stroke();
+        star(c, x, y, leak.size, leak.size > .8 ? T.gold : T.ink, .48 + near * .24, S * .014, .12, T);
+        c.restore();
+      });
+    }
+
+    function clipGate(c, w, h) {
+      c.beginPath();
+      GATE_TEAR.forEach(([x, y], i) => {
+        if (i === 0) c.moveTo(x * w, y * h);
+        else c.lineTo(x * w, y * h);
+      });
+      c.closePath();
+      c.clip();
+    }
 
     function frame(dt) {
       if (!state.w) return;
@@ -797,9 +1242,14 @@
       const { w, h } = state;
       const S = Math.min(w, h);
       c.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
+      c.clearRect(0, 0, w, h);
 
       state.near = lerp(state.near, state.nearTarget, Math.min(1, dt * 4) || 1);
       const near = state.near;
+
+      /* 배경과 먼 별은 찢어진 종이 안에만 남긴다. */
+      c.save();
+      clipGate(c, w, h);
 
       const g = c.createLinearGradient(w, 0, 0, h);
       g.addColorStop(0, T.sky0); g.addColorStop(1, T.sky2);
@@ -809,13 +1259,29 @@
       volume(c, w * .30, h * .70, S * .70, S * .42, .5, T.neb2, .22 + near * .12);
 
       /* 포인터를 따라 층마다 다른 폭으로 밀린다. 이 시차가 깊이를 만든다. */
-      stars.forEach(([fx, fy, m, d], i) => {
+      stars.forEach(([fx, fy, m, d]) => {
         const depth = .3 + d * .7;
         const x = fx * w + state.px * depth * 9;
         const y = fy * h + state.py * depth * 9;
         star(c, x, y, .5 + m * 1.1, m > .9 ? T.gold : T.ink,
           .28 + m * .42 + near * .18, m > .6 ? 2 + m * 3 : 0, .12, T);
       });
+
+      const v = c.createRadialGradient(w * .5, h * .45, S * .1, w * .5, h * .5, S * .95);
+      v.addColorStop(0, rgba(T.vignette, 0));
+      v.addColorStop(1, rgba(T.vignette, .62));
+      c.fillStyle = v; c.fillRect(0, 0, w, h);
+
+      c.save();
+      c.globalAlpha = .05;
+      c.globalCompositeOperation = 'overlay';
+      c.fillStyle = c.createPattern(noise(), 'repeat');
+      c.fillRect(0, 0, w, h);
+      c.restore();
+      c.restore();
+
+      drawTornEdge(c, w, h, S);
+      drawLeaks(c, w, h, S, near);
 
       /* 가까울수록 선이 길게 그어진다. 다 그어지면 별자리가 완성된다. */
       if (near > .02) {
@@ -853,17 +1319,6 @@
       }
       if (state.meteor < -.9) state.meteor = 5 + Math.random() * 6;
 
-      const v = c.createRadialGradient(w * .5, h * .45, S * .1, w * .5, h * .5, S * .95);
-      v.addColorStop(0, rgba(T.vignette, 0));
-      v.addColorStop(1, rgba(T.vignette, .62));
-      c.fillStyle = v; c.fillRect(0, 0, w, h);
-
-      c.save();
-      c.globalAlpha = .05;
-      c.globalCompositeOperation = 'overlay';
-      c.fillStyle = c.createPattern(noise(), 'repeat');
-      c.fillRect(0, 0, w, h);
-      c.restore();
     }
 
     /* 포인터가 창 밖에 있어도 반응한다. 창 안에서만 움직이면 아무도 눈치채지 못한다. */
@@ -907,6 +1362,195 @@
     window.addEventListener('resize', () => { resize(); frame(0); });
     resize();
     if (prefersReduced()) frame(1); else requestAnimationFrame(loop);
+  }
+
+  /* 실제 종이 재질 자산을 쓰는 홈 진입점. 이전의 작은 캔버스 창 대신
+     서로 다른 찢김 사진과 난수 배치를 조합한다. 자산 자체에 찢긴 섬유,
+     말린 종이, 구멍 밖의 별/혜성 꼬리가 있어 종이 위젯으로 읽히지 않는다. */
+  function initGateway() {
+    const field = document.querySelector('[data-gate-field]');
+    const gate = document.querySelector('[data-gate]');
+    const art = document.querySelector('[data-gate-art]');
+    const burstCanvas = document.querySelector('[data-gate-burst]');
+    if (!field || !gate || !art) return;
+
+    const cfg = document.getElementById('nebula-config');
+    const target = (cfg ? (JSON.parse(cfg.textContent || '{}').target || '') : '') || 'nebula-transit.html';
+    const random = rng((Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0);
+    const variants = [
+      { src:'assets/gateway/torn-portal-wide-v1.png', scale:1.04, glint:[65,45] },
+      { src:'assets/gateway/torn-portal-trail-v1.png', scale:1.07, glint:[57,52] },
+      { src:'assets/gateway/torn-portal-diagonal-v1.png', scale:1.03, glint:[62,42] },
+    ];
+    const variant = variants[Math.floor(random() * variants.length)];
+    const profile = { lane:Math.floor(random() * 3), size:.92 + random() * .24, rotation:(random() - .5) * 12 };
+    art.src = variant.src;
+    art.style.setProperty('--gate-art-scale', String(variant.scale));
+    field.dataset.variant = String(profile.lane);
+    field.style.setProperty('--gate-glint-x', `${variant.glint[0]}%`);
+    field.style.setProperty('--gate-glint-y', `${variant.glint[1]}%`);
+
+    /* 텍스트/지표와 겹치지 않는 홈 여백 세 곳만 후보로 둔다. 해상도별로 같은
+       여백을 다시 계산하므로 폴드·폰·태블릿·노트북에서도 위치가 무너지지 않는다. */
+    function placeGateway() {
+      const w = window.innerWidth;
+      let lanes;
+      if (w <= 390) {
+        lanes = [[55,84], [62,88], [49,90]];
+      } else if (w <= 640) {
+        lanes = [[55,85], [62,89], [49,91]];
+      } else if (w <= 1200) {
+        lanes = [[67,72], [68,78], [67,57]];
+      } else {
+        lanes = [[61.5,71], [62.5,78], [63,53]];
+      }
+      const base = w <= 390 ? .77 : w <= 640 ? .74 : w <= 1200 ? .30 : .22;
+      const min = w <= 390 ? 218 : w <= 640 ? 238 : w <= 1200 ? 270 : 290;
+      const max = w <= 390 ? 290 : w <= 640 ? 350 : w <= 1200 ? 395 : 420;
+      const size = Math.max(min, Math.min(max, w * base * profile.size));
+      field.style.setProperty('--gate-size', `${Math.round(size)}px`);
+      field.style.setProperty('--gate-rot', `${profile.rotation.toFixed(2)}deg`);
+
+      /* 장식의 투명 영역도 버튼이므로 실제 v2 버튼·지표와 한 픽셀도 겹치지
+         않아야 한다. 난수 후보를 순환하며 렌더된 클릭 영역 기준으로 고른다. */
+      const blockers = Array.from(document.querySelectorAll('.hero-btns > *, .hero-stats > *'));
+      const intersects = (a, b) => a.left < b.right + 10 && a.right > b.left - 10 && a.top < b.bottom + 10 && a.bottom > b.top - 10;
+      for (let step = 0; step < lanes.length; step++) {
+        const lane = lanes[(profile.lane + step) % lanes.length];
+        field.style.setProperty('--gate-x', `${lane[0]}%`);
+        field.style.setProperty('--gate-y', `${lane[1]}%`);
+        const box = field.getBoundingClientRect();
+        if (blockers.every((blocker) => !intersects(box, blocker.getBoundingClientRect()))) return;
+      }
+
+      /* 극도로 좁거나 폴드가 열린 비율처럼 후보가 모두 만나는 경우에만 한 단계
+         줄인 뒤 다시 찾는다. 이름·버튼을 가리는 것보다 진입점을 작게 두는 편이 낫다. */
+      field.style.setProperty('--gate-size', `${Math.round(size * .82)}px`);
+      for (let step = 0; step < lanes.length; step++) {
+        const lane = lanes[(profile.lane + step) % lanes.length];
+        field.style.setProperty('--gate-x', `${lane[0]}%`);
+        field.style.setProperty('--gate-y', `${lane[1]}%`);
+        const box = field.getBoundingClientRect();
+        if (blockers.every((blocker) => !intersects(box, blocker.getBoundingClientRect()))) return;
+      }
+    }
+    placeGateway();
+    window.addEventListener('resize', placeGateway, { passive:true });
+
+    /* 종이 바깥에서도 고개를 아주 작게 돌린다. 과한 반복 애니메이션 대신
+       사용자가 가까이 왔을 때만 공간감이 생긴다. */
+    window.addEventListener('pointermove', (event) => {
+      const box = field.getBoundingClientRect();
+      const dx = Math.max(-1, Math.min(1, (event.clientX - (box.left + box.width / 2)) / Math.max(1, window.innerWidth * .5)));
+      const dy = Math.max(-1, Math.min(1, (event.clientY - (box.top + box.height / 2)) / Math.max(1, window.innerHeight * .5)));
+      art.style.setProperty('--gate-shift-x', `${(dx * 5).toFixed(2)}px`);
+      art.style.setProperty('--gate-shift-y', `${(dy * 4).toFixed(2)}px`);
+    }, { passive:true });
+
+    /* 진입은 단순 확대가 아니라, 찢긴 가장자리 밖에 있던 별가루·짧은 선들이
+       안쪽으로 빨려 들어가며 우주가 자리를 차지하는 한 번의 사건이다. 캔버스는
+       이 순간에만 살아나므로 홈 화면을 계속 산만하게 만들지 않는다. */
+    let burstFrame = 0;
+    function drawEntryBurst(origin) {
+      if (!burstCanvas || prefersReduced()) return;
+      cancelAnimationFrame(burstFrame);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = window.innerWidth, h = window.innerHeight;
+      burstCanvas.width = Math.max(1, Math.round(w * dpr));
+      burstCanvas.height = Math.max(1, Math.round(h * dpr));
+      const ctx = burstCanvas.getContext('2d');
+      if (!ctx) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const particleRandom = rng((Date.now() ^ Math.floor(origin.x * 71 + origin.y * 131)) >>> 0);
+      const particles = Array.from({ length:96 }, (_, index) => {
+        const angle = particleRandom() * Math.PI * 2;
+        return {
+          angle, distance:72 + Math.pow(particleRandom(), .46) * Math.min(Math.max(w, h) * .48, 610),
+          size:index % 13 === 0 ? 2.9 : .55 + particleRandom() * 1.5,
+          warm:index % 4 !== 0, delay:particleRandom() * .18, twist:(particleRandom() - .5) * .68,
+        };
+      });
+      const start = performance.now();
+      burstCanvas.classList.add('is-active');
+
+      function easeInQuint(value) { return value * value * value * value * value; }
+      function easeOutQuart(value) { return 1 - Math.pow(1 - value, 4); }
+      function frame(now) {
+        const elapsed = Math.max(0, (now - start) / 1120);
+        const progress = Math.min(1, elapsed);
+        ctx.clearRect(0, 0, w, h);
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+
+        /* 얇은 궤적은 처음에는 종이 바깥으로 퍼져 있다가, 중앙의 찢긴 면에
+           합쳐진다. 원형 링은 쓰지 않아 구멍이 인공적인 포털처럼 보이지 않는다. */
+        particles.forEach((particle) => {
+          const local = Math.max(0, Math.min(1, (progress - particle.delay) / (1 - particle.delay)));
+          const pull = easeInQuint(local);
+          const radius = particle.distance * (1 - pull) + 5 * pull;
+          const angle = particle.angle + particle.twist * (1 - local) * Math.sin(local * Math.PI);
+          const x = origin.x + Math.cos(angle) * radius;
+          const y = origin.y + Math.sin(angle) * radius * .68;
+          const tailRadius = radius + Math.max(9, particle.distance * (.045 + .11 * (1 - local)));
+          const tailX = origin.x + Math.cos(angle - particle.twist * .35) * tailRadius;
+          const tailY = origin.y + Math.sin(angle - particle.twist * .35) * tailRadius * .68;
+          const alpha = (1 - easeOutQuart(Math.max(0, (progress - .55) / .45))) * (.32 + particle.size * .16);
+          ctx.strokeStyle = particle.warm
+            ? `rgba(245, 204, 119, ${alpha.toFixed(3)})`
+            : `rgba(179, 206, 255, ${(alpha * .82).toFixed(3)})`;
+          ctx.lineWidth = particle.size > 2 ? 1.25 : .55;
+          ctx.beginPath(); ctx.moveTo(tailX, tailY); ctx.lineTo(x, y); ctx.stroke();
+          ctx.fillStyle = particle.warm
+            ? `rgba(255, 232, 174, ${(alpha * 1.6).toFixed(3)})`
+            : `rgba(207, 224, 255, ${(alpha * 1.35).toFixed(3)})`;
+          ctx.beginPath(); ctx.arc(x, y, particle.size * (1 - local * .42), 0, Math.PI * 2); ctx.fill();
+        });
+
+        /* 한두 개의 큰 별은 화면 바깥까지 선을 남긴다. 사용자가 요청한
+           ‘구멍 밖으로 새는 별’이 클릭 순간에는 궤적으로 이어진다. */
+        const flare = Math.sin(Math.min(1, progress * 1.65) * Math.PI);
+        for (let i = 0; i < 5; i++) {
+          const angle = (i / 5) * Math.PI * 2 + .36;
+          const length = 130 + i * 42 + progress * 215;
+          const x = origin.x + Math.cos(angle) * length;
+          const y = origin.y + Math.sin(angle) * length * .58;
+          const gradient = ctx.createLinearGradient(origin.x, origin.y, x, y);
+          gradient.addColorStop(0, `rgba(255,234,182,${(flare * .78).toFixed(3)})`);
+          gradient.addColorStop(1, 'rgba(255,234,182,0)');
+          ctx.strokeStyle = gradient; ctx.lineWidth = 1.05;
+          ctx.beginPath(); ctx.moveTo(origin.x, origin.y); ctx.lineTo(x, y); ctx.stroke();
+        }
+        ctx.restore();
+
+        if (progress < 1) burstFrame = requestAnimationFrame(frame);
+        else {
+          burstCanvas.classList.remove('is-active');
+          ctx.clearRect(0, 0, w, h);
+        }
+      }
+      burstFrame = requestAnimationFrame(frame);
+    }
+
+    const veil = document.createElement('div');
+    veil.className = 'gate-veil';
+    document.body.append(veil);
+    let entering = false;
+    gate.addEventListener('click', () => {
+      if (entering) return;
+      entering = true;
+      gate.disabled = true;
+      const box = gate.getBoundingClientRect();
+      playApprovedSfx('enter');
+      veil.style.setProperty('--gx', `${box.left + box.width / 2}px`);
+      veil.style.setProperty('--gy', `${box.top + box.height / 2}px`);
+      field.classList.add('is-opening');
+      drawEntryBurst({ x:box.left + box.width / 2, y:box.top + box.height / 2 });
+      veil.classList.add('open');
+      /* SFX-06 B의 세 음과 마지막 잔향을 읽을 수 있도록, 기존 0.76초보다
+         전환을 길게 잡는다. 애니메이션과 소리가 같은 끝점으로 모인다. */
+      window.setTimeout(() => { window.location.href = target; }, prefersReduced() ? 200 : 1200);
+    });
   }
 
   const page = document.body.dataset.page;
