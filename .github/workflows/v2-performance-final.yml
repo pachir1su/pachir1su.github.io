@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 100
           token: ${{ github.token }}
 
-      - name: Apply final detail-runtime cleanup
+      - name: Apply live-detail performance and accessibility pass
         shell: bash
         run: |
           set -euo pipefail
@@ -37,24 +37,111 @@ jobs:
           import re
 
           root = Path('final')
+          project_root = root / 'projects'
+          live = []
+          archives = []
 
-          # These two live Swordmaster sub-detail pages were outside the earlier index.html-only detail pass.
-          for rel in [
-              'projects/swordmaster/file_swordmaster.html',
-              'projects/swordmaster/media_swordmaster.html',
-          ]:
-              p = root / rel
+          font_pat = re.compile(r'<link\s+href="(https://fonts\.googleapis\.com/css2\?[^\"]+)"\s+rel="stylesheet"\s*/>', re.S)
+          fa_pat = re.compile(r'<link\s+rel="stylesheet"\s+href="(https://cdnjs\.cloudflare\.com/ajax/libs/font-awesome/6\.4\.0/css/all\.min\.css)"\s*/>', re.S)
+
+          def add_aria_to_opening_tag(text, pattern, label, what):
+              rx = re.compile(pattern, re.S)
+              m = rx.search(text)
+              if not m:
+                  raise SystemExit(f'{what} opening tag missing')
+              tag = m.group(0)
+              if 'aria-label=' in tag:
+                  return text
+              return text[:m.start()] + tag[:-1] + f' aria-label="{label}">' + text[m.end():]
+
+          for p in sorted(project_root.rglob('*.html')):
               s = p.read_text(encoding='utf-8')
+              if 'class="detail-body"' not in s:
+                  continue
+              rel = str(p.relative_to(root))
+              if p.name == '_archive.html':
+                  archives.append(rel)
+                  continue
+              live.append(rel)
               before = s
-              s = re.sub(r'\n\s*<link href="https://unpkg\.com/aos@2\.3\.1/dist/aos\.css" rel="stylesheet" />', '', s, count=1)
-              s = re.sub(r'\n\s*<script src="https://unpkg\.com/aos@2\.3\.1/dist/aos\.js"></script>', '', s, count=1)
-              s = re.sub(r'\n\s*<script src="https://cdnjs\.cloudflare\.com/ajax/libs/vanilla-tilt/1\.8\.0/vanilla-tilt\.min\.js"></script>', '', s, count=1)
-              s = s.replace('<script src="../../script.js"></script>', '<script src="../../detail.js"></script>', 1)
-              if s == before:
-                  raise SystemExit(f'no runtime cleanup applied to {rel}')
-              if 'unpkg.com/aos' in s or 'vanilla-tilt' in s or '../../script.js' in s:
-                  raise SystemExit(f'legacy runtime remains in {rel}')
+
+              # Any remaining live legacy runtime is removed. data-aos attributes stay as hooks for detail.js.
+              s = re.sub(r'\n\s*<link href="https://unpkg\.com/aos@2\.3\.1/dist/aos\.css" rel="stylesheet" />', '', s)
+              s = re.sub(r'\n\s*<script src="https://unpkg\.com/aos@2\.3\.1/dist/aos\.js"></script>', '', s)
+              s = re.sub(r'\n\s*<script src="https://cdnjs\.cloudflare\.com/ajax/libs/vanilla-tilt/1\.8\.0/vanilla-tilt\.min\.js"></script>', '', s)
+              s = s.replace('<script src="../../script.js"></script>', '<script src="../../detail.js"></script>')
+
+              # External decorative fonts/icons must not block first paint.
+              fm = font_pat.search(s)
+              if not fm:
+                  raise SystemExit(f'Google Fonts stylesheet not found in {rel}')
+              font_url = fm.group(1).replace('display=swap', 'display=optional')
+              font_block = (
+                  f'<link href="{font_url}" rel="stylesheet" media="print" onload="this.media=\'all\'" />\n'
+                  f'    <noscript><link href="{font_url}" rel="stylesheet" /></noscript>'
+              )
+              s = s[:fm.start()] + font_block + s[fm.end():]
+
+              fam = fa_pat.search(s)
+              if not fam:
+                  raise SystemExit(f'Font Awesome stylesheet not found in {rel}')
+              fa_url = fam.group(1)
+              fa_block = (
+                  f'<link rel="stylesheet" href="{fa_url}" media="print" onload="this.media=\'all\'" />\n'
+                  f'    <noscript><link rel="stylesheet" href="{fa_url}" /></noscript>'
+              )
+              s = s[:fam.start()] + fa_block + s[fam.end():]
+
+              # Common icon-only controls/links need names.
+              s = s.replace(
+                  '<button type="button" id="btn-back-to-top">',
+                  '<button type="button" id="btn-back-to-top" aria-label="맨 위로">',
+                  1,
+              )
+              s = add_aria_to_opening_tag(
+                  s,
+                  r'<a\b(?=[^>]*class="nav-github")[^>]*>',
+                  'GitHub 프로필',
+                  f'{rel} nav GitHub',
+              )
+
+              social_match = re.search(r'<div class="social-links">.*?</div>', s, re.S)
+              if not social_match:
+                  raise SystemExit(f'social links block missing in {rel}')
+              social = social_match.group(0)
+              social = add_aria_to_opening_tag(
+                  social,
+                  r'<a\b(?=[^>]*href="https://github\.com/pachir1su")[^>]*>',
+                  'GitHub 프로필',
+                  f'{rel} footer GitHub',
+              )
+              social = add_aria_to_opening_tag(
+                  social,
+                  r'<a\b(?=[^>]*href="mailto:capybara@koreatech\.ac\.kr")[^>]*>',
+                  '이메일 보내기',
+                  f'{rel} footer email',
+              )
+              s = s[:social_match.start()] + social + s[social_match.end():]
+
+              # A single main landmark contains the page-specific hero/body, leaving global nav/footer outside.
+              if '<main id="main-content">' not in s:
+                  marker = '    <section class="detail-hero">'
+                  if marker not in s:
+                      raise SystemExit(f'detail hero marker missing in {rel}')
+                  s = s.replace(marker, '    <main id="main-content">\n' + marker, 1)
+                  footer = '    <footer>'
+                  if footer not in s:
+                      raise SystemExit(f'footer marker missing in {rel}')
+                  s = s.replace(footer, '    </main>\n\n' + footer, 1)
+
               p.write_text(s.rstrip() + '\n', encoding='utf-8')
+              if s == before:
+                  raise SystemExit(f'expected live-detail change missing for {rel}')
+
+          if len(live) != 28:
+              raise SystemExit(f'expected 28 live detail pages, got {len(live)}')
+          if archives != ['projects/Sibal_Life_Smoking/_archive.html']:
+              raise SystemExit(f'unexpected archive set: {archives}')
 
           # Keep visible language labels inside their accessible names on every detail page.
           p = root / 'detail.js'
@@ -63,47 +150,29 @@ jobs:
           new = """    if (langDesktop) {\n      langDesktop.title = lang === 'ko' ? 'English' : '한국어';\n      langDesktop.setAttribute('aria-label', lang === 'ko' ? 'EN · English' : 'KO · 한국어');\n    }\n    if (langMobile) langMobile.setAttribute('aria-label', lang === 'ko' ? 'English · 언어 전환' : '한국어 · Switch language');\n    applyTheme(document.documentElement.dataset.theme || 'light');\n"""
           if old not in s:
               raise SystemExit('detail.js language label insertion point missing')
-          s = s.replace(old, new, 1)
-          p.write_text(s.rstrip() + '\n', encoding='utf-8')
-          PY
+          p.write_text(s.replace(old, new, 1).rstrip() + '\n', encoding='utf-8')
 
-          # Audit every live detail HTML. _archive.html is a preserved, non-routed historical file and is intentionally untouched.
-          python3 - <<'PY'
-          from pathlib import Path
-          root = Path('final/projects')
-          details = []
-          legacy = []
-          archives = []
-          for p in sorted(root.rglob('*.html')):
-              s = p.read_text(encoding='utf-8')
-              if 'class="detail-body"' not in s:
-                  continue
-              if p.name == '_archive.html':
-                  archives.append(str(p.relative_to(Path('final'))))
-                  continue
-              details.append(str(p.relative_to(Path('final'))))
+          # Defensive audit after mutation.
+          for rel in live:
+              s = (root / rel).read_text(encoding='utf-8')
               bad = []
               if 'unpkg.com/aos@' in s: bad.append('AOS')
               if 'VanillaTilt' in s or 'vanilla-tilt' in s: bad.append('VanillaTilt')
               if 'src="../../script.js"' in s: bad.append('root-script')
               if 'src="../../detail.js"' not in s: bad.append('missing-detail-js')
-              if bad: legacy.append((str(p), bad))
-          print(f'live detail html count={len(details)}')
-          print('\n'.join(details))
-          print(f'preserved archives={archives}')
-          if legacy:
-              raise SystemExit(f'legacy live detail runtimes: {legacy}')
-          if len(details) != 28:
-              raise SystemExit(f'expected 28 live detail HTML pages, got {len(details)}')
-          if archives != ['projects/Sibal_Life_Smoking/_archive.html']:
-              raise SystemExit(f'unexpected archive set: {archives}')
+              if '<main id="main-content">' not in s: bad.append('missing-main')
+              if 'id="btn-back-to-top" aria-label=' not in s: bad.append('unnamed-back-to-top')
+              if 'media="print"' not in s or 'display=optional' not in s: bad.append('blocking-external-css')
+              if bad:
+                  raise SystemExit(f'{rel}: {bad}')
+          print(f'optimized live details={len(live)}, preserved archives={archives}')
           PY
 
           node --check final/detail.js
           node --check final/script.js
           node final/tools/verify-build.js
           git -C final diff --check
-          test "$(git -C final status --porcelain=v1 --untracked-files=all | wc -l)" -eq 3
+          test "$(git -C final status --porcelain=v1 --untracked-files=all | wc -l)" -eq 29
 
       - name: Install browser and Lighthouse
         shell: bash
@@ -141,52 +210,49 @@ jobs:
           const fs = require('fs');
           const path = require('path');
           const root = path.resolve('final/projects');
-          function walk(dir) {
-            return fs.readdirSync(dir, {withFileTypes:true}).flatMap(e => e.isDirectory() ? walk(path.join(dir,e.name)) : [path.join(dir,e.name)]);
-          }
-          const pages = walk(root).filter(p => p.endsWith('.html') && path.basename(p) !== '_archive.html' && fs.readFileSync(p,'utf8').includes('class="detail-body"'))
-            .map(p => '/' + path.relative(path.resolve('final'), p).split(path.sep).join('/'));
+          function walk(dir) { return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(dir,e.name)):[path.join(dir,e.name)]); }
+          const pages = walk(root).filter(p=>p.endsWith('.html') && path.basename(p)!=='_archive.html' && fs.readFileSync(p,'utf8').includes('class="detail-body"'))
+            .map(p=>'/' + path.relative(path.resolve('final'),p).split(path.sep).join('/'));
           if (pages.length !== 28) throw new Error(`expected 28 live detail pages, got ${pages.length}`);
-          (async () => {
-            const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH, headless: true, args:['--no-sandbox'] });
-            const failures = [];
-            let cases = 0;
-            for (const width of [390,1280]) for (const theme of ['light','dark']) for (const url of pages) {
+          (async()=>{
+            const browser=await chromium.launch({executablePath:process.env.CHROME_PATH,headless:true,args:['--no-sandbox']});
+            const failures=[]; let cases=0;
+            for(const width of [390,1280]) for(const theme of ['light','dark']) for(const url of pages){
               cases++;
-              const page = await browser.newPage({ viewport: {width, height:900} });
+              const page=await browser.newPage({viewport:{width,height:900}});
               const pageErrors=[]; const badRequests=[];
-              page.on('pageerror', e => pageErrors.push(e.message));
-              page.on('request', r => { if (/aos|vanilla-tilt|devicon/i.test(r.url())) badRequests.push(r.url()); });
-              await page.addInitScript(t => localStorage.setItem('theme', t), theme);
-              try {
-                await page.goto(process.env.BASE_URL + url, {waitUntil:'networkidle', timeout:60000});
-                const state = await page.evaluate(() => ({
-                  overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
-                  broken: [...document.images].filter(i => i.complete && i.naturalWidth === 0).map(i => i.src),
-                  detailRuntime: [...document.scripts].some(s => /\/detail\.js(?:$|\?)/.test(s.src)),
-                  rootRuntime: [...document.scripts].some(s => /\/script\.js(?:$|\?)/.test(s.src)),
-                  langName: document.querySelector('#langToggle')?.getAttribute('aria-label') || ''
+              page.on('pageerror',e=>pageErrors.push(e.message));
+              page.on('request',r=>{if(/aos|vanilla-tilt|devicon/i.test(r.url()))badRequests.push(r.url())});
+              await page.addInitScript(t=>localStorage.setItem('theme',t),theme);
+              try{
+                await page.goto(process.env.BASE_URL+url,{waitUntil:'networkidle',timeout:60000});
+                const state=await page.evaluate(()=>({
+                  overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+1,
+                  broken:[...document.images].filter(i=>i.complete&&i.naturalWidth===0).map(i=>i.src),
+                  detailRuntime:[...document.scripts].some(s=>/\/detail\.js(?:$|\?)/.test(s.src)),
+                  rootRuntime:[...document.scripts].some(s=>/\/script\.js(?:$|\?)/.test(s.src)),
+                  mainCount:document.querySelectorAll('main').length,
+                  langName:document.querySelector('#langToggle')?.getAttribute('aria-label')||''
                 }));
-                if (state.overflow) throw new Error('horizontal overflow');
-                if (state.broken.length) throw new Error('broken images: ' + state.broken.join(','));
-                if (!state.detailRuntime || state.rootRuntime) throw new Error('wrong detail runtime');
-                if (!state.langName.includes('EN')) throw new Error('language accessible name missing visible EN label');
-                if (pageErrors.length) throw new Error('page errors: ' + pageErrors.join(' | '));
-                if (badRequests.length) throw new Error('legacy requests: ' + badRequests.join(' | '));
-              } catch (e) { failures.push(`${width}-${theme}-${url}: ${e.message}`); }
+                if(state.overflow)throw new Error('horizontal overflow');
+                if(state.broken.length)throw new Error('broken images: '+state.broken.join(','));
+                if(!state.detailRuntime||state.rootRuntime)throw new Error('wrong detail runtime');
+                if(state.mainCount!==1)throw new Error(`main landmark count ${state.mainCount}`);
+                if(!state.langName.includes('EN'))throw new Error('language accessible name missing visible EN label');
+                if(pageErrors.length)throw new Error('page errors: '+pageErrors.join(' | '));
+                if(badRequests.length)throw new Error('legacy requests: '+badRequests.join(' | '));
+              }catch(e){failures.push(`${width}-${theme}-${url}: ${e.message}`)}
               await page.close();
             }
-            const page = await browser.newPage({ viewport:{width:390,height:900} });
-            await page.goto(process.env.BASE_URL + '/projects/swordmaster/media_swordmaster.html', {waitUntil:'networkidle'});
+            const page=await browser.newPage({viewport:{width:390,height:900}});
+            await page.goto(process.env.BASE_URL+'/projects/swordmaster/media_swordmaster.html',{waitUntil:'networkidle'});
             await page.locator('#langToggle').click();
-            const switched = await page.locator('#langToggle').getAttribute('aria-label');
-            if (!switched || !switched.includes('KO')) failures.push(`language toggle accessible name after switch: ${switched}`);
-            await page.close();
-            await browser.close();
+            const switched=await page.locator('#langToggle').getAttribute('aria-label');
+            if(!switched||!switched.includes('KO'))failures.push(`language toggle accessible name after switch: ${switched}`);
+            await page.close(); await browser.close();
             const summary={pages:pages.length,cases,failures};
             fs.writeFileSync('v2-performance-evidence/detail-regression.json',JSON.stringify(summary,null,2));
-            console.log(summary);
-            if (failures.length) process.exit(1);
+            console.log(summary); if(failures.length)process.exit(1);
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
 
@@ -202,28 +268,20 @@ jobs:
           "$LH" http://127.0.0.1:4178/projects/swordmaster/media_swordmaster.html --chrome-path="$CHROME_PATH" --preset=desktop --output=json --output-path=v2-performance-evidence/lighthouse/media-desktop.json --quiet --chrome-flags="--headless --no-sandbox"
           node <<'NODE'
           const fs=require('fs'); const out={};
-          for(const key of ['root-mobile','root-desktop','media-mobile','media-desktop']) {
+          for(const key of ['root-mobile','root-desktop','media-mobile','media-desktop']){
             const j=JSON.parse(fs.readFileSync(`v2-performance-evidence/lighthouse/${key}.json`));
-            out[key]={
-              performance:Math.round(j.categories.performance.score*100),
-              accessibility:Math.round(j.categories.accessibility.score*100),
-              bestPractices:Math.round(j.categories['best-practices'].score*100),
-              seo:Math.round(j.categories.seo.score*100),
-              fcp:j.audits['first-contentful-paint'].displayValue,
-              lcp:j.audits['largest-contentful-paint'].displayValue,
-              tbt:j.audits['total-blocking-time'].displayValue,
-              cls:j.audits['cumulative-layout-shift'].displayValue,
-              bytes:j.audits['total-byte-weight'].displayValue
-            };
+            const failedA11y=j.categories.accessibility.auditRefs.map(r=>({id:r.id,weight:r.weight,a:j.audits[r.id]})).filter(x=>x.weight>0&&x.a&&x.a.score!==1);
+            out[key]={performance:Math.round(j.categories.performance.score*100),accessibility:Math.round(j.categories.accessibility.score*100),bestPractices:Math.round(j.categories['best-practices'].score*100),seo:Math.round(j.categories.seo.score*100),fcp:j.audits['first-contentful-paint'].displayValue,lcp:j.audits['largest-contentful-paint'].displayValue,tbt:j.audits['total-blocking-time'].displayValue,cls:j.audits['cumulative-layout-shift'].displayValue,bytes:j.audits['total-byte-weight'].displayValue,failedA11y:failedA11y.map(x=>x.id)};
           }
-          fs.writeFileSync('v2-performance-evidence/lighthouse-summary.json',JSON.stringify(out,null,2));
-          console.log(out);
-          if(out['root-mobile'].performance < 85) throw new Error('root mobile performance regressed below 85');
-          if(out['root-desktop'].performance < 95) throw new Error('root desktop performance regressed below 95');
-          for(const k of Object.keys(out)) if(out[k].accessibility < 100) throw new Error(`${k} accessibility below 100`);
+          fs.writeFileSync('v2-performance-evidence/lighthouse-summary.json',JSON.stringify(out,null,2)); console.log(out);
+          if(out['root-mobile'].performance<85)throw new Error('root mobile performance regressed below 85');
+          if(out['root-desktop'].performance<95)throw new Error('root desktop performance regressed below 95');
+          if(out['media-mobile'].performance<80)throw new Error('media mobile performance below 80');
+          if(out['media-desktop'].performance<90)throw new Error('media desktop performance below 90');
+          for(const k of Object.keys(out))if(out[k].accessibility<100)throw new Error(`${k} accessibility below 100: ${out[k].failedA11y.join(',')}`);
           NODE
 
-      - name: Commit exactly three files and push
+      - name: Commit 29 files atomically and push
         shell: bash
         run: |
           set -euo pipefail
@@ -232,25 +290,25 @@ jobs:
           test "$(git merge-base "$BASE" HEAD)" = "$BASE"
           git config user.name "v2 performance runner"
           git config user.email "actions@users.noreply.github.com"
-
-          git add -- detail.js
-          git commit -m "fix: align detail language accessibility" -- detail.js
-          git add -- projects/swordmaster/file_swordmaster.html
-          git commit -m "perf: lighten File Swordmaster detail runtime" -- projects/swordmaster/file_swordmaster.html
-          git add -- projects/swordmaster/media_swordmaster.html
-          git commit -m "perf: lighten Media Swordmaster detail runtime" -- projects/swordmaster/media_swordmaster.html
-
+          mapfile -d '' FILES < <(git status --porcelain=v1 -z --untracked-files=all | sed -z 's/^...//')
+          test "${#FILES[@]}" -eq 29
+          for f in "${FILES[@]}"; do
+            git add -- "$f"
+            if [ "$f" = "detail.js" ]; then msg="fix: align detail runtime accessibility"; else msg="perf: optimize live detail template"; fi
+            git commit -m "$msg" -- "$f"
+          done
           changed="$(git diff --name-only "$BASE"...HEAD | wc -l)"
           commits="$(git rev-list --count "$BASE"..HEAD)"
           echo "changed=$changed commits=$commits"
-          test "$changed" -eq 3
-          test "$commits" -eq 3
+          test "$changed" -eq 29
+          test "$commits" -eq 29
           test "$changed" -eq "$commits"
           EXPECTED="$(git ls-remote origin refs/heads/agent/v2-performance-final | cut -f1)"
           test "$EXPECTED" = "$BASE"
           git push --force-with-lease=refs/heads/agent/v2-performance-final:"$EXPECTED" origin HEAD:agent/v2-performance-final
 
       - name: Upload evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: v2-performance-final-evidence
