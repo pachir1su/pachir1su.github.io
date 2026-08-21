@@ -25,14 +25,16 @@ jobs:
         with:
           ref: agent/v3-prototype-baseline
           path: target
-          fetch-depth: 1
+          fetch-depth: 20
 
       - name: Verify atomic baseline and regressions
         shell: bash
         run: |
           set -euo pipefail
           cd target
-          test "$(git rev-list --count origin/main..HEAD 2>/dev/null || git rev-list --count ec5e92b81991cb3c013010aeb90d3beb3c89a1e7..HEAD)" -eq 9
+          git fetch origin main --depth=20
+          test "$(git rev-list --count origin/main..HEAD)" -eq 9
+          test "$(git diff --name-only origin/main...HEAD | wc -l)" -eq 9
           node --check docs/v3-constellation-prototypes/nebula.js
           node --check build.js
           node --check script.js
