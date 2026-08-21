@@ -31,20 +31,44 @@ function heightFor(w) { return w <= 390 ? 844 : w <= 768 ? 1024 : 900; }
     check(v.imgs.length===0,`${label}:broken images`,v.imgs.join('\n'));
   }
 
-  // Root responsive matrix.
   for (const w of widths) for (const theme of ['light','dark']) {
     const label=`root-${w}-${theme}`; const {context,page,errors,forbidden}=await open(w,theme);
-    try { await page.goto(`${base}/`,{waitUntil:'domcontentloaded'}); await verifyPage(page,label); check(errors.length===0,`${label}:errors`,errors.join('\n')); check(forbidden.length===0,`${label}:forbidden third-party`,forbidden.join('\n')); cases.push(label); if([320,768,1440].includes(w)&&theme==='light') await page.screenshot({path:path.join(out,`${label}.png`),fullPage:false}); } catch(e){failures.push({name:label,detail:e.stack||String(e)});} await context.close();
+    try {
+      await page.goto(`${base}/`,{waitUntil:'domcontentloaded'});
+      await verifyPage(page,label);
+      check(errors.length===0,`${label}:errors`,errors.join('\n'));
+      check(forbidden.length===0,`${label}:forbidden third-party`,forbidden.join('\n'));
+      if (w === 390 && theme === 'light') {
+        const clickable = page.locator('.pfilter, .btn, .plink').first();
+        if (await clickable.count()) await clickable.click();
+        await page.waitForTimeout(80);
+        check((await page.locator('.stamp-pop').count())===0,`${label}:stamp feedback removed`);
+      }
+      cases.push(label);
+      if([320,768,1440].includes(w)&&theme==='light') await page.screenshot({path:path.join(out,`${label}.png`),fullPage:false});
+    } catch(e){failures.push({name:label,detail:e.stack||String(e)});} await context.close();
   }
 
   const detailDirs = fs.readdirSync(path.join(target,'projects')).filter(d=>fs.existsSync(path.join(target,'projects',d,'index.html'))).sort();
-  // All details: mobile + desktop, light + dark.
+  const redirectOnly = new Set(['Sibal_Life_Smoking']);
   for (const d of detailDirs) for (const w of [390,1440]) for (const theme of ['light','dark']) {
     const label=`detail-${d}-${w}-${theme}`; const {context,page,errors,forbidden}=await open(w,theme);
-    try { await page.goto(`${base}/projects/${encodeURIComponent(d)}/`,{waitUntil:'domcontentloaded'}); await verifyPage(page,label); check(errors.length===0,`${label}:errors`,errors.join('\n')); check(forbidden.length===0,`${label}:forbidden libraries`,forbidden.join('\n')); const hasDetail=await page.locator('script[src$="detail.js"]').count(); check(hasDetail===1,`${label}:detail runtime missing`,hasDetail); cases.push(label); } catch(e){failures.push({name:label,detail:e.stack||String(e)});} await context.close();
+    try {
+      await page.goto(`${base}/projects/${encodeURIComponent(d)}/`,{waitUntil:'domcontentloaded'});
+      await page.waitForTimeout(80);
+      if (redirectOnly.has(d)) {
+        check(new URL(page.url()).pathname === '/',`${label}:redirect target`,page.url());
+      } else {
+        await verifyPage(page,label);
+        check(errors.length===0,`${label}:errors`,errors.join('\n'));
+        check(forbidden.length===0,`${label}:forbidden libraries`,forbidden.join('\n'));
+        const hasDetail=await page.locator('script[src$="detail.js"]').count();
+        check(hasDetail===1,`${label}:detail runtime missing`,hasDetail);
+      }
+      cases.push(label);
+    } catch(e){failures.push({name:label,detail:e.stack||String(e)});} await context.close();
   }
 
-  // Demo interactions.
   const demos={
     'Wall_Sina': async page => { const r=page.locator('[data-project-demo="wall"] input[type="range"]'); await r.fill('85'); check((await page.locator('.demo-status').innerText()).length>3,'wall:status'); },
     '2026_U-CAST': async page => { const b=page.locator('[data-project-demo="ucast"] .demo-channel .demo-btn').first(); await b.click(); check(await page.locator('.demo-warning').evaluate(el=>el.classList.contains('active')),'ucast:warning'); },
@@ -57,7 +81,6 @@ function heightFor(w) { return w <= 390 ? 844 : w <= 768 ? 1024 : 900; }
     try { await page.goto(`${base}/projects/${d}/`,{waitUntil:'domcontentloaded'}); await page.waitForSelector('[data-project-demo]'); await test(page); await page.locator('#langToggle').click(); check((await page.locator('[data-project-demo]').count())===1,`${label}:lang rerender`); check(errors.length===0,`${label}:errors`,errors.join('\n')); cases.push(label); await page.screenshot({path:path.join(out,`${label}.png`),fullPage:false}); } catch(e){failures.push({name:label,detail:e.stack||String(e)});} await context.close();
   }
 
-  // Media additions.
   {
     const {context,page}=await open(1440,'light');
     await page.goto(`${base}/projects/koreatechGongjiAgent/`,{waitUntil:'domcontentloaded'}); const kga=await page.locator('[data-media-followup="v27-kga-audit"] img').count(); check(kga>=2,'kga:additional media',`count=${kga}`); await context.close();
