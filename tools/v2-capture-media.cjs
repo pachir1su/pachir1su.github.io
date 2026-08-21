@@ -46,15 +46,15 @@ const runnerBase = process.env.RUNNER_BASE || 'http://127.0.0.1:4175';
     await context.close();
   }
 
-  // KGA: render only material derived from the private repository's reviewed design sources.
-  // These are source-design screenshots, not live-operation screenshots; the portfolio captions
-  // preserve that distinction. Existing web-shuttle.webp remains the verified live screen.
+  // KGA: render only material derived from the repository's reviewed design sources.
+  // These are source-design screenshots, not live-operation screenshots. The portfolio
+  // keeps the existing web-shuttle.webp as the separately verified live screen.
   {
     const context = await browser.newContext({ viewport: { width: 1440, height: 1050 }, colorScheme: 'light', deviceScaleFactor: 1 });
     const page = await context.newPage();
     await page.goto(`${runnerBase}/tools/kga-source-snapshots.html`, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.locator('#kga-design-hub .desktop').screenshot({ path: path.join(out, 'kga-design-hub.png') });
-    await page.locator('#kga-mobile-source .phone').screenshot({ path: path.join(out, 'kga-mobile-source.png') });
+    await page.locator('#kga-design-hub .desktop').screenshot({ path: path.join(out, 'kga-home.png') });
+    await page.locator('#kga-mobile-source .phone').screenshot({ path: path.join(out, 'kga-shuttle.png') });
     await context.close();
   }
 
