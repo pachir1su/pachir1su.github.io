@@ -25,6 +25,9 @@
       <i>LEE GEON YEONG</i>
     </div>
 
+    <!-- 우주에서 v2 노트 홈으로 돌아가는 기능성 메모지. 시각 텍스트는 두지 않는다. -->
+    <a class="orbit-back-note" href="../../index.html" aria-label="v2 홈으로 돌아가기"></a>
+
     <!-- 연도 버튼은 projects.json 의 실제 연도 그룹으로 만들어진다. -->
     <nav class="orbit" aria-label="프로젝트 연도" data-orbit>
       <div class="orbit-axis" aria-hidden="true"></div>
@@ -38,14 +41,12 @@
       <p class="kicker">V3 KEY VISUAL · 전환 화면</p>
       <h2>프로젝트는 다 보입니다. 상태는 형태가 말합니다.</h2>
       <p>포트폴리오이므로 <b>프로젝트 이름은 눌러야 나오는 것이 아니라 언제나 화면에 있어야 합니다.</b> 성도가 밝은 별에 이름을 붙여 두는 방식을 그대로 썼습니다. 눌렀을 때 펼쳐지는 것은 역할과 한 줄 설명이고, 한 번 더 누르면 실제 상세 페이지로 갑니다.</p>
-      <p>연도를 고르면 그 해 프로젝트가 별이 되어 <b>순서대로 이어진 그 해의 별자리</b>를 만듭니다. 진행 중과 궤도를 잃은 별은 별자리에 속하지 않으므로 선이 없습니다. 연도 축에는 시간만 올리고 상태는 올리지 않습니다.</p>
+      <p>연도를 고르면 그 해 프로젝트가 별이 되어 <b>사용자가 정한 순서대로 이어진 그 해의 별자리</b>를 만듭니다. 진행 중과 실패한 프로젝트도 해당 연도에서만 함께 나타나며, 별자리에 속하지 않으므로 선이 없습니다. 연도 축에는 시간만 올리고 상태는 올리지 않습니다.</p>
 
       <div class="rows">
-        <div class="row"><b>진행 예정 3</b><span><em>별이 태어나는 중</em> — 가스 원반만 돌고 아직 코어가 켜지지 않았습니다. 속이 빈 윤곽만 보입니다. 한맵 · 마법 아카데미 · DelphiRec</span></div>
-        <div class="row"><b>개발 중 3</b><span><em>점화 시작</em> — 코어가 켜져 느리게 맥동합니다. 승기봇 · HTML Viewer · CentrifugeAI</span></div>
-        <div class="row"><b>실패 3</b><span><em>초신성 잔해</em> — 껍질이 바깥으로 퍼지고 군데군데 끊겼으며 중심은 비어 있습니다. InfoCatch · InvestAI · 건영운세</span></div>
-        <div class="row"><b>지연 1</b><span><em>궤도 이탈</em> — 별은 아직 살아 있고 다만 축에서 떨어져 나왔습니다. 끊어진 궤도 흔적이 남습니다. 한기대 지도 (초기 버전)</span></div>
-        <div class="row"><b>격리 1</b><span>BrawlCraft는 제51구역으로 확정되어 이 화면에 올리지 않았습니다.</span></div>
+        <div class="row"><b>2026 · 진행 중 6</b><span><em>별이 태어나는 중</em> — 한맵 · CentrifugeAI · 마법 아카데미 · 승기봇 · HTML Viewer · DelphiRec. 기획 단계는 속이 빈 코어, 개발 중은 점화된 코어입니다.</span></div>
+        <div class="row"><b>2026 · 실패 2</b><span><em>초신성 잔해와 궤도 이탈</em> — BrawlCraft는 퍼진 잔해, 한기대 지도는 다시 할 여지를 남긴 궤도 이탈로 표현합니다.</span></div>
+        <div class="row"><b>2025 · 실패 3</b><span><em>초신성 잔해</em> — InfoCatch · InvestAI · 건영운세는 2025를 고를 때만 나타납니다.</span></div>
       </div>
 
       <div class="notes">
@@ -53,16 +54,16 @@
         <div class="note"><b>형태가 상태를 말합니다</b><span>“진행 중”, “실패” 같은 상태 글자는 쓰지 않습니다. 원반이 도는 것과 껍질이 터진 것은 글자 없이도 구분됩니다.</span></div>
         <div class="note"><b>연도마다 별자리가 다릅니다</b><span>그 해 프로젝트를 순서대로 이어 만든 형태라, 2026은 열 점, 2025와 2024는 다섯 점짜리 별자리가 됩니다.</span></div>
         <div class="note"><b>지연은 실패와 다르게 생겼습니다</b><span>한기대 지도 초기 버전은 잔해가 아니라 <b>아직 빛나는 별</b>입니다. 궤도만 벗어났습니다. 다시 할 여지가 형태에 남아 있습니다.</span></div>
-        <div class="note"><b>실제 데이터입니다</b><span><code>projects.json</code>의 <code>wip</code>·<code>failed</code> 그룹을 그대로 읽습니다. 기획 단계인지 개발 중인지도 <code>badge</code> 값으로 갈랐습니다.</span></div>
+        <div class="note"><b>실제 데이터 + 사용자 순서입니다</b><span><code>projects.json</code>에서 상세 링크와 설명을 읽고, #114에 적어 준 연도별 완료·진행·실패 순서로 시안 안에서만 재배열합니다.</span></div>
         <div class="note"><b>마우스만 쓰는 게 아닙니다</b><span>탭 키로 천체를 하나씩 옮겨 다닐 수 있고, 터치에서도 최소 44px가 확보됩니다. <code>Esc</code>로 닫힙니다.</span></div>
         <div class="note"><b>가볍게 돌아갑니다</b><span>성운 하늘은 한 번 그려 캐시에 두고, 매 프레임 다시 그리는 것은 열 개의 천체뿐입니다. <code>prefers-reduced-motion</code>에서는 움직임 없이 한 장만 그립니다.</span></div>
-        <div class="note warn"><b>아직 안 만든 것</b><span>모바일 전용 UX는 별도 기획 대상입니다. 지금은 좁은 화면에서 세 무리를 세로로 벌려 읽히게만 해 두었습니다. 성장 별자리와 제51구역도 다음 단계입니다.</span></div>
+        <div class="note"><b>반응형 무대입니다</b><span>데스크톱·태블릿·모바일은 각각 다른 성도 좌표를 씁니다. 모바일에서는 44px 터치 영역과 세로 스크롤로 긴 2026 목록도 겹치지 않게 읽을 수 있습니다.</span></div>
       </div>
     </section>
 
     <footer>
       <p><b>범위.</b> 실제 v3.0.0 제품 코드가 아니라 <code>docs/v3-constellation-prototypes/</code> 안의 디자인 시안입니다. 운영 <code>index.html</code>과 <code>projects.json</code>은 변경하지 않았습니다.</p>
-      <p>첫 화면은 <a href="nebula-keyvisual.html">키비주얼 시안</a>에, 시각 언어를 고른 근거는 <a href="nebula-taste-board.html">취향 보드</a>에 있습니다.</p>
+      <p>첫 화면은 <a href="nebula-keyvisual.html">키비주얼 시안</a>에, 효과음 후보와 선택은 <a href="nebula-sound.html">사운드 맵 2차</a>에 있습니다.</p>
     </footer>
   </div>
 
