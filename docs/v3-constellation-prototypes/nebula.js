@@ -34,6 +34,13 @@
     },
   };
 
+  /* 전환 화면 라이트 모드는 키비주얼보다 한 단계 깊게 눌러 우주로 읽히게 한다. */
+  const TRANSIT_LIGHT = {
+    ...PALETTE.light,
+    sky0: '#dfe3ed', sky1: '#d4d9e6', sky2: '#c9d0df',
+    neb: '#625b86', neb2: '#7c759e', lane: '#a8adbf',
+  };
+
   /* 화면 밖 오른쪽 위 광원. 성운 덩어리는 전부 이 방향으로 밝아진다. */
   const LIGHT_DIR = [0.62, -0.78];
 
@@ -139,7 +146,7 @@
     softCurve(c, [w * .46, h * .96, w * .62, h * .74, w * .84, h * .70, w * 1.04, h * .80],
       S * .10, T.lane, L ? .10 : .26, 5);
     softCurve(c, [w * .58, h * .06, w * .72, h * .16, w * .80, h * .28, w * .96, h * .34],
-      S * .022, L ? T.neb : T.glow, L ? .10 : .13, 3);
+      S * .006, T.neb2, L ? .035 : .045, 2);
 
     /* 먼 먼지 — 거의 안 보이지만 표면의 재질을 만든다. */
     const rf = rng(101);
@@ -205,7 +212,7 @@
     const lit = o.stage === 'dev';
     const pulse = lit ? .5 + .5 * Math.sin(t * .9 + o.phase) : 0;
 
-    const gr = R * 2.6 * grow;
+    const gr = R * 2.1 * grow;
     const g = c.createRadialGradient(x, y, 0, x, y, gr);
     const a = (lit ? .17 : .11) + focus * .13 + pulse * .05;
     g.addColorStop(0, rgba(T.glow, a));
@@ -221,7 +228,7 @@
       c.scale(1, .34);
       c.strokeStyle = rgba(T.glow, Math.max(0, .17 - i * .045) + focus * .16);
       c.lineWidth = 1;
-      c.beginPath(); c.arc(0, 0, R * (1.5 + i * .58) * pull * grow, 0, 7); c.stroke();
+      c.beginPath(); c.arc(0, 0, R * (1.15 + i * .38) * pull * grow, 0, 7); c.stroke();
       c.restore();
     }
 
@@ -231,59 +238,65 @@
       cg.addColorStop(1, rgba(T.gold, 0));
       c.fillStyle = cg; c.beginPath(); c.arc(x, y, R * 1.15, 0, 7); c.fill();
       c.fillStyle = rgba(T.mode === 'light' ? T.ink : T.glow, .86);
-      c.beginPath(); c.arc(x, y, R * (.28 + pulse * .07), 0, 7); c.fill();
+      c.beginPath(); c.arc(x, y, R * (.34 + pulse * .08), 0, 7); c.fill();
     } else {
       /* 아직 점화 전 — 속이 빈 윤곽만 남긴다. */
       c.strokeStyle = rgba(T.mode === 'light' ? T.ink : T.glow, .36 + focus * .30);
       c.lineWidth = 1;
-      c.beginPath(); c.arc(x, y, R * .34, 0, 7); c.stroke();
+      c.beginPath(); c.arc(x, y, R * .38, 0, 7); c.stroke();
     }
   }
 
   /* 초신성 잔해. 껍질이 바깥으로 퍼지고 일부가 끊겨 있으며 중심은 비어 있다. */
   function remnant(c, x, y, R, T, o, t, focus) {
-    const rr = R * 2.2 * (1 + Math.sin(t * .35 + o.phase) * .025 + focus * .10);
-
+    const rr = R * 2.25 * (1 + Math.sin(t * .28 + o.phase) * .018 + focus * .08);
     c.save();
-    c.translate(x, y); c.rotate(o.tilt);
+    c.translate(x, y);
+    c.rotate(o.tilt * .28);
 
-    const g = c.createRadialGradient(0, 0, rr * .18, 0, 0, rr);
-    g.addColorStop(0, rgba(T.gold, 0));
-    g.addColorStop(.74, rgba(T.gold, .07 + focus * .08));
-    g.addColorStop(1, rgba(T.gold, 0));
-    c.fillStyle = g;
-    c.beginPath(); c.ellipse(0, 0, rr, rr * .86, 0, 0, 7); c.fill();
+    /* 완전한 닫힌 윤곽 대신 서로 떨어진 얇은 충격파 조각을 쓴다.
+       꽃잎처럼 보이는 폐곡선을 만들지 않는 것이 핵심이다. */
+    const halo = c.createRadialGradient(0, 0, rr * .36, 0, 0, rr * 1.18);
+    halo.addColorStop(0, rgba(T.gold, 0));
+    halo.addColorStop(.70, rgba(T.gold, .045 + focus * .045));
+    halo.addColorStop(1, rgba(T.gold, 0));
+    c.fillStyle = halo;
+    c.beginPath(); c.arc(0, 0, rr * 1.18, 0, 7); c.fill();
 
-    /* 껍질 — 완전한 원이 아니라 찌그러지고 군데군데 끊긴다. */
-    c.strokeStyle = rgba(T.gold, .32 + focus * .30);
-    c.lineWidth = 1.1;
-    c.beginPath();
-    const N = 110;
-    let lifted = true;
-    for (let i = 0; i <= N; i++) {
-      const ang = (i / N) * Math.PI * 2;
-      const wob = 1 + Math.sin(ang * 3 + o.phase) * .12 + Math.sin(ang * 7 + o.phase * 2) * .06;
-      const px = Math.cos(ang) * rr * wob, py = Math.sin(ang) * rr * wob * .86;
-      if (Math.sin(ang * 2 + o.phase * .7) > .80) { lifted = true; continue; }
-      if (lifted) { c.moveTo(px, py); lifted = false; } else c.lineTo(px, py);
-    }
-    c.stroke();
-
-    /* 필라멘트 — 중심에서 껍질로 뻗은 가는 줄기. */
-    c.strokeStyle = rgba(T.gold, .17 + focus * .22);
-    c.lineWidth = .8;
-    for (let i = 0; i < 5; i++) {
-      const ang = o.phase + i * 1.31;
+    const arcs = [
+      [.05, .56, 1.00, .82, -.05],
+      [.80, 1.22, .93, .76, .08],
+      [1.43, 1.91, 1.08, .87, -.02],
+    ];
+    c.strokeStyle = rgba(T.gold, .34 + focus * .30);
+    c.lineWidth = 1.05;
+    c.lineCap = 'round';
+    arcs.forEach(([a, z, rx, ry, rot]) => {
       c.beginPath();
-      c.moveTo(Math.cos(ang) * rr * .30, Math.sin(ang) * rr * .26);
-      c.lineTo(Math.cos(ang) * rr * .92, Math.sin(ang) * rr * .80);
+      c.ellipse(0, 0, rr * rx, rr * ry, rot, Math.PI * a, Math.PI * z);
+      c.stroke();
+    });
+
+    /* 껍질 밖으로 흩어진 작은 잔해. 중심은 의도적으로 비워 둔다. */
+    for (let i = 0; i < 9; i++) {
+      const ang = o.phase + i * .83;
+      const dist = rr * (.78 + (i % 4) * .09);
+      const px = Math.cos(ang) * dist;
+      const py = Math.sin(ang) * dist * .82;
+      c.fillStyle = rgba(T.gold, .16 + (i % 3) * .055 + focus * .10);
+      c.beginPath(); c.arc(px, py, Math.max(.55, R * (.035 + (i % 2) * .018)), 0, 7); c.fill();
+    }
+
+    c.strokeStyle = rgba(T.gold, .13 + focus * .16);
+    c.lineWidth = .7;
+    for (let i = 0; i < 4; i++) {
+      const ang = o.phase * .4 + i * 1.47;
+      c.beginPath();
+      c.moveTo(Math.cos(ang) * rr * .42, Math.sin(ang) * rr * .34);
+      c.lineTo(Math.cos(ang + .08) * rr * .76, Math.sin(ang + .08) * rr * .62);
       c.stroke();
     }
     c.restore();
-
-    /* 별이 있던 자리. 남은 것은 잔해뿐이다. */
-    c.fillStyle = rgba(T.ink, .32 + focus * .26);
-    c.beginPath(); c.arc(x, y, R * .16, 0, 7); c.fill();
   }
 
   /* 궤도 이탈. 별은 아직 살아 있고 다만 축에서 떨어져 나왔다.
@@ -508,6 +521,7 @@
     const stage = document.querySelector('[data-stage]');
     const canvas = stage && stage.querySelector('canvas');
     const axis = stage && stage.querySelector('[data-orbit]');
+    const loading = stage && stage.querySelector('[data-loading]');
     if (!stage || !canvas || !axis) return;
 
     const configNode = document.getElementById('nebula-config');
@@ -524,8 +538,8 @@
     function theme() {
       const forced = document.documentElement.getAttribute('data-theme');
       if (forced === 'dark') return PALETTE.dark;
-      if (forced === 'light') return PALETTE.light;
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? PALETTE.dark : PALETTE.light;
+      if (forced === 'light') return TRANSIT_LIGHT;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? PALETTE.dark : TRANSIT_LIGHT;
     }
 
     function layout() {
@@ -554,6 +568,7 @@
       const more = document.createElement('span');
       more.className = 'sky-more';
       more.textContent = item.note || '';
+      more.setAttribute('aria-hidden', 'true');
 
       text.append(name, more);
       hit.append(dot, text);
@@ -562,6 +577,7 @@
         const link = document.createElement('span');
         link.className = 'sky-link';
         link.textContent = '자세히 →';
+        link.setAttribute('aria-hidden', 'true');
         text.append(link);
       }
 
@@ -590,11 +606,15 @@
       const target = state.open === next ? null : next;
       if (state.open && state.open !== target) {
         state.open.hit.setAttribute('aria-expanded', 'false');
+        state.open.hit.querySelectorAll('.sky-more, .sky-link')
+          .forEach((el) => el.setAttribute('aria-hidden', 'true'));
         state.open.target = 0;
       }
       state.open = target;
       if (target) {
         target.hit.setAttribute('aria-expanded', 'true');
+        target.hit.querySelectorAll('.sky-more, .sky-link')
+          .forEach((el) => el.setAttribute('aria-hidden', 'false'));
         target.target = 1;
       }
       still();
@@ -680,17 +700,19 @@
 
     /* 성운 하늘은 캐시에서 붙이고, 매 프레임 다시 그리는 것은 천체뿐이다. */
     function frame(dt) {
-      if (!state.size || !state.data) return;
+      if (!state.size) return;
       const { w, h } = state.size;
-      const T = theme();
-      const L = layout();
-      const R = Math.min(w, h) * .026 * L.scale;
       const c = canvas.getContext('2d');
-      const k = Math.min(1, dt * 7) || 1;
 
       c.setTransform(1, 0, 0, 1, 0, 0);
       c.clearRect(0, 0, canvas.width, canvas.height);
       c.drawImage(sky, 0, 0);
+      if (!state.data) return;
+
+      const T = theme();
+      const L = layout();
+      const R = Math.min(w, h) * .026 * L.scale;
+      const k = Math.min(1, dt * 7) || 1;
       c.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);
 
       /* 그 해의 별자리 — 프로젝트를 순서대로 낡은 금빛 실선으로 잇는다. */
@@ -723,13 +745,19 @@
       });
     }
 
-    let last = 0;
+    let last = 0, raf = 0, animating = false;
     function loop(now) {
+      if (!animating) return;
       const dt = last ? Math.min(.05, (now - last) / 1000) : 0;
       last = now;
       state.t += dt;
       frame(dt);
-      requestAnimationFrame(loop);
+      raf = requestAnimationFrame(loop);
+    }
+    function setAnimating(next) {
+      if (prefersReduced()) { animating = false; cancelAnimationFrame(raf); if (next) frame(1); return; }
+      if (next && !animating) { animating = true; last = 0; raf = requestAnimationFrame(loop); }
+      if (!next && animating) { animating = false; cancelAnimationFrame(raf); }
     }
 
     /* 빈 곳을 누르면 펼쳐 둔 설명을 접는다. */
@@ -740,12 +768,20 @@
       if (event.key === 'Escape' && state.open) toggle(state.open);
     });
 
+    observe([canvas], resize);
+    window.addEventListener('resize', resize);
+    resize();
+
     loadProjects(config.source).then((data) => {
       build(data);
-      observe([canvas], resize);
-      window.addEventListener('resize', resize);
+      if (loading) loading.hidden = true;
       resize();
-      if (prefersReduced()) frame(1); else requestAnimationFrame(loop);
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => setAnimating(entries.some((entry) => entry.isIntersecting)), { threshold: .01 });
+        io.observe(stage);
+      } else {
+        setAnimating(true);
+      }
     });
 
     const dark = window.matchMedia('(prefers-color-scheme: dark)');
@@ -779,6 +815,7 @@
     for (let i = 0; i < 46; i++) stars.push([seeded(), seeded(), seeded(), seeded()]);
 
     const state = { w: 0, h: 0, dpr: 1, t: 0, near: 0, nearTarget: 0, px: 0, py: 0, meteor: 4 };
+    let visible = true;
 
     function resize() {
       const box = canvas.getBoundingClientRect();
@@ -809,7 +846,7 @@
       volume(c, w * .30, h * .70, S * .70, S * .42, .5, T.neb2, .22 + near * .12);
 
       /* 포인터를 따라 층마다 다른 폭으로 밀린다. 이 시차가 깊이를 만든다. */
-      stars.forEach(([fx, fy, m, d], i) => {
+      stars.forEach(([fx, fy, m, d]) => {
         const depth = .3 + d * .7;
         const x = fx * w + state.px * depth * 9;
         const y = fy * h + state.py * depth * 9;
@@ -878,9 +915,11 @@
       const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
       const reach = Math.max(box.width, box.height) * 2.6;
       state.nearTarget = Math.max(0, Math.min(1, 1 - dist / reach));
+      if (prefersReduced() && visible) frame(1);
     });
-    gate.addEventListener('pointerenter', () => { state.nearTarget = 1; });
-    gate.addEventListener('focus', () => { state.nearTarget = 1; });
+    gate.addEventListener('pointerenter', () => { state.nearTarget = 1; if (prefersReduced() && visible) frame(1); });
+    gate.addEventListener('focus', () => { state.nearTarget = 1; if (prefersReduced() && visible) frame(1); });
+    gate.addEventListener('blur', () => { state.nearTarget = 0; if (prefersReduced() && visible) frame(1); });
 
     /* 창이 화면을 덮으며 우주로 넘어간다. 페이지 전환이 문 열림처럼 보여야 한다. */
     const veil = document.createElement('div');
@@ -894,19 +933,31 @@
       setTimeout(() => { window.location.href = target; }, prefersReduced() ? 200 : 760);
     });
 
-    let last = 0;
+    let last = 0, raf = 0, animating = false;
     function loop(now) {
+      if (!animating) return;
       const dt = last ? Math.min(.05, (now - last) / 1000) : 0;
       last = now;
       state.t += dt;
       frame(dt);
-      requestAnimationFrame(loop);
+      raf = requestAnimationFrame(loop);
+    }
+    function setAnimating(next) {
+      visible = next;
+      if (prefersReduced()) { animating = false; cancelAnimationFrame(raf); if (next) frame(1); return; }
+      if (next && !animating) { animating = true; last = 0; raf = requestAnimationFrame(loop); }
+      if (!next && animating) { animating = false; cancelAnimationFrame(raf); }
     }
 
     observe([canvas], () => { resize(); frame(0); });
     window.addEventListener('resize', () => { resize(); frame(0); });
     resize();
-    if (prefersReduced()) frame(1); else requestAnimationFrame(loop);
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => setAnimating(entries.some((entry) => entry.isIntersecting)), { threshold: .01 });
+      io.observe(gate);
+    } else {
+      setAnimating(true);
+    }
   }
 
   const page = document.body.dataset.page;
