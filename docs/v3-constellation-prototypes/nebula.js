@@ -62,6 +62,26 @@
   };
   const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* #114에서 최종 판정이 끝난 세 동작만 런타임에 연결한다. 사용자 입력 뒤에만 생성한다. */
+  const APPROVED_SFX = {
+    year: 'assets/audio/sfx-04-year-a-wood.wav',
+    select: 'assets/audio/sfx-05-select-a-bell.wav',
+    enter: 'assets/audio/sfx-06-enter-b-three-notes.wav',
+  };
+  const activeSfx = new Map();
+  function playApprovedSfx(cue) {
+    const source = APPROVED_SFX[cue];
+    if (!source) return;
+    const previous = activeSfx.get(cue);
+    if (previous) { previous.pause(); previous.currentTime = 0; }
+    const audio = new Audio(source);
+    audio.preload = 'auto';
+    audio.volume = cue === 'year' ? .48 : .58;
+    activeSfx.set(cue, audio);
+    audio.addEventListener('ended', () => { if (activeSfx.get(cue) === audio) activeSfx.delete(cue); }, { once:true });
+    audio.play().catch(() => { if (activeSfx.get(cue) === audio) activeSfx.delete(cue); });
+  }
+
   /* 필름 입자는 256px 타일 하나를 만들어 패턴으로 재사용한다. */
   let noiseTile = null;
   function noise() {
@@ -602,7 +622,12 @@
       hit.addEventListener('focus', enter);
       hit.addEventListener('blur', leave);
       hit.addEventListener('click', () => {
-        if (state.open === body && item.detail) { window.location.href = base + item.detail; return; }
+        if (state.open === body && item.detail) {
+          playApprovedSfx('enter');
+          window.setTimeout(() => { window.location.href = base + item.detail; }, 140);
+          return;
+        }
+        playApprovedSfx('select');
         toggle(body);
       });
       return body;
@@ -673,6 +698,7 @@
         mark.setAttribute('aria-hidden', 'true');
         btn.append(label, mark);
         btn.addEventListener('click', () => {
+          if (state.year !== i) playApprovedSfx('year');
           state.year = i;
           Array.from(axis.querySelectorAll('.orbit-year'))
             .forEach((other, k) => other.setAttribute('aria-current', String(k === i)));
@@ -836,15 +862,26 @@
   function initGateway() {
     const gate = document.querySelector('[data-gate]');
     const canvas = gate && gate.querySelector('canvas');
+    const art = gate && gate.querySelector('[data-gate-art]');
     const wrap = gate && gate.closest('[data-gate-wrap]');
     const mote = wrap && wrap.querySelector('[data-gate-mote]');
-    if (!gate || !canvas || !wrap) return;
+    if (!gate || !canvas || !art || !wrap) return;
 
     /* 새로고침마다 다르되 Hero의 안전 슬롯 밖으로는 나가지 않는다. */
     const random = () => {
       if (window.crypto && crypto.getRandomValues) { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] / 4294967296; }
       return Math.random();
     };
+    const variants = [
+      { src:'assets/gateway/torn-portal-wide-v1.png', scale:1.00 },
+      { src:'assets/gateway/torn-portal-trail-v1.png', scale:1.03 },
+      { src:'assets/gateway/torn-portal-diagonal-v1.png', scale:1.02 },
+    ];
+    const variant = variants[Math.floor(random() * variants.length)];
+    art.src = variant.src;
+    art.dataset.variant = variant.src.split('/').pop();
+    art.style.setProperty('--gate-art-scale', String(variant.scale));
+
     const mobile = window.matchMedia('(max-width:768px)').matches;
     const slotWidth = mobile ? 170 : 220;
     const width = Math.round((mobile ? 106 : 128) + random() * (mobile ? 42 : 52));
@@ -1004,6 +1041,7 @@
     document.body.append(veil);
     gate.addEventListener('click', () => {
       const box = gate.getBoundingClientRect();
+      playApprovedSfx('enter');
       veil.style.setProperty('--gx', `${box.left + box.width / 2}px`);
       veil.style.setProperty('--gy', `${box.top + box.height / 2}px`);
       veil.classList.add('open');
