@@ -1,0 +1,28 @@
+name: inspect release candidate images
+on:
+  push:
+    branches: [agent/v2-media-demos-performance-runner]
+permissions:
+  contents: read
+jobs:
+  inspect-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release candidate
+        uses: actions/checkout@v4
+        with:
+          ref: agent/portfolio-release-candidate
+          path: rc
+      - name: Collect new text-bearing images
+        run: |
+          set -euo pipefail
+          mkdir -p inspect
+          cp rc/projects/HEALTH_CHECK_PROJECT/assets/images/notion-1.webp inspect/
+          cp rc/projects/koreatechGongjiAgent/assets/images/source-design-hub.webp inspect/
+          cp rc/projects/koreatechGongjiAgent/assets/images/source-mobile-proposal.webp inspect/
+          file inspect/*
+      - name: Upload image inspection artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rc-image-inspection
+          path: inspect
