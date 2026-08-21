@@ -6,7 +6,7 @@ const out = path.resolve(process.env.CAPTURE_OUT || '../captures');
 fs.mkdirSync(out, { recursive: true });
 const chrome = process.env.CHROME_PATH;
 const healthUrl = process.env.HEALTH_NOTION_URL;
-const kgaBase = process.env.KGA_BASE || 'http://127.0.0.1:4174';
+const runnerBase = process.env.RUNNER_BASE || 'http://127.0.0.1:4175';
 
 (async () => {
   const browser = await chromium.launch({ headless: true, executablePath: chrome });
@@ -39,40 +39,22 @@ const kgaBase = process.env.KGA_BASE || 'http://127.0.0.1:4174';
         await page.waitForTimeout(150);
         await img.screenshot({ path: path.join(out, `health-${++saved}.png`) }).catch(() => { saved--; });
       }
-      if (!saved) {
-        await page.screenshot({ path: path.join(out, 'health-1.png'), fullPage: false });
-      }
+      if (!saved) await page.screenshot({ path: path.join(out, 'health-1.png'), fullPage: false });
     } catch (error) {
       console.error('Health Notion capture failed:', error.message);
     }
     await context.close();
   }
 
-  // KGA screenshots are rendered from the current real KGA web/admin source.
-  // app.js is blocked so no private/runtime API data is fabricated or accessed.
+  // KGA: render only material derived from the private repository's reviewed design sources.
+  // These are source-design screenshots, not live-operation screenshots; the portfolio captions
+  // preserve that distinction. Existing web-shuttle.webp remains the verified live screen.
   {
-    const context = await browser.newContext({ viewport: { width: 1440, height: 960 }, colorScheme: 'light', deviceScaleFactor: 1 });
+    const context = await browser.newContext({ viewport: { width: 1440, height: 1050 }, colorScheme: 'light', deviceScaleFactor: 1 });
     const page = await context.newPage();
-    await page.route('**/web/assets/app.js', (route) => route.abort());
-    try {
-      await page.goto(`${kgaBase}/web/index.html`, { waitUntil: 'networkidle', timeout: 30000 });
-      await page.waitForTimeout(600);
-      await page.screenshot({ path: path.join(out, 'kga-home.png'), fullPage: true });
-
-      await page.evaluate(() => {
-        document.querySelectorAll('.view').forEach((el) => { el.hidden = true; });
-        const shuttle = document.querySelector('#view-shuttle');
-        if (shuttle) shuttle.hidden = false;
-      });
-      await page.waitForTimeout(250);
-      await page.screenshot({ path: path.join(out, 'kga-shuttle.png'), fullPage: true });
-
-      await page.goto(`${kgaBase}/web/admin.html`, { waitUntil: 'domcontentloaded', timeout: 30000 });
-      await page.waitForTimeout(500);
-      await page.screenshot({ path: path.join(out, 'kga-admin.png'), fullPage: true });
-    } catch (error) {
-      console.error('KGA source render capture failed:', error.message);
-    }
+    await page.goto(`${runnerBase}/tools/kga-source-snapshots.html`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.locator('#kga-design-hub .desktop').screenshot({ path: path.join(out, 'kga-design-hub.png') });
+    await page.locator('#kga-mobile-source .phone').screenshot({ path: path.join(out, 'kga-mobile-source.png') });
     await context.close();
   }
 
