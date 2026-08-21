@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="이건영 v3 포트폴리오 — 굵직한 성장 사건을 연결한 성장 별자리">
+  <title>성장 궤적 · v3 Universe</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="nebula.css">
+  <link rel="stylesheet" href="nebula-content.css">
+</head>
+<body class="universe-page">
+  <main class="universe-shell">
+    <nav class="universe-topbar" aria-label="우주 탐색">
+      <a class="universe-return" href="nebula-transit.html">← 프로젝트 별자리</a>
+      <div class="universe-siblings">
+        <a href="nebula-growth.html" aria-current="page">성장 궤적</a>
+        <a href="nebula-observatory.html">관측실</a>
+        <a href="../../index.html">v2 노트</a>
+      </div>
+    </nav>
+
+    <header class="universe-intro">
+      <p class="eyebrow">GROWTH CONSTELLATION</p>
+      <h1>큰 변화만 별로 남겼습니다.</h1>
+      <p>#59에 쌓인 월별 기록을 전부 옮기지 않고, 방향이 바뀐 순간과 여러 기술이 하나의 프로젝트로 합쳐진 순간만 연결합니다. 별을 선택하면 그때 무엇이 달라졌는지만 펼쳐집니다.</p>
+    </header>
+
+    <section class="universe-panel" aria-labelledby="growth-map-title">
+      <div class="growth-stage" data-growth-stage>
+        <canvas class="growth-sky" data-growth-sky aria-hidden="true"></canvas>
+        <div class="growth-map" data-growth-map>
+          <svg class="growth-lines" data-growth-lines aria-hidden="true" preserveAspectRatio="none"></svg>
+        </div>
+        <article class="growth-detail" data-growth-detail aria-live="polite">
+          <time data-growth-time>2023.03</time>
+          <h2 id="growth-map-title" data-growth-title>정보보안 동아리 ‘시큐리티’</h2>
+          <p data-growth-copy>JAVA와 AES256으로 암·복호화 프로그램을 만들며, 코드를 직접 바꾸고 결과를 확인하는 경험을 시작했습니다.</p>
+        </article>
+      </div>
+
+      <div class="growth-rank" aria-label="GitHub Rank 상승 궤적">
+        <div class="growth-rank-title">
+          <b>GitHub Rank</b>
+          <span>C → A</span>
+        </div>
+        <div class="rank-track">
+          <span class="rank-point"><i></i><b>C</b><small>시작점</small></span>
+          <span class="rank-point"><i></i><b>C+</b><small>2025-08-19 확인</small></span>
+          <span class="rank-point"><i></i><b>B-</b><small>≤ 2026-05-22</small></span>
+          <span class="rank-point"><i></i><b>B</b><small>2026-05-23</small></span>
+          <span class="rank-point"><i></i><b>B+</b><small>2026-05-29 저장 카드</small></span>
+          <span class="rank-point"><i></i><b>A-</b><small>2026-06-03</small></span>
+          <span class="rank-point"><i></i><b>A</b><small>2026-08-18</small></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc">
+      <h2>표현 원칙</h2>
+      <p>이 화면은 이력서식 연표가 아니라 성장 방향을 보는 성도입니다. 같은 달의 작은 활동은 합치고, 새로운 도구를 처음 접했거나 여러 계층을 연결하기 시작한 지점만 남깁니다.</p>
+      <div class="rows">
+        <div class="row"><b>2023</b><span>보안 코드 작성 → Arduino 첫 접촉. 소프트웨어만 보던 시야가 물리 장치로 넓어진 시기.</span></div>
+        <div class="row"><b>2024</b><span>첫 Arduino 프로젝트와 브레드보드 배선. 센서·배선·코드를 하나의 동작으로 연결하기 시작.</span></div>
+        <div class="row"><b>2025</b><span>BerryIno에서 NFC·Arduino·Raspberry Pi·Flask·Gemini API를 묶으며 시스템 단위 구현으로 확장.</span></div>
+        <div class="row"><b>2026</b><span>개인 포트폴리오와 여러 소프트웨어 프로젝트를 공개하고, GitHub Rank가 A까지 상승.</span></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  (() => {
+    'use strict';
+    const milestones = [
+      { date:'2023.03', title:'정보보안 동아리 ‘시큐리티’', short:'AES256 · JAVA', copy:'JAVA와 AES256으로 암·복호화 프로그램을 만들며, 코드를 직접 바꾸고 결과를 확인하는 경험을 시작했습니다.' },
+      { date:'2023.07', title:'Arduino 첫 접촉', short:'백석대 방학 캠프', copy:'RC 자동차 제어 실습에서 Arduino와 센서를 처음 다뤘고, 주어진 코드를 직접 수정해 조종을 개선했습니다.' },
+      { date:'2024.06', title:'첫 Arduino 프로젝트', short:'계수기 신호등', copy:'위드 AI 코딩 페스티벌에서 계수기 신호등을 만들었습니다. 아이디어를 실제 입출력 장치와 코드로 완성한 첫 Arduino 프로젝트로 기록했습니다.' },
+      { date:'2024.07', title:'브레드보드와 실제 배선', short:'지속가능발전 프로젝트', copy:'물 감지 센서를 직접 배선하고 브레드보드를 사용하면서, 회로·센서·제어 코드를 한 시스템 안에서 다루기 시작했습니다.' },
+      { date:'2025.03', title:'하드웨어와 웹을 연결', short:'BerryIno', copy:'NFC 출석 체크 시스템에서 Gemini API, Arduino, Raspberry Pi, Flask 통신을 함께 다루며 단일 프로그램을 넘어 여러 계층을 연결했습니다.' },
+      { date:'2026.02', title:'개인 포트폴리오 공개', short:'pachir1su.github.io', copy:'오픈소스 및 생성형 AI 활용 강의 과제로 시작한 포트폴리오를 공개하고, 이후 프로젝트 기록과 실험을 계속 축적하는 기반으로 확장했습니다.' },
+      { date:'2026.06', title:'도구를 직접 만드는 단계', short:'github-rank-insight · KGA', copy:'github-rank-insight와 koreatechGongjiAgent를 공개하며, 개인 작업을 넘어 실제 문제를 반복적으로 해결하는 도구와 서비스를 만드는 단계로 이동했습니다.' },
+    ];
+    const wide = [[12,24],[28,16],[45,31],[34,50],[55,62],[72,46],[87,25]];
+    const narrow = [[22,12],[70,22],[25,34],[72,45],[25,57],[70,69],[38,82]];
+    const stage = document.querySelector('[data-growth-stage]');
+    const map = document.querySelector('[data-growth-map]');
+    const svg = document.querySelector('[data-growth-lines]');
+    const canvas = document.querySelector('[data-growth-sky]');
+    const detail = {
+      time:document.querySelector('[data-growth-time]'),
+      title:document.querySelector('[data-growth-title]'),
+      copy:document.querySelector('[data-growth-copy]'),
+    };
+    let buttons=[];
+
+    function coordinates(){ return window.innerWidth <= 800 ? narrow : wide; }
+    function select(index, focus=false){
+      const item=milestones[index];
+      detail.time.textContent=item.date; detail.title.textContent=item.title; detail.copy.textContent=item.copy;
+      buttons.forEach((button,i)=>button.setAttribute('aria-current',String(i===index)));
+      if(focus) detail.title.focus?.();
+    }
+    function render(){
+      map.querySelectorAll('.growth-star').forEach(el=>el.remove());
+      svg.replaceChildren();
+      const points=coordinates();
+      svg.setAttribute('viewBox','0 0 100 100');
+      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d',points.map((p,i)=>`${i?'L':'M'} ${p[0]} ${p[1]}`).join(' '));
+      svg.append(path);
+      buttons=milestones.map((item,index)=>{
+        const button=document.createElement('button');
+        button.type='button'; button.className='growth-star';
+        button.style.left=`${points[index][0]}%`; button.style.top=`${points[index][1]}%`;
+        button.setAttribute('aria-label',`${item.date} ${item.title}`);
+        button.setAttribute('aria-current',String(index===0));
+        const label=document.createElement('span'); label.className='growth-label';
+        label.innerHTML=`<b>${item.title}</b><span>${item.date} · ${item.short}</span>`;
+        button.append(label);
+        button.addEventListener('click',()=>select(index));
+        button.addEventListener('keydown',(event)=>{
+          if(!['ArrowRight','ArrowDown','ArrowLeft','ArrowUp'].includes(event.key)) return;
+          event.preventDefault();
+          const delta=(event.key==='ArrowRight'||event.key==='ArrowDown')?1:-1;
+          buttons[(index+delta+buttons.length)%buttons.length].focus();
+        });
+        map.append(button); return button;
+      });
+    }
+    function drawSky(){
+      if(!canvas||!stage) return;
+      const box=stage.getBoundingClientRect(), dpr=Math.min(devicePixelRatio||1,2);
+      canvas.width=Math.max(1,Math.round(box.width*dpr)); canvas.height=Math.max(1,Math.round(box.height*dpr));
+      const c=canvas.getContext('2d'); if(!c) return; c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,box.width,box.height);
+      const dark=matchMedia('(prefers-color-scheme: dark)').matches;
+      const seed=()=>{ let s=913; return ()=>((s=(s*1664525+1013904223)>>>0)/4294967296); }; const r=seed();
+      for(let i=0;i<120;i++){ const x=r()*box.width,y=r()*box.height,rad=.35+r()*1.15; c.globalAlpha=(dark?.24:.18)+r()*.28; c.fillStyle=dark?'#dfe3ed':'#434858'; c.beginPath(); c.arc(x,y,rad,0,Math.PI*2); c.fill(); }
+      c.globalAlpha=1;
+    }
+    let timer=0;
+    function onResize(){ clearTimeout(timer); timer=setTimeout(()=>{render();drawSky();},80); }
+    window.addEventListener('resize',onResize,{passive:true});
+    if(matchMedia('(prefers-color-scheme: dark)').addEventListener) matchMedia('(prefers-color-scheme: dark)').addEventListener('change',drawSky);
+    render(); drawSky(); select(0);
+  })();
+  </script>
+</body>
+</html>
