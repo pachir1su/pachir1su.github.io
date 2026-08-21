@@ -214,7 +214,7 @@
       <div class="decision-grid">
         <b>SFX-01</b><span><em>A/B/C 모두 유효.</em> 단일 승자를 정하지 않고, 등장할 때마다 <b>셋 중 무작위로 하나를 순환</b>하는 후보군으로 취급.</span>
         <b>SFX-03</b><span><em>C′(종 제거) 채택.</em> 작업 후보로 승격, 아직 연결하지 않음.</span>
-        <b>SFX-04</b><span><em>A 확정 유지</em> + 비연결 유사 변주 후보(A2/A3) 추가. 확정 자체는 그대로.</span>
+        <b>SFX-04</b><span><em>A로 확정.</em> A′/A″ 등 새 시안을 만들지 않고 A만 고정. 비연결 변주 후보는 모두 제거.</span>
         <b>SFX-07</b><span><em>C′(C 기반·중역 보강) 채택.</em></span>
         <b>SFX-08</b><span><em>전부 불만족.</em> 기존 A/B/C/R 전부 폐기 표시. <b>복수의 새 후보(R2/R3)</b>로 재작업.</span>
         <b>SFX-11</b><span><em>A/B 유효.</em> 단일 승자를 정하지 않고 <b>둘 중 무작위 순환</b> 후보군으로 취급.</span>
@@ -222,6 +222,7 @@
         <b>SFX-13</b><span><em>전부 불만족(2차 C 확정 번복).</em> 기존 A/B/C 전부 폐기 표시. <b>복수의 새 후보(R/R2)</b>로 재작업.</span>
         <b>SFX-14 <small>(신규)</small></b><span>v2→v3 게이트웨이 전환 전용. SFX-06 B와 다른 방향(저역 스웰 + 연속 상승 글리산도)으로 새로 합성. <em>런타임에는 연결했지만 최종 확정 아님</em> — 사용자 청취 판정 대기.</span>
         <b>MUS-01</b><span>A 구조 유지, 목표 길이를 4~5초로 재단축. 기존 5·7·9초 후보 체계를 그대로 확장해 <b>4.5초 후보(A4)</b> 추가.</span>
+        <b>MUS-01 <small>(2026-08-21 2차 수정)</small></b><span><em>이중 재생 구조 제거.</em> 종 → 패드 → 화음 구조에서 패드가 두 번 부풀던 부분을 한 번으로 합쳐, 완성 음악이 한 번만 재생되도록 정리. 길이 후보(4.5·5·7·9초)는 동일 함수로 그대로 유지.</span>
       </div>
       <p class="cue-fix"><b>재작업 원칙 —</b> 08·12·13처럼 재작업 대상이 된 항목은 각각 한 개가 아니라 <b>복수 후보</b>를 만든다는 #114의 지시를 그대로 따랐습니다. 아래 각 절의 재작업 카드에서 재생해 비교할 수 있습니다.</p>
     </section>
@@ -346,12 +347,6 @@
           <p><b>낮은 종</b> — 여운이 조금 있습니다. 연도가 바뀌는 무게가 생깁니다.</p></div>
         <div class="variant"><span class="silent">C</span>
           <p class="silent"><b>소리 없음</b> — 별자리가 새로 그려지는 시각 변화만으로 충분할 수 있습니다.</p></div>
-        <div class="variant variant--fresh"><button class="play" type="button" data-cue="s4a2">A2</button>
-          <p><b>A 변주 · 살짝 밝게</b> — 확정된 A와 같은 나무 두드림 계열이되 음정과 감쇠를 조금 바꿨습니다.</p>
-          <p class="variant-note">2026-08-21 비연결 변주 후보 · A 확정은 그대로 유지</p></div>
-        <div class="variant variant--fresh"><button class="play" type="button" data-cue="s4a3">A3</button>
-          <p><b>A 변주 · 살짝 낮게</b> — 같은 몸통, 반음 아래로 낮춰 무거운 쪽으로 변주했습니다.</p>
-          <p class="variant-note">2026-08-21 비연결 변주 후보 · A 확정은 그대로 유지</p></div>
         <div class="find">
           <a href="https://pixabay.com/sound-effects/search/wood%20tap/" target="_blank" rel="noopener">Pixabay <code>wood tap</code></a>
           <a href="https://mixkit.co/free-sound-effects/click/" target="_blank" rel="noopener">Mixkit <code>click</code></a>
@@ -871,15 +866,15 @@
     }
   }
 
-  /* MUS-01 A의 순서(종 → 패드 → 화음)는 그대로 두고 시간만 압축한다.
-     길이 비교가 악기/구조 비교로 섞이지 않게 세 후보는 이 함수 하나를 공유한다. */
+  /* MUS-01 A의 순서(종 → 패드 → 화음)는 유지하되, 2026-08-21 지시대로 패드가
+     두 번 부풀었다 가라앉는 옛 구조("두 번 나오는" 인상의 원인)를 없애고
+     한 번만 재생되는 단일 패스로 정리했다. 세 길이 후보는 이 함수 하나를 공유한다. */
   function compressedM1A(at, seconds) {
     const when = (part) => at + secs(seconds * part);
     [1046.5, 1318.51, 1567.98].forEach((f, i) =>
       bell(when(.035 + i * .068), f, { dur:seconds * .23, gain:.067, wet:.70 }));
-    pad(when(.245), [261.63, 329.63, 392], { dur:seconds * .40, gain:.042, attack:seconds * .09, wet:.88 });
-    bell(when(.520), 659.25, { dur:seconds * .22, gain:.042, wet:.80 });
-    pad(when(.710), [261.63, 392, 523.25, 659.25], { dur:seconds * .22, gain:.050, attack:seconds * .055, wet:.94 });
+    pad(when(.260), [261.63, 329.63, 392], { dur:seconds * .58, gain:.048, attack:seconds * .10, wet:.90 });
+    bell(when(.760), 659.25, { dur:seconds * .24, gain:.052, ratios:[1, 2, 3, 4.2], wet:.85 });
   }
 
   /* ---- 상황별 변형 ------------------------------------------------- */
@@ -910,10 +905,6 @@
     /* 04 연도 전환 */
     s4a: (t) => mallet(t, 261.63, { dur: .26, gain: .17, wood: true, wet: .22 }),
     s4b: (t) => bell(t, 196, { dur: .95, gain: .085, wet: .45 }),
-    /* 04 확정(A)의 비연결 유사 변주 — 확정 자체는 그대로 두고 참고용으로만 둔다. */
-    s4a2: (t) => mallet(t, 293.66, { dur: .24, gain: .16, wood: true, wet: .26 }),
-    s4a3: (t) => mallet(t, 233.08, { dur: .30, gain: .18, wood: true, wet: .20 }),
-
     /* 05 프로젝트 별 선택 */
     s5a: (t) => bell(t, 783.99, { dur: .75, gain: .085, wet: .4 }),
     s5b: (t) => mallet(t, 587.33, { dur: .38, gain: .13, wood: true, wet: .3 }),
@@ -1060,7 +1051,7 @@
     s1a: 2200, s1b: 1400, s1c: 1800,
     s2a: 700, s2b: 700,
     s3a: 3400, s3b: 2600, s3c: 3200, s3d: 3000,
-    s4a: 500, s4b: 1200, s4a2: 500, s4a3: 550,
+    s4a: 500, s4b: 1200,
     s5a: 1000, s5b: 700,
     s6a: 1300, s6b: 1700, s6c: 1700,
     s7a: 1300, s7b: 1300, s7c: 1400, s7r: 1500,
