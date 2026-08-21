@@ -1,0 +1,86 @@
+name: v3 nebula visual QA fixes
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-target:
+    if: github.head_ref == 'agent/v3-nebula-qa-fixes-runner'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v3-nebula-qa-fixes
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Guard and patch visual defects
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "c003faaf0f41801f9562e7dad861a96112c9f34a"
+          git fetch origin main
+          test "$(git rev-parse origin/main)" = "ec5e92b81991cb3c013010aeb90d3beb3c89a1e7"
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def once(text, old, new, label):
+              n = text.count(old)
+              if n != 1:
+                  raise SystemExit(f'{label}: expected 1 match, got {n}')
+              return text.replace(old, new, 1)
+
+          p = Path('docs/v3-constellation-prototypes/nebula-gateway.html')
+          s = p.read_text(encoding='utf-8')
+          marker = '  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">'
+          root_fonts = '  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap">\n' + marker
+          s = once(s, marker, root_fonts, 'gateway v2 fonts')
+          p.write_text(s, encoding='utf-8', newline='\n')
+
+          p = Path('docs/v3-constellation-prototypes/nebula.js')
+          s = p.read_text(encoding='utf-8')
+          s = once(s,
+            """    softCurve(c, [w * .58, h * .06, w * .72, h * .16, w * .80, h * .28, w * .96, h * .34],\n      S * .012, T.neb2, L ? .08 : .10, 3);""",
+            """    softCurve(c, [w * .58, h * .06, w * .72, h * .16, w * .80, h * .28, w * .96, h * .34],\n      S * .006, T.neb2, L ? .035 : .045, 2);""", 'nebula filament')
+
+          start = s.index('  function remnant(c, x, y, R, T, o, t, focus) {')
+          end = s.index('\n\n  /* 궤도 이탈.', start)
+          new_remnant = '''  function remnant(c, x, y, R, T, o, t, focus) {\n    const rr = R * 2.25 * (1 + Math.sin(t * .28 + o.phase) * .018 + focus * .08);\n    c.save();\n    c.translate(x, y);\n    c.rotate(o.tilt * .28);\n\n    /* 완전한 닫힌 윤곽 대신 서로 떨어진 얇은 충격파 조각을 쓴다.\n       꽃잎처럼 보이는 폐곡선을 만들지 않는 것이 핵심이다. */\n    const halo = c.createRadialGradient(0, 0, rr * .36, 0, 0, rr * 1.18);\n    halo.addColorStop(0, rgba(T.gold, 0));\n    halo.addColorStop(.70, rgba(T.gold, .045 + focus * .045));\n    halo.addColorStop(1, rgba(T.gold, 0));\n    c.fillStyle = halo;\n    c.beginPath(); c.arc(0, 0, rr * 1.18, 0, 7); c.fill();\n\n    const arcs = [\n      [.05, .56, 1.00, .82, -.05],\n      [.80, 1.22, .93, .76, .08],\n      [1.43, 1.91, 1.08, .87, -.02],\n    ];\n    c.strokeStyle = rgba(T.gold, .34 + focus * .30);\n    c.lineWidth = 1.05;\n    c.lineCap = 'round';\n    arcs.forEach(([a, z, rx, ry, rot]) => {\n      c.beginPath();\n      c.ellipse(0, 0, rr * rx, rr * ry, rot, Math.PI * a, Math.PI * z);\n      c.stroke();\n    });\n\n    /* 껍질 밖으로 흩어진 작은 잔해. 중심은 의도적으로 비워 둔다. */\n    for (let i = 0; i < 9; i++) {\n      const ang = o.phase + i * .83;\n      const dist = rr * (.78 + (i % 4) * .09);\n      const px = Math.cos(ang) * dist;\n      const py = Math.sin(ang) * dist * .82;\n      c.fillStyle = rgba(T.gold, .16 + (i % 3) * .055 + focus * .10);\n      c.beginPath(); c.arc(px, py, Math.max(.55, R * (.035 + (i % 2) * .018)), 0, 7); c.fill();\n    }\n\n    c.strokeStyle = rgba(T.gold, .13 + focus * .16);\n    c.lineWidth = .7;\n    for (let i = 0; i < 4; i++) {\n      const ang = o.phase * .4 + i * 1.47;\n      c.beginPath();\n      c.moveTo(Math.cos(ang) * rr * .42, Math.sin(ang) * rr * .34);\n      c.lineTo(Math.cos(ang + .08) * rr * .76, Math.sin(ang + .08) * rr * .62);\n      c.stroke();\n    }\n    c.restore();\n  }'''
+          s = s[:start] + new_remnant + s[end:]
+          p.write_text(s, encoding='utf-8', newline='\n')
+          PY
+
+      - name: Rebuild five-file atomic history
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/nebula-final/docs/v3-constellation-prototypes
+          for f in nebula-gateway.html nebula-transit.html nebula.css nebula.js nebula-assets.md; do
+            cp "docs/v3-constellation-prototypes/$f" "/tmp/nebula-final/docs/v3-constellation-prototypes/$f"
+          done
+          git reset --hard origin/main
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          restore_commit() {
+            f="$1"; msg="$2"
+            cp "/tmp/nebula-final/$f" "$f"
+            git add -- "$f"
+            git commit -m "$msg"
+          }
+          restore_commit docs/v3-constellation-prototypes/nebula-gateway.html "fix: resync nebula gateway prototype"
+          restore_commit docs/v3-constellation-prototypes/nebula-transit.html "fix: add nebula transit safety affordances"
+          restore_commit docs/v3-constellation-prototypes/nebula.css "fix: isolate nebula prototype styles"
+          restore_commit docs/v3-constellation-prototypes/nebula.js "fix: harden nebula interaction renderer"
+          restore_commit docs/v3-constellation-prototypes/nebula-assets.md "docs: record nebula independent QA"
+          test "$(git rev-list --count origin/main..HEAD)" -eq 5
+          test "$(git diff --name-only origin/main...HEAD | wc -l)" -eq 5
+          node --check docs/v3-constellation-prototypes/nebula.js
+          node tools/verify-build.js
+          git diff --check origin/main...HEAD
+          git push --force-with-lease origin HEAD:agent/v3-nebula-qa-fixes
