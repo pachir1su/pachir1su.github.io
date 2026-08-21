@@ -1,4 +1,4 @@
-name: portfolio release candidate integration
+name: v2-only release candidate rebuild
 
 on:
   pull_request:
@@ -20,7 +20,7 @@ jobs:
           path: runner
           fetch-depth: 1
 
-      - name: Checkout clean main snapshot
+      - name: Checkout clean main
         uses: actions/checkout@v4
         with:
           ref: main
@@ -28,190 +28,136 @@ jobs:
           fetch-depth: 80
           token: ${{ github.token }}
 
-      - name: Checkout verified v2 snapshot
+      - name: Checkout verified v2 source
         uses: actions/checkout@v4
         with:
-          ref: agent/v2-media-demos-performance
-          path: v2
+          ref: d68843d40b2692d962720e0a012a8c17d0c014d3
+          path: source
           fetch-depth: 80
 
-      - name: Checkout latest v3 production direction
-        uses: actions/checkout@v4
-        with:
-          ref: Codex/fix-nebula-regressions-11
-          path: v3
-          fetch-depth: 80
-
-      - name: Verify expected bases
+      - name: Compose v2-only candidate
         shell: bash
         run: |
           set -euo pipefail
           BASE="4791c0b828b6382f26b74af7ca121e41e23904ec"
           test "$(git -C final rev-parse HEAD)" = "$BASE"
-          test "$(git -C v2 merge-base "$BASE" HEAD)" = "$BASE"
-          test "$(git -C v3 merge-base "$BASE" HEAD)" = "$BASE"
-          test "$(git -C v2 diff --name-only "$BASE"...HEAD | wc -l)" -eq 35
-          test "$(git -C v3 diff --name-only "$BASE"...HEAD | wc -l)" -eq 9
+          test "$(git -C source merge-base "$BASE" HEAD)" = "$BASE"
+          git -C source diff --name-only "$BASE"...HEAD > /tmp/v2-files-all
+          test "$(wc -l < /tmp/v2-files-all)" -eq 35
 
-      - name: Compose v2 and v3 snapshots without history stacking
-        shell: bash
-        run: |
-          set -euo pipefail
-          BASE="4791c0b828b6382f26b74af7ca121e41e23904ec"
-          git -C v2 diff --name-only "$BASE"...HEAD > /tmp/v2-files
+          grep -v -F -x \
+            -e 'projects/koreatechGongjiAgent/assets/images/source-design-hub.webp' \
+            -e 'projects/koreatechGongjiAgent/assets/images/source-mobile-proposal.webp' \
+            -e 'projects/koreatechGongjiAgent/index.html' \
+            /tmp/v2-files-all > /tmp/v2-files
+          test "$(wc -l < /tmp/v2-files)" -eq 32
+
           while IFS= read -r f; do
             mkdir -p "final/$(dirname "$f")"
-            cp -a "v2/$f" "final/$f"
+            cp -a "source/$f" "final/$f"
           done < /tmp/v2-files
 
-          git -C v3 diff --name-only "$BASE"...HEAD > /tmp/v3-files
-          while IFS= read -r f; do
-            case "$f" in
-              index.html|script.js|style.css) continue ;;
-            esac
-            mkdir -p "final/$(dirname "$f")"
-            cp -a "v3/$f" "final/$f"
-          done < /tmp/v3-files
-
-          for f in index.html script.js style.css; do
-            git -C final show "$BASE:$f" > "/tmp/base-${f}"
-            set +e
-            git merge-file -p "v2/$f" "/tmp/base-${f}" "v3/$f" > "final/$f.merged"
-            rc=$?
-            set -e
-            test "$rc" -eq 0
-            mv "final/$f.merged" "final/$f"
-          done
-          ! grep -R -n -E '^(<<<<<<<|=======|>>>>>>>)' final/index.html final/script.js final/style.css
-
-      - name: Apply return-state, performance, and accessibility fixes
-        shell: bash
-        run: |
-          set -euo pipefail
-          python3 runner/tools/release-candidate-patch.py
+          ! grep -R -n -E 'source-design-hub\.webp|source-mobile-proposal\.webp' final/projects/koreatechGongjiAgent || true
+          test ! -e final/projects/koreatechGongjiAgent/assets/images/source-design-hub.webp
+          test ! -e final/projects/koreatechGongjiAgent/assets/images/source-mobile-proposal.webp
+          test ! -d final/assets/images/nebula-gateway
           git -C final diff --check
           node --check final/script.js
           node --check final/detail.js
           node --check final/assets/project-demos.js
-          node --check final/docs/v3-constellation-prototypes/nebula.js
           node final/tools/verify-build.js
-          ! grep -q 'stamp-pop' final/script.js
-          ! grep -q 'stamp-pop' final/style.css
-          ! grep -q 'Stamp feedback' final/script.js
-          ! grep -R -E 'unpkg.com/aos@|vanilla-tilt/1.8.0' final/projects/*/index.html
-          ! grep -q 'devicons/devicon' final/index.html
-          grep -q 'function resetV3Gateway' final/script.js
-          grep -q 'function resetGate' final/docs/v3-constellation-prototypes/nebula.js
-          grep -q '<main id="main-content">' final/index.html
 
-      - name: Install temporary browser QA dependencies
+      - name: Install browser QA dependencies
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p /tmp/portfolio-rc-node
-          cd /tmp/portfolio-rc-node
+          mkdir -p /tmp/v2-only-node
+          cd /tmp/v2-only-node
           npm init -y >/dev/null
           npm install playwright@1.55.0 lighthouse >/dev/null
           CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
           test -n "$CHROME_PATH"
           echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
-          echo "NODE_PATH=/tmp/portfolio-rc-node/node_modules" >> "$GITHUB_ENV"
+          echo "NODE_PATH=/tmp/v2-only-node/node_modules" >> "$GITHUB_ENV"
 
-      - name: Serve release candidate
+      - name: Serve candidate
         shell: bash
         run: |
-          python3 -m http.server 4176 --directory final >/tmp/portfolio-rc-http.log 2>&1 &
+          python3 -m http.server 4176 --directory final >/tmp/v2-only-http.log 2>&1 &
           for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:4176/ >/dev/null; then exit 0; fi
+            curl -fsS http://127.0.0.1:4176/ >/dev/null && exit 0
             sleep 1
           done
-          cat /tmp/portfolio-rc-http.log
+          cat /tmp/v2-only-http.log
           exit 1
 
-      - name: Run full v2 regression and live-demo QA
-        shell: bash
+      - name: Run full v2 browser QA
         env:
           QA_BASE: http://127.0.0.1:4176
           TARGET_DIR: ${{ github.workspace }}/final
-          QA_OUT: ${{ github.workspace }}/rc-v2-qa
+          QA_OUT: ${{ github.workspace }}/v2-only-qa
+        shell: bash
         run: |
           set -euo pipefail
           NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node runner/tools/v2-phase-qa.cjs
 
-      - name: Run production gateway and universe QA
-        shell: bash
-        env:
-          QA_BASE: http://127.0.0.1:4176
-          QA_OUT: ${{ github.workspace }}/rc-v3-qa
-        run: |
-          set -euo pipefail
-          NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node runner/tools/v3-release-qa.cjs
-
-      - name: Measure and gate Lighthouse
+      - name: Lighthouse gate
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p lighthouse-rc
-          /tmp/portfolio-rc-node/node_modules/.bin/lighthouse http://127.0.0.1:4176/ \
-            --chrome-path="$CHROME_PATH" --output=json --output-path=lighthouse-rc/mobile.json \
-            --quiet --chrome-flags="--headless --no-sandbox"
-          /tmp/portfolio-rc-node/node_modules/.bin/lighthouse http://127.0.0.1:4176/ \
-            --chrome-path="$CHROME_PATH" --preset=desktop --output=json --output-path=lighthouse-rc/desktop.json \
-            --quiet --chrome-flags="--headless --no-sandbox"
+          mkdir -p lighthouse-v2-only
+          /tmp/v2-only-node/node_modules/.bin/lighthouse http://127.0.0.1:4176/ --chrome-path="$CHROME_PATH" --output=json --output-path=lighthouse-v2-only/mobile.json --quiet --chrome-flags="--headless --no-sandbox"
+          /tmp/v2-only-node/node_modules/.bin/lighthouse http://127.0.0.1:4176/ --chrome-path="$CHROME_PATH" --preset=desktop --output=json --output-path=lighthouse-v2-only/desktop.json --quiet --chrome-flags="--headless --no-sandbox"
           node - <<'NODE'
           const fs=require('fs'); const out={};
           for(const mode of ['mobile','desktop']) {
-            const j=JSON.parse(fs.readFileSync(`lighthouse-rc/${mode}.json`));
-            out[mode]={performance:Math.round(j.categories.performance.score*100),accessibility:Math.round(j.categories.accessibility.score*100),bestPractices:Math.round(j.categories['best-practices'].score*100),seo:Math.round(j.categories.seo.score*100),fcp:j.audits['first-contentful-paint'].displayValue,lcp:j.audits['largest-contentful-paint'].displayValue,tbt:j.audits['total-blocking-time'].displayValue,cls:j.audits['cumulative-layout-shift'].displayValue};
+            const j=JSON.parse(fs.readFileSync(`lighthouse-v2-only/${mode}.json`));
+            out[mode]={performance:Math.round(j.categories.performance.score*100),accessibility:Math.round(j.categories.accessibility.score*100),bestPractices:Math.round(j.categories['best-practices'].score*100),seo:Math.round(j.categories.seo.score*100),lcp:j.audits['largest-contentful-paint'].displayValue,tbt:j.audits['total-blocking-time'].displayValue,cls:j.audits['cumulative-layout-shift'].displayValue};
           }
-          fs.writeFileSync('lighthouse-rc/summary.json',JSON.stringify(out,null,2));
-          console.log(JSON.stringify(out,null,2));
-          if(out.mobile.performance < 74) throw new Error(`mobile performance regressed: ${out.mobile.performance}`);
-          if(out.desktop.performance < 80) throw new Error(`desktop performance regressed: ${out.desktop.performance}`);
-          if(out.mobile.accessibility < 100 || out.desktop.accessibility < 100) throw new Error('accessibility must return to 100');
+          fs.writeFileSync('lighthouse-v2-only/summary.json',JSON.stringify(out,null,2)); console.log(out);
+          if(out.mobile.performance < 80 || out.desktop.performance < 80) throw new Error('performance below 80');
+          if(out.mobile.accessibility < 100 || out.desktop.accessibility < 100) throw new Error('accessibility below 100');
           NODE
 
-      - name: Commit clean release candidate atomically
+      - name: Commit clean v2-only candidate atomically
         shell: bash
         run: |
           set -euo pipefail
           cd final
-          git config user.name "portfolio release runner"
+          git config user.name "v2 release runner"
           git config user.email "actions@users.noreply.github.com"
           BASE="4791c0b828b6382f26b74af7ca121e41e23904ec"
           mapfile -d '' FILES < <(git status --porcelain=v1 -z --untracked-files=all | sed -z 's/^...//')
-          test "${#FILES[@]}" -ge 40
+          test "${#FILES[@]}" -eq 32
           for f in "${FILES[@]}"; do
             git add -- "$f"
             case "$f" in
-              index.html) msg="feat: integrate optimized home with v3 gateway" ;;
-              script.js) msg="fix: harden home interactions and gateway return" ;;
-              style.css) msg="perf: stabilize responsive home rendering" ;;
+              index.html) msg="perf: optimize v2 home loading" ;;
+              script.js) msg="fix: simplify v2 home interactions" ;;
+              style.css) msg="perf: stabilize v2 responsive styles" ;;
               detail.js) msg="perf: add lightweight detail runtime" ;;
               assets/project-demos.js) msg="feat: add interactive project demos" ;;
               projects.json) msg="feat: link verified project sources" ;;
-              assets/images/nebula-gateway/*) msg="feat: add v3 gateway artwork" ;;
-              docs/v3-constellation-prototypes/*) msg="fix: finalize v3 constellation runtime" ;;
               projects/*/assets/images/*) msg="feat: add verified project media" ;;
               projects/*/index.html) msg="feat: enhance project detail experience" ;;
-              *) msg="chore: finalize portfolio release candidate" ;;
+              *) msg="chore: finalize v2 portfolio candidate" ;;
             esac
             git commit -m "$msg" -- "$f"
           done
           changed="$(git diff --name-only "$BASE"...HEAD | wc -l)"
           commits="$(git rev-list --count "$BASE"..HEAD)"
           echo "changed=$changed commits=$commits"
+          test "$changed" -eq 32
+          test "$commits" -eq 32
           test "$changed" -eq "$commits"
-          test "$changed" -eq "${#FILES[@]}"
-          git push origin HEAD:agent/portfolio-release-candidate
+          EXPECTED="$(git ls-remote origin refs/heads/agent/portfolio-release-candidate | cut -f1)"
+          test -n "$EXPECTED"
+          git push --force-with-lease=refs/heads/agent/portfolio-release-candidate:"$EXPECTED" origin HEAD:agent/portfolio-release-candidate
 
-      - name: Upload release evidence
-        if: always()
+      - name: Upload v2-only evidence
         uses: actions/upload-artifact@v4
         with:
-          name: portfolio-release-candidate-evidence
+          name: v2-only-release-evidence
           path: |
-            rc-v2-qa
-            rc-v3-qa
-            lighthouse-rc
-          if-no-files-found: warn
+            v2-only-qa
+            lighthouse-v2-only
