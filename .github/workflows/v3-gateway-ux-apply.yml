@@ -1,0 +1,128 @@
+name: v3 gateway UX apply
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.head_ref == 'agent/v3-nebula-qa-fixes-runner'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v3-gateway-ux
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Guard target head
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "6e5e681b057aaf60d8866b5337bda02919baffce"
+          git fetch origin agent/v3-nebula-qa-fixes
+          test "$(git rev-parse origin/agent/v3-nebula-qa-fixes)" = "6e5e681b057aaf60d8866b5337bda02919baffce"
+
+      - name: Apply Phase 3 UX
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def once(text, old, new, label):
+              n = text.count(old)
+              if n != 1:
+                  raise SystemExit(f'{label}: expected 1 match, got {n}')
+              return text.replace(old, new, 1)
+
+          # Gateway HTML: remove UI-like label and leave one decorative mote outside the tear.
+          p = Path('docs/v3-constellation-prototypes/nebula-gateway.html')
+          s = p.read_text(encoding='utf-8')
+          s = once(s,
+          '''        <div class="gate-slot gate-wrap">\n          <button class="gate" type="button" data-gate aria-label="별자리 — 우주로 들어가기">\n            <canvas aria-hidden="true"></canvas>\n          </button>\n          <span class="gate-name">CONSTELLATION</span>\n        </div>''',
+          '''        <div class="gate-slot gate-wrap" data-gate-wrap>\n          <button class="gate" type="button" data-gate aria-label="별자리 — 우주로 들어가기">\n            <canvas aria-hidden="true"></canvas>\n          </button>\n          <span class="gate-mote" data-gate-mote aria-hidden="true"></span>\n        </div>''', 'gateway markup')
+          s = once(s,
+          '''        <div class="row"><b>안내 문구 없음</b><span>“여기를 눌러 보세요” 같은 문구를 두지 않았습니다. 창 밖의 작은 <code>CONSTELLATION</code>은 조작 안내가 아니라 이름표이며, 이것도 뺄 수 있습니다.</span></div>''',
+          '''        <div class="row"><b>안내 문구 없음</b><span>“여기를 눌러 보세요” 같은 조작 문구나 별도 이름표를 두지 않습니다. 찢긴 종이와 아주 드문 천체 움직임만으로 다른 공간이 있음을 암시합니다.</span></div>''', 'gateway doc label')
+          s = once(s,
+          '''        <div class="note warn"><b>확인이 필요한 것</b><span>자리(지표 아래)와 크기가 맞는지, 이름표를 남길지 뺄지, 모바일에서 어디에 둘지입니다.</span></div>''',
+          '''        <div class="note"><b>새로고침마다 조금 다릅니다</b><span>지표 아래의 안전 슬롯은 그대로 유지하되, 찢김의 폭·윤곽·미세한 기울기·정렬만 제한된 범위에서 바뀝니다. 기존 Hero 내용 위로 침범하지 않습니다.</span></div>''', 'gateway doc random')
+          p.write_text(s, encoding='utf-8', newline='\n')
+
+          # Transit HTML: mobile observation panel lives inside the stage, separate from star labels.
+          p = Path('docs/v3-constellation-prototypes/nebula-transit.html')
+          s = p.read_text(encoding='utf-8')
+          s = once(s,
+          '''    <nav class="orbit" aria-label="프로젝트 연도" data-orbit>\n      <div class="orbit-axis" aria-hidden="true"></div>\n    </nav>\n  </div>''',
+          '''    <nav class="orbit" aria-label="프로젝트 연도" data-orbit>\n      <div class="orbit-axis" aria-hidden="true"></div>\n    </nav>\n\n    <aside class="mobile-observation" data-mobile-observation hidden aria-live="polite">\n      <button type="button" class="mobile-observation-close" data-mobile-close aria-label="관측 정보 닫기">×</button>\n      <b data-mobile-title></b>\n      <span data-mobile-note></span>\n      <a data-mobile-link hidden>자세히 →</a>\n    </aside>\n  </div>''', 'mobile panel')
+          s = once(s,
+          '''        <div class="note warn"><b>아직 안 만든 것</b><span>모바일 전용 탐험 UX는 별도 기획 대상입니다. 지금은 좁은 화면에서 세 무리를 세로로 벌려 읽히게만 해 두었습니다. 성장 별자리와 제51구역도 다음 단계입니다.</span></div>''',
+          '''        <div class="note"><b>모바일은 관측 패널</b><span>좁은 화면에서 별을 누르면 별 옆에 설명을 겹쳐 펼치지 않고 하단의 독립 관측 패널에 이름·설명·상세 이동을 보여 줍니다. 별 지도와 복귀 버튼은 계속 보입니다.</span></div>\n        <div class="note warn"><b>다음 단계</b><span>성장 별자리와 제51구역은 실제 우주 구현 Phase에서 이어서 만듭니다.</span></div>''', 'mobile doc')
+          p.write_text(s, encoding='utf-8', newline='\n')
+
+          # CSS: smaller organic randomized gateway + rare escaped mote + mobile panel.
+          p = Path('docs/v3-constellation-prototypes/nebula.css')
+          s = p.read_text(encoding='utf-8')
+          old = '''.gate {\n  position:relative; display:block; width:100%; max-width:260px;\n  aspect-ratio:7/5; padding:0; border:0; background:none;\n  cursor:pointer; isolation:isolate;\n  /* 종이를 찢어낸 자국. 반듯한 사각형이면 위젯처럼 보인다. */\n  clip-path:polygon(\n    2% 6%, 14% 2%, 31% 5%, 48% 1%, 66% 4%, 82% 1%, 97% 5%,\n    99% 22%, 96% 41%, 99% 60%, 97% 79%, 99% 95%,\n    84% 98%, 67% 95%, 49% 99%, 32% 96%, 15% 99%, 3% 94%,\n    1% 78%, 4% 59%, 1% 40%, 3% 21%\n  );\n  transition:transform .5s cubic-bezier(.2,.8,.2,1);\n}\n.gate canvas { display:block; width:100%; height:100%; }\n\n/* 찢긴 가장자리 안쪽의 종이 두께. 구멍처럼 보이게 하는 핵심이다. */\n.gate::after {\n  content:""; position:absolute; inset:0; z-index:2; pointer-events:none;\n  box-shadow:inset 0 0 0 1px rgba(0,0,0,.28), inset 0 3px 14px rgba(0,0,0,.42);\n}\n.gate:hover, .gate:focus-visible { transform:scale(1.035); }\n.gate:focus-visible { outline:2px solid #c9b477; outline-offset:6px; }\n\n/* 창 밖에 놓이는 아주 작은 안내. 조작 설명이 아니라 이름표다. */\n.gate-wrap { display:flex; flex-direction:column; align-items:flex-start; gap:10px; }\n.gate-name {\n  font-family:var(--mono); font-size:10.5px; letter-spacing:.22em;\n  color:#8a8fa3; transition:color .35s ease;\n}\n.gate-wrap:hover .gate-name { color:#a9914d; }\n'''
+          new = '''.gate {\n  position:relative; display:block; width:var(--gate-width,156px); max-width:100%;\n  aspect-ratio:var(--gate-ratio,1.48); padding:0; border:0; background:none;\n  cursor:pointer; isolation:isolate;\n  clip-path:var(--tear-clip, polygon(3% 8%,18% 3%,34% 6%,51% 2%,69% 5%,84% 3%,97% 9%,96% 31%,99% 51%,96% 72%,97% 92%,82% 97%,65% 94%,49% 98%,31% 95%,14% 98%,3% 91%,5% 70%,2% 50%,5% 29%));\n  transform:rotate(var(--gate-rot,0deg));\n  transition:transform .5s cubic-bezier(.2,.8,.2,1);\n}\n.gate canvas { display:block; width:100%; height:100%; }\n\n/* 찢긴 가장자리 안쪽의 종이 두께. 구멍처럼 보이게 하는 핵심이다. */\n.gate::after {\n  content:""; position:absolute; inset:0; z-index:2; pointer-events:none;\n  box-shadow:inset 0 0 0 1px rgba(0,0,0,.24), inset 0 2px 11px rgba(0,0,0,.38);\n}\n.gate:hover, .gate:focus-visible { transform:rotate(var(--gate-rot,0deg)) scale(1.03); }\n.gate:focus-visible { outline:2px solid #c9b477; outline-offset:6px; }\n\n/* 슬롯 자체는 Hero 지표 아래에 고정한다. 슬롯 안에서만 정렬·크기·찢김이 달라진다. */\n.gate-wrap {\n  position:relative; align-self:stretch; display:flex; flex-direction:column;\n  align-items:var(--gate-align,flex-start); min-width:0;\n}\n.gate-mote {\n  position:absolute; left:var(--mote-left,72%); top:var(--mote-top,22%);\n  width:3px; height:3px; border-radius:50%; pointer-events:none;\n  background:#c9b477; opacity:0;\n  box-shadow:0 0 7px rgba(201,180,119,.5);\n  animation:gate-mote-escape var(--mote-duration,10s) ease-in-out var(--mote-delay,2s) infinite;\n}\n@keyframes gate-mote-escape {\n  0%,68%,100% { opacity:0; transform:translate(0,0) scale(.6); }\n  72% { opacity:.3; }\n  78% { opacity:.8; transform:translate(calc(var(--mote-x,10px) * .45),calc(var(--mote-y,-9px) * .45)) scale(1); }\n  88% { opacity:0; transform:translate(var(--mote-x,10px),var(--mote-y,-9px)) scale(.45); }\n}\n'''
+          s = once(s, old, new, 'gateway css')
+          s = once(s,
+          '''  .stage-back { left:6%; bottom:2.5%; }''',
+          '''  .stage-back { left:6%; bottom:2.5%; min-height:44px; display:inline-flex; align-items:center; }''', 'mobile back')
+          s = once(s,
+          '''  .sky-more, .sky-link { font-size:clamp(10px,2.6vw,11.5px); }\n}''',
+          '''  .sky-more, .sky-link { display:none !important; }\n  .mobile-observation {\n    position:absolute; z-index:9; left:5%; right:5%; bottom:8.5%;\n    display:grid; grid-template-columns:minmax(0,1fr) auto; gap:3px 14px;\n    padding:13px 0 11px; border-top:1px solid var(--f-gold); border-bottom:1px solid rgba(169,145,77,.28);\n    background:linear-gradient(90deg,rgba(10,13,20,.82),rgba(15,19,29,.72));\n    backdrop-filter:blur(9px); color:var(--f-ink);\n  }\n  .mobile-observation[hidden] { display:none; }\n  .mobile-observation b { grid-column:1; font-size:13px; font-weight:400; }\n  .mobile-observation > span { grid-column:1; color:var(--f-muted); font-size:11.5px; line-height:1.55; }\n  .mobile-observation > a { grid-column:1; justify-self:start; margin-top:3px; color:var(--f-gold); font-size:11px; text-decoration:none; }\n  .mobile-observation-close {\n    grid-column:2; grid-row:1 / span 2; align-self:start; width:44px; height:44px;\n    border:0; background:none; color:var(--f-muted); font:300 22px/1 var(--sans); cursor:pointer;\n  }\n}\n@media (min-width:721px) { .mobile-observation { display:none !important; } }''', 'mobile panel css')
+          s = once(s,
+          '''@media (prefers-reduced-motion: reduce) {\n  .gate, .gate-name { transition:none; }\n  .gate-veil { transition:opacity .2s ease; clip-path:none; }\n}''',
+          '''@media (prefers-reduced-motion: reduce) {\n  .gate { transition:none; }\n  .gate-mote { display:none; animation:none; }\n  .gate-veil { transition:opacity .2s ease; clip-path:none; }\n}''', 'gateway reduced css')
+          p.write_text(s, encoding='utf-8', newline='\n')
+
+          # JS: random safe tear; mobile observation panel behavior.
+          p = Path('docs/v3-constellation-prototypes/nebula.js')
+          s = p.read_text(encoding='utf-8')
+          s = once(s,
+          '''    const loading = stage && stage.querySelector('[data-loading]');\n    if (!stage || !canvas || !axis) return;''',
+          '''    const loading = stage && stage.querySelector('[data-loading]');\n    const mobilePanel = stage && stage.querySelector('[data-mobile-observation]');\n    const mobileTitle = mobilePanel && mobilePanel.querySelector('[data-mobile-title]');\n    const mobileNote = mobilePanel && mobilePanel.querySelector('[data-mobile-note]');\n    const mobileLink = mobilePanel && mobilePanel.querySelector('[data-mobile-link]');\n    const mobileClose = mobilePanel && mobilePanel.querySelector('[data-mobile-close]');\n    const mobileQuery = window.matchMedia('(max-width:720px)');\n    if (!stage || !canvas || !axis) return;''', 'transit panel refs')
+          s = once(s,
+          '''    function toggle(next) {\n      const target = state.open === next ? null : next;\n      if (state.open && state.open !== target) {\n        state.open.hit.setAttribute('aria-expanded', 'false');\n        state.open.hit.querySelectorAll('.sky-more, .sky-link')\n          .forEach((el) => el.setAttribute('aria-hidden', 'true'));\n        state.open.target = 0;\n      }\n      state.open = target;\n      if (target) {\n        target.hit.setAttribute('aria-expanded', 'true');\n        target.hit.querySelectorAll('.sky-more, .sky-link')\n          .forEach((el) => el.setAttribute('aria-hidden', 'false'));\n        target.target = 1;\n      }\n      still();\n    }''',
+          '''    function syncMobilePanel(target) {\n      if (!mobilePanel) return;\n      if (!mobileQuery.matches || !target) {\n        mobilePanel.hidden = true;\n        return;\n      }\n      mobileTitle.textContent = target.item.name || '';\n      mobileNote.textContent = target.item.note || '';\n      if (target.item.detail) {\n        mobileLink.hidden = false;\n        mobileLink.href = base + target.item.detail;\n      } else {\n        mobileLink.hidden = true;\n        mobileLink.removeAttribute('href');\n      }\n      mobilePanel.hidden = false;\n    }\n\n    function toggle(next) {\n      const target = state.open === next ? null : next;\n      if (state.open && state.open !== target) {\n        state.open.hit.setAttribute('aria-expanded', 'false');\n        state.open.hit.querySelectorAll('.sky-more, .sky-link')\n          .forEach((el) => el.setAttribute('aria-hidden', 'true'));\n        state.open.target = 0;\n      }\n      state.open = target;\n      if (target) {\n        target.hit.setAttribute('aria-expanded', 'true');\n        target.hit.querySelectorAll('.sky-more, .sky-link')\n          .forEach((el) => el.setAttribute('aria-hidden', String(mobileQuery.matches)));\n        target.target = 1;\n      }\n      syncMobilePanel(target);\n      still();\n    }''', 'mobile panel toggle')
+          s = once(s,
+          '''    document.addEventListener('keydown', (event) => {\n      if (event.key === 'Escape' && state.open) toggle(state.open);\n    });''',
+          '''    document.addEventListener('keydown', (event) => {\n      if (event.key === 'Escape' && state.open) toggle(state.open);\n    });\n    if (mobileClose) mobileClose.addEventListener('click', () => { if (state.open) toggle(state.open); });\n    const onMobileChange = () => {\n      if (!state.open) { syncMobilePanel(null); return; }\n      state.open.hit.querySelectorAll('.sky-more, .sky-link')\n        .forEach((el) => el.setAttribute('aria-hidden', String(mobileQuery.matches)));\n      syncMobilePanel(state.open);\n    };\n    if (mobileQuery.addEventListener) mobileQuery.addEventListener('change', onMobileChange); else mobileQuery.addListener(onMobileChange);''', 'mobile panel events')
+          s = once(s,
+          '''  function initGateway() {\n    const gate = document.querySelector('[data-gate]');\n    const canvas = gate && gate.querySelector('canvas');\n    if (!gate || !canvas) return;''',
+          '''  function initGateway() {\n    const gate = document.querySelector('[data-gate]');\n    const canvas = gate && gate.querySelector('canvas');\n    const wrap = gate && gate.closest('[data-gate-wrap]');\n    const mote = wrap && wrap.querySelector('[data-gate-mote]');\n    if (!gate || !canvas || !wrap) return;\n\n    /* 새로고침마다 다르되 Hero의 안전 슬롯 밖으로는 나가지 않는다. */\n    const random = () => {\n      if (window.crypto && crypto.getRandomValues) { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] / 4294967296; }\n      return Math.random();\n    };\n    const mobile = window.matchMedia('(max-width:768px)').matches;\n    const width = Math.round((mobile ? 108 : 132) + random() * (mobile ? 42 : 50));\n    const ratio = 1.34 + random() * .28;\n    const rot = -1.4 + random() * 2.8;\n    const aligns = mobile ? ['flex-start','center'] : ['flex-start','center','flex-end'];\n    wrap.style.setProperty('--gate-align', aligns[Math.floor(random() * aligns.length)]);\n    wrap.style.marginTop = `${Math.round(8 + random() * 10)}px`;\n    gate.style.setProperty('--gate-width', `${width}px`);\n    gate.style.setProperty('--gate-ratio', ratio.toFixed(3));\n    gate.style.setProperty('--gate-rot', `${rot.toFixed(2)}deg`);\n\n    const top = [], right = [], bottom = [], left = [];\n    [3,18,34,51,69,84,97].forEach((x,i) => top.push(`${x}% ${Math.round(2 + random()*6)}%`));\n    [24,48,72,92].forEach((y) => right.push(`${Math.round(95 + random()*4)}% ${y}%`));\n    [82,65,49,31,14,3].forEach((x) => bottom.push(`${x}% ${Math.round(94 + random()*5)}%`));\n    [72,50,29,10].forEach((y) => left.push(`${Math.round(1 + random()*5)}% ${y}%`));\n    gate.style.setProperty('--tear-clip', `polygon(${[...top,...right,...bottom,...left].join(',')})`);\n\n    if (mote) {\n      const edge = Math.floor(random() * 3);\n      let left = 65 + random()*22, topPos = 18 + random()*48, dx = 8 + random()*9, dy = -(7 + random()*10);\n      if (edge === 1) { left = 86 + random()*8; topPos = 38 + random()*25; dx = 10 + random()*10; dy = -3 + random()*7; }\n      if (edge === 2) { left = 55 + random()*28; topPos = 83 + random()*8; dx = 5 + random()*9; dy = 8 + random()*10; }\n      mote.style.setProperty('--mote-left', `${left.toFixed(1)}%`);\n      mote.style.setProperty('--mote-top', `${topPos.toFixed(1)}%`);\n      mote.style.setProperty('--mote-x', `${dx.toFixed(1)}px`);\n      mote.style.setProperty('--mote-y', `${dy.toFixed(1)}px`);\n      mote.style.setProperty('--mote-duration', `${(9 + random()*5).toFixed(1)}s`);\n      mote.style.setProperty('--mote-delay', `${(1 + random()*4).toFixed(1)}s`);\n    }''', 'gateway randomization')
+          p.write_text(s, encoding='utf-8', newline='\n')
+          PY
+
+      - name: Commit one file at a time
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          commit_file() { f="$1"; m="$2"; git add -- "$f"; git commit -m "$m"; }
+          commit_file docs/v3-constellation-prototypes/nebula-gateway.html "feat: refine randomized constellation gateway"
+          commit_file docs/v3-constellation-prototypes/nebula-transit.html "feat: add mobile observation panel"
+          commit_file docs/v3-constellation-prototypes/nebula.css "feat: style gateway and mobile observation UX"
+          commit_file docs/v3-constellation-prototypes/nebula.js "feat: implement gateway and mobile observation behavior"
+
+      - name: Verify stacked atomicity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-list --count origin/agent/v3-nebula-qa-fixes..HEAD)" -eq 4
+          test "$(git diff --name-only origin/agent/v3-nebula-qa-fixes...HEAD | wc -l)" -eq 4
+          node --check docs/v3-constellation-prototypes/nebula.js
+          node tools/verify-build.js
+          git diff --check origin/agent/v3-nebula-qa-fixes...HEAD
+
+      - name: Push stacked branch
+        shell: bash
+        run: git push origin HEAD:agent/v3-gateway-ux
