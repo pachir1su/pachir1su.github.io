@@ -9,6 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- 실제 v2 스타일을 그대로 불러온다. 진입점이 진짜 홈 위에서 어떻게 보이는지가 이 시안의 전부다. -->
@@ -16,21 +17,22 @@
   <link rel="stylesheet" href="nebula.css">
   <script src="nebula.js" defer></script>
   <style>
-    /* v2 스타일과 시안 셸이 섞이지 않도록 셸만 격리한다. */
-    .gate-doc { font-family:"IBM Plex Sans KR",system-ui,sans-serif; background:var(--page); color:var(--ink); }
-    .gate-doc * { box-sizing:border-box; }
+    /* v2 스타일과 시안 셸이 섞이지 않도록 설명 영역만 격리한다. */
+    .gate-doc > .wrap { font-family:"IBM Plex Sans KR",system-ui,sans-serif; background:var(--page); color:var(--neb-ink); }
+    .gate-doc > .wrap * { box-sizing:border-box; }
     .hero { min-height:auto; padding-bottom:60px; }
     .scroll-hint { display:none; }
     /* 진입점은 우측 지표 열 아래에 놓는다. 이름과 경쟁하지 않는 자리다. */
     .hero-stats { display:flex; flex-direction:column; gap:22px; align-items:flex-start; }
     .gate-slot { margin-top:6px; }
+    @media (max-width:768px) { .gate-slot { margin-top:18px; } .gate { max-width:220px; } }
   </style>
 </head>
 <body data-page="nebula-gateway" class="gate-doc">
 
   <!-- ============================================================
-       v2 홈 섹션 재현 — 마크업은 운영 index.html 과 같다.
-       추가된 것은 .gate-slot 안의 창 하나뿐이다.
+       v2 홈 섹션 검증용 스냅샷 — 현재 main의 핵심 Hero 구조를 동기화한다.
+       실제 운영 반영은 이 마크업을 교체하지 않고 .gate-slot만 추가하는 것이 목표다.
        ============================================================ -->
   <section id="home" class="hero">
     <div class="hero-grid-bg" aria-hidden="true"></div>
@@ -43,21 +45,24 @@
           <span class="name-kr">이건영</span>
           <span class="name-en">Lee Geon Yeong</span>
         </h1>
-        <div class="hero-role">혁신의 기업가 &amp; 풀스택 개발자</div>
+        <div class="hero-role">
+혁신의 기업가 &amp;
+<span class="typing-wrap"><span id="typing-text">풀스택 개발자</span><span class="typing-cursor"></span></span>
+        </div>
         <p class="hero-desc">
           이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br />
           <strong>월 100만 명</strong>이 사용하는 서비스를 만드는 것이 목표입니다.
         </p>
-        <div class="hero-btns">
+        <div class="hero-btns" data-aos="fade-up" data-aos-delay="80">
           <a href="#projects" class="btn btn-primary"><i class="fas fa-folder-open"></i> 프로젝트 보기</a>
           <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" class="btn btn-ghost"><i class="fab fa-github"></i> GitHub</a>
           <button type="button" class="btn btn-ghost contact-email hero-email" title="클릭하면 복사됩니다">
-            <i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span>
+            <i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span><span class="copy-hint sr-only">복사</span>
           </button>
         </div>
       </div>
 
-      <div class="hero-stats">
+      <div class="hero-stats" data-aos="fade-up" data-aos-delay="160">
         <div class="stat-item"><span class="stat-num">20+</span><span class="stat-label">프로젝트</span></div>
         <div class="stat-divider"></div>
         <div class="stat-item"><span class="stat-num">4</span><span class="stat-label">수상 경력</span></div>
@@ -82,7 +87,7 @@
       <a class="back-link" href="index.html">← 시안 목록</a>
       <p class="kicker">V3 · 진입점</p>
       <h2>종이에 구멍이 하나 나 있습니다.</h2>
-      <p>v2는 <b>한 글자도 바꾸지 않습니다.</b> 위 화면은 운영 <code>index.html</code>의 홈 섹션 마크업 그대로이고, 실제 <code>style.css</code>를 불러와 렌더한 것입니다. 더한 것은 지표 아래 창 하나뿐입니다.</p>
+      <p>v2 사용자-facing 문구는 바꾸지 않습니다. 위 화면은 현재 <code>main</code>의 Hero 구조와 핵심 마크업을 동기화한 <b>검증용 스냅샷</b>이며 실제 <code>style.css</code>를 그대로 읽습니다. 운영 반영 전에는 다시 한 번 <code>index.html</code>과 구조를 대조합니다.</p>
       <p>v2는 노트이고 v3는 우주입니다. 두 세계가 만나는 지점이 하나뿐이라면, 그 형태는 <b>종이에 뚫린 구멍</b>이어야 합니다. 가장자리를 반듯하게 두지 않고 찢어낸 자국으로 잘라 냈고, 안쪽에 종이 두께가 지는 그림자를 넣었습니다. 위젯이 아니라 구멍으로 읽혀야 합니다.</p>
 
       <div class="rows">
@@ -95,7 +100,7 @@
 
       <div class="notes">
         <div class="note"><b>창 안은 언제나 밤입니다</b><span>페이지가 라이트 모드여도 구멍 너머는 어둡습니다. 밝은 종이와 어두운 우주의 대비가 이 진입점의 전부입니다.</span></div>
-        <div class="note"><b>v2 변경은 세 줄</b><span>실제 적용 시 운영 <code>index.html</code>에 추가되는 것은 <code>.gate-slot</code> 블록 하나입니다. 기존 마크업·데이터·빌드 생성 영역은 건드리지 않습니다.</span></div>
+        <div class="note"><b>운영 반영은 최소 삽입</b><span>목표는 운영 <code>index.html</code>의 기존 Hero를 복제·교체하지 않고 <code>.gate-slot</code> 진입점만 추가하는 것입니다. 실제 반영 직전 현재 Hero와 다시 대조합니다.</span></div>
         <div class="note"><b>키보드로도 들어갑니다</b><span>탭으로 포커스가 오면 별자리가 완성되고, 엔터로 진입합니다.</span></div>
         <div class="note warn"><b>확인이 필요한 것</b><span>자리(지표 아래)와 크기가 맞는지, 이름표를 남길지 뺄지, 모바일에서 어디에 둘지입니다.</span></div>
       </div>
