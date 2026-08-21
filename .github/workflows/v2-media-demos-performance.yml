@@ -93,6 +93,11 @@ jobs:
         run: |
           set -euo pipefail
           python3 runner/tools/v2-apply-phase.py
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('target/style.css')
+          p.write_text(p.read_text(encoding='utf-8').rstrip()+'\n', encoding='utf-8')
+          PY
           git -C target diff --check
           node --check target/script.js
           node --check target/detail.js
