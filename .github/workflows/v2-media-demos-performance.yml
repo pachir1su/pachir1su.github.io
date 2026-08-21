@@ -93,11 +93,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 runner/tools/v2-apply-phase.py
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('target/style.css')
-          p.write_text(p.read_text(encoding='utf-8').rstrip()+'\n', encoding='utf-8')
-          PY
+          python3 runner/tools/v2-postapply-fixes.py
           git -C target diff --check
           node --check target/script.js
           node --check target/detail.js
@@ -106,6 +102,9 @@ jobs:
           node target/tools/verify-build.js
           ! grep -R -E 'unpkg.com/aos@|vanilla-tilt/1.8.0' target/projects/*/index.html
           ! grep -q 'devicons/devicon' target/index.html
+          ! grep -q 'stamp-pop' target/script.js
+          ! grep -q 'stamp-pop' target/style.css
+          ! grep -q 'Stamp feedback' target/script.js
           grep -q 'detail.js' target/projects/Wall_Sina/index.html
           grep -q 'data-project-demo="wall"' target/projects/Wall_Sina/index.html
           grep -q 'data-project-demo="ucast"' target/projects/2026_U-CAST/index.html
@@ -171,7 +170,7 @@ jobs:
               detail.js) msg="perf: add lightweight detail runtime" ;;
               assets/project-demos.js) msg="feat: add interactive project demos" ;;
               index.html) msg="perf: reduce home render dependencies" ;;
-              script.js) msg="perf: throttle home interactions" ;;
+              script.js) msg="perf: streamline home interactions" ;;
               style.css) msg="perf: optimize v2 rendering styles" ;;
               projects.json) msg="feat: link health project notion" ;;
               projects/*/assets/images/*) msg="feat: add verified project media" ;;
