@@ -20,6 +20,7 @@ const check = (ok, name, detail = '') => { if (!ok) failures.push({ name, detail
       colorScheme: theme,
       reducedMotion: reduced ? 'reduce' : 'no-preference',
     });
+    await context.route('https://**/*', route => route.abort());
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', error => errors.push(`pageerror:${error.message}`));
