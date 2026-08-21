@@ -1,243 +1,81 @@
-name: v3 nebula QA fix runner
+name: v3 nebula browser QA
 
 on:
-  push:
-    branches:
-      - agent/v3-nebula-qa-fixes-runner
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  patch:
+  browser-qa:
+    if: github.head_ref == 'agent/v3-nebula-qa-fixes-runner'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout runner branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v3-nebula-qa-fixes-runner
+          path: runner
+          fetch-depth: 1
+
+      - name: Checkout target branch
+        uses: actions/checkout@v4
         with:
           ref: agent/v3-nebula-qa-fixes
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          path: target
+          fetch-depth: 1
 
-      - name: Guard target baseline
+      - name: Verify target head
         shell: bash
         run: |
           set -euo pipefail
-          git fetch origin main
-          test "$(git rev-parse origin/main)" = "ec5e92b81991cb3c013010aeb90d3beb3c89a1e7"
-          test "$(git rev-parse HEAD)" = "ec5e92b81991cb3c013010aeb90d3beb3c89a1e7"
-
-      - name: Apply guarded QA fixes
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-
-          def read(path):
-              return Path(path).read_text(encoding='utf-8')
-
-          def write(path, text):
-              Path(path).write_text(text, encoding='utf-8', newline='\n')
-
-          def once(text, old, new, label):
-              count = text.count(old)
-              if count != 1:
-                  raise SystemExit(f'{label}: expected 1 match, found {count}')
-              return text.replace(old, new, 1)
-
-          # 1) nebula.js — visual defects, loading, accessibility, visibility throttling.
-          p = 'docs/v3-constellation-prototypes/nebula.js'
-          s = read(p)
-          s = once(s,
-          """  const PALETTE = {\n    light: {\n      mode: 'light',\n      sky0: '#eceef5', sky1: '#e2e5ee', sky2: '#d7dbe7',\n      neb: '#706994', neb2: '#8d86ab', lane: '#b9bccd',\n      ink: '#242636', gold: '#8f7736', glow: '#ffffff', vignette: '#c9cdda',\n    },\n    dark: {\n      mode: 'dark',\n      sky0: '#12161f', sky1: '#0f131b', sky2: '#0b0e15',\n      neb: '#4a4468', neb2: '#6d648f', lane: '#080b11',\n      ink: '#e6e9f1', gold: '#c9b477', glow: '#cfd3e4', vignette: '#05070c',\n    },\n  };\n""",
-          """  const PALETTE = {\n    light: {\n      mode: 'light',\n      sky0: '#eceef5', sky1: '#e2e5ee', sky2: '#d7dbe7',\n      neb: '#706994', neb2: '#8d86ab', lane: '#b9bccd',\n      ink: '#242636', gold: '#8f7736', glow: '#ffffff', vignette: '#c9cdda',\n    },\n    dark: {\n      mode: 'dark',\n      sky0: '#12161f', sky1: '#0f131b', sky2: '#0b0e15',\n      neb: '#4a4468', neb2: '#6d648f', lane: '#080b11',\n      ink: '#e6e9f1', gold: '#c9b477', glow: '#cfd3e4', vignette: '#05070c',\n    },\n  };\n\n  /* 전환 화면 라이트 모드는 키비주얼보다 한 단계 깊게 눌러 우주로 읽히게 한다. */\n  const TRANSIT_LIGHT = {\n    ...PALETTE.light,\n    sky0: '#dfe3ed', sky1: '#d4d9e6', sky2: '#c9d0df',\n    neb: '#625b86', neb2: '#7c759e', lane: '#a8adbf',\n  };\n""", 'palette')
-          s = once(s,
-          """    softCurve(c, [w * .58, h * .06, w * .72, h * .16, w * .80, h * .28, w * .96, h * .34],\n      S * .022, L ? T.neb : T.glow, L ? .10 : .13, 3);\n""",
-          """    softCurve(c, [w * .58, h * .06, w * .72, h * .16, w * .80, h * .28, w * .96, h * .34],\n      S * .012, T.neb2, L ? .08 : .10, 3);\n""", 'bright nebula filament')
-          s = once(s, '    const gr = R * 2.6 * grow;', '    const gr = R * 2.1 * grow;', 'protostar glow radius')
-          s = once(s, '      c.beginPath(); c.arc(0, 0, R * (1.5 + i * .58) * pull * grow, 0, 7); c.stroke();',
-                   '      c.beginPath(); c.arc(0, 0, R * (1.15 + i * .38) * pull * grow, 0, 7); c.stroke();', 'accretion radius')
-          s = once(s, "      c.beginPath(); c.arc(x, y, R * (.28 + pulse * .07), 0, 7); c.fill();",
-                   "      c.beginPath(); c.arc(x, y, R * (.34 + pulse * .08), 0, 7); c.fill();", 'protostar core')
-          s = once(s, "      c.beginPath(); c.arc(x, y, R * .34, 0, 7); c.stroke();",
-                   "      c.beginPath(); c.arc(x, y, R * .38, 0, 7); c.stroke();", 'planned core')
-          s = once(s,
-                   '      const wob = 1 + Math.sin(ang * 3 + o.phase) * .12 + Math.sin(ang * 7 + o.phase * 2) * .06;',
-                   '      const wob = 1 + Math.sin(ang * 3 + o.phase) * .045 + Math.sin(ang * 7 + o.phase * 2) * .025;', 'remnant wobble')
-          s = once(s, '      if (Math.sin(ang * 2 + o.phase * .7) > .80) { lifted = true; continue; }',
-                   '      if (Math.sin(ang * 2 + o.phase * .7) > .70) { lifted = true; continue; }', 'remnant gaps')
-          s = once(s,
-          """    const canvas = stage && stage.querySelector('canvas');\n    const axis = stage && stage.querySelector('[data-orbit]');\n    if (!stage || !canvas || !axis) return;\n""",
-          """    const canvas = stage && stage.querySelector('canvas');\n    const axis = stage && stage.querySelector('[data-orbit]');\n    const loading = stage && stage.querySelector('[data-loading]');\n    if (!stage || !canvas || !axis) return;\n""", 'transit loading node')
-          s = once(s, "      return window.matchMedia('(prefers-color-scheme: dark)').matches ? PALETTE.dark : PALETTE.light;",
-                   "      return window.matchMedia('(prefers-color-scheme: dark)').matches ? PALETTE.dark : TRANSIT_LIGHT;", 'transit light theme')
-          s = once(s,
-          """      const more = document.createElement('span');\n      more.className = 'sky-more';\n      more.textContent = item.note || '';\n""",
-          """      const more = document.createElement('span');\n      more.className = 'sky-more';\n      more.textContent = item.note || '';\n      more.setAttribute('aria-hidden', 'true');\n""", 'sky-more aria')
-          s = once(s,
-          """        const link = document.createElement('span');\n        link.className = 'sky-link';\n        link.textContent = '자세히 →';\n        text.append(link);\n""",
-          """        const link = document.createElement('span');\n        link.className = 'sky-link';\n        link.textContent = '자세히 →';\n        link.setAttribute('aria-hidden', 'true');\n        text.append(link);\n""", 'sky-link aria')
-          s = once(s,
-          """      if (state.open && state.open !== target) {\n        state.open.hit.setAttribute('aria-expanded', 'false');\n        state.open.target = 0;\n      }\n      state.open = target;\n      if (target) {\n        target.hit.setAttribute('aria-expanded', 'true');\n        target.target = 1;\n      }\n""",
-          """      if (state.open && state.open !== target) {\n        state.open.hit.setAttribute('aria-expanded', 'false');\n        state.open.hit.querySelectorAll('.sky-more, .sky-link')\n          .forEach((el) => el.setAttribute('aria-hidden', 'true'));\n        state.open.target = 0;\n      }\n      state.open = target;\n      if (target) {\n        target.hit.setAttribute('aria-expanded', 'true');\n        target.hit.querySelectorAll('.sky-more, .sky-link')\n          .forEach((el) => el.setAttribute('aria-hidden', 'false'));\n        target.target = 1;\n      }\n""", 'toggle aria')
-          s = once(s,
-          """    function frame(dt) {\n      if (!state.size || !state.data) return;\n      const { w, h } = state.size;\n      const T = theme();\n      const L = layout();\n      const R = Math.min(w, h) * .026 * L.scale;\n      const c = canvas.getContext('2d');\n      const k = Math.min(1, dt * 7) || 1;\n\n      c.setTransform(1, 0, 0, 1, 0, 0);\n      c.clearRect(0, 0, canvas.width, canvas.height);\n      c.drawImage(sky, 0, 0);\n      c.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);\n""",
-          """    function frame(dt) {\n      if (!state.size) return;\n      const { w, h } = state.size;\n      const c = canvas.getContext('2d');\n\n      c.setTransform(1, 0, 0, 1, 0, 0);\n      c.clearRect(0, 0, canvas.width, canvas.height);\n      c.drawImage(sky, 0, 0);\n      if (!state.data) return;\n\n      const T = theme();\n      const L = layout();\n      const R = Math.min(w, h) * .026 * L.scale;\n      const k = Math.min(1, dt * 7) || 1;\n      c.setTransform(state.dpr, 0, 0, state.dpr, 0, 0);\n""", 'transit loading frame')
-          s = once(s,
-          """    let last = 0;\n    function loop(now) {\n      const dt = last ? Math.min(.05, (now - last) / 1000) : 0;\n      last = now;\n      state.t += dt;\n      frame(dt);\n      requestAnimationFrame(loop);\n    }\n""",
-          """    let last = 0, raf = 0, animating = false;\n    function loop(now) {\n      if (!animating) return;\n      const dt = last ? Math.min(.05, (now - last) / 1000) : 0;\n      last = now;\n      state.t += dt;\n      frame(dt);\n      raf = requestAnimationFrame(loop);\n    }\n    function setAnimating(next) {\n      if (prefersReduced()) { animating = false; cancelAnimationFrame(raf); if (next) frame(1); return; }\n      if (next && !animating) { animating = true; last = 0; raf = requestAnimationFrame(loop); }\n      if (!next && animating) { animating = false; cancelAnimationFrame(raf); }\n    }\n""", 'transit animation throttle')
-          s = once(s,
-          """    loadProjects(config.source).then((data) => {\n      build(data);\n      observe([canvas], resize);\n      window.addEventListener('resize', resize);\n      resize();\n      if (prefersReduced()) frame(1); else requestAnimationFrame(loop);\n    });\n""",
-          """    observe([canvas], resize);\n    window.addEventListener('resize', resize);\n    resize();\n\n    loadProjects(config.source).then((data) => {\n      build(data);\n      if (loading) loading.hidden = true;\n      resize();\n      if ('IntersectionObserver' in window) {\n        const io = new IntersectionObserver((entries) => setAnimating(entries.some((entry) => entry.isIntersecting)), { threshold: .01 });\n        io.observe(stage);\n      } else {\n        setAnimating(true);\n      }\n    });\n""", 'transit load lifecycle')
-          s = once(s,
-          """    gate.addEventListener('pointerenter', () => { state.nearTarget = 1; });\n    gate.addEventListener('focus', () => { state.nearTarget = 1; });\n""",
-          """    gate.addEventListener('pointerenter', () => { state.nearTarget = 1; if (prefersReduced()) frame(1); });\n    gate.addEventListener('focus', () => { state.nearTarget = 1; if (prefersReduced()) frame(1); });\n    gate.addEventListener('blur', () => { state.nearTarget = 0; if (prefersReduced()) frame(1); });\n""", 'gateway reduced-motion focus')
-          s = once(s,
-          """      state.nearTarget = Math.max(0, Math.min(1, 1 - dist / reach));\n    });\n""",
-          """      state.nearTarget = Math.max(0, Math.min(1, 1 - dist / reach));\n      if (prefersReduced()) frame(1);\n    });\n""", 'gateway reduced-motion pointer')
-          s = once(s,
-          """    let last = 0;\n    function loop(now) {\n      const dt = last ? Math.min(.05, (now - last) / 1000) : 0;\n      last = now;\n      state.t += dt;\n      frame(dt);\n      requestAnimationFrame(loop);\n    }\n\n    observe([canvas], () => { resize(); frame(0); });\n    window.addEventListener('resize', () => { resize(); frame(0); });\n    resize();\n    if (prefersReduced()) frame(1); else requestAnimationFrame(loop);\n""",
-          """    let last = 0, raf = 0, animating = false;\n    function loop(now) {\n      if (!animating) return;\n      const dt = last ? Math.min(.05, (now - last) / 1000) : 0;\n      last = now;\n      state.t += dt;\n      frame(dt);\n      raf = requestAnimationFrame(loop);\n    }\n    function setAnimating(next) {\n      if (prefersReduced()) { animating = false; cancelAnimationFrame(raf); if (next) frame(1); return; }\n      if (next && !animating) { animating = true; last = 0; raf = requestAnimationFrame(loop); }\n      if (!next && animating) { animating = false; cancelAnimationFrame(raf); }\n    }\n\n    observe([canvas], () => { resize(); frame(0); });\n    window.addEventListener('resize', () => { resize(); frame(0); });\n    resize();\n    if ('IntersectionObserver' in window) {\n      const io = new IntersectionObserver((entries) => setAnimating(entries.some((entry) => entry.isIntersecting)), { threshold: .01 });\n      io.observe(gate);\n    } else {\n      setAnimating(true);\n    }\n""", 'gateway animation throttle')
-          write(p, s)
-
-          # 2) nebula.css — avoid v2 token/body collisions; improve hit targets and stage utilities.
-          p = 'docs/v3-constellation-prototypes/nebula.css'
-          s = read(p)
-          s = s.replace('--ink', '--neb-ink').replace('--gold', '--neb-gold').replace('--line', '--neb-line')
-          s = once(s, 'body {\n  margin:0; min-width:320px; background:var(--page); color:var(--neb-ink);',
-                   'body:not([data-page="nebula-gateway"]) {\n  margin:0; min-width:320px; background:var(--page); color:var(--neb-ink);', 'gateway body isolation')
-          s = once(s, '  --dot: 26px;', '  --dot: 44px;', 'desktop hit target')
-          s = once(s, '  max-width:min(38vw,320px); padding:0; border:0; background:none;',
-                   '  min-width:44px; min-height:44px; max-width:min(44vw,380px); padding:0; border:0; background:none;', 'sky body size')
-          s = once(s,
-          """  font-weight:300; font-size:clamp(11px,1.02vw,14px); line-height:1.4; letter-spacing:-.01em;\n  color:var(--f-ink); text-shadow:var(--f-shadow);\n""",
-          """  max-width:34ch; overflow-wrap:anywhere; text-wrap:pretty;\n  font-weight:300; font-size:clamp(11px,1.02vw,14px); line-height:1.4; letter-spacing:-.01em;\n  color:var(--f-ink); text-shadow:var(--f-shadow);\n""", 'long labels')
-          s = once(s, '  .sky-body { --dot:24px; max-width:58vw; }',
-                   '  .sky-body { --dot:44px; max-width:72vw; }', 'mobile hit target')
-          marker = '/* ---------------------------------------------------------------------\n   하늘 위의 프로젝트 — 포트폴리오이므로 이름은 언제나 보여야 한다.'
-          insert = """/* 무대의 최소 제품 내비게이션. 설명이 아니라 돌아갈 출구와 로딩 상태만 둔다. */\n.stage-back {\n  position:absolute; z-index:7; left:7%; bottom:8%;\n  display:inline-flex; align-items:center; min-width:44px; min-height:44px;\n  color:var(--f-subtle); font-family:var(--mono); font-size:11px; letter-spacing:.08em;\n  text-decoration:none; text-shadow:var(--f-shadow);\n}\n.stage-back:hover, .stage-back:focus-visible { color:var(--f-gold); }\n.stage-loading {\n  position:absolute; z-index:6; left:50%; top:50%; transform:translate(-50%,-50%);\n  color:var(--f-subtle); font-family:var(--mono); font-size:11px; letter-spacing:.08em;\n  text-shadow:var(--f-shadow);\n}\n.stage-loading[hidden] { display:none; }\n\n"""
-          s = once(s, marker, insert + marker, 'stage utility styles')
-          s = once(s,
-          '  .stage-name { left:6%; top:2.5%; }',
-          '  .stage-name { left:6%; top:2.5%; }\n  .stage-back { left:6%; bottom:2.5%; }', 'mobile back position')
-          write(p, s)
-
-          # 3) gateway prototype — sync current hero snapshot and isolate prototype shell.
-          p = 'docs/v3-constellation-prototypes/nebula-gateway.html'
-          s = read(p)
-          s = once(s,
-          '    .gate-doc { font-family:"IBM Plex Sans KR",system-ui,sans-serif; background:var(--page); color:var(--ink); }\n    .gate-doc * { box-sizing:border-box; }',
-          '    .gate-doc > .wrap { font-family:"IBM Plex Sans KR",system-ui,sans-serif; background:var(--page); color:var(--neb-ink); }\n    .gate-doc > .wrap * { box-sizing:border-box; }', 'gateway shell isolation')
-          s = once(s,
-          '    .gate-slot { margin-top:6px; }',
-          '    .gate-slot { margin-top:6px; }\n    @media (max-width:768px) { .gate-slot { margin-top:18px; } .gate { max-width:220px; } }', 'gateway mobile slot')
-          s = once(s,
-          '        <div class="hero-role">혁신의 기업가 &amp; 풀스택 개발자</div>',
-          '        <div class="hero-role">\n혁신의 기업가 &amp;\n<span class="typing-wrap"><span id="typing-text">풀스택 개발자</span><span class="typing-cursor"></span></span>\n        </div>', 'gateway hero role')
-          s = once(s, '<div class="hero-btns">', '<div class="hero-btns" data-aos="fade-up" data-aos-delay="80">', 'gateway hero aos')
-          s = once(s,
-          '<i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span>',
-          '<i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span><span class="copy-hint sr-only">복사</span>', 'gateway mail helper')
-          s = once(s, '<div class="hero-stats">', '<div class="hero-stats" data-aos="fade-up" data-aos-delay="160">', 'gateway stats aos')
-          s = once(s,
-          '      <p>v2는 <b>한 글자도 바꾸지 않습니다.</b> 위 화면은 운영 <code>index.html</code>의 홈 섹션 마크업 그대로이고, 실제 <code>style.css</code>를 불러와 렌더한 것입니다. 더한 것은 지표 아래 창 하나뿐입니다.</p>',
-          '      <p>v2 사용자-facing 문구는 바꾸지 않습니다. 위 화면은 현재 <code>main</code>의 Hero 구조와 핵심 마크업을 동기화한 <b>검증용 스냅샷</b>이며 실제 <code>style.css</code>를 그대로 읽습니다. 운영 반영 전에는 다시 한 번 <code>index.html</code>과 구조를 대조합니다.</p>', 'gateway snapshot wording')
-          s = once(s,
-          '<div class="note"><b>v2 변경은 세 줄</b><span>실제 적용 시 운영 <code>index.html</code>에 추가되는 것은 <code>.gate-slot</code> 블록 하나입니다. 기존 마크업·데이터·빌드 생성 영역은 건드리지 않습니다.</span></div>',
-          '<div class="note"><b>운영 반영은 최소 삽입</b><span>목표는 운영 <code>index.html</code>의 기존 Hero를 복제·교체하지 않고 <code>.gate-slot</code> 진입점만 추가하는 것입니다. 실제 반영 직전 현재 Hero와 다시 대조합니다.</span></div>', 'gateway integration wording')
-          write(p, s)
-
-          # 4) transit prototype — visible return path, loading status, truthful performance note.
-          p = 'docs/v3-constellation-prototypes/nebula-transit.html'
-          s = read(p)
-          s = once(s,
-          '    <canvas aria-hidden="true"></canvas>\n\n    <div class="stage-name">',
-          '    <canvas aria-hidden="true"></canvas>\n    <a class="stage-back" href="../../" aria-label="기존 포트폴리오로 돌아가기">← PORTFOLIO</a>\n    <div class="stage-loading" data-loading role="status" aria-live="polite">별을 불러오는 중…</div>\n\n    <div class="stage-name">', 'transit navigation and loading')
-          s = once(s,
-          '<div class="note"><b>가볍게 돌아갑니다</b><span>성운 하늘은 한 번 그려 캐시에 두고, 매 프레임 다시 그리는 것은 열 개의 천체뿐입니다. <code>prefers-reduced-motion</code>에서는 움직임 없이 한 장만 그립니다.</span></div>',
-          '<div class="note"><b>렌더 범위를 제한합니다</b><span>성운 하늘은 한 번 그려 캐시에 두고, 현재 선택 연도와 진행·실패 천체만 다시 그립니다(2026 기준 최대 20개). 무대가 화면 밖으로 나가면 루프를 멈추고 <code>prefers-reduced-motion</code>에서는 정지 화면만 갱신합니다.</span></div>', 'transit performance wording')
-          s = once(s,
-          '<div class="note warn"><b>아직 안 만든 것</b><span>모바일 전용 UX는 별도 기획 대상입니다. 지금은 좁은 화면에서 세 무리를 세로로 벌려 읽히게만 해 두었습니다. 성장 별자리와 제51구역도 다음 단계입니다.</span></div>',
-          '<div class="note"><b>돌아갈 출구가 있습니다</b><span>좌측 아래 <code>← PORTFOLIO</code>로 기존 v2 공간으로 즉시 돌아갈 수 있습니다.</span></div>\n        <div class="note warn"><b>아직 안 만든 것</b><span>모바일 전용 탐험 UX는 별도 기획 대상입니다. 지금은 좁은 화면에서 세 무리를 세로로 벌려 읽히게만 해 두었습니다. 성장 별자리와 제51구역도 다음 단계입니다.</span></div>', 'transit remaining work')
-          write(p, s)
-
-          # 5) audit notes — keep design evidence and record what this QA pass changed.
-          p = 'docs/v3-constellation-prototypes/nebula-assets.md'
-          s = read(p)
-          anchor = '## 2. 오디오 — `assets/audio/`'
-          section = """## 1-1. ChatGPT 독립 정적 QA 후속 (2026-08-21)\n\n#168 병합 후 현재 `main`을 다시 읽어 시안 설명과 실제 코드를 대조했다. 브라우저 QA 전에\n정적으로 확정할 수 있는 회귀와 접근성 문제를 먼저 수정한다.\n\n- Gateway 문서가 현재 운영 Hero와 완전히 같다는 설명은 부정확했다. 현재 Hero 구조를 다시\n  동기화하고, 이 페이지를 **운영 반영 전 검증용 스냅샷**으로 명시한다.\n- `nebula.css`의 공용 `--ink`·`--gold`·`--line` 토큰과 body 규칙이 v2 스타일을 덮을 수 있어\n  Nebula 토큰을 분리하고 Gateway에서는 v2 body를 그대로 유지한다.\n- 프로젝트 천체 hit target을 최소 44px로 보강한다.\n- 접힌 설명은 `aria-hidden`도 함께 전환하여 스크린리더 상태를 `aria-expanded`와 맞춘다.\n- `prefers-reduced-motion`에서 Gateway 포커스/포인터 상태가 정지 화면에 즉시 반영되도록 한다.\n- `projects.json`을 기다리는 동안에도 성운 배경과 로딩 상태를 먼저 보여 준다.\n- 초신성 껍질 요동을 줄이고 끊긴 구간을 넓히며, 원시성 강착 원반 반경을 줄인다.\n- 전환 화면 라이트 팔레트만 별도로 한 단계 눌러 승인된 키비주얼 라이트 팔레트는 유지한다.\n- 무대가 viewport 밖이면 Canvas animation frame을 중지한다.\n- 우주 → 기존 포트폴리오 복귀 링크를 추가한다.\n\n이 항목들은 코드 수정 사항이다. **실제 시각 판정·모바일 겹침·키보드/터치 동작은 다음\n독립 브라우저 QA에서 다시 확인한다.**\n\n---\n\n"""
-          s = once(s, anchor, section + anchor, 'audit section')
-          write(p, s)
-          PY
-
-      - name: Commit one file per commit
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "chatgpt-actions"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          paths=(
-            docs/v3-constellation-prototypes/nebula.js
-            docs/v3-constellation-prototypes/nebula.css
-            docs/v3-constellation-prototypes/nebula-gateway.html
-            docs/v3-constellation-prototypes/nebula-transit.html
-            docs/v3-constellation-prototypes/nebula-assets.md
-          )
-          msgs=(
-            "fix: harden nebula runtime QA behavior"
-            "fix: isolate nebula styles and hit targets"
-            "fix: resync nebula gateway prototype"
-            "fix: add nebula loading and return path"
-            "docs: record nebula independent static QA"
-          )
-          for i in "${!paths[@]}"; do
-            test -n "$(git diff -- "${paths[$i]}")"
-            git add -- "${paths[$i]}"
-            test "$(git diff --cached --name-only | wc -l)" -eq 1
-            git commit -m "${msgs[$i]}"
-          done
-
-      - name: Static and regression gates
-        shell: bash
-        run: |
-          set -euo pipefail
+          cd target
+          test "$(git rev-parse HEAD)" = "c003faaf0f41801f9562e7dad861a96112c9f34a"
           node --check docs/v3-constellation-prototypes/nebula.js
           node --check tools/render-nebula-audio.js
           node --check build.js
           node --check script.js
-          node build.js
-          git diff --exit-code -- index.html
           node tools/verify-build.js
-          git diff --check origin/main...HEAD
 
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          data = json.loads(Path('projects.json').read_text(encoding='utf-8'))
-          groups = data['groups']
-          years = [g for g in groups if g.get('kind') == 'year' or g.get('year')]
-          wip = next(g for g in groups if g.get('kind') == 'wip')
-          failed = next(g for g in groups if g.get('kind') == 'failed')
-          assert [str(g['year']) for g in years] == ['2026', '2025', '2024']
-          assert [len(g['cards']) for g in years] == [10, 5, 5]
-          assert len(wip['cards']) == 6
-          assert len(failed['cards']) == 5
-          titles = [c['title'] if isinstance(c['title'], str) else c['title'].get('ko') for c in failed['cards']]
-          assert 'BrawlCraft' in titles
-          print('projects mapping source: 10/5/5 year, 6 wip, 5 failed incl. quarantined BrawlCraft')
-          PY
-
-          git fetch origin main
-          files=$(git diff --name-only origin/main...HEAD | wc -l)
-          commits=$(git rev-list --count origin/main..HEAD)
-          echo "changed_files=$files commits=$commits"
-          test "$files" -eq 5
-          test "$commits" -eq 5
-          test -z "$(git status --porcelain)"
-
-      - name: Push target branch
+      - name: Install temporary Playwright
         shell: bash
         run: |
           set -euo pipefail
-          git push origin HEAD:agent/v3-nebula-qa-fixes
+          mkdir -p /tmp/nebula-qa
+          cd /tmp/nebula-qa
+          npm init -y >/dev/null
+          npm install playwright@1.55.0 >/dev/null
+          CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+          echo "NODE_PATH=/tmp/nebula-qa/node_modules" >> "$GITHUB_ENV"
+
+      - name: Start local server
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --directory target >/tmp/nebula-http.log 2>&1 &
+          echo $! >/tmp/nebula-http.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/docs/v3-constellation-prototypes/nebula-transit.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/nebula-http.log
+          exit 1
+
+      - name: Run browser QA
+        shell: bash
+        env:
+          QA_OUT: qa-artifacts
+        run: |
+          set -euo pipefail
+          NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node runner/tools/v3-nebula-browser-qa.cjs
+
+      - name: Upload QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-nebula-browser-qa
+          path: qa-artifacts
+          if-no-files-found: warn
