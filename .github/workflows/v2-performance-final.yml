@@ -38,7 +38,7 @@ jobs:
 
           root = Path('final')
 
-          # The two Swordmaster sub-detail pages were outside the earlier index.html-only detail pass.
+          # These two live Swordmaster sub-detail pages were outside the earlier index.html-only detail pass.
           for rel in [
               'projects/swordmaster/file_swordmaster.html',
               'projects/swordmaster/media_swordmaster.html',
@@ -48,10 +48,11 @@ jobs:
               before = s
               s = re.sub(r'\n\s*<link href="https://unpkg\.com/aos@2\.3\.1/dist/aos\.css" rel="stylesheet" />', '', s, count=1)
               s = re.sub(r'\n\s*<script src="https://unpkg\.com/aos@2\.3\.1/dist/aos\.js"></script>', '', s, count=1)
+              s = re.sub(r'\n\s*<script src="https://cdnjs\.cloudflare\.com/ajax/libs/vanilla-tilt/1\.8\.0/vanilla-tilt\.min\.js"></script>', '', s, count=1)
               s = s.replace('<script src="../../script.js"></script>', '<script src="../../detail.js"></script>', 1)
               if s == before:
                   raise SystemExit(f'no runtime cleanup applied to {rel}')
-              if 'unpkg.com/aos' in s or '../../script.js' in s:
+              if 'unpkg.com/aos' in s or 'vanilla-tilt' in s or '../../script.js' in s:
                   raise SystemExit(f'legacy runtime remains in {rel}')
               p.write_text(s.rstrip() + '\n', encoding='utf-8')
 
@@ -66,15 +67,19 @@ jobs:
           p.write_text(s.rstrip() + '\n', encoding='utf-8')
           PY
 
-          # Audit every actual detail HTML, not only index.html files.
+          # Audit every live detail HTML. _archive.html is a preserved, non-routed historical file and is intentionally untouched.
           python3 - <<'PY'
           from pathlib import Path
           root = Path('final/projects')
           details = []
           legacy = []
+          archives = []
           for p in sorted(root.rglob('*.html')):
               s = p.read_text(encoding='utf-8')
               if 'class="detail-body"' not in s:
+                  continue
+              if p.name == '_archive.html':
+                  archives.append(str(p.relative_to(Path('final'))))
                   continue
               details.append(str(p.relative_to(Path('final'))))
               bad = []
@@ -83,12 +88,15 @@ jobs:
               if 'src="../../script.js"' in s: bad.append('root-script')
               if 'src="../../detail.js"' not in s: bad.append('missing-detail-js')
               if bad: legacy.append((str(p), bad))
-          print(f'detail html count={len(details)}')
+          print(f'live detail html count={len(details)}')
           print('\n'.join(details))
+          print(f'preserved archives={archives}')
           if legacy:
-              raise SystemExit(f'legacy detail runtimes: {legacy}')
-          if len(details) < 29:
-              raise SystemExit(f'expected at least 29 detail HTML pages, got {len(details)}')
+              raise SystemExit(f'legacy live detail runtimes: {legacy}')
+          if len(details) != 28:
+              raise SystemExit(f'expected 28 live detail HTML pages, got {len(details)}')
+          if archives != ['projects/Sibal_Life_Smoking/_archive.html']:
+              raise SystemExit(f'unexpected archive set: {archives}')
           PY
 
           node --check final/detail.js
@@ -121,7 +129,7 @@ jobs:
           cat /tmp/v2-perf-http.log
           exit 1
 
-      - name: Run all-detail browser regression
+      - name: Run all-live-detail browser regression
         env:
           BASE_URL: http://127.0.0.1:4178
         shell: bash
@@ -136,8 +144,9 @@ jobs:
           function walk(dir) {
             return fs.readdirSync(dir, {withFileTypes:true}).flatMap(e => e.isDirectory() ? walk(path.join(dir,e.name)) : [path.join(dir,e.name)]);
           }
-          const pages = walk(root).filter(p => p.endsWith('.html') && fs.readFileSync(p,'utf8').includes('class="detail-body"'))
+          const pages = walk(root).filter(p => p.endsWith('.html') && path.basename(p) !== '_archive.html' && fs.readFileSync(p,'utf8').includes('class="detail-body"'))
             .map(p => '/' + path.relative(path.resolve('final'), p).split(path.sep).join('/'));
+          if (pages.length !== 28) throw new Error(`expected 28 live detail pages, got ${pages.length}`);
           (async () => {
             const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH, headless: true, args:['--no-sandbox'] });
             const failures = [];
@@ -167,7 +176,6 @@ jobs:
               } catch (e) { failures.push(`${width}-${theme}-${url}: ${e.message}`); }
               await page.close();
             }
-            // Explicitly verify the language name after toggling on the new Media Swordmaster page.
             const page = await browser.newPage({ viewport:{width:390,height:900} });
             await page.goto(process.env.BASE_URL + '/projects/swordmaster/media_swordmaster.html', {waitUntil:'networkidle'});
             await page.locator('#langToggle').click();
