@@ -1,0 +1,229 @@
+name: v2 media final pass runner
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  capture-and-validate:
+    if: github.head_ref == 'agent/v2-media-final-pass-runner'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout runner
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v2-media-final-pass-runner
+          path: runner
+          fetch-depth: 1
+
+      - name: Checkout v2 media target
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v2-media-final-pass
+          path: portfolio
+          fetch-depth: 80
+          token: ${{ github.token }}
+
+      - name: Checkout Media Swordmaster source
+        uses: actions/checkout@v4
+        with:
+          repository: pachir1su/media_swordmaster
+          ref: main
+          path: media-source
+          fetch-depth: 1
+
+      - name: Install runtime and browser QA dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-cjk >/dev/null
+          python3 -m pip install --disable-pip-version-check -q -r media-source/requirements.txt
+          mkdir -p /tmp/media-node
+          cd /tmp/media-node
+          npm init -y >/dev/null
+          npm install playwright@1.55.0 >/dev/null
+          CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+          echo "NODE_PATH=/tmp/media-node/node_modules" >> "$GITHUB_ENV"
+
+      - name: Launch actual Media Swordmaster app
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd media-source
+          GRADIO_ANALYTICS_ENABLED=False \
+          GRADIO_SERVER_NAME=127.0.0.1 \
+          GRADIO_SERVER_PORT=7860 \
+          python3 app.py >/tmp/media-swordmaster.log 2>&1 &
+          echo $! >/tmp/media-swordmaster.pid
+          for i in {1..90}; do
+            if curl -fsS http://127.0.0.1:7860/ >/dev/null; then
+              exit 0
+            fi
+            if ! kill -0 "$(cat /tmp/media-swordmaster.pid)" 2>/dev/null; then
+              cat /tmp/media-swordmaster.log
+              exit 1
+            fi
+            sleep 1
+          done
+          cat /tmp/media-swordmaster.log
+          exit 1
+
+      - name: Validate real UI and capture screenshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node <<'NODE'
+          const { chromium } = require('playwright');
+          (async () => {
+            const browser = await chromium.launch({
+              executablePath: process.env.CHROME_PATH,
+              headless: true,
+              args: ['--no-sandbox']
+            });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
+            await page.goto('http://127.0.0.1:7860/', { waitUntil: 'networkidle', timeout: 120000 });
+            await page.waitForTimeout(2500);
+            const body = await page.locator('body').innerText();
+            const required = [
+              'media_swordmaster',
+              '메타데이터 편집',
+              '확장자 변환',
+              'GIF 만들기',
+              '워터마크 추가',
+              '파일 업로드'
+            ];
+            for (const text of required) {
+              if (!body.includes(text)) throw new Error(`missing UI text: ${text}`);
+            }
+            if (body.includes('□□') || body.includes('�')) throw new Error('Korean text rendering appears corrupted');
+            if (errors.length) throw new Error(errors.join('\n'));
+            await page.screenshot({ path: 'evidence/media-swordmaster-actual.png', fullPage: true });
+            const meta = await page.evaluate(() => ({
+              title: document.title,
+              width: document.documentElement.scrollWidth,
+              height: document.documentElement.scrollHeight,
+              textSample: document.body.innerText.slice(0, 500)
+            }));
+            require('fs').writeFileSync('evidence/media-swordmaster-ui.json', JSON.stringify(meta, null, 2));
+            await browser.close();
+          })().catch(err => { console.error(err); process.exit(1); });
+          NODE
+
+      - name: Add only verified app screenshot to portfolio target
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          source = Path('evidence/media-swordmaster-actual.png')
+          dest = Path('portfolio/projects/swordmaster/assets/images/media-swordmaster-live.webp')
+          dest.parent.mkdir(parents=True, exist_ok=True)
+          with Image.open(source) as im:
+              rgb = im.convert('RGB')
+              rgb.save(dest, 'WEBP', quality=82, method=6)
+              width, height = rgb.size
+
+          page = Path('portfolio/projects/swordmaster/media_swordmaster.html')
+          text = page.read_text(encoding='utf-8')
+          if 'media-swordmaster-live.webp' in text:
+              raise SystemExit('media screenshot block already exists')
+          marker = '            <div class="detail-section" data-aos="fade-up" data-aos-delay="50">\n              <h2 data-en="Key Features" data-ko="주요 기능">주요 기능</h2>'
+          if marker not in text:
+              raise SystemExit('insertion marker not found')
+          block = f'''            <div class="detail-section" data-media-source="media-swordmaster-local">\n              <h2 data-en="Actual App Screen" data-ko="실제 앱 화면">실제 앱 화면</h2>\n              <figure class="detail-figure">\n                <img\n                  src="assets/images/media-swordmaster-live.webp"\n                  alt="Media Swordmaster Gradio 앱 실제 로컬 실행 화면"\n                  width="{width}"\n                  height="{height}"\n                  loading="lazy"\n                  decoding="async"\n                />\n                <figcaption\n                  data-ko="저장소의 app.py를 실제로 로컬 실행해 캡처한 Gradio 화면입니다. 생성 시안이나 오류 화면이 아닙니다."\n                  data-en="Actual Gradio UI captured by running the repository's app.py locally. This is not a generated mockup or an error screen."\n                >\n                  저장소의 app.py를 실제로 로컬 실행해 캡처한 Gradio 화면입니다. 생성 시안이나 오류 화면이 아닙니다.\n                </figcaption>\n              </figure>\n            </div>\n'''
+          text = text.replace(marker, block + marker, 1)
+          page.write_text(text, encoding='utf-8')
+          PY
+          test -s portfolio/projects/swordmaster/assets/images/media-swordmaster-live.webp
+          grep -q 'data-media-source="media-swordmaster-local"' portfolio/projects/swordmaster/media_swordmaster.html
+          ! grep -R -n -E 'notion-1\.webp|source-design-hub\.webp|source-mobile-proposal\.webp' portfolio/projects
+          git -C portfolio diff --check
+
+      - name: Validate portfolio rendering
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4177 --directory portfolio >/tmp/portfolio-http.log 2>&1 &
+          for i in {1..30}; do
+            curl -fsS http://127.0.0.1:4177/projects/swordmaster/media_swordmaster.html >/dev/null && break
+            sleep 1
+          done
+          NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          (async () => {
+            const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH, headless: true, args: ['--no-sandbox'] });
+            for (const width of [390, 1280]) {
+              const page = await browser.newPage({ viewport: { width, height: 900 } });
+              const errors = [];
+              page.on('pageerror', e => errors.push(e.message));
+              await page.goto('http://127.0.0.1:4177/projects/swordmaster/media_swordmaster.html', { waitUntil: 'networkidle', timeout: 120000 });
+              await page.locator('[data-media-source="media-swordmaster-local"] img').scrollIntoViewIfNeeded();
+              await page.waitForTimeout(800);
+              const result = await page.evaluate(() => {
+                const img = document.querySelector('[data-media-source="media-swordmaster-local"] img');
+                return {
+                  overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+                  complete: !!img && img.complete,
+                  naturalWidth: img?.naturalWidth || 0,
+                  naturalHeight: img?.naturalHeight || 0,
+                  declaredWidth: Number(img?.getAttribute('width') || 0),
+                  declaredHeight: Number(img?.getAttribute('height') || 0),
+                  brokenImages: [...document.images].filter(i => i.complete && i.naturalWidth === 0).map(i => i.src)
+                };
+              });
+              if (result.overflow) throw new Error(`horizontal overflow at ${width}`);
+              if (!result.complete || !result.naturalWidth) throw new Error(`media image not loaded at ${width}`);
+              if (result.brokenImages.length) throw new Error(`broken images at ${width}: ${result.brokenImages.join(', ')}`);
+              if (result.naturalWidth !== result.declaredWidth || result.naturalHeight !== result.declaredHeight) throw new Error(`dimension mismatch at ${width}`);
+              if (errors.length) throw new Error(`page errors at ${width}: ${errors.join(', ')}`);
+              await page.screenshot({ path: `evidence/portfolio-media-swordmaster-${width}.png`, fullPage: true });
+              await page.close();
+            }
+            await browser.close();
+          })().catch(err => { console.error(err); process.exit(1); });
+          NODE
+
+      - name: Commit target atomically and push
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd portfolio
+          BASE="887131176bb6cf4a48ee1a899e67a251440080e7"
+          test "$(git merge-base "$BASE" HEAD)" = "$BASE"
+          git config user.name "v2 media runner"
+          git config user.email "actions@users.noreply.github.com"
+
+          git add -- projects/swordmaster/assets/images/media-swordmaster-live.webp
+          git commit -m "feat: add verified Media Swordmaster app screen" -- projects/swordmaster/assets/images/media-swordmaster-live.webp
+
+          git add -- projects/swordmaster/media_swordmaster.html
+          git commit -m "feat: show verified Media Swordmaster app screen" -- projects/swordmaster/media_swordmaster.html
+
+          changed="$(git diff --name-only "$BASE"...HEAD | wc -l)"
+          commits="$(git rev-list --count "$BASE"..HEAD)"
+          echo "changed=$changed commits=$commits"
+          test "$changed" -eq 2
+          test "$commits" -eq 2
+          test "$changed" -eq "$commits"
+          EXPECTED="$(git ls-remote origin refs/heads/agent/v2-media-final-pass | cut -f1)"
+          test "$EXPECTED" = "$BASE"
+          git push --force-with-lease=refs/heads/agent/v2-media-final-pass:"$EXPECTED" origin HEAD:agent/v2-media-final-pass
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-media-swordmaster-evidence
+          path: evidence
