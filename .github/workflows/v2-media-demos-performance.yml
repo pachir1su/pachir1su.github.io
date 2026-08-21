@@ -45,10 +45,11 @@ jobs:
           git -C source diff --name-only "$BASE"...HEAD > /tmp/v2-files-all
           test "$(wc -l < /tmp/v2-files-all)" -eq 35
 
+          # Drop every browser-generated screenshot containing Korean text.
           grep -v -F -x \
+            -e 'projects/HEALTH_CHECK_PROJECT/assets/images/notion-1.webp' \
             -e 'projects/koreatechGongjiAgent/assets/images/source-design-hub.webp' \
             -e 'projects/koreatechGongjiAgent/assets/images/source-mobile-proposal.webp' \
-            -e 'projects/koreatechGongjiAgent/index.html' \
             /tmp/v2-files-all > /tmp/v2-files
           test "$(wc -l < /tmp/v2-files)" -eq 32
 
@@ -57,7 +58,55 @@ jobs:
             cp -a "source/$f" "final/$f"
           done < /tmp/v2-files
 
-          ! grep -R -n -E 'source-design-hub\.webp|source-mobile-proposal\.webp' final/projects/koreatechGongjiAgent || true
+          # Keep the useful detail/demo changes but remove only the generated-image blocks.
+          python3 - <<'PY'
+          from pathlib import Path
+
+          health = Path('final/projects/HEALTH_CHECK_PROJECT/index.html')
+          lines = health.read_text(encoding='utf-8').splitlines(True)
+          out = []
+          dropping = False
+          for line in lines:
+              if not dropping and 'data-media-source="health-notion"' in line:
+                  dropping = True
+                  continue
+              if dropping and '<div class="detail-section" data-aos="fade-up" data-aos-delay="100">' in line:
+                  dropping = False
+                  out.append(line)
+                  continue
+              if not dropping:
+                  out.append(line)
+          health.write_text(''.join(out), encoding='utf-8')
+
+          kga = Path('final/projects/koreatechGongjiAgent/index.html')
+          lines = kga.read_text(encoding='utf-8').splitlines(True)
+          out = []
+          i = 0
+          targets = ('source-design-hub.webp', 'source-mobile-proposal.webp')
+          while i < len(lines):
+              if '<figure class="detail-figure">' in lines[i]:
+                  j = i
+                  block = []
+                  while j < len(lines):
+                      block.append(lines[j])
+                      if '</figure>' in lines[j]:
+                          break
+                      j += 1
+                  text = ''.join(block)
+                  if any(t in text for t in targets):
+                      i = j + 1
+                      continue
+                  out.extend(block)
+                  i = j + 1
+                  continue
+              out.append(lines[i])
+              i += 1
+          kga.write_text(''.join(out), encoding='utf-8')
+          PY
+
+          ! grep -R -n -E 'notion-1\.webp|source-design-hub\.webp|source-mobile-proposal\.webp' \
+            final/projects/HEALTH_CHECK_PROJECT final/projects/koreatechGongjiAgent
+          test ! -e final/projects/HEALTH_CHECK_PROJECT/assets/images/notion-1.webp
           test ! -e final/projects/koreatechGongjiAgent/assets/images/source-design-hub.webp
           test ! -e final/projects/koreatechGongjiAgent/assets/images/source-mobile-proposal.webp
           test ! -d final/assets/images/nebula-gateway
@@ -138,7 +187,6 @@ jobs:
               detail.js) msg="perf: add lightweight detail runtime" ;;
               assets/project-demos.js) msg="feat: add interactive project demos" ;;
               projects.json) msg="feat: link verified project sources" ;;
-              projects/*/assets/images/*) msg="feat: add verified project media" ;;
               projects/*/index.html) msg="feat: enhance project detail experience" ;;
               *) msg="chore: finalize v2 portfolio candidate" ;;
             esac
