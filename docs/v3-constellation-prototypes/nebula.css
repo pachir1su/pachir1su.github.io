@@ -222,7 +222,7 @@ footer b { color:var(--neb-ink); font-weight:500; }
      본격적인 모바일 UX는 별도 기획 대상이며 여기서는 읽히는 것까지만 맞춘다. */
   .stage { height:auto; min-height:0; aspect-ratio:9/20; }
   .stage-name { left:6%; top:2.5%; }
-  .stage-back { left:6%; bottom:2.5%; }
+  .stage-back { left:6%; bottom:2.5%; min-height:44px; display:inline-flex; align-items:center; }
   .orbit { position:absolute; left:6%; right:6%; top:9%; bottom:auto;
            display:flex; align-items:flex-end; gap:24px; }
   .orbit-axis { left:0; right:0; top:auto; bottom:-10px;
@@ -233,8 +233,24 @@ footer b { color:var(--neb-ink); font-weight:500; }
   .orbit-year[aria-current="true"] b { font-size:clamp(21px,5.6vw,30px); }
   .sky-body { --dot:44px; max-width:72vw; }
   .sky-name { max-width:calc(100vw - 88px); font-size:clamp(11px,3vw,13px); }
-  .sky-more, .sky-link { font-size:clamp(10px,2.6vw,11.5px); }
+  .sky-more, .sky-link { display:none !important; }
+  .mobile-observation {
+    position:absolute; z-index:9; left:5%; right:5%; bottom:8.5%;
+    display:grid; grid-template-columns:minmax(0,1fr) auto; gap:3px 14px;
+    padding:13px 0 11px; border-top:1px solid var(--f-gold); border-bottom:1px solid rgba(169,145,77,.28);
+    background:linear-gradient(90deg,rgba(10,13,20,.82),rgba(15,19,29,.72));
+    backdrop-filter:blur(9px); color:var(--f-ink);
+  }
+  .mobile-observation[hidden] { display:none; }
+  .mobile-observation b { grid-column:1; font-size:13px; font-weight:400; }
+  .mobile-observation > span { grid-column:1; color:var(--f-muted); font-size:11.5px; line-height:1.55; }
+  .mobile-observation > a { grid-column:1; justify-self:start; margin-top:3px; color:var(--f-gold); font-size:11px; text-decoration:none; }
+  .mobile-observation-close {
+    grid-column:2; grid-row:1 / span 2; align-self:start; width:44px; height:44px;
+    border:0; background:none; color:var(--f-muted); font:300 22px/1 var(--sans); cursor:pointer;
+  }
 }
+@media (min-width:721px) { .mobile-observation { display:none !important; } }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior:auto; }
@@ -250,16 +266,11 @@ footer b { color:var(--neb-ink); font-weight:500; }
    설명 문구 없이 형태만으로 "여기 다른 데가 있다"를 말해야 한다.
    ===================================================================== */
 .gate {
-  position:relative; display:block; width:100%; max-width:260px;
-  aspect-ratio:7/5; padding:0; border:0; background:none;
+  position:relative; display:block; width:var(--gate-width,156px); max-width:100%; margin-inline:4px;
+  aspect-ratio:var(--gate-ratio,1.48); padding:0; border:0; background:none;
   cursor:pointer; isolation:isolate;
-  /* 종이를 찢어낸 자국. 반듯한 사각형이면 위젯처럼 보인다. */
-  clip-path:polygon(
-    2% 6%, 14% 2%, 31% 5%, 48% 1%, 66% 4%, 82% 1%, 97% 5%,
-    99% 22%, 96% 41%, 99% 60%, 97% 79%, 99% 95%,
-    84% 98%, 67% 95%, 49% 99%, 32% 96%, 15% 99%, 3% 94%,
-    1% 78%, 4% 59%, 1% 40%, 3% 21%
-  );
+  clip-path:var(--tear-clip, polygon(3% 8%,18% 3%,34% 6%,51% 2%,69% 5%,84% 3%,97% 9%,96% 31%,99% 51%,96% 72%,97% 92%,82% 97%,65% 94%,49% 98%,31% 95%,14% 98%,3% 91%,5% 70%,2% 50%,5% 29%));
+  transform:rotate(var(--gate-rot,0deg));
   transition:transform .5s cubic-bezier(.2,.8,.2,1);
 }
 .gate canvas { display:block; width:100%; height:100%; }
@@ -267,18 +278,30 @@ footer b { color:var(--neb-ink); font-weight:500; }
 /* 찢긴 가장자리 안쪽의 종이 두께. 구멍처럼 보이게 하는 핵심이다. */
 .gate::after {
   content:""; position:absolute; inset:0; z-index:2; pointer-events:none;
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,.28), inset 0 3px 14px rgba(0,0,0,.42);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.24), inset 0 2px 11px rgba(0,0,0,.38);
 }
-.gate:hover, .gate:focus-visible { transform:scale(1.035); }
+.gate:hover, .gate:focus-visible { transform:rotate(var(--gate-rot,0deg)) scale(1.03); }
 .gate:focus-visible { outline:2px solid #c9b477; outline-offset:6px; }
 
-/* 창 밖에 놓이는 아주 작은 안내. 조작 설명이 아니라 이름표다. */
-.gate-wrap { display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
-.gate-name {
-  font-family:var(--mono); font-size:10.5px; letter-spacing:.22em;
-  color:#8a8fa3; transition:color .35s ease;
+/* 슬롯 자체는 Hero 지표 아래에 고정한다. 슬롯 안에서만 정렬·크기·찢김이 달라진다. */
+.gate-wrap {
+  position:relative; align-self:flex-start; display:flex; flex-direction:column;
+  width:var(--gate-slot-width,220px); max-width:100%;
+  align-items:var(--gate-align,flex-start); min-width:0;
 }
-.gate-wrap:hover .gate-name { color:#a9914d; }
+.gate-mote {
+  position:absolute; left:var(--mote-left,110px); top:var(--mote-top,28px);
+  width:3px; height:3px; border-radius:50%; pointer-events:none;
+  background:#c9b477; opacity:0;
+  box-shadow:0 0 7px rgba(201,180,119,.5);
+  animation:gate-mote-escape var(--mote-duration,10s) ease-in-out var(--mote-delay,2s) infinite;
+}
+@keyframes gate-mote-escape {
+  0%,68%,100% { opacity:0; transform:translate(0,0) scale(.6); }
+  72% { opacity:.3; }
+  78% { opacity:.8; transform:translate(calc(var(--mote-x,10px) * .45),calc(var(--mote-y,-9px) * .45)) scale(1); }
+  88% { opacity:0; transform:translate(var(--mote-x,10px),var(--mote-y,-9px)) scale(.45); }
+}
 
 /* 눌렀을 때 창이 화면을 덮으며 우주로 넘어간다. */
 .gate-veil {
@@ -289,7 +312,13 @@ footer b { color:var(--neb-ink); font-weight:500; }
 }
 .gate-veil.open { opacity:1; clip-path:circle(150% at var(--gx,50%) var(--gy,50%)); }
 
+@media (max-width:768px) { .gate-wrap { --gate-slot-width:170px; } }
+
+/* v2의 전역 heading color가 시안 설명 셸의 어두운 테마를 덮지 않게 한다. */
+.gate-doc > .wrap h1, .gate-doc > .wrap h2, .gate-doc > .wrap h3 { color:var(--neb-ink); }
+
 @media (prefers-reduced-motion: reduce) {
-  .gate, .gate-name { transition:none; }
+  .gate { transition:none; }
+  .gate-mote { display:none; animation:none; }
   .gate-veil { transition:opacity .2s ease; clip-path:none; }
 }
