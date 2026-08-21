@@ -179,7 +179,7 @@ jobs:
           git config user.name "portfolio release runner"
           git config user.email "actions@users.noreply.github.com"
           BASE="4791c0b828b6382f26b74af7ca121e41e23904ec"
-          mapfile -d '' FILES < <(git status --porcelain=v1 -z | sed -z 's/^...//')
+          mapfile -d '' FILES < <(git status --porcelain=v1 -z --untracked-files=all | sed -z 's/^...//')
           test "${#FILES[@]}" -ge 40
           for f in "${FILES[@]}"; do
             git add -- "$f"
