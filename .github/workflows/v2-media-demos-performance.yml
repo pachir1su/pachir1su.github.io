@@ -28,14 +28,6 @@ jobs:
           fetch-depth: 80
           token: ${{ github.token }}
 
-      - name: Checkout current KGA source
-        uses: actions/checkout@v4
-        with:
-          repository: pachir1su/koreatechGongjiAgent
-          ref: main
-          path: kga
-          fetch-depth: 1
-
       - name: Verify clean base
         shell: bash
         run: |
@@ -57,30 +49,44 @@ jobs:
           echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
           echo "NODE_PATH=/tmp/v2-phase-node/node_modules" >> "$GITHUB_ENV"
 
-      - name: Start real KGA frontend source server
+      - name: Start temporary source-snapshot server
         shell: bash
         run: |
-          python3 -m http.server 4174 --directory kga >/tmp/kga-source-http.log 2>&1 &
+          python3 -m http.server 4175 --directory runner >/tmp/v2-runner-http.log 2>&1 &
           for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:4174/web/index.html >/dev/null; then exit 0; fi
+            if curl -fsS http://127.0.0.1:4175/tools/kga-source-snapshots.html >/dev/null; then exit 0; fi
             sleep 1
           done
-          cat /tmp/kga-source-http.log
+          cat /tmp/v2-runner-http.log
           exit 1
 
-      - name: Capture public Health Notion and current KGA UI
+      - name: Capture public Health Notion and KGA source-design screens
         shell: bash
         env:
           CAPTURE_OUT: ${{ github.workspace }}/captures
           HEALTH_NOTION_URL: https://pachir1su.notion.site/2025-SDGs-1b9f776d60dc8058976bc03379ceaf06
-          KGA_BASE: http://127.0.0.1:4174
+          RUNNER_BASE: http://127.0.0.1:4175
         run: |
           set -euo pipefail
           NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node runner/tools/v2-capture-media.cjs
           test -f captures/health-1.png
           test -f captures/kga-home.png
           test -f captures/kga-shuttle.png
-          test -f captures/kga-admin.png
+
+      - name: Align KGA media labels with source-design provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('runner/tools/v2-apply-phase.py')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace("'kga-home.png': TARGET / 'projects/koreatechGongjiAgent/assets/images/web-home.webp',", "'kga-home.png': TARGET / 'projects/koreatechGongjiAgent/assets/images/source-design-hub.webp',")
+          s=s.replace("'kga-shuttle.png': TARGET / 'projects/koreatechGongjiAgent/assets/images/web-shuttle-ui.webp',", "'kga-shuttle.png': TARGET / 'projects/koreatechGongjiAgent/assets/images/source-mobile-proposal.webp',")
+          s=s.replace("('web-home.webp', '현재 KGA 소스에서 렌더링한 홈 대시보드', 'Home dashboard rendered from the current KGA source'),", "('source-design-hub.webp', 'KGA 저장소의 디자인 검토 허브 소스 렌더', 'Source render of the KGA repository design review hub'),")
+          s=s.replace("('web-shuttle-ui.webp', '현재 KGA 소스의 셔틀 화면 UI', 'Shuttle view rendered from the current KGA source'),", "('source-mobile-proposal.webp', 'KGA 저장소의 모바일 우선 시안 소스 렌더', 'Source render of the KGA repository mobile-first proposal'),")
+          p.write_text(s,encoding='utf-8')
+          PY
 
       - name: Apply consolidated v2 phase
         shell: bash
@@ -101,6 +107,8 @@ jobs:
           grep -q 'data-project-demo="health"' target/projects/HEALTH_CHECK_PROJECT/index.html
           grep -q 'data-project-demo="berry"' target/projects/BerryIno/index.html
           grep -q 'data-project-demo="plant"' target/projects/PlantClock/index.html
+          grep -q 'source-design-hub.webp' target/projects/koreatechGongjiAgent/index.html
+          grep -q 'source-mobile-proposal.webp' target/projects/koreatechGongjiAgent/index.html
 
       - name: Start modified portfolio server
         shell: bash
