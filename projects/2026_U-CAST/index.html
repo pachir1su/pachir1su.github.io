@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
     <link rel="stylesheet" href="../../style.css" />
   </head>
   <body>
@@ -56,6 +55,8 @@
         </div>
         <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
           <a href="https://github.com/pachir1su/2026_U-CAST" target="_blank" rel="noopener noreferrer" class="btn btn-primary"><i class="fab fa-github"></i> GitHub</a>
+          <a href="#live-demo" class="btn btn-ghost"><i class="fas fa-play"></i> <span data-en="Try Demo" data-ko="데모 체험">데모 체험</span></a>
+
           <a href="../../index.html#projects" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a>
         </div>
       </div>
@@ -120,7 +121,11 @@
               </div>
             </div>
 
-            <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
+                        <div class="detail-section" id="live-demo" data-aos="fade-up" data-aos-delay="80">
+              <h2 data-en="Interactive Demo" data-ko="직접 체험 데모">직접 체험 데모</h2>
+              <div data-project-demo="ucast"></div>
+            </div>
+<div class="detail-section" data-aos="fade-up" data-aos-delay="100">
               <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
               <p class="role-position"><i class="fas fa-user-tag"></i> <span data-en="Team Mentor" data-ko="5팀 멘토">5팀 멘토</span></p>
               <ul>
@@ -159,9 +164,7 @@
         <div class="social-links"><a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a><a href="mailto:capybara@koreatech.ac.kr"><i class="fas fa-envelope"></i></a></div>
       </div>
     </footer>
-
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
-    <script src="../../script.js"></script>
+    <script defer src="../../detail.js"></script>
+    <script defer src="../../assets/project-demos.js"></script>
   </body>
 </html>
