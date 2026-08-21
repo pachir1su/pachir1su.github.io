@@ -32,7 +32,7 @@ jobs:
         run: |
           set -euo pipefail
           cd target
-          test "$(git rev-parse HEAD)" = "7e36d6d83d3f2bb108e81e46412a5b5a4d93a8d2"
+          test "$(git rev-parse HEAD)" = "55a4a86eb06004eb5cfab6e2be10882db56a84a4"
           node --check docs/v3-constellation-prototypes/nebula.js
           node --check build.js
           node --check script.js
