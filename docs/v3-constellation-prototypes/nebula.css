@@ -143,7 +143,7 @@ footer b { color:var(--ink); font-weight:500; }
   position:relative; display:flex; align-items:center; justify-content:flex-end; gap:16px;
   margin:0 0 clamp(14px,2vh,24px); padding:0; border:0; background:none;
   color:var(--f-subtle); font-family:inherit; cursor:pointer;
-  transition:color .28s ease;
+  transition:color .28s ease, transform .45s cubic-bezier(.2,.8,.2,1);
 }
 .orbit-year:last-child { margin-bottom:0; }
 .orbit-year b { font-weight:200; font-size:clamp(20px,2.6vw,34px); letter-spacing:-.02em; line-height:1;
@@ -154,6 +154,8 @@ footer b { color:var(--ink); font-weight:500; }
 .orbit-year[aria-current="true"] { color:var(--f-ink); }
 .orbit-year[aria-current="true"] b { font-weight:300; font-size:clamp(26px,3.4vw,44px); }
 .orbit-year[aria-current="true"] i { width:9px; height:9px; background:var(--f-gold); opacity:1; }
+.stage.year-changing .orbit-year[aria-current="true"] { transform:translateX(-4px); }
+.stage.year-changing .orbit-axis { opacity:.7; }
 
 /* ---------------------------------------------------------------------
    하늘 위의 프로젝트 — 포트폴리오이므로 이름은 언제나 보여야 한다.
@@ -161,9 +163,9 @@ footer b { color:var(--ink); font-weight:500; }
    역할과 한 줄 설명뿐이다.
    --------------------------------------------------------------------- */
 .sky-body {
-  --dot: 26px;
+  --dot: 38px;
   position:absolute; z-index:2;
-  display:flex; align-items:flex-start; gap:10px;
+  display:flex; width:fit-content; align-items:flex-start; gap:8px; min-height:44px;
   max-width:min(38vw,320px); padding:0; border:0; background:none;
   color:var(--f-muted); font-family:inherit; text-align:left; cursor:pointer;
 }
@@ -178,7 +180,7 @@ footer b { color:var(--ink); font-weight:500; }
 .sky-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-width:0; padding-top:3px; }
 .sky-name {
   font-weight:300; font-size:clamp(11px,1.02vw,14px); line-height:1.4; letter-spacing:-.01em;
-  color:var(--f-ink); text-shadow:var(--f-shadow);
+  color:var(--f-ink); text-shadow:var(--f-shadow); white-space:nowrap;
 }
 /* 접혀 있는 부분. 이름과 달리 이건 눌러야 나온다. */
 .sky-more, .sky-link {
@@ -188,6 +190,8 @@ footer b { color:var(--ink); font-weight:500; }
   transition:max-height .3s ease, opacity .25s ease;
 }
 .sky-link { color:var(--f-gold); }
+.sky-body:not([aria-expanded="true"]) .sky-more,
+.sky-body:not([aria-expanded="true"]) .sky-link { display:none; }
 .sky-body[aria-expanded="true"] { z-index:5; }
 .sky-body[aria-expanded="true"] .sky-more { max-height:6em; opacity:1; margin-top:3px; }
 .sky-body[aria-expanded="true"] .sky-link { max-height:2em; opacity:1; margin-top:5px; }
@@ -200,10 +204,22 @@ footer b { color:var(--ink); font-weight:500; }
 .sky-body--wip .sky-name, .sky-body--failed .sky-name { color:var(--f-muted); font-size:clamp(10px,.92vw,12.5px); }
 .sky-body--wip:hover .sky-name, .sky-body--failed:hover .sky-name { color:var(--f-ink); }
 
-@media (max-width:720px) {
-  /* 세 무리를 한 화면에 욱여넣지 않고 세로로 벌린다.
-     본격적인 모바일 UX는 별도 기획 대상이며 여기서는 읽히는 것까지만 맞춘다. */
-  .stage { height:auto; min-height:0; aspect-ratio:9/20; }
+@media (min-width:641px) and (max-width:1200px), (min-width:641px) and (max-aspect-ratio:4/3) {
+  /* 코드의 tablet 성도와 같은 조건을 쓴다. 궤도는 위, 상태는 아래로
+     분리해 연도 버튼과 프로젝트의 클릭 영역이 만나지 않게 한다. */
+  .stage { min-height:1120px; }
+  .stage-name { left:6%; top:6%; }
+  .orbit { right:5%; top:8%; bottom:auto; }
+  .orbit-back-note { left:6%; top:13%; }
+  .sky-body { max-width:min(25vw,250px); }
+  .sky-name { font-size:clamp(11px,1.45vw,13px); }
+  .sky-more, .sky-link { font-size:clamp(10px,1.25vw,11.5px); }
+}
+
+@media (max-width:640px) {
+  /* 모바일은 프로젝트 이름의 겹침보다 읽기와 44px 터치 영역을 우선한다.
+     2026의 완료·진행·실패 19개 항목도 세로 스크롤 안에서 모두 닿을 수 있다. */
+  .stage { height:max(100svh,1760px); min-height:1760px; aspect-ratio:auto; }
   .stage-name { left:6%; top:2.5%; }
   .orbit { position:absolute; left:6%; right:6%; top:9%; bottom:auto;
            display:flex; align-items:flex-end; gap:24px; }
@@ -213,14 +229,24 @@ footer b { color:var(--ink); font-weight:500; }
   .orbit-year { flex-direction:column-reverse; gap:8px; margin:0; }
   .orbit-year b { font-size:clamp(17px,4.6vw,24px); }
   .orbit-year[aria-current="true"] b { font-size:clamp(21px,5.6vw,30px); }
-  .sky-body { --dot:24px; max-width:58vw; }
-  .sky-name { font-size:clamp(11px,3vw,13px); }
+  .sky-body { --dot:44px; max-width:32vw; min-height:44px; gap:7px; }
+  .sky-name { font-size:clamp(11px,3vw,12.5px); line-height:1.32; white-space:normal; overflow-wrap:anywhere; }
   .sky-more, .sky-link { font-size:clamp(10px,2.6vw,11.5px); }
+}
+
+/* 280~390px 폭의 접힌 폴드는 긴 이름이 두 줄로 바뀐다. JS의 fold 성도와
+   같은 경계에서 무대만 조금 더 길게 써서 이름·별·터치 영역을 분리한다. */
+@media (max-width:390px) {
+  .stage { height:max(100svh,1840px); min-height:1840px; }
+  .orbit { gap:18px; }
+  .sky-body { max-width:35vw; }
+  .sky-name { font-size:11px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior:auto; }
   .orbit-year, .orbit-year i, .sky-more, .sky-link { transition:none; }
+  .stage.year-changing .orbit-year[aria-current="true"] { transform:none; }
 }
 
 /* =====================================================================
@@ -231,47 +257,99 @@ footer b { color:var(--ink); font-weight:500; }
    v2(종이)와 v3(우주) 두 세계가 만나는 유일한 지점이므로,
    설명 문구 없이 형태만으로 "여기 다른 데가 있다"를 말해야 한다.
    ===================================================================== */
-.gate {
-  position:relative; display:block; width:100%; max-width:260px;
-  aspect-ratio:7/5; padding:0; border:0; background:none;
-  cursor:pointer; isolation:isolate;
-  /* 종이를 찢어낸 자국. 반듯한 사각형이면 위젯처럼 보인다. */
-  clip-path:polygon(
-    2% 6%, 14% 2%, 31% 5%, 48% 1%, 66% 4%, 82% 1%, 97% 5%,
-    99% 22%, 96% 41%, 99% 60%, 97% 79%, 99% 95%,
-    84% 98%, 67% 95%, 49% 99%, 32% 96%, 15% 99%, 3% 94%,
-    1% 78%, 4% 59%, 1% 40%, 3% 21%
-  );
-  transition:transform .5s cubic-bezier(.2,.8,.2,1);
+.gate-field {
+  --gate-x:62%; --gate-y:67%; --gate-size:clamp(270px,28vw,460px); --gate-rot:0deg;
+  position:absolute; left:var(--gate-x); top:var(--gate-y); z-index:3;
+  width:var(--gate-size); aspect-ratio:3/2; transform:translate(-50%,-50%) rotate(var(--gate-rot));
+  transform-origin:center; isolation:isolate;
+  transition:transform .72s cubic-bezier(.65,0,.35,1), filter .48s ease;
 }
-.gate canvas { display:block; width:100%; height:100%; }
-
-/* 찢긴 가장자리 안쪽의 종이 두께. 구멍처럼 보이게 하는 핵심이다. */
-.gate::after {
-  content:""; position:absolute; inset:0; z-index:2; pointer-events:none;
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,.28), inset 0 3px 14px rgba(0,0,0,.42);
+.gate {
+  position:relative; display:block; width:100%; height:100%; padding:0; border:0; background:none;
+  cursor:pointer; isolation:isolate; overflow:visible;
+  transition:transform .48s cubic-bezier(.2,.8,.2,1), filter .48s ease;
+}
+.gate-art {
+  position:absolute; inset:0; display:block; width:100%; height:100%; object-fit:contain; pointer-events:none;
+  transform:translate3d(var(--gate-shift-x,0),var(--gate-shift-y,0),0) scale(var(--gate-art-scale,1));
+  filter:drop-shadow(0 13px 14px rgba(36,31,24,.18));
+  transition:transform .6s cubic-bezier(.2,.8,.2,1), filter .45s ease;
+}
+/* 자산에 이미 찢김 밖의 별과 꼬리가 있다. 호버한 순간에만 아주 작은
+   광점 하나를 더해 조작 가능한 입구라는 사실을 눈치채게 한다. */
+.gate-glint {
+  position:absolute; left:var(--gate-glint-x,64%); top:var(--gate-glint-y,44%); width:8px; height:8px;
+  border-radius:50%; pointer-events:none; opacity:.24; background:#f4ce78;
+  box-shadow:0 0 0 1px rgba(255,238,189,.38), 0 0 16px 5px rgba(205,164,76,.24);
+  transition:transform .42s ease, opacity .42s ease;
 }
 .gate:hover, .gate:focus-visible { transform:scale(1.035); }
+.gate:hover .gate-art, .gate:focus-visible .gate-art { filter:drop-shadow(0 18px 18px rgba(36,31,24,.23)) saturate(1.05); }
+.gate:hover .gate-glint, .gate:focus-visible .gate-glint { opacity:.84; transform:scale(1.65); }
 .gate:focus-visible { outline:2px solid #c9b477; outline-offset:6px; }
+/* 클릭 뒤에는 찢긴 면을 중심으로 종이가 들리며 우주가 그 자리를 차지한다.
+   원래 홈페이지의 문체를 깨지 않는 짧은 전환으로, 애니메이션의 시작점도 명확하다. */
+.gate-field.is-opening { transform:translate(-50%,-50%) rotate(var(--gate-rot)) scale(1.82); filter:brightness(.68) saturate(1.24); transition-duration:1.08s, .42s; }
+.gate-field.is-opening .gate { transform:scale(1.11); transition-duration:.82s; }
+.gate-field.is-opening .gate-art { filter:drop-shadow(0 22px 24px rgba(20,17,13,.28)) brightness(.92) saturate(1.24); }
+.gate-field.is-opening .gate-glint { opacity:1; transform:scale(5.6); transition-duration:.76s; }
 
-/* 창 밖에 놓이는 아주 작은 안내. 조작 설명이 아니라 이름표다. */
-.gate-wrap { display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
-.gate-name {
-  font-family:var(--mono); font-size:10.5px; letter-spacing:.22em;
-  color:#8a8fa3; transition:color .35s ease;
+/* 클릭 순간 종이 가장자리에서 나온 금가루와 별이 구멍 쪽으로 빨려 들어간다.
+   CSS 반복 효과가 아니라 한 번만 그리는 캔버스라 페이지 전환의 박자가 된다. */
+.gate-burst {
+  position:fixed; inset:0; z-index:10000; width:100%; height:100%; pointer-events:none;
+  opacity:0; transition:opacity .12s linear;
 }
-.gate-wrap:hover .gate-name { color:#a9914d; }
+.gate-burst.is-active { opacity:1; }
+
+/* 별자리 화면에서 v2로 돌아가는 작은 메모지. 기능은 숨기지 않되 시야를 빼앗지 않는다. */
+.orbit-back-note {
+  position:absolute; left:7%; top:22%; z-index:4;
+  display:block; width:clamp(44px,4vw,58px); min-height:clamp(38px,3.6vw,50px); padding:0;
+  color:#403c35; background:#e7dec6; text-decoration:none;
+  box-shadow:2px 5px 10px rgba(7,10,18,.17);
+  clip-path:polygon(1% 5%, 92% 0, 100% 10%, 97% 88%, 89% 100%, 10% 95%, 0 84%);
+  transform:rotate(-2.5deg); transition:transform .3s ease, box-shadow .3s ease;
+}
+.orbit-back-note::before {
+  content:""; position:absolute; left:20%; top:2px; width:60%; height:8px;
+  background:rgba(174,163,132,.54); transform:rotate(2deg);
+}
+.orbit-back-note:hover, .orbit-back-note:focus-visible {
+  color:#2e2c28; transform:rotate(0) translateY(-2px); box-shadow:3px 8px 14px rgba(7,10,18,.22);
+}
+
+@media (max-width:640px) {
+  .gate-field { --gate-size:clamp(230px,80vw,350px); }
+  .orbit-back-note { left:6%; top:12.5%; width:46px; min-height:40px; }
+}
+
+/* 작은 폴드 화면, 큰 폰, 태블릿, 노트북에서 진입점과 원래 홈 정보가
+   서로 침범하지 않도록 각각의 안전 여백을 둔다. */
+@media (max-width:390px) {
+  .gate-field { --gate-size:min(86vw,300px); }
+}
+@media (min-width:641px) and (max-width:1024px) {
+  .gate-field { --gate-size:clamp(270px,42vw,390px); }
+}
+@media (min-width:1025px) and (max-width:1365px) {
+  .gate-field { --gate-size:clamp(290px,31vw,420px); }
+}
 
 /* 눌렀을 때 창이 화면을 덮으며 우주로 넘어간다. */
 .gate-veil {
   position:fixed; inset:0; z-index:9999; pointer-events:none;
-  background:#0b0e15; opacity:0;
+  background:
+    radial-gradient(circle at var(--gx,50%) var(--gy,50%), rgba(62,82,126,.96) 0, rgba(18,27,46,.98) 20%, rgba(8,11,19,.995) 57%),
+    #080b12;
+  opacity:0;
   clip-path:circle(0% at var(--gx,50%) var(--gy,50%));
-  transition:clip-path .85s cubic-bezier(.65,0,.35,1), opacity .3s ease;
+  transition:clip-path 1.08s cubic-bezier(.65,0,.25,1), opacity .22s ease;
 }
 .gate-veil.open { opacity:1; clip-path:circle(150% at var(--gx,50%) var(--gy,50%)); }
 
 @media (prefers-reduced-motion: reduce) {
-  .gate, .gate-name { transition:none; }
+  .gate, .gate-field, .orbit-back-note { transition:none; }
   .gate-veil { transition:opacity .2s ease; clip-path:none; }
+  .gate-burst { display:none; }
 }

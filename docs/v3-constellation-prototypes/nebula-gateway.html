@@ -19,11 +19,18 @@
     /* v2 스타일과 시안 셸이 섞이지 않도록 셸만 격리한다. */
     .gate-doc { font-family:"IBM Plex Sans KR",system-ui,sans-serif; background:var(--page); color:var(--ink); }
     .gate-doc * { box-sizing:border-box; }
-    .hero { min-height:auto; padding-bottom:60px; }
+    .hero { position:relative; min-height:clamp(650px,100svh,920px); padding-bottom:60px; overflow:visible; }
     .scroll-hint { display:none; }
-    /* 진입점은 우측 지표 열 아래에 놓는다. 이름과 경쟁하지 않는 자리다. */
+    .hero-content { position:relative; z-index:2; }
     .hero-stats { display:flex; flex-direction:column; gap:22px; align-items:flex-start; }
-    .gate-slot { margin-top:6px; }
+    /* 진입점은 지표 칸에 고정하지 않는다. 새로 열 때마다 안전한 홈 여백 안에서
+       위치·크기·기울기가 달라진다. */
+    .gate-slot { z-index:3; }
+    @media (max-width:640px) {
+      .hero { min-height:880px; padding-bottom:130px; }
+      .hero-content { min-height:610px; }
+      .hero-stats { margin-top:36px; }
+    }
   </style>
 </head>
 <body data-page="nebula-gateway" class="gate-doc">
@@ -64,15 +71,18 @@
         <div class="stat-divider"></div>
         <div class="stat-item"><span class="stat-num">8위</span><span class="stat-label">581 팀 중</span></div>
 
-        <!-- 여기가 v2와 v3를 잇는 유일한 지점이다. -->
-        <div class="gate-slot gate-wrap">
-          <button class="gate" type="button" data-gate aria-label="별자리 — 우주로 들어가기">
-            <canvas aria-hidden="true"></canvas>
-          </button>
-          <span class="gate-name">CONSTELLATION</span>
-        </div>
       </div>
     </div>
+
+    <!-- v2와 v3를 잇는 유일한 지점. 통계 칸에 가둬 두지 않고, 홈의 종이를
+         실제로 찢고 나온 것처럼 별도 레이어에 놓는다. -->
+    <div class="gate-slot gate-field" data-gate-field>
+      <button class="gate" type="button" data-gate aria-label="별자리로 우주 공간에 들어가기">
+        <img class="gate-art" data-gate-art alt="" decoding="async">
+        <span class="gate-glint" aria-hidden="true"></span>
+      </button>
+    </div>
+    <canvas class="gate-burst" data-gate-burst aria-hidden="true"></canvas>
   </section>
 
   <script type="application/json" id="nebula-config">{"target":"nebula-transit.html"}</script>
@@ -86,18 +96,18 @@
       <p>v2는 노트이고 v3는 우주입니다. 두 세계가 만나는 지점이 하나뿐이라면, 그 형태는 <b>종이에 뚫린 구멍</b>이어야 합니다. 가장자리를 반듯하게 두지 않고 찢어낸 자국으로 잘라 냈고, 안쪽에 종이 두께가 지는 그림자를 넣었습니다. 위젯이 아니라 구멍으로 읽혀야 합니다.</p>
 
       <div class="rows">
-        <div class="row"><b>창 밖에서도 반응</b><span>포인터가 화면 어디에 있든 창 안의 별이 그쪽으로 기웁니다. 층마다 밀리는 폭이 달라 <em>시차</em>가 생깁니다. 창 안에서만 반응하면 아무도 눈치채지 못합니다. <b>움직이는 것이 시야에 걸려야 눈길이 갑니다.</b></span></div>
-        <div class="row"><b>가까이 갈수록 그어짐</b><span>커서가 다가올수록 별자리 선이 한 구간씩 그어집니다. 다 그어지면 북두칠성이 완성됩니다. <em>가까이 갈 이유</em>가 생깁니다.</span></div>
-        <div class="row"><b>가만히 둬도 살아 있음</b><span>5–11초에 한 번 유성이 하나 지나갑니다. 그 외에는 아무 일도 없습니다. 반복되는 장식이 아니라 드물게 일어나는 사건이라 눈에 걸립니다.</span></div>
+        <div class="row"><b>매번 다른 찢김</b><span>새로고침할 때마다 <em>실제 찢긴 종이 자산·위치·크기·기울기</em>를 바꿉니다. 지표 칸의 고정 위젯이 아니라 홈 종이를 우연히 찢고 나온 장면으로 보이게 합니다.</span></div>
+        <div class="row"><b>경계 밖으로 샘</b><span>별·먼지·혜성 꼬리가 찢긴 가장자리 밖까지 나옵니다. 우주는 구멍 안에만 갇히지 않고, 종이 표면으로 조금 번집니다.</span></div>
+        <div class="row"><b>가까이 갈수록 반응</b><span>포인터가 다가오면 종이와 별빛이 같은 방향으로 아주 작게 기웁니다. <em>움직이는 것이 시야에 걸려야</em> 눈길이 갑니다.</span></div>
         <div class="row"><b>누르면 문이 열림</b><span>창이 그 자리에서 화면 전체로 번지며 우주로 넘어갑니다. 페이지가 그냥 바뀌는 게 아니라 <em>그 구멍으로 들어간</em> 것처럼 보입니다.</span></div>
-        <div class="row"><b>안내 문구 없음</b><span>“여기를 눌러 보세요” 같은 문구를 두지 않았습니다. 창 밖의 작은 <code>CONSTELLATION</code>은 조작 안내가 아니라 이름표이며, 이것도 뺄 수 있습니다.</span></div>
+        <div class="row"><b>이름표 없음</b><span>“여기를 눌러 보세요” 같은 문구와 영문 이름표를 두지 않았습니다. 종이의 찢긴 구멍과 그 너머에서 새어 나오는 별만으로 다른 공간임을 보여 줍니다.</span></div>
       </div>
 
       <div class="notes">
         <div class="note"><b>창 안은 언제나 밤입니다</b><span>페이지가 라이트 모드여도 구멍 너머는 어둡습니다. 밝은 종이와 어두운 우주의 대비가 이 진입점의 전부입니다.</span></div>
         <div class="note"><b>v2 변경은 세 줄</b><span>실제 적용 시 운영 <code>index.html</code>에 추가되는 것은 <code>.gate-slot</code> 블록 하나입니다. 기존 마크업·데이터·빌드 생성 영역은 건드리지 않습니다.</span></div>
         <div class="note"><b>키보드로도 들어갑니다</b><span>탭으로 포커스가 오면 별자리가 완성되고, 엔터로 진입합니다.</span></div>
-        <div class="note warn"><b>확인이 필요한 것</b><span>자리(지표 아래)와 크기가 맞는지, 이름표를 남길지 뺄지, 모바일에서 어디에 둘지입니다.</span></div>
+        <div class="note warn"><b>확인이 필요한 것</b><span>자리(지표 아래)와 크기가 맞는지, 모바일에서 어디에 둘지입니다.</span></div>
       </div>
     </section>
 
