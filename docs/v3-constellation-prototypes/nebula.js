@@ -544,6 +544,59 @@
     });
   }
 
+  /* #114 5차 라운드 — SFX-05(별 선택)·SFX-06 B(상세 진입)는 확정안의 결을
+     유지한 유사 변주를 여러 개 만들어 등장할 때마다 무작위로 순환 재생하라는
+     지시를 반영한다. 확정 wav 파일(select/enter)은 그대로 두고, 새 변주만
+     Web Audio로 합성해 자산 파일을 늘리지 않는다. nebula-sound.html의
+     s5a2/s5a3, s6b2/s6b3 후보와 같은 정의를 그대로 옮겼다. */
+  let variantSfxCtx = null;
+  function variantAudio() {
+    if (!variantSfxCtx) variantSfxCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (variantSfxCtx.state === 'suspended') variantSfxCtx.resume().catch(() => {});
+    return variantSfxCtx;
+  }
+  /* 확정 SFX-05/06과 같은 "종" 계열 배음비(비조화 부분음)로 짧은 종 한 점을 합성한다. */
+  function synthBellVariant(freq, ratios, dur, gain) {
+    try {
+      const ctx = variantAudio();
+      const at = ctx.currentTime + 0.01;
+      ratios.forEach((r, i) => {
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq * r, at);
+        const life = dur * Math.pow(0.6, i) * (i ? 1 : 1.2);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, at);
+        g.gain.exponentialRampToValueAtTime(Math.max(0.0003, gain * Math.pow(0.5, i)), at + 0.006);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + life);
+        osc.connect(g).connect(ctx.destination);
+        osc.start(at); osc.stop(at + life + 0.05);
+      });
+    } catch (err) {
+      /* 오디오 실패는 상호작용을 막지 않는다. */
+    }
+  }
+  /* SFX-05 A(확정) — 짧고 낮은 종 한 점 — 의 결을 유지한 유사 변주 A2/A3. */
+  const SELECT_SFX_VARIANTS = [
+    'confirmed',
+    () => synthBellVariant(830.61, [1, 2, 2.76, 5.4], 0.7, 0.075),
+    () => synthBellVariant(739.99, [1, 2, 2.76], 0.85, 0.08),
+  ];
+  /* SFX-06 B(확정) — 세 음이 차례로 겹치며 상승하는 종 — 의 결을 유지한 변주 B2/B3. */
+  const ENTER_SFX_VARIANTS = [
+    'confirmed',
+    () => [493.88, 622.25, 932.33].forEach((f, i) => window.setTimeout(() =>
+      synthBellVariant(f, [1, 2, 2.76, 5.4], i === 2 ? 1.2 : 0.42, 0.07), i * 70)),
+    () => [587.33, 739.99, 1108.73].forEach((f, i) => window.setTimeout(() =>
+      synthBellVariant(f, [1, 2, 2.76], i === 2 ? 1.1 : 0.4, 0.065), i * 60)),
+  ];
+  /* cue별 후보 목록(확정 wav 포함)에서 하나를 무작위로 골라 재생한다. */
+  function playRotatingSfx(cue, variants) {
+    const pick = variants[Math.floor(Math.random() * variants.length)];
+    if (pick === 'confirmed') playApprovedSfx(cue);
+    else pick();
+  }
+
   /* v2→v3 게이트웨이 전용 신규 후보음. #114 최종 지시대로 상세/우주 진입에
      쓰는 SFX-06 B(세 음의 벨)를 그대로 재사용하지 않고, 다른 방향(느리게
      열리는 낮은 스웰 + 위로 미끄러지는 글리산도)으로 새로 합성한다.
@@ -647,9 +700,14 @@
   };
   /* 접힌 폴드는 이름이 두 줄이 되는 경우가 많으므로, 모바일보다 한 단계
      더 길게 벌린 전용 성도다. 양쪽을 번갈아 읽을 수 있게 궤적도 지그재그로 둔다. */
+  /* #114 5차 라운드 — 11개짜리 폴드 성도는 좁은 세로 폭 안에 균일 간격(.060)으로
+     11개를 한 무리로 몰아넣은 단일 표였고, 넉넉한 재시도 횟수로도 충돌 해소가
+     빠듯했다. 여백을 다시 넓히는 대신 표 자체를 "가까운 무리"(위 6개)와
+     "먼 무리"(아래 5개) 둘로 분리하고, 두 무리 사이에만 훨씬 큰 세로 간격
+     (.165, 기존 균일 간격의 약 세 배)을 둬서 시각적으로도 두 성도로 읽히게 한다. */
   const FOLD_YEAR = {
-    11: [[.135, .180], [.760, .240], [.135, .300], [.760, .360], [.135, .420], [.760, .480],
-         [.135, .540], [.760, .600], [.135, .660], [.760, .720], [.135, .780]],
+    11: [[.135, .150], [.760, .205], [.135, .260], [.760, .315], [.135, .370], [.760, .425],
+         [.135, .590], [.760, .645], [.135, .700], [.760, .755], [.135, .810]],
     10: [[.135, .190], [.760, .255], [.135, .320], [.760, .385], [.135, .450],
          [.760, .515], [.135, .580], [.760, .645], [.135, .710], [.760, .775]],
     5: [[.145, .285], [.755, .405], [.145, .525], [.755, .645], [.145, .765]],
@@ -793,11 +851,11 @@
       hit.addEventListener('blur', leave);
       hit.addEventListener('click', () => {
         if (state.open === body && item.detail) {
-          playApprovedSfx('enter');
+          playRotatingSfx('enter', ENTER_SFX_VARIANTS);
           window.setTimeout(() => { window.location.href = base + item.detail; }, 140);
           return;
         }
-        playApprovedSfx('select');
+        playRotatingSfx('select', SELECT_SFX_VARIANTS);
         toggle(body);
       });
       return body;
