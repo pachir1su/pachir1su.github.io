@@ -1,0 +1,79 @@
+name: v3 gateway browser QA
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    if: github.head_ref == 'agent/v3-nebula-qa-fixes-runner'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout runner
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v3-nebula-qa-fixes-runner
+          path: runner
+          fetch-depth: 1
+
+      - name: Checkout Phase 3 target
+        uses: actions/checkout@v4
+        with:
+          ref: agent/v3-gateway-ux
+          path: target
+          fetch-depth: 1
+
+      - name: Verify target and regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd target
+          test "$(git rev-parse HEAD)" = "71b1dd528e1df5092f48331603d9b27449b96523"
+          node --check docs/v3-constellation-prototypes/nebula.js
+          node --check build.js
+          node --check script.js
+          node tools/verify-build.js
+
+      - name: Install temporary Playwright
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gateway-qa
+          cd /tmp/gateway-qa
+          npm init -y >/dev/null
+          npm install playwright@1.55.0 >/dev/null
+          CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+          echo "NODE_PATH=/tmp/gateway-qa/node_modules" >> "$GITHUB_ENV"
+
+      - name: Start target server
+        shell: bash
+        run: |
+          python3 -m http.server 4173 --directory target >/tmp/gateway-http.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/docs/v3-constellation-prototypes/nebula-gateway.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/gateway-http.log
+          exit 1
+
+      - name: Run Phase 3 browser QA
+        shell: bash
+        env:
+          QA_OUT: gateway-qa-artifacts
+        run: |
+          set -euo pipefail
+          NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node runner/tools/v3-gateway-browser-qa.cjs
+
+      - name: Upload Phase 3 QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-gateway-browser-qa
+          path: gateway-qa-artifacts
+          if-no-files-found: warn
