@@ -565,3 +565,211 @@ window._updateProjectCount();
     });
   });
 })();
+
+/* ------------------------------------------------------------- */
+/* 19. v3 nebula gateway                                        */
+/* ------------------------------------------------------------- */
+(function initV3NebulaGateway() {
+  const slot = document.querySelector('[data-v3-gateway]');
+  const link = document.querySelector('[data-v3-gateway-link]');
+  const art = document.querySelector('[data-v3-gateway-art]');
+  const burstCanvas = document.querySelector('[data-v3-gateway-burst]');
+  const hero = document.querySelector('.hero');
+  if (!slot || !link || !art || !burstCanvas || !hero) return;
+
+  const variants = [
+    { src: 'assets/images/nebula-gateway/torn-portal-wide-v1.png', scale: 1.04, glint: [65, 45] },
+    { src: 'assets/images/nebula-gateway/torn-portal-trail-v1.png', scale: 1.07, glint: [57, 52] },
+    { src: 'assets/images/nebula-gateway/torn-portal-diagonal-v1.png', scale: 1.03, glint: [62, 42] },
+  ];
+  const profile = {
+    lane: Math.floor(Math.random() * 3),
+    size: .92 + Math.random() * .22,
+    rotation: (Math.random() - .5) * 12,
+  };
+  const variant = variants[Math.floor(Math.random() * variants.length)];
+  art.src = variant.src;
+  art.style.setProperty('--v3-gate-art-scale', String(variant.scale));
+  slot.style.setProperty('--v3-gate-glint-x', `${variant.glint[0]}%`);
+  slot.style.setProperty('--v3-gate-glint-y', `${variant.glint[1]}%`);
+  slot.style.setProperty('--v3-gate-rot', `${profile.rotation.toFixed(2)}deg`);
+
+  /* 버튼과 지표가 실제로 렌더된 뒤 충돌을 피한다. 모바일은 본문 아래의 빈 종이,
+     태블릿·데스크톱은 통계와 본문 사이의 여백만 후보로 둔다. */
+  function placeGateway() {
+    const width = window.innerWidth;
+    const lanes = width <= 390
+      ? [[50, 78], [56, 80], [45, 76]]
+      : width <= 640
+        ? [[52, 76], [60, 79], [45, 77]]
+        : width <= 1024
+          ? [[66, 79], [65, 88], [66, 64]]
+          : [[66, 72], [65, 80], [64, 56]];
+    const base = width <= 390 ? .76 : width <= 640 ? .72 : width <= 1024 ? .34 : .23;
+    const min = width <= 390 ? 210 : width <= 640 ? 236 : width <= 1024 ? 270 : 290;
+    const max = width <= 390 ? 292 : width <= 640 ? 342 : width <= 1024 ? 390 : 430;
+    const size = Math.max(min, Math.min(max, width * base * profile.size));
+    slot.style.setProperty('--v3-gate-size', `${Math.round(size)}px`);
+    const blockers = Array.from(hero.querySelectorAll('.hero-btns > *, .hero-stats > *'));
+    const intersects = (a, b) => a.left < b.right + 10 && a.right > b.left - 10 && a.top < b.bottom + 10 && a.bottom > b.top - 10;
+    for (let index = 0; index < lanes.length; index++) {
+      const lane = lanes[(profile.lane + index) % lanes.length];
+      slot.style.setProperty('--v3-gate-x', `${lane[0]}%`);
+      slot.style.setProperty('--v3-gate-y', `${lane[1]}%`);
+      const rect = slot.getBoundingClientRect();
+      if (blockers.every((blocker) => !intersects(rect, blocker.getBoundingClientRect()))) return;
+    }
+    slot.style.setProperty('--v3-gate-size', `${Math.round(size * .82)}px`);
+  }
+  placeGateway();
+  window.addEventListener('resize', placeGateway, { passive: true });
+
+  window.addEventListener('pointermove', (event) => {
+    const rect = slot.getBoundingClientRect();
+    const x = Math.max(-1, Math.min(1, (event.clientX - (rect.left + rect.width / 2)) / Math.max(1, window.innerWidth * .5)));
+    const y = Math.max(-1, Math.min(1, (event.clientY - (rect.top + rect.height / 2)) / Math.max(1, window.innerHeight * .5)));
+    art.style.setProperty('--v3-gate-shift-x', `${(x * 5).toFixed(2)}px`);
+    art.style.setProperty('--v3-gate-shift-y', `${(y * 4).toFixed(2)}px`);
+  }, { passive: true });
+
+  function playGatewayPaperSfx() {
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextCtor) return;
+    try {
+      const context = new AudioContextCtor();
+      const start = context.currentTime;
+      const master = context.createGain();
+      master.gain.setValueAtTime(.001, start);
+      master.gain.linearRampToValueAtTime(.11, start + .18);
+      master.gain.exponentialRampToValueAtTime(.001, start + 2.8);
+      master.connect(context.destination);
+      const tone = context.createOscillator();
+      const toneGain = context.createGain();
+      tone.type = 'sine';
+      tone.frequency.setValueAtTime(154, start + .08);
+      tone.frequency.exponentialRampToValueAtTime(466, start + 1.75);
+      toneGain.gain.setValueAtTime(.001, start);
+      toneGain.gain.linearRampToValueAtTime(.34, start + .62);
+      toneGain.gain.exponentialRampToValueAtTime(.001, start + 2.55);
+      tone.connect(toneGain).connect(master);
+      tone.start(start); tone.stop(start + 2.7);
+      const length = Math.max(1, Math.ceil(context.sampleRate * 1.65));
+      const buffer = context.createBuffer(1, length, context.sampleRate);
+      const samples = buffer.getChannelData(0);
+      for (let i = 0; i < length; i++) samples[i] = Math.random() * 2 - 1;
+      const noise = context.createBufferSource();
+      const filter = context.createBiquadFilter();
+      const breathGain = context.createGain();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(620, start);
+      filter.frequency.exponentialRampToValueAtTime(2360, start + 1.45);
+      filter.Q.value = .72;
+      breathGain.gain.setValueAtTime(.001, start);
+      breathGain.gain.linearRampToValueAtTime(.18, start + .28);
+      breathGain.gain.exponentialRampToValueAtTime(.001, start + 1.65);
+      noise.buffer = buffer;
+      noise.connect(filter).connect(breathGain).connect(master);
+      noise.start(start); noise.stop(start + 1.7);
+      window.setTimeout(() => { context.close().catch(() => {}); }, 3000);
+    } catch (_) { /* 오디오 정책 실패가 진입 전환을 막지 않는다. */ }
+  }
+
+  function playArrivalSfx() {
+    const files = [
+      'docs/v3-constellation-prototypes/assets/audio/sfx-01-star-a-glass-bell.wav',
+      'docs/v3-constellation-prototypes/assets/audio/sfx-01-star-b-celesta.wav',
+      'docs/v3-constellation-prototypes/assets/audio/sfx-01-star-c-harp.wav',
+    ];
+    const audio = new Audio(files[Math.floor(Math.random() * files.length)]);
+    audio.preload = 'auto';
+    audio.volume = .42;
+    audio.play().catch(() => {});
+  }
+
+  let burstFrame = 0;
+  function drawEntryBurst(origin) {
+    if (prefersReducedMotion) return;
+    cancelAnimationFrame(burstFrame);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    burstCanvas.width = Math.max(1, Math.round(width * dpr));
+    burstCanvas.height = Math.max(1, Math.round(height * dpr));
+    const context = burstCanvas.getContext('2d');
+    if (!context) return;
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const particles = Array.from({ length: 96 }, (_, index) => {
+      const angle = Math.random() * Math.PI * 2;
+      return {
+        angle,
+        distance: 72 + Math.pow(Math.random(), .46) * Math.min(Math.max(width, height) * .48, 610),
+        size: index % 13 === 0 ? 2.9 : .55 + Math.random() * 1.5,
+        warm: index % 4 !== 0,
+        delay: Math.random() * .18,
+        twist: (Math.random() - .5) * .68,
+      };
+    });
+    const start = performance.now();
+    burstCanvas.classList.add('is-active');
+    const fadeOut = (value) => 1 - Math.pow(1 - value, 4);
+    function frame(now) {
+      const progress = Math.min(1, Math.max(0, (now - start) / 3650));
+      context.clearRect(0, 0, width, height);
+      context.save();
+      context.globalCompositeOperation = 'lighter';
+      particles.forEach((particle) => {
+        const local = Math.max(0, Math.min(1, (progress - particle.delay) / (1 - particle.delay)));
+        const pull = 1 - Math.pow(1 - local, 2.7);
+        const radius = particle.distance * (1 - pull) + 5 * pull;
+        const angle = particle.angle + particle.twist * (1 - local) * Math.sin(local * Math.PI);
+        const x = origin.x + Math.cos(angle) * radius;
+        const y = origin.y + Math.sin(angle) * radius * .68;
+        const tailRadius = radius + Math.max(9, particle.distance * (.045 + .11 * (1 - local)));
+        const tailX = origin.x + Math.cos(angle - particle.twist * .35) * tailRadius;
+        const tailY = origin.y + Math.sin(angle - particle.twist * .35) * tailRadius * .68;
+        const alpha = (1 - fadeOut(Math.max(0, (progress - .72) / .28))) * (.32 + particle.size * .16);
+        context.strokeStyle = particle.warm
+          ? `rgba(245, 204, 119, ${alpha.toFixed(3)})`
+          : `rgba(179, 206, 255, ${(alpha * .82).toFixed(3)})`;
+        context.lineWidth = particle.size > 2 ? 1.25 : .55;
+        context.beginPath(); context.moveTo(tailX, tailY); context.lineTo(x, y); context.stroke();
+        context.fillStyle = particle.warm
+          ? `rgba(255, 232, 174, ${(alpha * 1.6).toFixed(3)})`
+          : `rgba(207, 224, 255, ${(alpha * 1.35).toFixed(3)})`;
+        context.beginPath(); context.arc(x, y, particle.size * (1 - local * .42), 0, Math.PI * 2); context.fill();
+      });
+      context.restore();
+      if (progress < 1) burstFrame = requestAnimationFrame(frame);
+      else {
+        burstCanvas.classList.remove('is-active');
+        context.clearRect(0, 0, width, height);
+      }
+    }
+    burstFrame = requestAnimationFrame(frame);
+  }
+
+  const veil = document.createElement('div');
+  veil.className = 'v3-gateway-veil';
+  document.body.append(veil);
+  let entering = false;
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (entering) return;
+    entering = true;
+    const rect = link.getBoundingClientRect();
+    const origin = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    document.body.classList.add('v3-gateway-entering');
+    slot.classList.add('is-entering');
+    veil.style.setProperty('--v3-gx', `${origin.x}px`);
+    veil.style.setProperty('--v3-gy', `${origin.y}px`);
+    veil.classList.add('is-open');
+    playGatewayPaperSfx();
+    drawEntryBurst(origin);
+    if (!prefersReducedMotion) {
+      window.setTimeout(playArrivalSfx, 900);
+      window.setTimeout(playArrivalSfx, 1500);
+      window.setTimeout(playArrivalSfx, 2100);
+    }
+    window.setTimeout(() => { window.location.href = link.href; }, prefersReducedMotion ? 200 : 4000);
+  });
+})();
