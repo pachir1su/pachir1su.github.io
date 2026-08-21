@@ -1,0 +1,55 @@
+name: v3 gateway safe margin
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.head_ref == 'agent/v3-nebula-qa-fixes-runner'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/v3-gateway-ux
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Guard and add rotation safety margin
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "7e36d6d83d3f2bb108e81e46412a5b5a4d93a8d2"
+          git fetch origin agent/v3-nebula-qa-fixes
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('docs/v3-constellation-prototypes/nebula.css')
+          s=p.read_text(encoding='utf-8')
+          old='''  position:relative; display:block; width:var(--gate-width,156px); max-width:100%;\n  aspect-ratio:var(--gate-ratio,1.48); padding:0; border:0; background:none;'''
+          new='''  position:relative; display:block; width:var(--gate-width,156px); max-width:100%; margin-inline:4px;\n  aspect-ratio:var(--gate-ratio,1.48); padding:0; border:0; background:none;'''
+          if s.count(old)!=1: raise SystemExit(f'gateway margin match count={s.count(old)}')
+          p.write_text(s.replace(old,new,1),encoding='utf-8',newline='\n')
+          PY
+      - name: Rebuild four commits and push
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gateway-final/docs/v3-constellation-prototypes
+          for f in nebula-gateway.html nebula-transit.html nebula.css nebula.js; do cp "docs/v3-constellation-prototypes/$f" "/tmp/gateway-final/docs/v3-constellation-prototypes/$f"; done
+          git reset --hard origin/agent/v3-nebula-qa-fixes
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          restore_commit() { f="$1"; m="$2"; cp "/tmp/gateway-final/$f" "$f"; git add -- "$f"; git commit -m "$m"; }
+          restore_commit docs/v3-constellation-prototypes/nebula-gateway.html "feat: refine randomized constellation gateway"
+          restore_commit docs/v3-constellation-prototypes/nebula-transit.html "feat: add mobile observation panel"
+          restore_commit docs/v3-constellation-prototypes/nebula.css "feat: style gateway and mobile observation UX"
+          restore_commit docs/v3-constellation-prototypes/nebula.js "feat: implement gateway and mobile observation behavior"
+          test "$(git rev-list --count origin/agent/v3-nebula-qa-fixes..HEAD)" -eq 4
+          test "$(git diff --name-only origin/agent/v3-nebula-qa-fixes...HEAD | wc -l)" -eq 4
+          node --check docs/v3-constellation-prototypes/nebula.js
+          node tools/verify-build.js
+          git diff --check origin/agent/v3-nebula-qa-fixes...HEAD
+          git push --force-with-lease origin HEAD:agent/v3-gateway-ux
