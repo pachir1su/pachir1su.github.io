@@ -17,11 +17,26 @@ function scrollBehavior() {
 }
 
 /* ------------------------------------------------------------- */
-/* 2. AOS                                                        */
+/* 2. Native scroll reveal (AOS replacement)                     */
 /* ------------------------------------------------------------- */
-if (typeof AOS !== 'undefined') {
-  AOS.init({ once: true, duration: 400, easing: 'ease-out-cubic' });
-}
+(function initReveal() {
+  const items = [...document.querySelectorAll('[data-aos]')];
+  if (!items.length || prefersReducedMotion || typeof IntersectionObserver === 'undefined') {
+    items.forEach((el) => el.classList.add('is-revealed'));
+    return;
+  }
+  document.documentElement.classList.add('reveal-enabled');
+  const obs = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add('is-revealed');
+    obs.unobserve(entry.target);
+  }), { rootMargin: '100px 0px', threshold: 0.05 });
+  items.forEach((el) => {
+    const delay = Math.min(240, Number(el.dataset.aosDelay || 0));
+    if (delay) el.style.setProperty('--reveal-delay', `${delay}ms`);
+    obs.observe(el);
+  });
+})();
 
 /* ------------------------------------------------------------- */
 /* 3. Back-to-top + scroll progress                              */
@@ -134,27 +149,7 @@ sidebarOverlay?.addEventListener('click', closeMobile);
 mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMobile));
 
 /* ------------------------------------------------------------- */
-/* 6. Stamp feedback                                            */
-/* ------------------------------------------------------------- */
-(function initStampClick() {
-  if (prefersReducedMotion) return;
-  const words = ['확인', 'OK', '!!', '@@', 'GOOD', '체크'];
-  document.querySelectorAll('.btn, .plink, .chip, .wip-badge, .stat-item, .nav-github, #btn-back-to-top').forEach((el) => {
-    el.addEventListener('click', (event) => {
-      const stamp = document.createElement('div');
-      stamp.className = 'stamp-pop';
-      stamp.textContent = words[Math.floor(Math.random() * words.length)];
-      stamp.style.setProperty('--stamp-rot', `${-8 + Math.random() * 16}deg`);
-      stamp.style.left = `${event.clientX}px`;
-      stamp.style.top = `${event.clientY}px`;
-      document.body.appendChild(stamp);
-      setTimeout(() => stamp.remove(), 500);
-    });
-  });
-})();
-
-/* ------------------------------------------------------------- */
-/* 7. Hero stat counter                                         */
+/* 6. Hero stat counter                                         */
 /* ------------------------------------------------------------- */
 (function initStatCounter() {
   const stats = document.querySelectorAll('.stat-num');
@@ -215,15 +210,23 @@ mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click
   }
   function move(event) {
     const card = event.currentTarget;
-    const rect = card._v26Rect || card.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
-    card.style.setProperty('--shadow-x', `${-x * 7}px`);
-    card.style.setProperty('--shadow-y', `${-y * 7 + 4}px`);
+    card._v27Pointer = { x: event.clientX, y: event.clientY };
+    if (card._v27Raf) return;
+    card._v27Raf = requestAnimationFrame(() => {
+      card._v27Raf = 0;
+      const rect = card._v26Rect || card.getBoundingClientRect();
+      const point = card._v27Pointer;
+      const x = (point.x - rect.left) / rect.width - 0.5;
+      const y = (point.y - rect.top) / rect.height - 0.5;
+      card.style.setProperty('--shadow-x', `${-x * 7}px`);
+      card.style.setProperty('--shadow-y', `${-y * 7 + 4}px`);
+    });
   }
   function leave(event) {
     const card = event.currentTarget;
     delete card._v26Rect;
+    if (card._v27Raf) cancelAnimationFrame(card._v27Raf);
+    card._v27Raf = 0;
     card.style.setProperty('--shadow-x', '0px');
     card.style.setProperty('--shadow-y', '6px');
   }
@@ -545,6 +548,8 @@ window._updateProjectCount();
     const mobileLabel = document.querySelector('.lang-label-mobile');
     if (mobileLabel) mobileLabel.textContent = lang === 'ko' ? 'English' : '한국어';
     desktop.title = lang === 'ko' ? 'English' : '한국어';
+    desktop.setAttribute('aria-label', lang === 'ko' ? 'EN · English' : 'KO · 한국어');
+    if (mobile) mobile.setAttribute('aria-label', lang === 'ko' ? 'English · 언어 전환' : '한국어 · Switch language');
   }
 
   window._typingWords = typingWords[current];
@@ -563,5 +568,259 @@ window._updateProjectCount();
       if (window.getSelection()?.toString().trim()) return;
       window.location.href = card.dataset.cardHref;
     });
+  });
+})();
+
+/* ------------------------------------------------------------- */
+/* 19. v3 nebula gateway                                        */
+/* ------------------------------------------------------------- */
+(function initV3NebulaGateway() {
+  const slot = document.querySelector('[data-v3-gateway]');
+  const link = document.querySelector('[data-v3-gateway-link]');
+  const art = document.querySelector('[data-v3-gateway-art]');
+  const burstCanvas = document.querySelector('[data-v3-gateway-burst]');
+  const hero = document.querySelector('.hero');
+  if (!slot || !link || !art || !burstCanvas || !hero) return;
+
+  const variants = [
+    { src: 'assets/images/nebula-gateway/torn-portal-wide-v1.png', scale: 1.04, glint: [65, 45] },
+    { src: 'assets/images/nebula-gateway/torn-portal-trail-v1.png', scale: 1.07, glint: [57, 52] },
+    { src: 'assets/images/nebula-gateway/torn-portal-diagonal-v1.png', scale: 1.03, glint: [62, 42] },
+  ];
+  const profile = {
+    lane: Math.floor(Math.random() * 3),
+    size: .92 + Math.random() * .22,
+    rotation: (Math.random() - .5) * 12,
+  };
+  const variant = variants[Math.floor(Math.random() * variants.length)];
+  art.src = variant.src;
+  art.style.setProperty('--v3-gate-art-scale', String(variant.scale));
+  slot.style.setProperty('--v3-gate-glint-x', `${variant.glint[0]}%`);
+  slot.style.setProperty('--v3-gate-glint-y', `${variant.glint[1]}%`);
+  slot.style.setProperty('--v3-gate-rot', `${profile.rotation.toFixed(2)}deg`);
+
+  /* 버튼과 지표가 실제로 렌더된 뒤 충돌을 피한다. 모바일은 본문 아래의 빈 종이,
+     태블릿·데스크톱은 통계와 본문 사이의 여백만 후보로 둔다. */
+  function placeGateway() {
+    const width = window.innerWidth;
+    const base = width <= 390 ? .76 : width <= 640 ? .72 : width <= 1024 ? .34 : .23;
+    const min = width <= 390 ? 210 : width <= 640 ? 236 : width <= 1024 ? 250 : 290;
+    const max = width <= 390 ? 292 : width <= 640 ? 342 : width <= 1024 ? 360 : 430;
+    const initialSize = Math.max(min, Math.min(max, width * base * profile.size));
+    const heroRect = hero.getBoundingClientRect();
+    const blockers = Array.from(hero.querySelectorAll('.hero-main > *, .hero-stats > *'))
+      .filter((node) => node !== slot && node.getClientRects().length);
+    const blockerRects = blockers.map((node) => node.getBoundingClientRect());
+    const intersects = (a, b) => a.left < b.right + 12 && a.right > b.left - 12 && a.top < b.bottom + 12 && a.bottom > b.top - 12;
+    const insideHero = (rect) => rect.left >= heroRect.left + 8 && rect.right <= heroRect.right - 8 && rect.top >= heroRect.top + 58 && rect.bottom <= heroRect.bottom - 10;
+    const lanes = width <= 390
+      ? [[50, 87], [36, 88], [64, 88], [50, 91]]
+      : width <= 640
+        ? [[50, 86], [34, 87], [66, 87], [50, 91]]
+        : width <= 1024
+          ? [[68, 84], [32, 84], [50, 88], [72, 90], [28, 90]]
+          : [[72, 70], [70, 82], [66, 55], [82, 68], [58, 78]];
+    const scales = width <= 1024 ? [1, .9, .8, .7] : [1, .9, .8];
+
+    function tryCandidate(lane, candidateSize) {
+      slot.style.setProperty('--v3-gate-size', `${Math.round(candidateSize)}px`);
+      slot.style.setProperty('--v3-gate-x', `${lane[0]}%`);
+      slot.style.setProperty('--v3-gate-y', `${lane[1]}%`);
+      const rect = slot.getBoundingClientRect();
+      return insideHero(rect) && blockerRects.every((blocker) => !intersects(rect, blocker));
+    }
+
+    for (const scale of scales) {
+      const candidateSize = Math.max(184, initialSize * scale);
+      for (let index = 0; index < lanes.length; index++) {
+        const lane = lanes[(profile.lane + index) % lanes.length];
+        if (tryCandidate(lane, candidateSize)) return;
+      }
+    }
+
+    /* 마지막 후보는 전용 하단 여백의 중앙에 둔다. 작은 화면에서는 CSS가
+       Gateway용 bottom padding을 확보하므로 텍스트/버튼 위에 덮지 않는다. */
+    let fallbackSize = Math.max(176, initialSize * .66);
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const halfHeight = fallbackSize / 3;
+      const lastBlockerBottom = blockerRects.reduce((value, rect) => Math.max(value, rect.bottom), heroRect.top + 58);
+      const minCenter = lastBlockerBottom + 18 + halfHeight;
+      const maxCenter = heroRect.bottom - 14 - halfHeight;
+      const center = Math.min(maxCenter, Math.max(minCenter, heroRect.top + heroRect.height * .86));
+      slot.style.setProperty('--v3-gate-size', `${Math.round(fallbackSize)}px`);
+      slot.style.setProperty('--v3-gate-x', '50%');
+      slot.style.setProperty('--v3-gate-y', `${Math.max(72, center - heroRect.top)}px`);
+      const rect = slot.getBoundingClientRect();
+      if (insideHero(rect) && blockerRects.every((blocker) => !intersects(rect, blocker))) return;
+      fallbackSize *= .84;
+    }
+  }
+  placeGateway();
+  window.addEventListener('load', placeGateway, { once: true });
+  document.fonts?.ready?.then(placeGateway).catch(() => {});
+  if ('ResizeObserver' in window) new ResizeObserver(placeGateway).observe(hero);
+  window.addEventListener('resize', placeGateway, { passive: true });
+
+  window.addEventListener('pointermove', (event) => {
+    const rect = slot.getBoundingClientRect();
+    const x = Math.max(-1, Math.min(1, (event.clientX - (rect.left + rect.width / 2)) / Math.max(1, window.innerWidth * .5)));
+    const y = Math.max(-1, Math.min(1, (event.clientY - (rect.top + rect.height / 2)) / Math.max(1, window.innerHeight * .5)));
+    art.style.setProperty('--v3-gate-shift-x', `${(x * 5).toFixed(2)}px`);
+    art.style.setProperty('--v3-gate-shift-y', `${(y * 4).toFixed(2)}px`);
+  }, { passive: true });
+
+  function playGatewayPaperSfx() {
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextCtor) return;
+    try {
+      const context = new AudioContextCtor();
+      const start = context.currentTime;
+      const master = context.createGain();
+      master.gain.setValueAtTime(.001, start);
+      master.gain.linearRampToValueAtTime(.11, start + .18);
+      master.gain.exponentialRampToValueAtTime(.001, start + 2.8);
+      master.connect(context.destination);
+      const tone = context.createOscillator();
+      const toneGain = context.createGain();
+      tone.type = 'sine';
+      tone.frequency.setValueAtTime(154, start + .08);
+      tone.frequency.exponentialRampToValueAtTime(466, start + 1.75);
+      toneGain.gain.setValueAtTime(.001, start);
+      toneGain.gain.linearRampToValueAtTime(.34, start + .62);
+      toneGain.gain.exponentialRampToValueAtTime(.001, start + 2.55);
+      tone.connect(toneGain).connect(master);
+      tone.start(start); tone.stop(start + 2.7);
+      const length = Math.max(1, Math.ceil(context.sampleRate * 1.65));
+      const buffer = context.createBuffer(1, length, context.sampleRate);
+      const samples = buffer.getChannelData(0);
+      for (let i = 0; i < length; i++) samples[i] = Math.random() * 2 - 1;
+      const noise = context.createBufferSource();
+      const filter = context.createBiquadFilter();
+      const breathGain = context.createGain();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(620, start);
+      filter.frequency.exponentialRampToValueAtTime(2360, start + 1.45);
+      filter.Q.value = .72;
+      breathGain.gain.setValueAtTime(.001, start);
+      breathGain.gain.linearRampToValueAtTime(.18, start + .28);
+      breathGain.gain.exponentialRampToValueAtTime(.001, start + 1.65);
+      noise.buffer = buffer;
+      noise.connect(filter).connect(breathGain).connect(master);
+      noise.start(start); noise.stop(start + 1.7);
+      window.setTimeout(() => { context.close().catch(() => {}); }, 3000);
+    } catch (_) { /* 오디오 정책 실패가 진입 전환을 막지 않는다. */ }
+  }
+
+  function playArrivalSfx() {
+    const files = [
+      'docs/v3-constellation-prototypes/assets/audio/sfx-01-star-a-glass-bell.wav',
+      'docs/v3-constellation-prototypes/assets/audio/sfx-01-star-b-celesta.wav',
+      'docs/v3-constellation-prototypes/assets/audio/sfx-01-star-c-harp.wav',
+    ];
+    const audio = new Audio(files[Math.floor(Math.random() * files.length)]);
+    audio.preload = 'auto';
+    audio.volume = .42;
+    audio.play().catch(() => {});
+  }
+
+  let burstFrame = 0;
+  function drawEntryBurst(origin) {
+    if (prefersReducedMotion) return;
+    cancelAnimationFrame(burstFrame);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    burstCanvas.width = Math.max(1, Math.round(width * dpr));
+    burstCanvas.height = Math.max(1, Math.round(height * dpr));
+    const context = burstCanvas.getContext('2d');
+    if (!context) return;
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const particles = Array.from({ length: 96 }, (_, index) => {
+      const angle = Math.random() * Math.PI * 2;
+      return {
+        angle,
+        distance: 72 + Math.pow(Math.random(), .46) * Math.min(Math.max(width, height) * .48, 610),
+        size: index % 13 === 0 ? 2.9 : .55 + Math.random() * 1.5,
+        warm: index % 4 !== 0,
+        delay: Math.random() * .18,
+        twist: (Math.random() - .5) * .68,
+      };
+    });
+    const start = performance.now();
+    burstCanvas.classList.add('is-active');
+    const fadeOut = (value) => 1 - Math.pow(1 - value, 4);
+    function frame(now) {
+      const progress = Math.min(1, Math.max(0, (now - start) / 3650));
+      context.clearRect(0, 0, width, height);
+      context.save();
+      context.globalCompositeOperation = 'lighter';
+      particles.forEach((particle) => {
+        const local = Math.max(0, Math.min(1, (progress - particle.delay) / (1 - particle.delay)));
+        const pull = 1 - Math.pow(1 - local, 2.7);
+        const radius = particle.distance * (1 - pull) + 5 * pull;
+        const angle = particle.angle + particle.twist * (1 - local) * Math.sin(local * Math.PI);
+        const x = origin.x + Math.cos(angle) * radius;
+        const y = origin.y + Math.sin(angle) * radius * .68;
+        const tailRadius = radius + Math.max(9, particle.distance * (.045 + .11 * (1 - local)));
+        const tailX = origin.x + Math.cos(angle - particle.twist * .35) * tailRadius;
+        const tailY = origin.y + Math.sin(angle - particle.twist * .35) * tailRadius * .68;
+        const alpha = (1 - fadeOut(Math.max(0, (progress - .72) / .28))) * (.32 + particle.size * .16);
+        context.strokeStyle = particle.warm
+          ? `rgba(245, 204, 119, ${alpha.toFixed(3)})`
+          : `rgba(179, 206, 255, ${(alpha * .82).toFixed(3)})`;
+        context.lineWidth = particle.size > 2 ? 1.25 : .55;
+        context.beginPath(); context.moveTo(tailX, tailY); context.lineTo(x, y); context.stroke();
+        context.fillStyle = particle.warm
+          ? `rgba(255, 232, 174, ${(alpha * 1.6).toFixed(3)})`
+          : `rgba(207, 224, 255, ${(alpha * 1.35).toFixed(3)})`;
+        context.beginPath(); context.arc(x, y, particle.size * (1 - local * .42), 0, Math.PI * 2); context.fill();
+      });
+      context.restore();
+      if (progress < 1) burstFrame = requestAnimationFrame(frame);
+      else {
+        burstCanvas.classList.remove('is-active');
+        context.clearRect(0, 0, width, height);
+      }
+    }
+    burstFrame = requestAnimationFrame(frame);
+  }
+
+  const veil = document.createElement('div');
+  veil.className = 'v3-gateway-veil';
+  document.body.append(veil);
+  let entering = false;
+  function resetV3Gateway() {
+    entering = false;
+    document.body.classList.remove('v3-gateway-entering');
+    slot.classList.remove('is-entering');
+    veil.classList.remove('is-open');
+    burstCanvas.classList.remove('is-active');
+    cancelAnimationFrame(burstFrame);
+  }
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) resetV3Gateway();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && entering) resetV3Gateway();
+  });
+  link.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (entering) return;
+    entering = true;
+    const rect = link.getBoundingClientRect();
+    const origin = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    document.body.classList.add('v3-gateway-entering');
+    slot.classList.add('is-entering');
+    veil.style.setProperty('--v3-gx', `${origin.x}px`);
+    veil.style.setProperty('--v3-gy', `${origin.y}px`);
+    veil.classList.add('is-open');
+    playGatewayPaperSfx();
+    drawEntryBurst(origin);
+    if (!prefersReducedMotion) {
+      window.setTimeout(playArrivalSfx, 900);
+      window.setTimeout(playArrivalSfx, 1500);
+      window.setTimeout(playArrivalSfx, 2100);
+    }
+    window.setTimeout(() => { window.location.href = link.href; }, prefersReducedMotion ? 200 : 4000);
   });
 })();
