@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="v3 포트폴리오 효과음 13개 상황과 11초 음악의 성격 견본 및 무료 음원 후보">
+  <meta name="description" content="v3 포트폴리오 효과음 13개 상황의 2차 판정과 재작업 후보, 5·7·9초 음악 비교">
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
   <title>사운드 맵 · 2차</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,6 +56,21 @@
     .diag-row b { font-size:12.5px; font-weight:500; }
     .diag-row span { color:var(--muted); font-size:12.5px; }
     .diag-row span em { font-style:normal; color:var(--ink); font-weight:500; }
+
+    .decision-ledger { margin-top:28px; padding:18px 20px; border:1px solid var(--line); background:var(--surface); }
+    .decision-ledger h2 { margin:0 0 5px; font-size:14px; font-weight:500; }
+    .decision-ledger > p { margin:0 0 12px; color:var(--muted); font-size:12.5px; }
+    .decision-grid { display:grid; grid-template-columns:76px minmax(0,1fr); border-top:1px solid var(--line); }
+    .decision-grid > b, .decision-grid > span { padding:8px 0; border-bottom:1px solid var(--line); font-size:12px; line-height:1.55; }
+    .decision-grid > b { font-family:var(--mono); color:var(--gold); font-weight:500; }
+    .decision-grid > span { color:var(--muted); }
+    .decision-grid > span em { color:var(--ink); font-style:normal; font-weight:500; }
+    .variant--fresh { margin:-1px; padding:1px; border:1px solid color-mix(in srgb, var(--gold) 58%, var(--line)); background:color-mix(in srgb, var(--gold) 7%, var(--surface)); }
+    .variant--fresh .play { border-color:var(--gold); }
+    .variant-note { margin:0; font-size:11px; color:var(--gold); }
+    .archive { margin-top:12px; color:var(--muted); font-size:12px; }
+    .archive summary { cursor:pointer; color:var(--muted); }
+    .archive .variant { margin-top:10px; }
 
     /* ---------- 조정판 ---------- */
     .desk {
@@ -168,6 +183,27 @@
       <div class="diag-row"><b>괜찮다고 하신 것</b><span><em>06 · 09 · 10 · 12</em> 의 공통점은 <b>음이 움직이거나 여러 겹이 겹쳐 있다</b>는 점입니다. 글라이드, 비브라토, 두 음 이상. 단음보다 정보가 많아 그나마 악기처럼 들렸습니다.</span></div>
       <div class="diag-row"><b>이번에 바꾼 것</b><span>종은 실제 종의 비조화 배음비(2.76 · 5.40 · 8.93)로 합성했습니다. 모든 소리에 2.6초 잔향을 걸고 소리마다 다른 비율로 섞었습니다. 감쇠도 배음마다 다르게 두어 시간이 지나면 기음만 남습니다.</span></div>
     </div>
+
+    <section class="decision-ledger" aria-labelledby="decision-title">
+      <h2 id="decision-title">2차 판정 기록 — #114 기준</h2>
+      <p>이 표가 현재 상태의 기준입니다. <b>확정</b>은 우주 상호작용에 연결했고, 재작업·재설계 항목은 선택된 척하지 않습니다. 아래 금색 테두리의 <b>재작업 후보</b>는 이 판정을 실제로 반영해 새로 합성한 비교용 소리입니다.</p>
+      <div class="decision-grid">
+        <b>SFX-01</b><span>세 안 모두 좋음. <em>B(셀레스타) 추천, 최종 택일 대기</em></span>
+        <b>SFX-02</b><span><em>무음 확정.</em> 선은 조용히 그어집니다.</span>
+        <b>SFX-03</b><span><em>A 확정.</em> C의 종을 뺀 변형은 별도 후보로 제작.</span>
+        <b>SFX-04</b><span><em>A 확정 · 연도 전환에 연결.</em></span>
+        <b>SFX-05</b><span><em>A 확정 · 프로젝트 별 선택에 연결.</em></span>
+        <b>SFX-06</b><span><em>B 확정 · 상세/우주 진입에 연결.</em></span>
+        <b>SFX-07</b><span>C 기준 재작업.</span>
+        <b>SFX-08</b><span>재작업.</span>
+        <b>SFX-09</b><span>방향부터 재설계.</span>
+        <b>SFX-10</b><span><em>A 확정.</em></span>
+        <b>SFX-11</b><span>A 추천, 최종 택일 대기.</span>
+        <b>SFX-12</b><span>혜성에 맞는 방향부터 재설계.</span>
+        <b>SFX-13</b><span><em>C 확정.</em></span>
+        <b>MUS-01</b><span>A 구조 유지. 5·7·9초 길이를 다시 비교.</span>
+      </div>
+    </section>
   </header>
 
   <div class="desk">
@@ -204,7 +240,7 @@
 
     <div class="cue">
       <div class="cue-head">
-        <span class="cue-id">SFX-01 <span class="verdict bad">1차 별로</span></span>
+        <span class="cue-id">SFX-01 <span class="verdict bad">1차 별로</span> <span class="verdict ok">B 추천 · 택일 대기</span></span>
         <h3>별 하나가 나타남</h3>
         <p class="cue-when">진입 연출에서 7회. 별마다 음이 조금씩 높아짐</p>
         <p class="cue-fix"><b>고친 것 —</b> 맨 사인파를 버리고 실제 종의 비조화 배음으로 다시 만들었습니다. 배음이 먼저 사라지고 기음만 남습니다.</p>
@@ -259,6 +295,9 @@
           <p><b>종 아르페지오</b> — 세 음이 차례로 울리며 겹칩니다. SFX-01과 같은 악기라 이어집니다.</p></div>
         <div class="variant"><button class="play" type="button" data-cue="s3c">C</button>
           <p><b>낮은 현 + 높은 종</b> — 아래는 두껍고 위는 하나만. 대비가 커서 인상이 강합니다.</p></div>
+        <div class="variant variant--fresh"><button class="play" type="button" data-cue="s3d">C′</button>
+          <p><b>종을 뺀 C</b> — 낮은 현과 공기만 남긴 재작업 후보. #114에서 요청한 <em>“C에서 종 제거”</em>를 그대로 반영했습니다.</p>
+          <p class="variant-note">재작업 후보 · 아직 연결하지 않음</p></div>
         <div class="find">
           <a href="https://pixabay.com/sound-effects/search/ambient%20bells/" target="_blank" rel="noopener">Pixabay <code>ambient bells</code></a>
           <a href="https://freesound.org/people/Erokia/packs/26730/" target="_blank" rel="noopener">Freesound <code>Erokia — Ambient Loops</code></a>
@@ -273,7 +312,7 @@
 
     <div class="cue">
       <div class="cue-head">
-        <span class="cue-id">SFX-04 <span class="verdict bad">1차 별로</span></span>
+        <span class="cue-id">SFX-04 <span class="verdict ok">A 확정 · 연결됨</span></span>
         <h3>연도 전환</h3>
         <p class="cue-when">2026 · 2025 · 2024를 오갈 때</p>
         <p class="cue-fix"><b>고친 것 —</b> 삼각파 단음을 버렸습니다. 실제로 두드린 물체처럼 들리게 몸통 울림을 넣었습니다.</p>
@@ -294,7 +333,7 @@
 
     <div class="cue">
       <div class="cue-head">
-        <span class="cue-id">SFX-05 <span class="verdict bad">1차 별로</span></span>
+        <span class="cue-id">SFX-05 <span class="verdict ok">A 확정 · 연결됨</span></span>
         <h3>프로젝트 별 선택</h3>
         <p class="cue-when">별을 눌러 역할·설명이 펼쳐질 때</p>
         <p class="cue-fix"><b>고친 것 —</b> SFX-01과 같은 악기 계열로 묶되 더 짧고 낮게. 한 세계로 들려야 합니다.</p>
@@ -315,7 +354,7 @@
 
     <div class="cue">
       <div class="cue-head">
-        <span class="cue-id">SFX-06 <span class="verdict ok">1차 괜찮음</span></span>
+        <span class="cue-id">SFX-06 <span class="verdict ok">B 확정 · 연결됨</span></span>
         <h3>상세 페이지로 이동</h3>
         <p class="cue-when">펼쳐진 별을 한 번 더 눌러 실제 프로젝트로 갈 때</p>
         <p class="cue-fix"><b>발전시킨 것 —</b> 두 음 상승은 그대로 두고 배음과 잔향을 더했습니다. B는 세 음, C는 문이 열리는 공기를 얹었습니다.</p>
@@ -341,12 +380,15 @@
 
     <div class="cue">
       <div class="cue-head">
-        <span class="cue-id">SFX-07 <span class="verdict bad">1차 별로</span></span>
+        <span class="cue-id">SFX-07 <span class="verdict bad">C 기준 재작업</span></span>
         <h3>태어나는 별을 열 때</h3>
         <p class="cue-when">진행 중 프로젝트 6개 중 하나</p>
-        <p class="cue-fix"><b>고친 것 —</b> 형태가 없던 저음 스웰을 버렸습니다. 셋 다 <b>끝을 맺지 않습니다.</b> 아직 완성되지 않았기 때문입니다.</p>
+        <p class="cue-fix"><b>재작업 —</b> #114의 “C만 들리고, C 기준으로 다시”를 반영했습니다. 이번 후보는 중역 몸통을 올리고 마지막을 닫지 않습니다.</p>
       </div>
       <div class="cue-body">
+        <div class="variant variant--fresh"><button class="play" type="button" data-cue="s7r">C′</button>
+          <p><b>밝아지는 먼지</b> — C의 들이쉬는 결은 남기되, 중역의 숨결과 아주 짧은 별가루를 넣어 실제로 들리게 했습니다.</p>
+          <p class="variant-note">재작업 후보 · 아직 연결하지 않음</p></div>
         <div class="variant"><button class="play" type="button" data-cue="s7a">A</button>
           <p><b>역방향 스웰</b> — 소리가 거꾸로 자라 올라옵니다. 무언가 모이는 느낌.</p></div>
         <div class="variant"><button class="play" type="button" data-cue="s7b">B</button>
@@ -362,12 +404,15 @@
 
     <div class="cue">
       <div class="cue-head">
-        <span class="cue-id">SFX-08 <span class="verdict bad">1차 별로</span></span>
+        <span class="cue-id">SFX-08 <span class="verdict bad">재작업</span></span>
         <h3>초신성 잔해를 열 때</h3>
         <p class="cue-when">실패한 프로젝트 3개 중 하나</p>
-        <p class="cue-fix"><b>고친 것 —</b> 1차는 잔향이 없어 “먼 울림”이 아니라 그냥 둔탁한 저음이었습니다. 이번엔 잔향이 본체입니다.</p>
+        <p class="cue-fix"><b>재작업 —</b> 거의 안 들리던 문제를 피하려고 저역만 남기지 않았습니다. 먼 충격 뒤에 중역의 작은 파편이 남는 구조입니다.</p>
       </div>
       <div class="cue-body">
+        <div class="variant variant--fresh"><button class="play" type="button" data-cue="s8r">R</button>
+          <p><b>먼 충격 + 파편</b> — 한 번의 낮은 충격 뒤에 작은 금속성 파편이 멀어집니다. 폭발보다 ‘남은 잔해’ 쪽입니다.</p>
+          <p class="variant-note">재작업 후보 · 아직 연결하지 않음</p></div>
         <div class="variant"><button class="play" type="button" data-cue="s8a">A</button>
           <p><b>먼 붐 + 긴 꼬리</b> — 터지는 소리는 작고 남는 여운이 깁니다.</p></div>
         <div class="variant"><button class="play" type="button" data-cue="s8b">B</button>
@@ -383,12 +428,15 @@
 
     <div class="cue">
       <div class="cue-head">
-        <span class="cue-id">SFX-09 <span class="verdict ok">1차 괜찮음</span></span>
+        <span class="cue-id">SFX-09 <span class="verdict bad">방향 재설계</span></span>
         <h3>궤도를 이탈한 별을 열 때</h3>
         <p class="cue-when">지연된 프로젝트 1개 — 한기대 지도 초기 버전</p>
-        <p class="cue-fix"><b>발전시킨 것 —</b> 비브라토는 유지하고 배음과 잔향을 더했습니다. B·C는 “멀어진다”는 느낌을 다르게 풀었습니다.</p>
+        <p class="cue-fix"><b>재설계 —</b> #114에서 세 안 모두 별로였으므로, 기존 흔들리는 전자음을 보정하지 않았습니다. 궤도를 놓치는 물체의 장력과 공기 마찰로 방향부터 바꿨습니다.</p>
       </div>
       <div class="cue-body">
+        <div class="variant variant--fresh"><button class="play" type="button" data-cue="s9r">R</button>
+          <p><b>장력 이탈</b> — 낮은 장력이 한 번 늘어났다 끊기고, 먼 궤적만 남습니다. ‘고장’보다 ‘경로를 벗어남’에 가깝습니다.</p>
+          <p class="variant-note">방향 재설계 후보 · 아직 연결하지 않음</p></div>
         <div class="variant"><button class="play" type="button" data-cue="s9a">A</button>
           <p><b>흔들리는 톤 (1차 개선판)</b> — 고르셨던 그 소리에 몸통과 공간을 더했습니다.</p></div>
         <div class="variant"><button class="play" type="button" data-cue="s9b">B</button>
@@ -429,7 +477,7 @@
 
     <div class="cue">
       <div class="cue-head">
-        <span class="cue-id">SFX-11 <span class="verdict mid">1차 조금 별로</span></span>
+        <span class="cue-id">SFX-11 <span class="verdict mid">1차 조금 별로</span> <span class="verdict ok">A 추천 · 택일 대기</span></span>
         <h3>뱀주인자리 등장</h3>
         <p class="cue-when">황도대의 빈 구간을 직접 따라 그렸을 때</p>
         <p class="cue-fix"><b>고친 것 —</b> 반음 겹침이 그냥 불협으로 들렸습니다. 이번엔 <b>먼저 자리를 잡은 뒤</b> 하나가 끼어듭니다.</p>
@@ -449,12 +497,15 @@
 
     <div class="cue">
       <div class="cue-head">
-        <span class="cue-id">SFX-12 <span class="verdict ok">1차 괜찮음</span></span>
-        <h3>카피바라</h3>
+        <span class="cue-id">SFX-12 <span class="verdict bad">혜성 방향 재설계</span></span>
+        <h3>카피바라를 알리는 혜성</h3>
         <p class="cue-when">모든 연도를 관측한 뒤 혜성이 지나갈 때</p>
-        <p class="cue-fix"><b>발전시킨 것 —</b> 물방울 두 방울은 유지하고 실제 물처럼 들리게 몸통을 넣었습니다.</p>
+        <p class="cue-fix"><b>재설계 —</b> #114 피드백대로 물방울은 혜성이 아닙니다. 화면을 가로지르는 공기와 끝의 희미한 별가루만 남겼습니다.</p>
       </div>
       <div class="cue-body">
+        <div class="variant variant--fresh"><button class="play" type="button" data-cue="s12r">R</button>
+          <p><b>혜성의 꼬리</b> — 저음 없이 스치고, 마지막에 가는 빛만 남습니다. 동물 소리나 물방울은 넣지 않았습니다.</p>
+          <p class="variant-note">방향 재설계 후보 · 아직 연결하지 않음</p></div>
         <div class="variant"><button class="play" type="button" data-cue="s12a">A</button>
           <p><b>물방울 둘 (1차 개선판)</b> — 고르셨던 그 소리, 훨씬 물 같습니다.</p></div>
         <div class="variant"><button class="play" type="button" data-cue="s12b">B</button>
@@ -489,23 +540,29 @@
   </section>
 
   <section>
-    <h2>음악 한 곡 — 11초</h2>
-    <p>효과음과 달리 이건 <b>생성으로 만드는 게 맞습니다.</b> Google의 Lyria 계열(Gemini API의 Lyria RealTime, MusicFX)은 짧은 효과음에는 안 맞지만 <b>11초 무가사 곡에는 적합합니다.</b> 아래 셋 중 방향을 고르시면 그 구조로 생성 프롬프트를 다시 써 드립니다.</p>
+    <h2>음악 한 곡 — 길이 재검토</h2>
+    <p>효과음과 달리 이건 <b>생성으로 만드는 게 맞습니다.</b> 11초 견본은 길다는 평가를 받아, A 구조를 유지한 <b>5·7·9초 후보</b>를 아래에서 바로 비교합니다. 길이가 정해진 뒤 생성 프롬프트를 확정합니다.</p>
 
     <div class="cue">
       <div class="cue-head">
         <span class="cue-id">MUS-01 <span class="verdict ok">1차 괜찮음</span></span>
         <h3>별자리 완성 음악</h3>
         <p class="cue-when">성장 별자리를 전부 이었을 때만. 일반 재생 버튼 없음</p>
-        <p class="cue-fix"><b>발전시킨 것 —</b> 구조는 유지하고 악기를 제대로 만들었습니다. 셋 다 정확히 11초이고 마지막 0.7초에 사라집니다.</p>
+        <p class="cue-fix"><b>재작업 —</b> A의 <em>종 → 패드 → 화음</em> 구조를 유지해 실제로 5·7·9초로 압축했습니다. 길이만 다르게 해서 구조와 길이를 섞어 비교하지 않습니다.</p>
       </div>
       <div class="cue-body">
-        <div class="variant"><button class="play" type="button" data-cue="m1a">A</button>
-          <p><b>종 → 패드 → 화음 (1차 개선판)</b> — 고르셨던 구조 그대로, 악기만 제대로.</p></div>
-        <div class="variant"><button class="play" type="button" data-cue="m1b">B</button>
-          <p><b>피아노 중심</b> — 더 느리고 여백이 많습니다. 쓸쓸한 쪽으로 기웁니다.</p></div>
-        <div class="variant"><button class="play" type="button" data-cue="m1c">C</button>
-          <p><b>종만</b> — 패드 없이 종 몇 개와 잔향뿐. 가장 미니멀하고 차갑습니다.</p></div>
+        <div class="variant variant--fresh"><button class="play" type="button" data-cue="m1a5">5초</button>
+          <p><b>종 → 패드 → 화음</b> — 가장 압축된 버전. 진입 연출이 짧을 때의 기준점입니다.</p></div>
+        <div class="variant variant--fresh"><button class="play" type="button" data-cue="m1a7">7초</button>
+          <p><b>종 → 패드 → 화음</b> — 패드가 한 번 숨을 쉴 여백이 있는 중간 길이입니다.</p></div>
+        <div class="variant variant--fresh"><button class="play" type="button" data-cue="m1a9">9초</button>
+          <p><b>종 → 패드 → 화음</b> — 11초보다 짧지만 마지막 화음의 여운은 가장 보존합니다.</p></div>
+        <details class="archive">
+          <summary>기존 11초 견본 열기 — 비교용 보관, 새 후보가 아님</summary>
+          <div class="variant"><button class="play" type="button" data-cue="m1a">A</button><p><b>종 → 패드 → 화음</b> — 기존 11초 A.</p></div>
+          <div class="variant"><button class="play" type="button" data-cue="m1b">B</button><p><b>피아노 중심</b> — 기존 11초 B.</p></div>
+          <div class="variant"><button class="play" type="button" data-cue="m1c">C</button><p><b>종만</b> — 기존 11초 C.</p></div>
+        </details>
         <div class="find">
           <a href="https://pixabay.com/music/search/ambient/" target="_blank" rel="noopener">Pixabay Music <code>ambient</code> — 생성 대신 기성곡을 쓸 경우</a>
         </div>
@@ -537,15 +594,10 @@
   </section>
 
   <footer>
-    <p><b>답은 이렇게 주시면 됩니다.</b> 변형 기호와, 손잡이를 돌리셨다면 그 값만 적어 주세요.</p>
-    <pre>SFX-01  B    음높이 -2  길이 1.3
-SFX-04  C    (무음)
-SFX-08  A
-MUS-01  C
-</pre>
+    <p><b>판정 기록.</b> 확정·무음·재작업·재설계 상태는 이 페이지 상단의 표와 #114를 함께 기준으로 합니다. 새 후보가 생길 때에만 해당 행을 갱신합니다.</p>
     <p><b>“셋 다 아니다”도 답입니다.</b> 그럴 땐 어느 쪽이 덜 별로였는지와, 무엇이 거슬렸는지(너무 높다 / 너무 길다 / 너무 기계적이다)만 알려 주시면 다시 만들겠습니다.</p>
     <p>방향이 좁혀지면 그 성격에 맞는 <b>실제 파일</b>을 위 출처에서 찾아 붙이겠습니다. 합성 견본은 최종 소리가 아니라 저와 소리를 맞추기 위한 중간 단계입니다.</p>
-    <p>사운드는 기본 디자인이 끝난 뒤 마지막 단계에 붙입니다. 저장소 코드와 Draft PR #168에는 아직 사운드가 들어가지 않았습니다.</p>
+    <p><b>현재는 2차 판정을 반영한 재작업 후보까지 놓인 상태입니다.</b> 확정된 04·05·06만 전환 화면에 연결돼 있습니다. 새 후보는 사용자 확인 전에는 연결하지 않습니다.</p>
   </footer>
 </div>
 
@@ -744,6 +796,17 @@ MUS-01  C
     }
   }
 
+  /* MUS-01 A의 순서(종 → 패드 → 화음)는 그대로 두고 시간만 압축한다.
+     길이 비교가 악기/구조 비교로 섞이지 않게 세 후보는 이 함수 하나를 공유한다. */
+  function compressedM1A(at, seconds) {
+    const when = (part) => at + secs(seconds * part);
+    [1046.5, 1318.51, 1567.98].forEach((f, i) =>
+      bell(when(.035 + i * .068), f, { dur:seconds * .23, gain:.067, wet:.70 }));
+    pad(when(.245), [261.63, 329.63, 392], { dur:seconds * .40, gain:.042, attack:seconds * .09, wet:.88 });
+    bell(when(.520), 659.25, { dur:seconds * .22, gain:.042, wet:.80 });
+    pad(when(.710), [261.63, 392, 523.25, 659.25], { dur:seconds * .22, gain:.050, attack:seconds * .055, wet:.94 });
+  }
+
   /* ---- 상황별 변형 ------------------------------------------------- */
   const CUES = {
     /* 01 별 하나가 나타남 */
@@ -766,6 +829,8 @@ MUS-01  C
                     bell(t + i * .14, f, { dur: 2.0 - i * .2, gain: .095 - i * .012, wet: .68 })); },
     s3c: (t) => { pad(t, [130.81, 196], { dur: 2.4, gain: .05, attack: .4, type: 'sawtooth', wet: .8 });
                   bell(t + .35, 1318.51, { dur: 2.0, gain: .085, wet: .72 }); },
+    s3d: (t) => { pad(t, [130.81, 196, 261.63], { dur:2.45, gain:.058, attack:.26, type:'sawtooth', wet:.82 });
+                  burst(t + .12, { from:380, to:860, dur:.72, q:1.05, gain:.038, attack:.24, wet:.76 }); },
 
     /* 04 연도 전환 */
     s4a: (t) => mallet(t, 261.63, { dur: .26, gain: .17, wood: true, wet: .22 }),
@@ -792,6 +857,9 @@ MUS-01  C
                   burst(t, { from: 260, to: 520, dur: .9, q: 3.4, gain: .05, attack: .35, wet: .7 }); },
     s7c: (t) => { burst(t, { from: 420, to: 1500, dur: .95, q: .7, gain: .055, attack: .68, wet: .75 });
                   glide(t + .2, { from: 174.61, to: 261.63, dur: .7, gain: .035, attack: .45, wet: .7 }); },
+    s7r: (t) => { burst(t, { from:280, to:1780, dur:1.05, q:1.15, gain:.095, attack:.46, wet:.72 });
+                  glide(t + .13, { from:146.83, to:220, dur:.92, gain:.075, attack:.34, wet:.68, harm:false });
+                  burst(t + .46, { from:1200, to:2100, dur:.38, q:2.1, gain:.030, attack:.16, wet:.68 }); },
 
     /* 08 초신성 잔해 */
     s8a: (t) => boom(t, { freq: 78, to: 30, dur: 1.5, gain: .17, wet: .95 }),
@@ -801,12 +869,20 @@ MUS-01  C
                                    gain: .07 - i * .012, attack: .06, wet: .9 })); },
     s8c: (t) => { burst(t, { from: 120, to: 45, dur: 1.6, type: 'lowpass', q: .5, gain: .07, attack: .5, wet: 1 });
                   glide(t + .1, { from: 55, to: 41, dur: 1.5, gain: .055, attack: .45, wet: 1, harm: false }); },
+    s8r: (t) => { boom(t, { freq:92, to:38, dur:1.25, gain:.125, wet:.78 });
+                  [0.08, .23, .48, .76].forEach((d, i) =>
+                    burst(t + d, { from:1650 - i * 220, to:420 - i * 38, dur:.42, q:2.3,
+                                   gain:.052 - i * .007, attack:.018, wet:.80 })); },
 
     /* 09 궤도 이탈 */
     s9a: (t) => glide(t, { from: 392, dur: .8, gain: .085, vib: 5.5, wet: .6 }),
     s9b: (t) => { glide(t, { from: 330, to: 415, dur: .55, gain: .085, vib: 4, wet: .55 });
                   glide(t + .5, { from: 415, to: 262, dur: .7, gain: .05, vib: 3, wet: .8 }); },
     s9c: (t) => glide(t, { from: 392, to: 330, dur: 1.3, gain: .085, vib: 7, vibTo: 1.6, wet: .8 }),
+    s9r: (t) => { glide(t, { from:246.94, to:207.65, dur:1.22, type:'triangle', gain:.095,
+                              attack:.02, vib:3.0, vibTo:.8, vibDepth:.042, wet:.76, harm:false });
+                  burst(t + .08, { from:2100, to:510, dur:.82, q:3.1, gain:.050, attack:.025, wet:.70 });
+                  glide(t + .42, { from:493.88, to:329.63, dur:.58, gain:.028, attack:.04, wet:.66 }); },
 
     /* 10 제51구역 */
     s10a: (t) => { glide(t, { from: 73.42, to: 55, dur: 1.0, type: 'sawtooth', gain: .06, attack: .06, wet: .7, harm: false });
@@ -834,6 +910,9 @@ MUS-01  C
     s12b: (t) => { drop(t, 660); drop(t + .17, 587); drop(t + .36, 392); },
     s12c: (t) => { mallet(t, 523.25, { dur: .3, gain: .12, wood: true, wet: .35 });
                    mallet(t + .18, 392, { dur: .38, gain: .10, wood: true, wet: .4 }); },
+    s12r: (t) => { burst(t, { from:2800, to:620, dur:.72, q:.72, gain:.078, attack:.012, wet:.60 });
+                   glide(t + .10, { from:680, to:1520, dur:.43, gain:.040, attack:.025, wet:.68 });
+                   burst(t + .51, { from:4200, to:1800, dur:.25, q:2.4, gain:.026, attack:.018, wet:.75 }); },
 
     /* 13 일식 — 더해지는 게 아니라 빠져나간다 */
     s13a: (t) => { glide(t, { from: 392, to: 49, dur: 1.9, gain: .10, attack: .12, wet: .9, harm: false });
@@ -843,7 +922,7 @@ MUS-01  C
     s13c: (t) => { pad(t, [130.81, 196, 261.63], { dur: 2.2, gain: .05, attack: .15, wet: .85 });
                    burst(t, { from: 4200, to: 120, dur: 2.1, type: 'lowpass', q: .7, gain: .045, attack: .1, wet: .85 }); },
 
-    /* MUS-01 — 셋 다 정확히 11초, 마지막 0.7초에 사라진다 */
+    /* MUS-01 기존 11초 견본 — 아래의 m1a5/7/9는 같은 A 구조를 압축한 새 후보다. */
     m1a: (t) => {
       [1046.5, 1318.51, 1567.98, 1975.53].forEach((f, i) => bell(t + i * .34, f, { dur: 2.2, gain: .07, wet: .7 }));
       pad(t + 2.0, [261.63, 329.63, 392], { dur: 5.6, gain: .04, attack: 1.3, wet: .9 });
@@ -862,6 +941,9 @@ MUS-01  C
       bell(t + 5.4, 622.25, { dur: 3.4, gain: .055, wet: 1 });
       [523.25, 783.99, 1046.5].forEach((f, i) => bell(t + 7.4 + i * .2, f, { dur: 3.6, gain: .065, wet: 1 }));
     },
+    m1a5: (t) => compressedM1A(t, 5),
+    m1a7: (t) => compressedM1A(t, 7),
+    m1a9: (t) => compressedM1A(t, 9),
   };
 
   /* 물방울 — 짧은 상승 글라이드에 몸통을 붙인 것. */
@@ -873,18 +955,19 @@ MUS-01  C
   const LENGTH = {
     s1a: 2200, s1b: 1400, s1c: 1800,
     s2a: 700, s2b: 700,
-    s3a: 3400, s3b: 2600, s3c: 3200,
+    s3a: 3400, s3b: 2600, s3c: 3200, s3d: 3000,
     s4a: 500, s4b: 1200,
     s5a: 1000, s5b: 700,
     s6a: 1300, s6b: 1700, s6c: 1700,
-    s7a: 1300, s7b: 1300, s7c: 1400,
-    s8a: 2200, s8b: 2600, s8c: 2400,
-    s9a: 1300, s9b: 1700, s9c: 1900,
+    s7a: 1300, s7b: 1300, s7c: 1400, s7r: 1500,
+    s8a: 2200, s8b: 2600, s8c: 2400, s8r: 2100,
+    s9a: 1300, s9b: 1700, s9c: 1900, s9r: 1800,
     s10a: 3000, s10b: 2400, s10c: 2800,
     s11a: 3200, s11b: 4000, s11c: 3600,
-    s12a: 900, s12b: 1100, s12c: 1000,
+    s12a: 900, s12b: 1100, s12c: 1000, s12r: 1100,
     s13a: 2600, s13b: 3400, s13c: 2900,
     m1a: 11500, m1b: 11500, m1c: 11500,
+    m1a5: 5400, m1a7: 7400, m1a9: 9400,
   };
 
   /* ---- 조정판 ------------------------------------------------------ */
