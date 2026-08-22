@@ -1,0 +1,94 @@
+name: TEMP v2 media candidate capture
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Install Korean fonts and Playwright binding
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          python -m pip install --quiet playwright
+
+      - name: Capture KGA meal and public freshman-guide candidates
+        env:
+          KGA_BASE: https://que-tune-earnings-ahead.trycloudflare.com/web
+          GUIDE_URL: https://capybaracute.notion.site/26-2fca8de5ee5f806db9e9e64464a9ac78
+        run: |
+          python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          from pathlib import Path
+          from urllib.parse import urljoin
+          import json, os, re
+
+          out = Path('media-candidates')
+          out.mkdir(exist_ok=True)
+          targets = [
+              ('login', '로그인'),
+              ('lecture', '강의'),
+              ('tips', '꿀팁'),
+              ('aunuri', '아우누리'),
+          ]
+
+          with sync_playwright() as p:
+              browser = p.chromium.launch(
+                  headless=True,
+                  executable_path='/usr/bin/google-chrome',
+                  args=['--no-sandbox', '--lang=ko-KR'],
+              )
+
+              # KGA current public meal route. Admin is intentionally never opened.
+              page = browser.new_page(viewport={'width': 1440, 'height': 1100}, locale='ko-KR')
+              page.goto(os.environ['KGA_BASE'] + '#/meal', wait_until='domcontentloaded', timeout=60000)
+              page.wait_for_timeout(12000)
+              page.screenshot(path=str(out / 'kga-meal.png'), full_page=True)
+              (out / 'kga-meal.txt').write_text(page.title() + '\n' + page.locator('body').inner_text()[:8000], encoding='utf-8')
+              page.close()
+
+              # Public Notion guide: capture main, then discover target child-page links from live DOM.
+              page = browser.new_page(viewport={'width': 1440, 'height': 1000}, locale='ko-KR')
+              guide = os.environ['GUIDE_URL']
+              page.goto(guide, wait_until='domcontentloaded', timeout=60000)
+              page.wait_for_timeout(12000)
+              page.screenshot(path=str(out / 'guide-main.png'), full_page=True)
+
+              anchors = page.locator('a').evaluate_all("els => els.map(a => ({text:(a.innerText||a.textContent||'').trim(), href:a.href})).filter(x => x.href)")
+              (out / 'guide-links.json').write_text(json.dumps(anchors, ensure_ascii=False, indent=2), encoding='utf-8')
+
+              used = set()
+              selected = {}
+              for key, keyword in targets:
+                  matches = [a for a in anchors if keyword in a['text'] and a['href'] not in used]
+                  # Prefer Notion child-page navigation, not external help links.
+                  matches.sort(key=lambda a: (0 if 'notion.site' in a['href'] else 1, len(a['text'])))
+                  if not matches:
+                      continue
+                  selected[key] = matches[0]
+                  used.add(matches[0]['href'])
+
+              for key, item in selected.items():
+                  child = browser.new_page(viewport={'width': 1440, 'height': 1000}, locale='ko-KR')
+                  child.goto(item['href'], wait_until='domcontentloaded', timeout=60000)
+                  child.wait_for_timeout(10000)
+                  child.screenshot(path=str(out / f'guide-{key}.png'), full_page=True)
+                  (out / f'guide-{key}.txt').write_text(child.title() + '\n' + child.locator('body').inner_text()[:8000], encoding='utf-8')
+                  child.close()
+
+              (out / 'guide-selected.json').write_text(json.dumps(selected, ensure_ascii=False, indent=2), encoding='utf-8')
+              page.close()
+              browser.close()
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v2-media-candidates
+          path: media-candidates/
+          retention-days: 1
