@@ -1,0 +1,98 @@
+name: TEMP PR197 browser QA
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/v2-discontinued-kga-link
+
+      - name: Install Playwright binding
+        run: python -m pip install --quiet playwright
+
+      - name: Serve site and run browser regression
+        run: |
+          python -m http.server 8765 >/tmp/v2-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 1
+          python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          import json, os
+
+          results = []
+          with sync_playwright() as p:
+              browser = p.chromium.launch(
+                  headless=True,
+                  executable_path='/usr/bin/google-chrome',
+                  args=['--no-sandbox'],
+              )
+              for width, height in [(1440, 1100), (390, 844)]:
+                  page = browser.new_page(viewport={'width': width, 'height': height})
+                  page.goto('http://127.0.0.1:8765/', wait_until='networkidle')
+
+                  counts = {
+                      'total': page.locator('.project-card').count(),
+                      'wip': page.locator('.project-card.project-wip').count(),
+                      'discontinued': page.locator('.project-card.project-discontinued').count(),
+                      'failed': page.locator('.project-card.project-failed').count(),
+                  }
+                  assert counts == {'total': 31, 'wip': 1, 'discontinued': 6, 'failed': 5}, counts
+                  assert page.locator('a[href*="1518630779922546759"]').count() == 0
+
+                  page.locator('.pfilter[data-filter="discontinued"]').click()
+                  assert page.locator('.project-card:visible').count() == 6
+                  assert page.locator('.year-group-discontinued:visible').count() == 1
+
+                  page.locator('#langToggle').click()
+                  assert page.locator('.pfilter[data-filter="discontinued"]').inner_text().strip() == 'Discontinued'
+                  assert page.locator('.year-group-discontinued .year-heading').inner_text().strip() == 'Discontinued Projects'
+                  assert page.locator('#projectTotalCount').inner_text().strip() == '19 done · 1 upcoming · 6 discontinued'
+
+                  page.locator('#themeToggle').click()
+                  assert page.evaluate('document.documentElement.dataset.theme') == 'dark'
+                  scroll_width = page.evaluate('document.documentElement.scrollWidth')
+                  inner_width = page.evaluate('window.innerWidth')
+                  assert scroll_width <= inner_width + 1, (scroll_width, inner_width)
+
+                  # 공개 저장소 정책: 우클릭/선택 방지 핸들러가 없어야 한다.
+                  assert page.evaluate('document.oncontextmenu === null')
+                  assert page.evaluate('document.onselectstart === null')
+
+                  os.makedirs('qa-artifacts', exist_ok=True)
+                  page.screenshot(path=f'qa-artifacts/pr197-{width}.png', full_page=True)
+                  results.append({'viewport': width, **counts, 'overflow': scroll_width - inner_width})
+                  page.close()
+
+              page = browser.new_page(viewport={'width': 1280, 'height': 900})
+              page.goto('http://127.0.0.1:8765/projects/koreatechGongjiAgent/', wait_until='networkidle')
+              assert page.locator('a[href*="1518630779922546759"]').count() == 0
+              assert page.locator('a[href*="github.com/pachir1su/koreatechGongjiAgent"]').count() >= 1
+              page.screenshot(path='qa-artifacts/kga-detail-no-invite.png', full_page=True)
+              page.close()
+              browser.close()
+
+          print(json.dumps(results, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Run repository verification
+        run: |
+          node --check build.js
+          node --check script.js
+          node build.js
+          node tools/verify-build.js
+          git diff --check
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr197-browser-qa
+          path: qa-artifacts/
+          retention-days: 1
