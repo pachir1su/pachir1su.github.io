@@ -141,15 +141,15 @@
          각 후보에 짝지을 사운드 후보(G1~G3, SFX-14 재작업)도 함께 미리 듣는다.
          ============================================================ -->
     <section class="doc gw-lab" aria-labelledby="gw-lab-title">
-      <h2 id="gw-lab-title">진입 연출 후보 비교판 <small>(7차, 미확정)</small></h2>
-      <p>실제 위 진입점은 그대로 "찢긴 종이"로 동작합니다. 6차의 <b>초점 풀림·장막 걷힘·불씨 번짐</b>도 전부 반려되어(아래 목록에 "반려"로 표시, 재생만 가능), 참고할 레퍼런스 없이 에이전트가 자유롭게 브레인스토밍한 <b>새 은유 셋 — 종이 재구성·유리 아래 번짐·빛의 확장</b>을 추가했습니다. 종이 찢기·조리개(개방 기구)·잉크(번짐)·초점·장막·불씨 여섯 은유 모두와 다른 메커니즘입니다. 애니메이션 후보를 고른 뒤 소리 후보(선택)를 골라 함께 재생해 볼 수 있습니다. <code>prefers-reduced-motion</code>이 켜져 있으면 애니메이션 대신 종료 상태로 즉시 전환합니다.</p>
+      <h2 id="gw-lab-title">진입 연출 후보 비교판 <small>(8차, 미확정)</small></h2>
+      <p>실제 위 진입점은 그대로 "찢긴 종이"로 동작합니다. 8차에서 "우주 진입점은 초점 풀림이 좀 괜찮긴 함"이라는 판정을 받아, 6차에서 한 번 반려됐던 <b>초점 풀림</b>을 <b>몰입 진입(초점 풀림 정련)</b>으로 완전히 다시 짜 이번 라운드의 <b>주 후보</b>로 삼았습니다(목록 맨 앞, ★ 표시). 다른 이세계로 빨려들어가는 느낌을 내기 위해 길이도 약 5초로 늘렸습니다(다른 후보는 여전히 약 3.4초). 7차의 <b>종이 재구성·유리 아래 번짐·빛의 확장</b>은 비교용으로 남겼습니다. 애니메이션 후보를 고른 뒤 소리 후보(선택)를 골라 함께 재생해 볼 수 있습니다. <code>prefers-reduced-motion</code>이 켜져 있으면 애니메이션 대신 종료 상태로 즉시 전환합니다.</p>
 
       <div class="gw-picker" role="group" aria-label="진입 연출 후보">
+        <button type="button" class="gw-anim-btn" data-gw-anim="focus">★ 몰입 진입(초점 풀림 정련) <small>(8차, 주 후보 · 약 5초)</small></button>
         <button type="button" class="gw-anim-btn is-active" data-gw-anim="torn">찢긴 종이 <small>(현재 기본)</small></button>
-        <button type="button" class="gw-anim-btn" data-gw-anim="coalesce">종이 재구성 <small>(7차 신규)</small></button>
-        <button type="button" class="gw-anim-btn" data-gw-anim="loupe">유리 아래 번짐 <small>(7차 신규)</small></button>
-        <button type="button" class="gw-anim-btn" data-gw-anim="point">빛의 확장 <small>(7차 신규)</small></button>
-        <button type="button" class="gw-anim-btn" data-gw-anim="focus">초점 풀림 <small>(6차, 반려)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="coalesce">종이 재구성 <small>(7차)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="loupe">유리 아래 번짐 <small>(7차)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="point">빛의 확장 <small>(7차)</small></button>
         <button type="button" class="gw-anim-btn" data-gw-anim="veil">장막 걷힘 <small>(6차, 반려)</small></button>
         <button type="button" class="gw-anim-btn" data-gw-anim="ember">불씨 번짐 <small>(6차, 반려)</small></button>
         <button type="button" class="gw-anim-btn" data-gw-anim="aperture">조리개 개방 <small>(5차, 반려)</small></button>
@@ -169,7 +169,7 @@
         <canvas class="gw-stage-canvas" data-gw-canvas></canvas>
         <button type="button" class="gw-stage-trigger" data-gw-trigger>재생 <span aria-hidden="true">▶</span></button>
       </div>
-      <p class="gw-hint">애니메이션 후보를 고른 뒤 <b>재생</b>을 누르면 약 3~4초 미리보기가 실행됩니다. 실제 진입점 동작과는 분리되어 있어 페이지를 벗어나지 않습니다.</p>
+      <p class="gw-hint">애니메이션 후보를 고른 뒤 <b>재생</b>을 누르면 약 3~4초(★ 몰입 진입은 약 5초) 미리보기가 실행됩니다. 실제 진입점 동작과는 분리되어 있어 페이지를 벗어나지 않습니다.</p>
     </section>
 
     <footer>
@@ -191,6 +191,10 @@
 
     const prefersReduced = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    /* 8차 — 실제 진입점 자체는 여전히 "찢긴 종이"라 이 비교판의 기본 선택도
+       torn을 유지한다. 다만 목록 표시상으로만 "몰입 진입"을 맨 앞·주 후보로
+       강조했고(위 gw-picker 마크업), 실제 초기 anim 값과 is-active 클래스는
+       torn 버튼에 그대로 남아 있다 — 사용자가 직접 눌러 비교한다. */
     let anim = 'torn';
     document.querySelectorAll('[data-gw-anim]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -409,31 +413,64 @@
       })(start);
     }
 
-    /* 6차 신규 은유 1 — 초점 풀림. 문/구멍/스밈 은유를 전부 벗어나, 종이
-       위에 흐리게 깔린 별빛이 서서히 초점을 되찾으며 우주가 "이미 거기 있었던
-       것처럼" 드러난다. 크기 변화가 아니라 선명도 변화로 전환을 표현한다. */
+    /* 8차 정련 — 몰입 진입(초점 풀림 정련). 6차의 "초점 풀림"(선명도 변화만
+       있던 정적인 버전)은 반려됐지만, 8차 판정에서 "우주 진입점은 초점
+       풀림이 좀 괜찮긴 함"이라며 방향 자체는 긍정적으로 재평가받았다. 다만
+       "다른 이세계에 빨려들어가는 것 같은 야무진 애니메이션"을 원했으므로,
+       단순 블러 해소가 아니라 실제 "관통해 지나가는" 느낌을 더했다 — 화면
+       중심에서 방사형으로 뻗어나가는 선(종이 파편/별빛 궤적)이 뷰어를 관통해
+       지나가듯 가속하며 흩어지고, 그 사이로 종이가 걷히며 우주가 드러나고,
+       후반부에 별자리가 초점을 되찾아 선명해진다. 길이는 다른 후보(약 3.4초)
+       보다 길게 잡아 진입점 클릭 시 약 5초(트리거의 DURATIONS.focus)로
+       재생된다. */
     function playFocus(ctx, w, h, dur) {
+      const cx = w * .5, cy = h * .5;
+      const maxR = Math.max(w, h);
+      const streaks = Array.from({ length: 130 }, () => ({
+        a: Math.random() * Math.PI * 2,
+        speed: .5 + Math.random() * .9,
+        dist0: Math.random() * .2,
+        len: .05 + Math.random() * .13,
+        paper: Math.random() < .28,
+      }));
       const stars = Array.from({ length: 90 }, () => ({ x: Math.random() * w, y: Math.random() * h, r: .6 + Math.random() * 1.6 }));
       const start = performance.now();
       (function frame(now) {
         const p = Math.min(1, (now - start) / dur);
-        const e = easeInOut(p);
-        const blur = (1 - e) * 14;
-        const paperAlpha = Math.max(0, 1 - e * 1.15);
+        /* 가속하는 관통감 — 초반은 천천히, 후반으로 갈수록 빠르게 빨려든다. */
+        const e = Math.pow(p, .68);
         ctx.save();
         ctx.fillStyle = '#0c0e16'; ctx.fillRect(0, 0, w, h);
-        ctx.filter = blur > .3 ? `blur(${blur.toFixed(1)}px)` : 'none';
-        stars.forEach((s) => {
-          ctx.fillStyle = `rgba(225,220,255,${(.35 + Math.random() * .5).toFixed(2)})`;
-          ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+        /* 방사형으로 뻗어나가는 종이·별빛 파편 — "이세계로 빨려들어가는" 축을 만든다. */
+        streaks.forEach((s) => {
+          const dist = (s.dist0 + e * s.speed) % 1.15;
+          const r0 = dist * maxR;
+          const r1 = Math.min(maxR * 1.25, r0 + s.len * maxR * (.4 + e * 1.7));
+          const x0 = cx + Math.cos(s.a) * r0, y0 = cy + Math.sin(s.a) * r0 * .85;
+          const x1 = cx + Math.cos(s.a) * r1, y1 = cy + Math.sin(s.a) * r1 * .85;
+          const alpha = Math.min(.85, .15 + e * .65) * (1 - dist * .4);
+          ctx.strokeStyle = s.paper ? `rgba(244,236,224,${alpha.toFixed(2)})` : `rgba(215,225,255,${alpha.toFixed(2)})`;
+          ctx.lineWidth = s.paper ? 2.2 : 1;
+          ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
         });
-        ctx.filter = 'none';
-        if (paperAlpha > 0) {
-          ctx.globalAlpha = paperAlpha;
-          ctx.fillStyle = '#f4ece0'; ctx.fillRect(0, 0, w, h);
-          ctx.globalAlpha = 1;
-        }
+        /* 종이가 아직 다 걷히지 않은 만큼만 남아 있다가 빠르게 사라진다. */
+        const paperAlpha = Math.max(0, 1 - e * 1.4);
+        if (paperAlpha > 0) { ctx.globalAlpha = paperAlpha; ctx.fillStyle = '#f4ece0'; ctx.fillRect(0, 0, w, h); ctx.globalAlpha = 1; }
         ctx.restore();
+        /* 후반부에 별자리가 초점을 되찾으며 선명해진다 — 관통해 도착한 "다른 이세계". */
+        if (e > .5) {
+          const focusE = Math.min(1, (e - .5) / .5);
+          const blur = (1 - focusE) * 10;
+          ctx.save();
+          ctx.globalAlpha = focusE;
+          ctx.filter = blur > .3 ? `blur(${blur.toFixed(1)}px)` : 'none';
+          stars.forEach((s) => {
+            ctx.fillStyle = `rgba(225,220,255,${(.4 + Math.random() * .5).toFixed(2)})`;
+            ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+          });
+          ctx.filter = 'none';
+          ctx.restore();
+        }
         if (p < 1) requestAnimationFrame(frame);
       })(start);
     }
@@ -624,9 +661,13 @@
       coalesce: playCoalesce, loupe: playLoupe, point: playPoint,
     };
 
+    /* 8차 — 후보별 재생 길이. 몰입 진입(focus)만 "다른 이세계로 빨려들어가는"
+       느낌을 온전히 담기 위해 약 5초로 늘렸다. 나머지 후보는 기존 3.4초를
+       유지한다. */
+    const DURATIONS = { focus: 5000 };
     trigger.addEventListener('click', () => {
       const { ctx, w, h } = sizeCanvas();
-      const dur = prefersReduced() ? 40 : 3400;
+      const dur = prefersReduced() ? 40 : (DURATIONS[anim] || 3400);
       playSfxCandidate();
       (RUNNERS[anim] || playTorn)(ctx, w, h, dur);
     });
