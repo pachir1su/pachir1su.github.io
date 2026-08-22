@@ -195,7 +195,7 @@
          ============================================================ -->
     <main id="main-content">
     <!-- HERO -->
-    <section id="home" class="hero">
+    <section id="home" class="hero hero--has-v3-gateway">
       <div class="hero-grid-bg" aria-hidden="true"></div>
       <div class="hero-glow" aria-hidden="true"></div>
 
@@ -244,6 +244,16 @@
           </div>
         </div>
       </div>
+
+      <!-- v3 우주로 들어가는 유일한 홈 진입점. 문구를 추가하지 않고 v2 종이가
+           실제로 찢긴 자리에 우주가 보이는 형태로만 둔다. -->
+      <div class="v3-gateway-slot" data-v3-gateway>
+        <a class="v3-gateway" data-v3-gateway-link href="docs/v3-constellation-prototypes/nebula-transit.html" aria-label="별자리 우주 공간으로 들어가기">
+          <img class="v3-gateway-art" data-v3-gateway-art alt="" decoding="async">
+          <span class="v3-gateway-glint" aria-hidden="true"></span>
+        </a>
+      </div>
+      <canvas class="v3-gateway-burst" data-v3-gateway-burst aria-hidden="true"></canvas>
 
       <div class="scroll-hint" aria-hidden="true">
         <span>스크롤</span>
