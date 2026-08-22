@@ -141,19 +141,25 @@
          각 후보에 짝지을 사운드 후보(G1~G3, SFX-14 재작업)도 함께 미리 듣는다.
          ============================================================ -->
     <section class="doc gw-lab" aria-labelledby="gw-lab-title">
-      <h2 id="gw-lab-title">진입 연출 후보 비교판 <small>(5차, 미확정)</small></h2>
-      <p>실제 위 진입점은 그대로 "찢긴 종이"로 동작합니다. 아래는 서로 다른 시각 은유의 <b>새 후보 둘</b>을 비교하기 위한 별도 미리보기이며, 어느 것도 아직 확정이 아닙니다. 애니메이션 후보를 고른 뒤 소리 후보(선택)를 골라 함께 재생해 볼 수 있습니다. <code>prefers-reduced-motion</code>이 켜져 있으면 애니메이션 대신 종료 상태로 즉시 전환합니다.</p>
+      <h2 id="gw-lab-title">진입 연출 후보 비교판 <small>(6차, 미확정)</small></h2>
+      <p>실제 위 진입점은 그대로 "찢긴 종이"로 동작합니다. 5차의 <b>조리개 개방·잉크 번짐</b>은 모두 불만족 판정을 받아 후보에서 빠졌습니다(아래 목록에 "반려"로 표시, 재생만 가능). 종이 찢기·조리개(개방 기구)·잉크(번짐) 세 은유 모두와 겹치지 않는 <b>새 후보 셋 — 초점 풀림·장막 걷힘·불씨 번짐</b>을 추가했습니다. 애니메이션 후보를 고른 뒤 소리 후보(선택)를 골라 함께 재생해 볼 수 있습니다. <code>prefers-reduced-motion</code>이 켜져 있으면 애니메이션 대신 종료 상태로 즉시 전환합니다.</p>
 
       <div class="gw-picker" role="group" aria-label="진입 연출 후보">
         <button type="button" class="gw-anim-btn is-active" data-gw-anim="torn">찢긴 종이 <small>(현재 기본)</small></button>
-        <button type="button" class="gw-anim-btn" data-gw-anim="aperture">조리개 개방 <small>(신규)</small></button>
-        <button type="button" class="gw-anim-btn" data-gw-anim="ink">잉크 번짐 <small>(신규)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="focus">초점 풀림 <small>(6차 신규)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="veil">장막 걷힘 <small>(6차 신규)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="ember">불씨 번짐 <small>(6차 신규)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="aperture">조리개 개방 <small>(5차, 반려)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="ink">잉크 번짐 <small>(5차, 반려)</small></button>
       </div>
       <div class="gw-picker" role="group" aria-label="짝지을 소리 후보">
         <button type="button" class="gw-sfx-btn is-active" data-gw-sfx="none">소리 없음</button>
-        <button type="button" class="gw-sfx-btn" data-gw-sfx="g1">G1 종이 마찰</button>
-        <button type="button" class="gw-sfx-btn" data-gw-sfx="g2">G2 낮은 공명</button>
-        <button type="button" class="gw-sfx-btn" data-gw-sfx="g3">G3 별가루 결정</button>
+        <button type="button" class="gw-sfx-btn" data-gw-sfx="h1">H1 점점 빨라지는 펄스 <small>(6차)</small></button>
+        <button type="button" class="gw-sfx-btn" data-gw-sfx="h2">H2 도플러 스침 <small>(6차)</small></button>
+        <button type="button" class="gw-sfx-btn" data-gw-sfx="h3">H3 둘로 갈라짐 <small>(6차)</small></button>
+        <button type="button" class="gw-sfx-btn" data-gw-sfx="g1">G1 종이 마찰 <small>(5차, 반려)</small></button>
+        <button type="button" class="gw-sfx-btn" data-gw-sfx="g2">G2 낮은 공명 <small>(5차, 반려)</small></button>
+        <button type="button" class="gw-sfx-btn" data-gw-sfx="g3">G3 별가루 결정 <small>(5차, 반려)</small></button>
       </div>
 
       <div class="gw-stage" data-gw-stage>
@@ -239,6 +245,12 @@
       g3: () => { const at = audio().currentTime + .02;
                   for (let i = 0; i < 7; i++) tone(at + i * .18, 1600 + i * 70, .5, .035, 'sine');
                   tone(at + 1.3, 659.25, 1.2, .04, 'triangle'); },
+      /* 6차 — G1~G3(마찰/공명/결정) 전부 불만족이라 새로 만든 세 후보.
+         nebula-sound.html의 s14h1/h2/h3와 같은 정의를 옮겼다. */
+      h1: () => { const at = audio().currentTime + .02; const gaps = [.5, .42, .35, .29, .24, .2, .16, .13];
+                  let acc = 0; gaps.forEach((g) => { acc += g; tone(at + acc, 130, g * .8, .06, 'sine'); }); },
+      h2: () => { const at = audio().currentTime + .02; noise(at, 1.5, .05); noise(at + 1.4, 1.6, .045); },
+      h3: () => { const at = audio().currentTime + .02; tone(at, 220, 3.0, .06, 'sine'); tone(at + .4, 293.66, 2.7, .05, 'sine'); },
     };
     function playSfxCandidate() { if (SFX[sfx]) { try { SFX[sfx](); } catch (err) {} } }
 
@@ -361,7 +373,94 @@
       })(start);
     }
 
-    const RUNNERS = { torn: playTorn, aperture: playAperture, ink: playInk };
+    /* 6차 신규 은유 1 — 초점 풀림. 문/구멍/스밈 은유를 전부 벗어나, 종이
+       위에 흐리게 깔린 별빛이 서서히 초점을 되찾으며 우주가 "이미 거기 있었던
+       것처럼" 드러난다. 크기 변화가 아니라 선명도 변화로 전환을 표현한다. */
+    function playFocus(ctx, w, h, dur) {
+      const stars = Array.from({ length: 90 }, () => ({ x: Math.random() * w, y: Math.random() * h, r: .6 + Math.random() * 1.6 }));
+      const start = performance.now();
+      (function frame(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const e = easeInOut(p);
+        const blur = (1 - e) * 14;
+        const paperAlpha = Math.max(0, 1 - e * 1.15);
+        ctx.save();
+        ctx.fillStyle = '#0c0e16'; ctx.fillRect(0, 0, w, h);
+        ctx.filter = blur > .3 ? `blur(${blur.toFixed(1)}px)` : 'none';
+        stars.forEach((s) => {
+          ctx.fillStyle = `rgba(225,220,255,${(.35 + Math.random() * .5).toFixed(2)})`;
+          ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+        });
+        ctx.filter = 'none';
+        if (paperAlpha > 0) {
+          ctx.globalAlpha = paperAlpha;
+          ctx.fillStyle = '#f4ece0'; ctx.fillRect(0, 0, w, h);
+          ctx.globalAlpha = 1;
+        }
+        ctx.restore();
+        if (p < 1) requestAnimationFrame(frame);
+      })(start);
+    }
+
+    /* 6차 신규 은유 2 — 장막 걷힘. 종이가 찢기거나 열리는 게 아니라, 얇은
+       천 같은 장막이 한쪽에서 다른 쪽으로 걷히며 뒤의 우주를 드러낸다.
+       "찢김"과 달리 가장자리가 매끈하고 방향성이 뚜렷하다. */
+    function playVeil(ctx, w, h, dur) {
+      const start = performance.now();
+      (function frame(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const e = easeInOut(p);
+        ctx.fillStyle = '#0c0e16'; ctx.fillRect(0, 0, w, h);
+        for (let i = 0; i < 60; i++) {
+          const sx = Math.random() * w, sy = Math.random() * h;
+          ctx.fillStyle = `rgba(220,215,255,${(.25 + Math.random() * .5).toFixed(2)})`;
+          ctx.fillRect(sx, sy, 1.1, 1.1);
+        }
+        const veilX = w * e * 1.15 - w * .05;
+        const grad = ctx.createLinearGradient(veilX - 40, 0, veilX + 6, 0);
+        grad.addColorStop(0, 'rgba(244,236,224,0)');
+        grad.addColorStop(1, 'rgba(244,236,224,1)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, Math.max(0, veilX + 6), h);
+        ctx.fillStyle = '#f4ece0';
+        ctx.fillRect(0, 0, Math.max(0, veilX - 40), h);
+        if (p < 1) requestAnimationFrame(frame);
+      })(start);
+    }
+
+    /* 6차 신규 은유 3 — 불씨 번짐. 종이 한 점에서 따뜻한 불씨색 빛이 번지며
+       퍼질수록 색이 차가운 보랏빛 우주로 식어간다. 잉크(어두운 색이 퍼짐)와
+       반대로 밝은 빛이 퍼지며 온도가 바뀌는 것이 이 후보의 핵심이다. */
+    function playEmber(ctx, w, h, dur) {
+      const cx = w * .5, cy = h * .58;
+      const start = performance.now();
+      (function frame(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const e = easeInOut(p);
+        ctx.fillStyle = '#f4ece0'; ctx.fillRect(0, 0, w, h);
+        const r = Math.max(w, h) * (.03 + e * .95);
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        const warm = `rgba(255,${170 - e * 60},${90 - e * 60},${Math.max(0, .9 - e * .5).toFixed(2)})`;
+        grad.addColorStop(0, warm);
+        grad.addColorStop(.55, `rgba(${120 - e * 60},${90 - e * 30},${170 + e * 40},${(.55 + e * .3).toFixed(2)})`);
+        grad.addColorStop(1, 'rgba(12,14,22,1)');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+        if (e > .35) {
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, (e - .35) / .5);
+          for (let i = 0; i < 60; i++) {
+            const sx = Math.random() * w, sy = Math.random() * h;
+            ctx.fillStyle = 'rgba(225,220,255,.5)';
+            ctx.fillRect(sx, sy, 1, 1);
+          }
+          ctx.restore();
+        }
+        if (p < 1) requestAnimationFrame(frame);
+      })(start);
+    }
+
+    const RUNNERS = { torn: playTorn, aperture: playAperture, ink: playInk, focus: playFocus, veil: playVeil, ember: playEmber };
 
     trigger.addEventListener('click', () => {
       const { ctx, w, h } = sizeCanvas();
