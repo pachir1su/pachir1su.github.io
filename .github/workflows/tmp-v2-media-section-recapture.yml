@@ -1,0 +1,84 @@
+name: TEMP v2 media section recapture
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Install Korean fonts and Playwright binding
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+          python -m pip install --quiet playwright
+
+      - name: Recapture useful sections only
+        env:
+          KGA_BASE: https://que-tune-earnings-ahead.trycloudflare.com/web
+          GUIDE_URL: https://capybaracute.notion.site/26-2fca8de5ee5f806db9e9e64464a9ac78
+        run: |
+          python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          from pathlib import Path
+          import json, os
+
+          out = Path('media-recapture')
+          out.mkdir(exist_ok=True)
+          log = {}
+
+          with sync_playwright() as p:
+              browser = p.chromium.launch(
+                  headless=True,
+                  executable_path='/usr/bin/google-chrome',
+                  args=['--no-sandbox', '--lang=ko-KR'],
+              )
+
+              # KGA meal: choose the breakfast tab so a real populated meal state is preferred.
+              page = browser.new_page(viewport={'width': 1440, 'height': 1000}, locale='ko-KR')
+              page.goto(os.environ['KGA_BASE'] + '#/meal', wait_until='domcontentloaded', timeout=60000)
+              page.wait_for_timeout(10000)
+              breakfast = page.get_by_text('아침', exact=True)
+              if breakfast.count():
+                  breakfast.first.click()
+                  page.wait_for_timeout(2500)
+              page.screenshot(path=str(out / 'kga-meal-breakfast.png'), full_page=True)
+              log['kga-meal-breakfast'] = page.locator('body').inner_text()[:5000]
+              page.close()
+
+              # Guide: stay on the known-good public main page and capture representative internal sections.
+              page = browser.new_page(viewport={'width': 1440, 'height': 1000}, locale='ko-KR')
+              page.goto(os.environ['GUIDE_URL'], wait_until='domcontentloaded', timeout=60000)
+              page.wait_for_timeout(12000)
+
+              def capture_section(name, text):
+                  loc = page.get_by_text(text, exact=True)
+                  if not loc.count():
+                      log[name] = 'NOT FOUND: ' + text
+                      return
+                  # Later occurrence is generally the actual section heading rather than the sitemap link.
+                  target = loc.last
+                  target.scroll_into_view_if_needed()
+                  page.wait_for_timeout(1800)
+                  page.screenshot(path=str(out / f'guide-{name}.png'), full_page=False)
+                  log[name] = page.locator('body').inner_text()[:7000]
+
+              capture_section('basics', '기초 안내 페이지')
+              capture_section('faq', 'FAQ')
+              capture_section('calendar', '학사일정 캘린더')
+              page.close()
+              browser.close()
+
+          (out / 'capture-log.json').write_text(json.dumps(log, ensure_ascii=False, indent=2), encoding='utf-8')
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v2-media-section-recapture
+          path: media-recapture/
+          retention-days: 1
