@@ -6,22 +6,17 @@
     <title>Media Swordmaster | 이건영 포트폴리오</title>
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=optional" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=optional" rel="stylesheet" /></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /></noscript>
     <link rel="stylesheet" href="../../style.css" />
   </head>
   <body>
     <div class="progress-container">
       <div class="progress-bar" id="myBar"></div>
     </div>
-    <button type="button" id="btn-back-to-top">
+    <button type="button" id="btn-back-to-top" aria-label="맨 위로">
       <i class="fas fa-arrow-up"></i>
     </button>
 
@@ -38,7 +33,7 @@
               href="https://github.com/pachir1su"
               target="_blank" rel="noopener noreferrer"
               class="nav-github"
-              ><i class="fab fa-github"></i
+               aria-label="GitHub 프로필"><i class="fab fa-github"></i
             ></a>
           </li>
         </ul>
@@ -74,6 +69,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 
+    <main id="main-content">
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
@@ -175,7 +171,7 @@
 
           <div class="detail-sidebar">
             <div class="sidebar-card" data-aos="fade-left">
-              <h4>Tech Stack</h4>
+              <h4 role="heading" aria-level="3">Tech Stack</h4>
               <div class="sidebar-stack">
                 <span class="tech-stack"><span>Python</span></span>
                 <span class="tech-stack"><span>Gradio</span></span>
@@ -187,7 +183,7 @@
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
-              <h4>Links</h4>
+              <h4 role="heading" aria-level="3">Links</h4>
               <div style="display: flex; flex-direction: column; gap: 10px">
                 <a
                   href="https://github.com/pachir1su/media_swordmaster"
@@ -198,7 +194,7 @@
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
+              <h4 role="heading" aria-level="3" data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p
                 style="
                   color: var(--text-muted);
@@ -211,7 +207,7 @@
               </p>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="200">
-              <h4 data-en="Supported Files" data-ko="지원 파일">지원 파일</h4>
+              <h4 role="heading" aria-level="3" data-en="Supported Files" data-ko="지원 파일">지원 파일</h4>
               <p
                 style="
                   color: var(--text-muted);
@@ -228,6 +224,8 @@
       </div>
     </section>
 
+    </main>
+
     <footer>
       <div class="container footer-inner">
         <div class="footer-logo">
@@ -239,16 +237,14 @@
         </p>
         <div class="social-links">
           <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"
-            ><i class="fab fa-github"></i
+             aria-label="GitHub 프로필"><i class="fab fa-github"></i
           ></a>
           <a href="mailto:capybara@koreatech.ac.kr"
-            ><i class="fas fa-envelope"></i
+             aria-label="이메일 보내기"><i class="fas fa-envelope"></i
           ></a>
         </div>
       </div>
     </footer>
-
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="../../script.js"></script>
+    <script src="../../detail.js"></script>
   </body>
 </html>

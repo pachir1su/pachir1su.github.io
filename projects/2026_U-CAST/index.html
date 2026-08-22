@@ -6,20 +6,22 @@
     <title>멈춰 ! — 2026 U-CAST 돌발 보행자 감지 경고 시스템 (로컬임팩트상) | 이건영 포트폴리오</title>
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=optional" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=optional" rel="stylesheet" /></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /></noscript>
     <link rel="stylesheet" href="../../style.css" />
   </head>
   <body>
     <div class="progress-container"><div class="progress-bar" id="myBar"></div></div>
-    <button type="button" id="btn-back-to-top"><i class="fas fa-arrow-up"></i></button>
+    <button type="button" id="btn-back-to-top" aria-label="맨 위로"><i class="fas fa-arrow-up"></i></button>
 
     <nav class="navbar">
       <div class="container nav-content">
         <a href="../../index.html" class="logo"><span class="logo-bracket">{</span> GY <span class="logo-bracket">}</span></a>
         <ul class="nav-links">
           <li><a href="../../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
-          <li><a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" class="nav-github"><i class="fab fa-github"></i></a></li>
+          <li><a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" class="nav-github" aria-label="GitHub 프로필"><i class="fab fa-github"></i></a></li>
         </ul>
         <div class="nav-utils">
           <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환"><span class="lang-label">EN</span></button>
@@ -39,6 +41,7 @@
       </div>
     </div>
 
+    <main id="main-content">
     <section class="detail-hero">
       <div class="hero-grid-bg"></div>
       <div class="detail-hero-glow"></div>
@@ -139,17 +142,17 @@
 
           <div class="detail-sidebar">
             <div class="sidebar-card" data-aos="fade-left">
-              <h4 data-en="Tech Stack" data-ko="기술 스택">Tech Stack</h4>
+              <h4 role="heading" aria-level="3" data-en="Tech Stack" data-ko="기술 스택">Tech Stack</h4>
               <div class="sidebar-stack"><span class="tech-stack"><span>Arduino Uno</span></span><span class="tech-stack"><span>C++</span></span><span class="tech-stack"><span>IR Sensor</span></span><span class="tech-stack"><span>NeoPixel</span></span><span class="tech-stack"><span>Passive Buzzer</span></span></div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
-              <h4 data-en="Links" data-ko="링크">Links</h4>
+              <h4 role="heading" aria-level="3" data-en="Links" data-ko="링크">Links</h4>
               <div style="display: flex; flex-direction: column; gap: 10px">
                 <a href="https://github.com/pachir1su/2026_U-CAST" target="_blank" rel="noopener noreferrer" class="github-activity-btn"><i class="fab fa-github"></i> <span data-en="GitHub Repo" data-ko="GitHub 저장소">GitHub 저장소</span></a>
               </div>
             </div>
             <div class="sidebar-card" data-aos="fade-left" data-aos-delay="150">
-              <h4 data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
+              <h4 role="heading" aria-level="3" data-en="Project Info" data-ko="프로젝트 유형">프로젝트 유형</h4>
               <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6" data-en="Youth urban-regeneration challenge / Independent-channel Arduino safety prototype / Team mentoring / Local Impact Award" data-ko="청소년 도시재생 챌린지 / 채널 독립형 아두이노 안전 시제품 / 팀 멘토링 / 로컬임팩트상 수상">청소년 도시재생 챌린지 / 채널 독립형 아두이노 안전 시제품 / 팀 멘토링 / 로컬임팩트상 수상</p>
             </div>
           </div>
@@ -157,11 +160,13 @@
       </div>
     </section>
 
+    </main>
+
     <footer>
       <div class="container footer-inner">
         <div class="footer-logo"><span class="logo-bracket">{</span> GY <span class="logo-bracket">}</span></div>
         <p class="footer-copy">&copy; 2026 Lee Geon Yeong. All rights reserved.</p>
-        <div class="social-links"><a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a><a href="mailto:capybara@koreatech.ac.kr"><i class="fas fa-envelope"></i></a></div>
+        <div class="social-links"><a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" aria-label="GitHub 프로필"><i class="fab fa-github"></i></a><a href="mailto:capybara@koreatech.ac.kr" aria-label="이메일 보내기"><i class="fas fa-envelope"></i></a></div>
       </div>
     </footer>
     <script defer src="../../detail.js"></script>
