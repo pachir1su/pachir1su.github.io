@@ -306,6 +306,7 @@ console.log('%c{ GY } portfolio · 1~5 sections · T top · G GitHub', 'color:#c
         const categories = (card.dataset.category || '').split(' ');
         const show = filter === 'all'
           || (filter === 'wip' && card.classList.contains('project-wip'))
+          || (filter === 'discontinued' && card.classList.contains('project-discontinued'))
           || (filter === 'failed' && card.classList.contains('project-failed'))
           || categories.includes(filter);
         card.style.display = show ? '' : 'none';
@@ -359,13 +360,15 @@ window._updateProjectCount = function () {
   if (!badge) return;
   let done = 0;
   let wip = 0;
+  let discontinued = 0;
   document.querySelectorAll('.project-card').forEach((card) => {
     if (card.classList.contains('project-wip')) wip++;
+    else if (card.classList.contains('project-discontinued')) discontinued++;
     else if (!card.classList.contains('project-failed')) done++;
   });
   badge.textContent = (localStorage.getItem('lang') || 'ko') === 'en'
-    ? `${done} done · ${wip} upcoming`
-    : `${done}개 완료 · ${wip}개 예정`;
+    ? `${done} done · ${wip} upcoming · ${discontinued} discontinued`
+    : `${done}개 완료 · ${wip}개 예정 · ${discontinued}개 중단`;
 };
 window._updateProjectCount();
 
@@ -448,8 +451,10 @@ window._updateProjectCount();
       '.pfilter[data-filter="discord"]': 'Discord Bot',
       '.pfilter[data-filter="web"]': 'Web',
       '.pfilter[data-filter="contest"]': 'Contest',
+      '.pfilter[data-filter="discontinued"]': 'Discontinued',
       '.pfilter[data-filter="failed"]': 'Failed',
       '.year-group-wip .year-heading': 'In Progress / Planned',
+      '.year-group-discontinued .year-heading': 'Discontinued Projects',
       '.year-group-failed .year-heading': 'Failed Projects',
       '.footer-copy': '© 2026 Lee Geon Yeong. All rights reserved.',
       '.copy-hint': 'Copy',
@@ -477,8 +482,10 @@ window._updateProjectCount();
       '.pfilter[data-filter="discord"]': 'Discord 봇',
       '.pfilter[data-filter="web"]': '웹',
       '.pfilter[data-filter="contest"]': '대회',
+      '.pfilter[data-filter="discontinued"]': '진행 중단',
       '.pfilter[data-filter="failed"]': '실패',
       '.year-group-wip .year-heading': '진행 중 · 예정',
+      '.year-group-discontinued .year-heading': '진행 중단',
       '.year-group-failed .year-heading': '실패한 프로젝트',
       '.footer-copy': '© 2026 Lee Geon Yeong. All rights reserved.',
       '.copy-hint': '복사',

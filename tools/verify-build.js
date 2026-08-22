@@ -70,6 +70,30 @@ check(
   `카드 수 불일치: projects.json ${expectedCount}개 · 생성 결과 ${actualCount}개`
 );
 
+/* --- 2-1) #191 프로젝트 상태 모델 회귀 방지 --- */
+check(expectedCount === 31, `프로젝트 총 수가 바뀌었습니다: ${expectedCount}개 (기대: 31개)`);
+const wipGroup = data.groups.find((g) => g.kind === "wip");
+const discontinuedGroup = data.groups.find((g) => g.kind === "discontinued");
+const wipDetails = (wipGroup?.cards || []).map((card) => card.detail);
+const discontinuedDetails = new Set((discontinuedGroup?.cards || []).map((card) => card.detail));
+const expectedDiscontinued = [
+  "projects/SG_bot/",
+  "projects/HTML_Viewer/",
+  "projects/CentrifugeAI/",
+  "projects/Magic_Academy/",
+  "projects/DelphiRec/",
+  "projects/SH_bot/",
+];
+check(
+  wipDetails.length === 1 && wipDetails[0] === "projects/Koreatech_map/",
+  "#191 상태 회귀: 진행 중 · 예정에는 한맵 하나만 있어야 합니다."
+);
+check(
+  expectedDiscontinued.length === discontinuedDetails.size &&
+    expectedDiscontinued.every((detail) => discontinuedDetails.has(detail)),
+  "#191 상태 회귀: 진행 중단 그룹은 승기봇·HTML Viewer·CentrifugeAI·마법 아카데미·DelphiRec·성현봇 6개여야 합니다."
+);
+
 /* --- 3) detail 경로 존재 + 카드 전체 클릭 연결 --- */
 for (const group of data.groups) {
   for (const card of group.cards) {
@@ -240,6 +264,15 @@ const retiredUiPatterns = [
 for (const [source, pattern, message] of retiredUiPatterns) {
   check(!source.includes(pattern), message);
 }
+
+
+/* #193: KGA는 유지하되 미배포 상태의 Discord 봇 초대 링크만 제거한다. */
+const kgaDetail = fs.readFileSync(path.join(root, "projects", "koreatechGongjiAgent", "index.html"), "utf8");
+const kgaProjects = fs.readFileSync(path.join(root, "projects.json"), "utf8");
+const inviteClientId = "1518630779922546759";
+check(!rootIndex.includes(inviteClientId), "#193 회귀: 메인 페이지에 KGA 봇 초대 링크가 남아 있습니다.");
+check(!kgaDetail.includes(inviteClientId), "#193 회귀: KGA 상세 페이지에 봇 초대 링크가 남아 있습니다.");
+check(!kgaProjects.includes(inviteClientId), "#193 회귀: projects.json에 KGA 봇 초대 링크가 남아 있습니다.");
 
 if (failures.length === 0) {
   console.log(`✅ 검증 통과: 카드 ${actualCount}개, 재실행 idempotent, 상세 경로·미디어 크기 정합.`);

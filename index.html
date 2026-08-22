@@ -331,7 +331,6 @@
   <div class="featured-links">
     <a href="projects/koreatechGongjiAgent/" class="flink flink-primary" data-en="Details" data-ko="자세히"><i class="fas fa-arrow-right"></i> 자세히</a>
     <a href="https://github.com/pachir1su/koreatechGongjiAgent" target="_blank" rel="noopener noreferrer" class="flink"><i class="fab fa-github"></i> GitHub</a>
-    <a href="https://discord.com/oauth2/authorize?client_id=1518630779922546759" target="_blank" rel="noopener noreferrer" class="flink" data-en="Invite Bot" data-ko="봇 초대"><i class="fab fa-discord"></i> 봇 초대</a>
   </div>
 </article>
         </div>
@@ -354,6 +353,7 @@
           <button type="button" class="pfilter" data-filter="web">웹</button>
           <button type="button" class="pfilter" data-filter="contest">대회</button>
           <button type="button" class="pfilter" data-filter="wip">WIP</button>
+          <button type="button" class="pfilter" data-filter="discontinued">진행 중단</button>
           <button type="button" class="pfilter" data-filter="failed">실패</button>
         </div>
 
@@ -460,22 +460,6 @@
               <div class="tech-stack"><span>Delphi Method</span><span>Claude</span><span>Gemini</span><span>Chart.js</span></div>
             </div>
 
-            <!-- 성현봇 (면진봇2) -->
-            <div class="project-card" data-category="discord" data-card-href="projects/SH_bot/" data-tilt>
-              <div class="project-top">
-                <i class="fab fa-discord project-icon"></i>
-                <div class="project-links">
-                  <a href="projects/SH_bot/" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
-                  <a href="https://github.com/pachir1su/SH_bot" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
-                </div>
-              </div>
-              <h3 data-en="SH Bot (MZ Bot 2)" data-ko="성현봇 (면진봇2)">성현봇 (면진봇2)</h3>
-              <p class="project-subtitle" data-en="Discord economy bot — gambling, stocks, enhance &amp; duel" data-ko="디스코드 경제 봇 — 도박·주식·강화·맞짱">디스코드 경제 봇 — 도박·주식·강화·맞짱</p>
-              <p class="project-role" data-en="Solo Development" data-ko="1인 개발"><i class="fas fa-user-tag"></i> 1인 개발</p>
-              <p data-en-html="MZ Bot successor with Korean slash commands&lt;br /&gt;Coins, gambling, stocks, item enhancement and PvP duels" data-ko-html="면진봇 후속작, 한글 슬래시 커맨드 지원&lt;br /&gt;코인·도박·주식·강화·맞짱(PvP) 경제 시스템">면진봇 후속작, 한글 슬래시 커맨드 지원<br />코인·도박·주식·강화·맞짱(PvP) 경제 시스템</p>
-              <div class="tech-stack"><span>Python</span><span>Discord.py</span><span>SQLite</span></div>
-            </div>
-
             <!-- 코리아텍 통합 알림 시스템 (구 한기대 공지 에이전트) -->
             <div class="project-card" data-category="ai discord" data-card-href="projects/koreatechGongjiAgent/" data-tilt>
               <div class="project-top">
@@ -483,7 +467,6 @@
                 <div class="project-links">
                   <a href="projects/koreatechGongjiAgent/" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
                   <a href="https://github.com/pachir1su/koreatechGongjiAgent" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
-                  <a href="https://discord.com/oauth2/authorize?client_id=1518630779922546759" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="봇 초대"><i class="fab fa-discord"></i></a>
                 </div>
               </div>
               <h3 data-en="KOREATECH Unified Alert System" data-ko="코리아텍 통합 알림 시스템">코리아텍 통합 알림 시스템</h3>
@@ -724,8 +707,15 @@
               <div class="tech-stack"><span>Web</span><span>Interactive Map</span><span>Animation</span></div>
             </div>
 
+          </div>
+        </div>
+
+        <div class="year-group year-group-discontinued" data-year="discontinued">
+          <h3 class="year-heading">진행 중단</h3>
+          <div class="projects-grid">
+
             <!-- 승기봇 -->
-            <div class="project-card project-wip" data-category="discord" data-card-href="projects/SG_bot/" data-tilt>
+            <div class="project-card project-discontinued" data-category="discord" data-card-href="projects/SG_bot/" data-tilt>
               <div class="project-top">
                 <i class="fab fa-discord project-icon"></i>
                 <div class="project-links">
@@ -733,17 +723,17 @@
                   <a href="https://github.com/pachir1su/SG_bot" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="wip-badge" data-en="In Dev" data-ko="개발 중">개발 중</div>
+              <div class="discontinued-badge" data-en="Discontinued" data-ko="개발 중단">개발 중단</div>
               <h3 data-en="SG Bot" data-ko="승기봇">승기봇</h3>
               <p class="project-subtitle" data-en="Revamped MZ Bot — mini-game Discord bot" data-ko="면진봇 개편판 — 미니게임 디스코드 봇">면진봇 개편판 — 미니게임 디스코드 봇</p>
               <p class="project-role" data-en="Solo Development" data-ko="1인 개발"><i class="fas fa-user-tag"></i> 1인 개발</p>
               <p data-en-html="Revamped version of MZ Bot&lt;br /&gt;Mini-game bot featuring Liar Game, Mafia, and more" data-ko-html="기존 면진봇의 개편 버전&lt;br /&gt;라이어게임, 양세찬게임, 마피아게임 등의 미니게임 봇">기존 면진봇의 개편 버전<br />라이어게임, 양세찬게임, 마피아게임 등의 미니게임 봇</p>
-              <div class="wip-status" data-en="Core system redesign in progress" data-ko="핵심 시스템 재설계 중">핵심 시스템 재설계 중</div>
+              <div class="discontinued-status" data-en="Development discontinued" data-ko="개발 중단">개발 중단</div>
               <div class="tech-stack"><span>Python</span><span>Discord.py</span></div>
             </div>
 
             <!-- HTML Viewer -->
-            <div class="project-card project-wip" data-category="web" data-card-href="projects/HTML_Viewer/" data-tilt>
+            <div class="project-card project-discontinued" data-category="web" data-card-href="projects/HTML_Viewer/" data-tilt>
               <div class="project-top">
                 <i class="fas fa-code project-icon"></i>
                 <div class="project-links">
@@ -751,17 +741,17 @@
                   <a href="https://github.com/pachir1su/HTML_Viewer" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="wip-badge" data-en="In Dev" data-ko="개발 중">개발 중</div>
+              <div class="discontinued-badge" data-en="Discontinued" data-ko="개발 중단">개발 중단</div>
               <h3>HTML Viewer</h3>
               <p class="project-subtitle" data-en="HTML real-time preview web viewer" data-ko="HTML 실시간 미리보기 웹 뷰어">HTML 실시간 미리보기 웹 뷰어</p>
               <p class="project-role" data-en="Solo Development" data-ko="1인 개발"><i class="fas fa-user-tag"></i> 1인 개발</p>
               <p data-en-html="Paste HTML code and&lt;br /&gt;see the result in real time" data-ko-html="HTML 코드를 붙여넣으면&lt;br /&gt;실시간으로 결과물을 보여주는 웹 뷰어">HTML 코드를 붙여넣으면<br />실시간으로 결과물을 보여주는 웹 뷰어</p>
-              <div class="wip-status" data-en="In development · not deployed" data-ko="개발 진행 중 · 미배포">개발 진행 중 · 미배포</div>
+              <div class="discontinued-status" data-en="Development discontinued" data-ko="개발 중단">개발 중단</div>
               <div class="tech-stack"><span>HTML</span><span>CSS</span><span>JavaScript</span></div>
             </div>
 
             <!-- CentrifugeAI -->
-            <div class="project-card project-wip" data-category="ai web" data-card-href="projects/CentrifugeAI/" data-tilt>
+            <div class="project-card project-discontinued" data-category="ai web" data-card-href="projects/CentrifugeAI/" data-tilt>
               <div class="project-top">
                 <i class="fas fa-flask project-icon"></i>
                 <div class="project-links">
@@ -769,33 +759,33 @@
                   <a href="https://github.com/pachir1su/CentrifugeAI" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="wip-badge" data-en="In Dev" data-ko="개발 중">개발 중</div>
+              <div class="discontinued-badge" data-en="Discontinued" data-ko="개발 중단">개발 중단</div>
               <h3>CentrifugeAI</h3>
               <p class="project-subtitle" data-en="Gemini virtual science lab" data-ko="Gemini 가상 과학 실험실">Gemini 가상 과학 실험실</p>
               <p class="project-role" data-en="Solo Development" data-ko="1인 개발"><i class="fas fa-user-tag"></i> 1인 개발</p>
               <p data-en-html="Put materials into virtual lab equipment (centrifuge, microscope, accelerator, etc.)&lt;br /&gt;and predict &amp; visualize results with Gemini AI" data-ko-html="가상 실험 장치(원심분리기·현미경·가속기 등)에&lt;br /&gt;재료를 넣고 Gemini AI로 결과를 예측·시각화하는 실험 시뮬레이터">가상 실험 장치(원심분리기·현미경·가속기 등)에<br />재료를 넣고 Gemini AI로 결과를 예측·시각화하는 실험 시뮬레이터</p>
-              <div class="wip-status" data-en="Finalizing" data-ko="마무리 단계">마무리 단계</div>
+              <div class="discontinued-status" data-en="Development discontinued" data-ko="개발 중단">개발 중단</div>
               <div class="tech-stack"><span>Python</span><span>Flask</span><span>SQLite</span><span>Gemini API</span><span>Discord.py</span><span>Matplotlib</span></div>
             </div>
 
             <!-- 마법 아카데미 -->
-            <div class="project-card project-wip" data-category="web" data-card-href="projects/Magic_Academy/" data-tilt>
+            <div class="project-card project-discontinued" data-category="web" data-card-href="projects/Magic_Academy/" data-tilt>
               <div class="project-top">
                 <i class="fas fa-hat-wizard project-icon"></i>
                 <div class="project-links">
                   <a href="projects/Magic_Academy/" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
                 </div>
               </div>
-              <div class="wip-badge" data-en="Planned" data-ko="진행 예정">진행 예정</div>
+              <div class="discontinued-badge" data-en="Discontinued" data-ko="개발 중단">개발 중단</div>
               <h3 data-en="Magic Academy" data-ko="마법 아카데미">마법 아카데미</h3>
               <p class="project-subtitle" data-en="Element combination magic interactive simulation" data-ko="원소 조합 마법 인터랙티브 시뮬레이션">원소 조합 마법 인터랙티브 시뮬레이션</p>
               <p data-en-html="Combine elements to create magic and&lt;br /&gt;visualize with interactive simulation" data-ko-html="원소를 조합해 마법을 만들고&lt;br /&gt;시각화하는 인터랙티브 시뮬레이션">원소를 조합해 마법을 만들고<br />시각화하는 인터랙티브 시뮬레이션</p>
-              <div class="wip-status" data-en="Planning · repository not yet created" data-ko="기획 단계 · 저장소 준비 중">기획 단계 · 저장소 준비 중</div>
+              <div class="discontinued-status" data-en="Development discontinued" data-ko="개발 중단">개발 중단</div>
               <div class="tech-stack"><span data-en="Python (Planned)" data-ko="Python (예정)">Python (예정)</span><span data-en="p5.js (Planned)" data-ko="p5.js (예정)">p5.js (예정)</span></div>
             </div>
 
             <!-- DelphiRec -->
-            <div class="project-card project-wip" data-category="ai" data-card-href="projects/DelphiRec/" data-tilt>
+            <div class="project-card project-discontinued" data-category="ai" data-card-href="projects/DelphiRec/" data-tilt>
               <div class="project-top">
                 <i class="fas fa-user-graduate project-icon"></i>
                 <div class="project-links">
@@ -803,12 +793,30 @@
                   <a href="https://github.com/pachir1su/DelphiRec" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
                 </div>
               </div>
-              <div class="wip-badge" data-en="Planned" data-ko="진행 예정">진행 예정</div>
+              <div class="discontinued-badge" data-en="Discontinued" data-ko="개발 중단">개발 중단</div>
               <h3>DelphiRec</h3>
               <p class="project-subtitle" data-en="Student record analysis &amp; Q&amp;A multi-agent AI" data-ko="생기부 분석·질의응답 멀티 에이전트 AI">생기부 분석·질의응답 멀티 에이전트 AI</p>
               <p data-en-html="Student record analysis &amp;amp; Q&amp;amp;A AI&lt;br /&gt;In-depth analysis using multi-expert personas and Delphi method" data-ko-html="생기부 분석 &amp;amp; 질의응답 AI&lt;br /&gt;멀티 전문가 페르소나와 델파이 기법으로 생기부를 심층 분석">생기부 분석 &amp; 질의응답 AI<br />멀티 전문가 페르소나와 델파이 기법으로 생기부를 심층 분석</p>
-              <div class="wip-status" data-en="Design stage · MVP scope defined" data-ko="설계 단계 · MVP 범위 확정">설계 단계 · MVP 범위 확정</div>
+              <div class="discontinued-status" data-en="Development discontinued" data-ko="개발 중단">개발 중단</div>
               <div class="tech-stack"><span>Claude API</span><span>FastAPI</span><span>React</span><span>Multi-Agent</span></div>
+            </div>
+
+            <!-- 성현봇 (면진봇2) -->
+            <div class="project-card project-discontinued" data-category="discord" data-card-href="projects/SH_bot/" data-tilt>
+              <div class="project-top">
+                <i class="fab fa-discord project-icon"></i>
+                <div class="project-links">
+                  <a href="projects/SH_bot/" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                  <a href="https://github.com/pachir1su/SH_bot" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                </div>
+              </div>
+              <div class="discontinued-badge" data-en="Discontinued" data-ko="개발 중단">개발 중단</div>
+              <h3 data-en="SH Bot (MZ Bot 2)" data-ko="성현봇 (면진봇2)">성현봇 (면진봇2)</h3>
+              <p class="project-subtitle" data-en="Discord economy bot — gambling, stocks, enhance &amp; duel" data-ko="디스코드 경제 봇 — 도박·주식·강화·맞짱">디스코드 경제 봇 — 도박·주식·강화·맞짱</p>
+              <p class="project-role" data-en="Solo Development" data-ko="1인 개발"><i class="fas fa-user-tag"></i> 1인 개발</p>
+              <p data-en-html="MZ Bot successor with Korean slash commands&lt;br /&gt;Coins, gambling, stocks, item enhancement and PvP duels" data-ko-html="면진봇 후속작, 한글 슬래시 커맨드 지원&lt;br /&gt;코인·도박·주식·강화·맞짱(PvP) 경제 시스템">면진봇 후속작, 한글 슬래시 커맨드 지원<br />코인·도박·주식·강화·맞짱(PvP) 경제 시스템</p>
+              <div class="discontinued-status" data-en="Development discontinued" data-ko="개발 중단">개발 중단</div>
+              <div class="tech-stack"><span>Python</span><span>Discord.py</span><span>SQLite</span></div>
             </div>
 
           </div>

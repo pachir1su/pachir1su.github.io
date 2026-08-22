@@ -216,40 +216,6 @@
           ]
         },
         {
-          "comment": "성현봇 (면진봇2)",
-          "category": "discord",
-          "icon": "fab fa-discord",
-          "detail": "projects/SH_bot/",
-          "links": [
-            {
-              "href": "https://github.com/pachir1su/SH_bot",
-              "title": "GitHub",
-              "icon": "fab fa-github"
-            }
-          ],
-          "title": {
-            "en": "SH Bot (MZ Bot 2)",
-            "ko": "성현봇 (면진봇2)"
-          },
-          "subtitle": {
-            "en": "Discord economy bot — gambling, stocks, enhance & duel",
-            "ko": "디스코드 경제 봇 — 도박·주식·강화·맞짱"
-          },
-          "role": {
-            "en": "Solo Development",
-            "ko": "1인 개발"
-          },
-          "descHtml": {
-            "en": "MZ Bot successor with Korean slash commands<br />Coins, gambling, stocks, item enhancement and PvP duels",
-            "ko": "면진봇 후속작, 한글 슬래시 커맨드 지원<br />코인·도박·주식·강화·맞짱(PvP) 경제 시스템"
-          },
-          "tech": [
-            "Python",
-            "Discord.py",
-            "SQLite"
-          ]
-        },
-        {
           "comment": "코리아텍 통합 알림 시스템 (구 한기대 공지 에이전트)",
           "category": "ai discord",
           "icon": "fas fa-bell",
@@ -259,11 +225,6 @@
               "href": "https://github.com/pachir1su/koreatechGongjiAgent",
               "title": "GitHub",
               "icon": "fab fa-github"
-            },
-            {
-              "href": "https://discord.com/oauth2/authorize?client_id=1518630779922546759",
-              "title": "봇 초대",
-              "icon": "fab fa-discord"
             }
           ],
           "title": {
@@ -764,7 +725,13 @@
             "Interactive Map",
             "Animation"
           ]
-        },
+        }
+      ]
+    },
+    {
+      "kind": "discontinued",
+      "heading": "진행 중단",
+      "cards": [
         {
           "comment": "승기봇",
           "category": "discord",
@@ -778,8 +745,8 @@
             }
           ],
           "badge": {
-            "en": "In Dev",
-            "ko": "개발 중"
+            "en": "Discontinued",
+            "ko": "개발 중단"
           },
           "title": {
             "en": "SG Bot",
@@ -798,8 +765,8 @@
             "ko": "기존 면진봇의 개편 버전<br />라이어게임, 양세찬게임, 마피아게임 등의 미니게임 봇"
           },
           "status": {
-            "en": "Core system redesign in progress",
-            "ko": "핵심 시스템 재설계 중"
+            "en": "Development discontinued",
+            "ko": "개발 중단"
           },
           "tech": [
             "Python",
@@ -819,8 +786,8 @@
             }
           ],
           "badge": {
-            "en": "In Dev",
-            "ko": "개발 중"
+            "en": "Discontinued",
+            "ko": "개발 중단"
           },
           "title": "HTML Viewer",
           "subtitle": {
@@ -836,8 +803,8 @@
             "ko": "HTML 코드를 붙여넣으면<br />실시간으로 결과물을 보여주는 웹 뷰어"
           },
           "status": {
-            "en": "In development · not deployed",
-            "ko": "개발 진행 중 · 미배포"
+            "en": "Development discontinued",
+            "ko": "개발 중단"
           },
           "tech": [
             "HTML",
@@ -858,8 +825,8 @@
             }
           ],
           "badge": {
-            "en": "In Dev",
-            "ko": "개발 중"
+            "en": "Discontinued",
+            "ko": "개발 중단"
           },
           "title": "CentrifugeAI",
           "subtitle": {
@@ -875,8 +842,8 @@
             "ko": "가상 실험 장치(원심분리기·현미경·가속기 등)에<br />재료를 넣고 Gemini AI로 결과를 예측·시각화하는 실험 시뮬레이터"
           },
           "status": {
-            "en": "Finalizing",
-            "ko": "마무리 단계"
+            "en": "Development discontinued",
+            "ko": "개발 중단"
           },
           "tech": [
             "Python",
@@ -894,8 +861,8 @@
           "detail": "projects/Magic_Academy/",
           "links": [],
           "badge": {
-            "en": "Planned",
-            "ko": "진행 예정"
+            "en": "Discontinued",
+            "ko": "개발 중단"
           },
           "title": {
             "en": "Magic Academy",
@@ -910,8 +877,8 @@
             "ko": "원소를 조합해 마법을 만들고<br />시각화하는 인터랙티브 시뮬레이션"
           },
           "status": {
-            "en": "Planning · repository not yet created",
-            "ko": "기획 단계 · 저장소 준비 중"
+            "en": "Development discontinued",
+            "ko": "개발 중단"
           },
           "tech": [
             {
@@ -937,8 +904,8 @@
             }
           ],
           "badge": {
-            "en": "Planned",
-            "ko": "진행 예정"
+            "en": "Discontinued",
+            "ko": "개발 중단"
           },
           "title": "DelphiRec",
           "subtitle": {
@@ -950,8 +917,8 @@
             "ko": "생기부 분석 &amp; 질의응답 AI<br />멀티 전문가 페르소나와 델파이 기법으로 생기부를 심층 분석"
           },
           "status": {
-            "en": "Design stage · MVP scope defined",
-            "ko": "설계 단계 · MVP 범위 확정"
+            "en": "Development discontinued",
+            "ko": "개발 중단"
           },
           "tech": [
             "Claude API",
@@ -959,6 +926,48 @@
             "React",
             "Multi-Agent"
           ]
+        },
+        {
+          "comment": "성현봇 (면진봇2)",
+          "category": "discord",
+          "icon": "fab fa-discord",
+          "detail": "projects/SH_bot/",
+          "links": [
+            {
+              "href": "https://github.com/pachir1su/SH_bot",
+              "title": "GitHub",
+              "icon": "fab fa-github"
+            }
+          ],
+          "title": {
+            "en": "SH Bot (MZ Bot 2)",
+            "ko": "성현봇 (면진봇2)"
+          },
+          "subtitle": {
+            "en": "Discord economy bot — gambling, stocks, enhance & duel",
+            "ko": "디스코드 경제 봇 — 도박·주식·강화·맞짱"
+          },
+          "role": {
+            "en": "Solo Development",
+            "ko": "1인 개발"
+          },
+          "descHtml": {
+            "en": "MZ Bot successor with Korean slash commands<br />Coins, gambling, stocks, item enhancement and PvP duels",
+            "ko": "면진봇 후속작, 한글 슬래시 커맨드 지원<br />코인·도박·주식·강화·맞짱(PvP) 경제 시스템"
+          },
+          "tech": [
+            "Python",
+            "Discord.py",
+            "SQLite"
+          ],
+          "badge": {
+            "en": "Discontinued",
+            "ko": "개발 중단"
+          },
+          "status": {
+            "en": "Development discontinued",
+            "ko": "개발 중단"
+          }
         }
       ]
     },
