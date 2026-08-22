@@ -85,24 +85,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Caveat(손글씨), Noto Sans KR(본문), Space Mono(코드/모노) -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=optional"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=optional" /></noscript>
 
-    <!-- Font Awesome — 아이콘 라이브러리 (fas, fab 클래스) -->
+    <!-- Font Awesome — 아이콘 라이브러리 (첫 페인트를 막지 않게 비동기 적용) -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      media="print"
+      onload="this.media='all'"
     />
-    <!-- Devicon — 기술 스택 아이콘 라이브러리 (devicon-* 클래스) -->
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdn.jsdelivr.net/gh/devicons/devicon@2.16.0/devicon.min.css"
-    />
-
-    <!-- AOS (Animate On Scroll) — 스크롤 진입 시 페이드/슬라이드 애니메이션 -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /></noscript>
 
     <!-- 메인 스타일시트 — 노트 테마, 카드 레이아웃, 반응형 포함 -->
     <link rel="stylesheet" href="style.css" />
@@ -151,7 +148,7 @@
         </ul>
         <!-- 유틸리티 버튼 — 언어 전환(#67) + 다크 모드(#68) -->
         <div class="nav-utils">
-          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="EN · English">
             <span class="lang-label">EN</span>
           </button>
           <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환">
@@ -196,6 +193,7 @@
          배경: 노트 줄 + 빨간 마진선 / 타이핑 효과
          통계(stat-item): 스크롤 진입 시 카운트업 애니메이션
          ============================================================ -->
+    <main id="main-content">
     <!-- HERO -->
     <section id="home" class="hero">
       <div class="hero-grid-bg" aria-hidden="true"></div>
@@ -573,6 +571,7 @@
                 <div class="project-links">
                   <a href="projects/HEALTH_CHECK_PROJECT/" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
                   <a href="https://github.com/pachir1su/HEALTH_CHECK_PROJECT" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <a href="https://pachir1su.notion.site/2025-SDGs-1b9f776d60dc8058976bc03379ceaf06" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="Notion"><i class="fas fa-external-link-alt"></i></a>
                 </div>
               </div>
               <h3 data-en="Health Care System" data-ko="헬스 케어 시스템">헬스 케어 시스템</h3>
@@ -930,14 +929,14 @@
             <div class="skill-icon"><i class="fas fa-code"></i></div>
             <h3 data-en="Core Languages" data-ko="핵심 언어">핵심 언어</h3>
             <ul class="skill-list">
-              <li><i class="devicon-python-plain colored"></i> Python</li>
-              <li><i class="devicon-c-plain colored"></i> C / C++</li>
-              <li><i class="devicon-java-plain colored"></i> Java</li>
+              <li><span class="skill-glyph" aria-hidden="true">Py</span> Python</li>
+              <li><span class="skill-glyph" aria-hidden="true">C</span> C / C++</li>
+              <li><span class="skill-glyph" aria-hidden="true">Jv</span> Java</li>
               <li>
-                <i class="devicon-javascript-plain colored"></i> JavaScript
+                <span class="skill-glyph" aria-hidden="true">JS</span> JavaScript
               </li>
               <li>
-                <i class="devicon-processing-plain colored"></i> Processing
+                <span class="skill-glyph" aria-hidden="true">Pr</span> Processing
               </li>
             </ul>
           </div>
@@ -952,7 +951,7 @@
             <ul class="skill-list">
               <li data-en="LLM Proficiency" data-ko="LLM 활용 능력"><i class="fas fa-robot"></i> LLM 활용 능력</li>
               <li>
-                <i class="devicon-scikitlearn-plain colored"></i> Scikit-learn /
+                <span class="skill-glyph" aria-hidden="true">ML</span> Scikit-learn /
                 Keras
               </li>
               <li><i class="fas fa-chart-pie"></i> Orange3</li>
@@ -970,14 +969,14 @@
             <h3 data-en="Web &amp; App Dev" data-ko="웹 &amp; 앱 개발">웹 & 앱 개발</h3>
             <ul class="skill-list">
               <li>
-                <i class="devicon-react-original colored"></i> React / HTML /
+                <span class="skill-glyph" aria-hidden="true">Re</span> React / HTML /
                 CSS
               </li>
-              <li><i class="devicon-flask-original colored"></i> Flask / FastAPI</li>
-              <li><i class="devicon-sqlite-plain colored"></i> SQLite</li>
+              <li><span class="skill-glyph" aria-hidden="true">Fl</span> Flask / FastAPI</li>
+              <li><span class="skill-glyph" aria-hidden="true">DB</span> SQLite</li>
               <li data-en="Selenium · pyautogui (crawling &amp; automation)" data-ko="Selenium · pyautogui (크롤링·자동화)"><i class="fas fa-robot"></i> Selenium · pyautogui (크롤링·자동화)</li>
-              <li><i class="devicon-flutter-plain colored"></i> Flutter</li>
-              <li><i class="devicon-figma-plain colored"></i> Figma</li>
+              <li><span class="skill-glyph" aria-hidden="true">Ft</span> Flutter</li>
+              <li><span class="skill-glyph" aria-hidden="true">Fg</span> Figma</li>
               <li data-en="Discord Bot Dev (Discord.py)" data-ko="Discord 봇 개발 (Discord.py)"><i class="fab fa-discord"></i> Discord 봇 개발 (Discord.py)</li>
             </ul>
           </div>
@@ -991,7 +990,7 @@
             <h3 data-en="Hardware &amp; Maker" data-ko="하드웨어 &amp; 메이커">하드웨어 & 메이커</h3>
             <ul class="skill-list">
               <li data-en="Arduino / Raspberry Pi" data-ko="아두이노 / 라즈베리파이">
-                <i class="devicon-arduino-plain colored"></i> 아두이노 /
+                <span class="skill-glyph" aria-hidden="true">Ar</span> 아두이노 /
                 라즈베리파이
               </li>
               <li data-en="3D Printing / Modeling" data-ko="3D 프린팅 / 모델링"><i class="fas fa-cube"></i> 3D 프린팅 / 모델링</li>
@@ -1009,7 +1008,7 @@
             <div class="skill-icon"><i class="fas fa-file-alt"></i></div>
             <h3 data-en="Documentation &amp; Collaboration" data-ko="문서화 &amp; 협업">문서화 & 협업</h3>
             <ul class="skill-list">
-    <li><i class="devicon-notion-plain colored"></i> Notion</li>
+    <li><span class="skill-glyph" aria-hidden="true">Nt</span> Notion</li>
     <li data-en="Excellent Report Writing" data-ko="탁월한 보고서 작성"><i class="fas fa-file-contract"></i> 탁월한 보고서 작성</li>
     <li data-en="Systematic File Organization" data-ko="체계적인 자료 정리"><i class="fas fa-folder-open"></i> 체계적인 자료 정리</li>
     <li data-en="Technical Documentation" data-ko="기술 문서 작성"><i class="fas fa-pen-nib"></i> 기술 문서 작성</li>
@@ -1241,6 +1240,8 @@
     </section>
 
 
+    </main>
+
     <!-- ============================================================
          푸터 — 로고, 저작권, 소셜 링크(GitHub + 이메일 복사 버튼)
          이메일 버튼: 클릭 시 클립보드 복사 + 피드백 텍스트 변경 (script.js #19)
@@ -1264,9 +1265,6 @@
         </div>
       </div>
     </footer>
-
-    <!-- AOS 라이브러리 JS — CSS보다 나중에 로드, AOS.init()은 script.js에서 호출 -->
-    <script defer src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <!-- 메인 인터랙션 스크립트 — 커서/스크롤/타이핑/필터/섹션 네비 등 모든 동작 포함 -->
     <script defer src="script.js"></script>
   </body>
