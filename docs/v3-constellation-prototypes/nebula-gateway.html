@@ -31,6 +31,29 @@
       .hero-content { min-height:610px; }
       .hero-stats { margin-top:36px; }
     }
+
+    /* #114 5차 — 진입 연출 후보 비교판. 실제 진입점(.gate-slot)과는 완전히
+       분리된 미리보기라, 여기서 무엇을 눌러도 위 데모나 v3 이동에 영향을 주지 않는다. */
+    .gw-lab h2 small { color:var(--muted); font-weight:400; font-size:.65em; }
+    .gw-picker { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
+    .gw-anim-btn, .gw-sfx-btn {
+      padding:8px 14px; border:1px solid var(--line, #cbd0df); background:none;
+      color:inherit; font:inherit; font-size:12.5px; cursor:pointer; border-radius:2px;
+    }
+    .gw-anim-btn small, .gw-sfx-btn small { opacity:.65; }
+    .gw-anim-btn.is-active, .gw-sfx-btn.is-active { border-color:currentColor; font-weight:600; }
+    .gw-stage {
+      position:relative; margin-top:8px; width:100%; max-width:520px; aspect-ratio:16/10;
+      background:#0c0e16; border:1px solid var(--line, #cbd0df); overflow:hidden;
+    }
+    .gw-stage-canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+    .gw-stage-trigger {
+      position:absolute; right:12px; bottom:12px; z-index:2;
+      padding:8px 16px; border:1px solid rgba(255,255,255,.5); background:rgba(10,12,20,.55);
+      color:#fff; font:inherit; font-size:12.5px; cursor:pointer; border-radius:2px;
+    }
+    .gw-stage-trigger:hover { border-color:#fff; }
+    .gw-hint { margin-top:10px; font-size:12.5px; color:var(--muted); }
   </style>
 </head>
 <body data-page="nebula-gateway" class="gate-doc">
@@ -111,11 +134,546 @@
       </div>
     </section>
 
+    <!-- ============================================================
+         #114 5차 라운드 — 진입 연출 후보 전환판.
+         위 실제 진입점(.gate-slot)의 동작은 건드리지 않는 별도 미리보기다.
+         기존 "찢긴 종이"를 포함해 서로 다른 시각 은유의 후보를 비교하고,
+         각 후보에 짝지을 사운드 후보(G1~G3, SFX-14 재작업)도 함께 미리 듣는다.
+         ============================================================ -->
+    <section class="doc gw-lab" aria-labelledby="gw-lab-title">
+      <h2 id="gw-lab-title">진입 연출 후보 비교판 <small>(8차, 미확정)</small></h2>
+      <p>실제 위 진입점은 그대로 "찢긴 종이"로 동작합니다. 8차에서 "우주 진입점은 초점 풀림이 좀 괜찮긴 함"이라는 판정을 받아, 6차에서 한 번 반려됐던 <b>초점 풀림</b>을 <b>몰입 진입(초점 풀림 정련)</b>으로 완전히 다시 짜 이번 라운드의 <b>주 후보</b>로 삼았습니다(목록 맨 앞, ★ 표시). 다른 이세계로 빨려들어가는 느낌을 내기 위해 길이도 약 5초로 늘렸습니다(다른 후보는 여전히 약 3.4초). 7차의 <b>종이 재구성·유리 아래 번짐·빛의 확장</b>은 비교용으로 남겼습니다. 애니메이션 후보를 고른 뒤 소리 후보(선택)를 골라 함께 재생해 볼 수 있습니다. <code>prefers-reduced-motion</code>이 켜져 있으면 애니메이션 대신 종료 상태로 즉시 전환합니다.</p>
+
+      <div class="gw-picker" role="group" aria-label="진입 연출 후보">
+        <button type="button" class="gw-anim-btn" data-gw-anim="focus">★ 몰입 진입(초점 풀림 정련) <small>(8차, 주 후보 · 약 5초)</small></button>
+        <button type="button" class="gw-anim-btn is-active" data-gw-anim="torn">찢긴 종이 <small>(현재 기본)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="coalesce">종이 재구성 <small>(7차)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="loupe">유리 아래 번짐 <small>(7차)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="point">빛의 확장 <small>(7차)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="veil">장막 걷힘 <small>(6차, 반려)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="ember">불씨 번짐 <small>(6차, 반려)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="aperture">조리개 개방 <small>(5차, 반려)</small></button>
+        <button type="button" class="gw-anim-btn" data-gw-anim="ink">잉크 번짐 <small>(5차, 반려)</small></button>
+      </div>
+      <div class="gw-picker" role="group" aria-label="짝지을 소리 후보">
+        <button type="button" class="gw-sfx-btn is-active" data-gw-sfx="none">소리 없음</button>
+        <button type="button" class="gw-sfx-btn" data-gw-sfx="i1">I1 상승 패드 + 성긴 벨 <small>(7차, 음악)</small></button>
+        <button type="button" class="gw-sfx-btn" data-gw-sfx="i2">I2 떠오르는 화음 층 <small>(7차, 음악)</small></button>
+        <button type="button" class="gw-sfx-btn" data-gw-sfx="i3">I3 느린 나선 상승 <small>(7차, 음악)</small></button>
+        <button type="button" class="gw-sfx-btn" data-gw-sfx="h1">H1 점점 빨라지는 펄스 <small>(6차, 반려)</small></button>
+        <button type="button" class="gw-sfx-btn" data-gw-sfx="h2">H2 도플러 스침 <small>(6차, 반려)</small></button>
+        <button type="button" class="gw-sfx-btn" data-gw-sfx="h3">H3 둘로 갈라짐 <small>(6차, 반려)</small></button>
+      </div>
+
+      <div class="gw-stage" data-gw-stage>
+        <canvas class="gw-stage-canvas" data-gw-canvas></canvas>
+        <button type="button" class="gw-stage-trigger" data-gw-trigger>재생 <span aria-hidden="true">▶</span></button>
+      </div>
+      <p class="gw-hint">애니메이션 후보를 고른 뒤 <b>재생</b>을 누르면 약 3~4초(★ 몰입 진입은 약 5초) 미리보기가 실행됩니다. 실제 진입점 동작과는 분리되어 있어 페이지를 벗어나지 않습니다.</p>
+    </section>
+
     <footer>
       <p><b>범위.</b> 운영 <code>index.html</code>과 <code>projects.json</code>은 변경하지 않았습니다. 이 페이지는 <code>../../style.css</code>를 읽기만 합니다.</p>
       <p>구멍 너머는 <a href="nebula-transit.html">전환 화면</a>으로 이어집니다. 첫 화면 시각 언어는 <a href="nebula-keyvisual.html">키비주얼</a>에 있습니다.</p>
     </footer>
   </div>
 
+  <!-- #114 5차 — 진입 연출/소리 후보 비교판 전용 스크립트. 위 실제 진입점
+       초기화(nebula.js의 initGateway)와는 완전히 분리되어 있어, 여기서 실패해도
+       실제 데모 동작에 영향을 주지 않는다. -->
+  <script>
+  (() => {
+    'use strict';
+    const stage = document.querySelector('[data-gw-stage]');
+    const canvas = document.querySelector('[data-gw-canvas]');
+    const trigger = document.querySelector('[data-gw-trigger]');
+    if (!stage || !canvas || !trigger) return;
+
+    const prefersReduced = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* 8차 — 실제 진입점 자체는 여전히 "찢긴 종이"라 이 비교판의 기본 선택도
+       torn을 유지한다. 다만 목록 표시상으로만 "몰입 진입"을 맨 앞·주 후보로
+       강조했고(위 gw-picker 마크업), 실제 초기 anim 값과 is-active 클래스는
+       torn 버튼에 그대로 남아 있다 — 사용자가 직접 눌러 비교한다. */
+    let anim = 'torn';
+    document.querySelectorAll('[data-gw-anim]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-gw-anim]').forEach((b) => b.classList.toggle('is-active', b === btn));
+        anim = btn.dataset.gwAnim;
+      });
+    });
+    let sfx = 'none';
+    document.querySelectorAll('[data-gw-sfx]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-gw-sfx]').forEach((b) => b.classList.toggle('is-active', b === btn));
+        sfx = btn.dataset.gwSfx;
+      });
+    });
+
+    /* ---- 소리 후보 G1~G3. nebula-sound.html의 s14g1/g2/g3와 같은 정의를
+       옮겼다. 확정 아님 — 미리듣기 전용. ---- */
+    let sfxCtx = null;
+    function audio() {
+      if (!sfxCtx) sfxCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (sfxCtx.state === 'suspended') sfxCtx.resume().catch(() => {});
+      return sfxCtx;
+    }
+    function tone(at, freq, dur, gain, type) {
+      const ctx = audio();
+      const osc = ctx.createOscillator();
+      osc.type = type || 'sine';
+      osc.frequency.setValueAtTime(freq, at);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, at);
+      g.gain.exponentialRampToValueAtTime(Math.max(0.0003, gain), at + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+      osc.connect(g).connect(ctx.destination);
+      osc.start(at); osc.stop(at + dur + 0.05);
+    }
+    function noise(at, dur, gain) {
+      const ctx = audio();
+      const len = Math.max(1, Math.ceil(ctx.sampleRate * dur));
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 1.4);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const filt = ctx.createBiquadFilter();
+      filt.type = 'bandpass'; filt.frequency.value = 2200; filt.Q.value = 1.1;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(gain, at);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+      src.connect(filt).connect(g).connect(ctx.destination);
+      src.start(at); src.stop(at + dur + 0.05);
+    }
+    /* 7차 — SFX-14가 효과음에서 짧은 음악으로 재정의되면서 추가한 최소한의
+       패드 헬퍼. nebula-sound.html의 pad()를 이 페이지의 단순한 tone/noise
+       스타일에 맞춰 축약한 버전이다 — 디튠된 세 겹을 얹어 두께를 낸다. */
+    function padTone(at, freqs, dur, gain) {
+      const ctx = audio();
+      freqs.forEach((f) => {
+        [-6, 0, 6].forEach((cent, i) => {
+          const osc = ctx.createOscillator();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f * Math.pow(2, cent / 1200), at);
+          const g = ctx.createGain();
+          const peak = gain * (i === 1 ? 1 : .6);
+          g.gain.setValueAtTime(0.0001, at);
+          g.gain.exponentialRampToValueAtTime(peak, at + dur * .3);
+          g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+          osc.connect(g).connect(ctx.destination);
+          osc.start(at); osc.stop(at + dur + .05);
+        });
+      });
+    }
+    const SFX = {
+      g1: () => { const at = audio().currentTime + .02; noise(at, .5, .06); tone(at + .5, 900, .8, .025, 'triangle'); },
+      g2: () => { const at = audio().currentTime + .02; tone(at, 46, 2.4, .1, 'sine'); },
+      g3: () => { const at = audio().currentTime + .02;
+                  for (let i = 0; i < 7; i++) tone(at + i * .18, 1600 + i * 70, .5, .035, 'sine');
+                  tone(at + 1.3, 659.25, 1.2, .04, 'triangle'); },
+      /* 6차 — G1~G3(마찰/공명/결정) 전부 불만족이라 새로 만든 세 후보.
+         nebula-sound.html의 s14h1/h2/h3와 같은 정의를 옮겼다. 7차 판정에서
+         "효과음 말고 음악"으로 다시 반려됐다 — 재생용으로만 남긴다. */
+      h1: () => { const at = audio().currentTime + .02; const gaps = [.5, .42, .35, .29, .24, .2, .16, .13];
+                  let acc = 0; gaps.forEach((g) => { acc += g; tone(at + acc, 130, g * .8, .06, 'sine'); }); },
+      h2: () => { const at = audio().currentTime + .02; noise(at, 1.5, .05); noise(at + 1.4, 1.6, .045); },
+      h3: () => { const at = audio().currentTime + .02; tone(at, 220, 3.0, .06, 'sine'); tone(at + .4, 293.66, 2.7, .05, 'sine'); },
+      /* 7차 — SFX-14 음악 후보. nebula-sound.html의 s14i1/i2/i3와 같은
+         구조(상승 패드 + 성긴 벨/차임)를 이 페이지의 축약 헬퍼로 재현한다. */
+      i1: () => { const at = audio().currentTime + .02;
+                  padTone(at, [130.81, 196], 4.6, .05); padTone(at + 1.6, [196, 261.63, 329.63], 3.2, .045);
+                  tone(at + 2.2, 987.77, 2.0, .035, 'sine'); tone(at + 3.6, 1318.51, 1.4, .028, 'sine'); },
+      i2: () => { const at = audio().currentTime + .02;
+                  padTone(at, [146.83, 220], 2.0, .055); padTone(at + 1.2, [220, 293.66, 349.23], 2.0, .05);
+                  padTone(at + 2.4, [293.66, 392, 493.88], 2.0, .048); tone(at + 3.9, 1567.98, 1.2, .04, 'sine'); },
+      i3: () => { const at = audio().currentTime + .02;
+                  padTone(at, [110, 174.61], 5.6, .045); tone(at + .5, 220, 2.4, .028, 'triangle');
+                  tone(at + 2.8, 659.25, 1.6, .028, 'sine'); tone(at + 3.3, 440, 2.4, .024, 'triangle');
+                  tone(at + 5.3, 1174.66, 1.0, .022, 'sine'); },
+    };
+    function playSfxCandidate() { if (SFX[sfx]) { try { SFX[sfx](); } catch (err) {} } }
+
+    /* ---- 애니메이션 후보 ---- */
+    function sizeCanvas() {
+      const box = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.max(1, Math.round(box.width * dpr));
+      canvas.height = Math.max(1, Math.round(box.height * dpr));
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { ctx, w: box.width, h: box.height };
+    }
+    function easeInOut(v) { return v < .5 ? 2 * v * v : 1 - Math.pow(-2 * v + 2, 2) / 2; }
+
+    /* 찢긴 종이(기존 기본) — 별도 이미지 자산 없이, 이 미리보기에서는 불규칙한
+       가장자리를 가진 구멍이 벌어지며 안쪽에서 별빛이 새어 나오는 것으로
+       단순화해 재현한다. 실제 진입점의 자산 기반 연출과 동일하지는 않다. */
+    function playTorn(ctx, w, h, dur) {
+      const cx = w / 2, cy = h / 2;
+      const jag = Array.from({ length: 22 }, () => .78 + Math.random() * .3);
+      const start = performance.now();
+      (function frame(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const e = easeInOut(p);
+        ctx.fillStyle = '#f4ece0'; ctx.fillRect(0, 0, w, h);
+        ctx.save();
+        ctx.beginPath();
+        const radius = Math.max(w, h) * .06 + e * Math.max(w, h) * .85;
+        jag.forEach((j, i) => {
+          const a = (i / jag.length) * Math.PI * 2;
+          const r = radius * j;
+          const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r * .82;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        });
+        ctx.closePath(); ctx.clip();
+        ctx.fillStyle = '#0c0e16'; ctx.fillRect(0, 0, w, h);
+        for (let i = 0; i < 60; i++) {
+          const sx = Math.random() * w, sy = Math.random() * h;
+          ctx.fillStyle = `rgba(230,220,255,${(.3 + Math.random() * .5).toFixed(2)})`;
+          ctx.fillRect(sx, sy, 1.2, 1.2);
+        }
+        ctx.restore();
+        if (p < 1) requestAnimationFrame(frame);
+      })(start);
+    }
+
+    /* 조리개 개방 — 별자리와 무관한 완전히 다른 은유. 카메라 조리개처럼 다각형
+       날이 회전하며 열려, 문이 아니라 '초점이 맞춰지는' 인상을 준다. */
+    function playAperture(ctx, w, h, dur) {
+      const cx = w / 2, cy = h / 2, blades = 7, maxR = Math.max(w, h) * .78;
+      const start = performance.now();
+      (function frame(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const e = easeInOut(p);
+        ctx.fillStyle = '#f4ece0'; ctx.fillRect(0, 0, w, h);
+        ctx.save();
+        const openR = maxR * e;
+        const rot = -.15 * (1 - e);
+        ctx.beginPath();
+        for (let i = 0; i < blades; i++) {
+          const a0 = (i / blades) * Math.PI * 2 + rot;
+          const a1 = ((i + .82) / blades) * Math.PI * 2 + rot;
+          const x0 = cx + Math.cos(a0) * openR, y0 = cy + Math.sin(a0) * openR * .82;
+          const x1 = cx + Math.cos(a1) * openR, y1 = cy + Math.sin(a1) * openR * .82;
+          if (i === 0) ctx.moveTo(x0, y0); else ctx.lineTo(x0, y0);
+          ctx.lineTo(x1, y1);
+        }
+        ctx.closePath(); ctx.clip();
+        ctx.fillStyle = '#0c0e16'; ctx.fillRect(0, 0, w, h);
+        for (let i = 0; i < 60; i++) {
+          const sx = Math.random() * w, sy = Math.random() * h;
+          ctx.fillStyle = `rgba(210,225,255,${(.25 + Math.random() * .5).toFixed(2)})`;
+          ctx.fillRect(sx, sy, 1.1, 1.1);
+        }
+        ctx.restore();
+        if (p < 1) requestAnimationFrame(frame);
+      })(start);
+    }
+
+    /* 잉크 번짐 — 종이 위에 어두운 잉크가 여러 방울에서 동시에 번져 퍼지며
+       종이(따뜻한 색)를 우주(차가운 보라)로 물들인다. 문/구멍 은유가 아니라
+       "스며드는" 은유라 앞의 둘과 겹치지 않는다. */
+    function playInk(ctx, w, h, dur) {
+      const blots = Array.from({ length: 5 }, () => ({
+        x: w * (.3 + Math.random() * .4), y: h * (.3 + Math.random() * .4),
+        delay: Math.random() * .35, wob: Math.random() * Math.PI * 2,
+      }));
+      const start = performance.now();
+      (function frame(now) {
+        const p = Math.min(1, (now - start) / dur);
+        ctx.fillStyle = '#f4ece0'; ctx.fillRect(0, 0, w, h);
+        ctx.save();
+        ctx.globalCompositeOperation = 'multiply';
+        blots.forEach((b) => {
+          const local = Math.max(0, Math.min(1, (p - b.delay) / (1 - b.delay)));
+          const e = easeInOut(local);
+          const r = Math.max(w, h) * .05 + e * Math.max(w, h) * .6;
+          const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, r);
+          grad.addColorStop(0, 'rgba(30,20,55,.95)');
+          grad.addColorStop(.7, 'rgba(50,40,90,.7)');
+          grad.addColorStop(1, 'rgba(50,40,90,0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.ellipse(b.x, b.y, r * (1 + Math.sin(b.wob + p * 4) * .06), r * .86, 0, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.restore();
+        if (p > .55) {
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, (p - .55) / .35);
+          for (let i = 0; i < 50; i++) {
+            const sx = Math.random() * w, sy = Math.random() * h;
+            ctx.fillStyle = 'rgba(220,215,255,.5)';
+            ctx.fillRect(sx, sy, 1, 1);
+          }
+          ctx.restore();
+        }
+        if (p < 1) requestAnimationFrame(frame);
+      })(start);
+    }
+
+    /* 8차 정련 — 몰입 진입(초점 풀림 정련). 6차의 "초점 풀림"(선명도 변화만
+       있던 정적인 버전)은 반려됐지만, 8차 판정에서 "우주 진입점은 초점
+       풀림이 좀 괜찮긴 함"이라며 방향 자체는 긍정적으로 재평가받았다. 다만
+       "다른 이세계에 빨려들어가는 것 같은 야무진 애니메이션"을 원했으므로,
+       단순 블러 해소가 아니라 실제 "관통해 지나가는" 느낌을 더했다 — 화면
+       중심에서 방사형으로 뻗어나가는 선(종이 파편/별빛 궤적)이 뷰어를 관통해
+       지나가듯 가속하며 흩어지고, 그 사이로 종이가 걷히며 우주가 드러나고,
+       후반부에 별자리가 초점을 되찾아 선명해진다. 길이는 다른 후보(약 3.4초)
+       보다 길게 잡아 진입점 클릭 시 약 5초(트리거의 DURATIONS.focus)로
+       재생된다. */
+    function playFocus(ctx, w, h, dur) {
+      const cx = w * .5, cy = h * .5;
+      const maxR = Math.max(w, h);
+      const streaks = Array.from({ length: 130 }, () => ({
+        a: Math.random() * Math.PI * 2,
+        speed: .5 + Math.random() * .9,
+        dist0: Math.random() * .2,
+        len: .05 + Math.random() * .13,
+        paper: Math.random() < .28,
+      }));
+      const stars = Array.from({ length: 90 }, () => ({ x: Math.random() * w, y: Math.random() * h, r: .6 + Math.random() * 1.6 }));
+      const start = performance.now();
+      (function frame(now) {
+        const p = Math.min(1, (now - start) / dur);
+        /* 가속하는 관통감 — 초반은 천천히, 후반으로 갈수록 빠르게 빨려든다. */
+        const e = Math.pow(p, .68);
+        ctx.save();
+        ctx.fillStyle = '#0c0e16'; ctx.fillRect(0, 0, w, h);
+        /* 방사형으로 뻗어나가는 종이·별빛 파편 — "이세계로 빨려들어가는" 축을 만든다. */
+        streaks.forEach((s) => {
+          const dist = (s.dist0 + e * s.speed) % 1.15;
+          const r0 = dist * maxR;
+          const r1 = Math.min(maxR * 1.25, r0 + s.len * maxR * (.4 + e * 1.7));
+          const x0 = cx + Math.cos(s.a) * r0, y0 = cy + Math.sin(s.a) * r0 * .85;
+          const x1 = cx + Math.cos(s.a) * r1, y1 = cy + Math.sin(s.a) * r1 * .85;
+          const alpha = Math.min(.85, .15 + e * .65) * (1 - dist * .4);
+          ctx.strokeStyle = s.paper ? `rgba(244,236,224,${alpha.toFixed(2)})` : `rgba(215,225,255,${alpha.toFixed(2)})`;
+          ctx.lineWidth = s.paper ? 2.2 : 1;
+          ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+        });
+        /* 종이가 아직 다 걷히지 않은 만큼만 남아 있다가 빠르게 사라진다. */
+        const paperAlpha = Math.max(0, 1 - e * 1.4);
+        if (paperAlpha > 0) { ctx.globalAlpha = paperAlpha; ctx.fillStyle = '#f4ece0'; ctx.fillRect(0, 0, w, h); ctx.globalAlpha = 1; }
+        ctx.restore();
+        /* 후반부에 별자리가 초점을 되찾으며 선명해진다 — 관통해 도착한 "다른 이세계". */
+        if (e > .5) {
+          const focusE = Math.min(1, (e - .5) / .5);
+          const blur = (1 - focusE) * 10;
+          ctx.save();
+          ctx.globalAlpha = focusE;
+          ctx.filter = blur > .3 ? `blur(${blur.toFixed(1)}px)` : 'none';
+          stars.forEach((s) => {
+            ctx.fillStyle = `rgba(225,220,255,${(.4 + Math.random() * .5).toFixed(2)})`;
+            ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+          });
+          ctx.filter = 'none';
+          ctx.restore();
+        }
+        if (p < 1) requestAnimationFrame(frame);
+      })(start);
+    }
+
+    /* 6차 신규 은유 2 — 장막 걷힘. 종이가 찢기거나 열리는 게 아니라, 얇은
+       천 같은 장막이 한쪽에서 다른 쪽으로 걷히며 뒤의 우주를 드러낸다.
+       "찢김"과 달리 가장자리가 매끈하고 방향성이 뚜렷하다. */
+    function playVeil(ctx, w, h, dur) {
+      const start = performance.now();
+      (function frame(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const e = easeInOut(p);
+        ctx.fillStyle = '#0c0e16'; ctx.fillRect(0, 0, w, h);
+        for (let i = 0; i < 60; i++) {
+          const sx = Math.random() * w, sy = Math.random() * h;
+          ctx.fillStyle = `rgba(220,215,255,${(.25 + Math.random() * .5).toFixed(2)})`;
+          ctx.fillRect(sx, sy, 1.1, 1.1);
+        }
+        const veilX = w * e * 1.15 - w * .05;
+        const grad = ctx.createLinearGradient(veilX - 40, 0, veilX + 6, 0);
+        grad.addColorStop(0, 'rgba(244,236,224,0)');
+        grad.addColorStop(1, 'rgba(244,236,224,1)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, Math.max(0, veilX + 6), h);
+        ctx.fillStyle = '#f4ece0';
+        ctx.fillRect(0, 0, Math.max(0, veilX - 40), h);
+        if (p < 1) requestAnimationFrame(frame);
+      })(start);
+    }
+
+    /* 6차 신규 은유 3 — 불씨 번짐. 종이 한 점에서 따뜻한 불씨색 빛이 번지며
+       퍼질수록 색이 차가운 보랏빛 우주로 식어간다. 잉크(어두운 색이 퍼짐)와
+       반대로 밝은 빛이 퍼지며 온도가 바뀌는 것이 이 후보의 핵심이다. */
+    function playEmber(ctx, w, h, dur) {
+      const cx = w * .5, cy = h * .58;
+      const start = performance.now();
+      (function frame(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const e = easeInOut(p);
+        ctx.fillStyle = '#f4ece0'; ctx.fillRect(0, 0, w, h);
+        const r = Math.max(w, h) * (.03 + e * .95);
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        const warm = `rgba(255,${170 - e * 60},${90 - e * 60},${Math.max(0, .9 - e * .5).toFixed(2)})`;
+        grad.addColorStop(0, warm);
+        grad.addColorStop(.55, `rgba(${120 - e * 60},${90 - e * 30},${170 + e * 40},${(.55 + e * .3).toFixed(2)})`);
+        grad.addColorStop(1, 'rgba(12,14,22,1)');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+        if (e > .35) {
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, (e - .35) / .5);
+          for (let i = 0; i < 60; i++) {
+            const sx = Math.random() * w, sy = Math.random() * h;
+            ctx.fillStyle = 'rgba(225,220,255,.5)';
+            ctx.fillRect(sx, sy, 1, 1);
+          }
+          ctx.restore();
+        }
+        if (p < 1) requestAnimationFrame(frame);
+      })(start);
+    }
+
+    /* 7차 신규 은유 1 — 종이 재구성(coalesce). 지금까지의 후보는 전부
+       "종이 표면에 뚫리거나 번지는 하나의 사건"이었다. 이건 다르다 — 화면에
+       흩어진 v2 종이 질감의 작은 조각(점)들이 각자 다른 지점에서 출발해
+       모여들며 그대로 별자리의 점으로 재배치된다. 포털이 아니라 "당신의
+       포트폴리오 자체가 하늘이 되는" 변신이다. */
+    function playCoalesce(ctx, w, h, dur) {
+      const n = 70;
+      const particles = Array.from({ length: n }, () => ({
+        sx: Math.random() * w, sy: Math.random() * h,
+        tx: w * (.15 + Math.random() * .7), ty: h * (.12 + Math.random() * .68),
+        delay: Math.random() * .3, size: .8 + Math.random() * 1.8,
+      }));
+      const start = performance.now();
+      (function frame(now) {
+        const p = Math.min(1, (now - start) / dur);
+        ctx.fillStyle = '#f4ece0'; ctx.fillRect(0, 0, w, h);
+        const fade = Math.max(0, 1 - p * 1.3);
+        if (fade > 0) { ctx.save(); ctx.globalAlpha = fade * .35;
+          ctx.strokeStyle = '#c9bfa9'; ctx.lineWidth = 1;
+          for (let i = 0; i < 10; i++) { ctx.beginPath(); ctx.moveTo(0, (i / 10) * h); ctx.lineTo(w, (i / 10) * h); ctx.stroke(); }
+          ctx.restore(); }
+        const bg = Math.min(1, Math.max(0, (p - .2) / .7));
+        if (bg > 0) { ctx.save(); ctx.globalAlpha = bg; ctx.fillStyle = '#0c0e16'; ctx.fillRect(0, 0, w, h); ctx.restore(); }
+        particles.forEach((pt) => {
+          const local = Math.max(0, Math.min(1, (p - pt.delay) / (1 - pt.delay)));
+          const e = easeInOut(local);
+          const x = pt.sx + (pt.tx - pt.sx) * e, y = pt.sy + (pt.ty - pt.sy) * e;
+          const glow = .4 + e * .6;
+          ctx.fillStyle = `rgba(${Math.round(230 - e * 20)},${Math.round(220 - e * 10)},${Math.round(200 + e * 55)},${glow.toFixed(2)})`;
+          ctx.beginPath(); ctx.arc(x, y, pt.size * (.6 + e * .7), 0, Math.PI * 2); ctx.fill();
+        });
+        if (p < 1) requestAnimationFrame(frame);
+      })(start);
+    }
+
+    /* 7차 신규 은유 2 — 유리 아래 번짐(loupe). 조리개처럼 기계적으로 열리는
+       원이 아니라, 확대경(loupe)을 종이 위에 대고 누르는 듯한 하나의 원형
+       창이 커지며 그 안에서만 우주가 보인다. 가장자리는 매끈한 원이 아니라
+       살짝 일렁이는 굴절 경계로 그려 "유리 아래 잉크"처럼 읽히게 한다. */
+    function playLoupe(ctx, w, h, dur) {
+      const cx = w * .5, cy = h * .5;
+      const start = performance.now();
+      (function frame(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const e = easeInOut(p);
+        ctx.fillStyle = '#f4ece0'; ctx.fillRect(0, 0, w, h);
+        const baseR = Math.max(w, h) * .04 + e * Math.max(w, h) * .82;
+        ctx.save();
+        ctx.beginPath();
+        const spokes = 40;
+        for (let i = 0; i <= spokes; i++) {
+          const a = (i / spokes) * Math.PI * 2;
+          const wobble = 1 + Math.sin(a * 5 + p * 6) * .025 * (1 - e * .4);
+          const r = baseR * wobble;
+          const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r * .85;
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.closePath(); ctx.clip();
+        ctx.fillStyle = '#0c0e16'; ctx.fillRect(0, 0, w, h);
+        for (let i = 0; i < 70; i++) {
+          const sx = Math.random() * w, sy = Math.random() * h;
+          ctx.fillStyle = `rgba(215,225,255,${(.3 + Math.random() * .5).toFixed(2)})`;
+          ctx.fillRect(sx, sy, 1.1, 1.1);
+        }
+        ctx.restore();
+        /* 확대경의 두꺼운 유리 테두리 — 문/조리개의 기계적 날이 아니라
+           빛이 굴절되는 하나의 얇은 링으로만 존재를 알린다. */
+        ctx.save();
+        ctx.globalAlpha = .5 + e * .3;
+        ctx.strokeStyle = 'rgba(255,250,240,.6)';
+        ctx.lineWidth = 2.4;
+        ctx.beginPath(); ctx.ellipse(cx, cy, baseR, baseR * .85, 0, 0, Math.PI * 2); ctx.stroke();
+        ctx.restore();
+        if (p < 1) requestAnimationFrame(frame);
+      })(start);
+    }
+
+    /* 7차 신규 은유 3 — 빛의 확장(point-of-light). 렌즈·조리개·바늘구멍
+       같은 광학 기구 은유가 아니라, 화면 한 점에서 시작한 단 하나의 밝은
+       빛이 지수적으로 커지며 화면을 삼킨다. 색이 식거나 번지지 않고
+       "커지기만" 한다는 점에서 불씨 번짐과도 다르다. */
+    function playPoint(ctx, w, h, dur) {
+      const cx = w * .5, cy = h * .52;
+      const start = performance.now();
+      (function frame(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const e = Math.pow(p, .38);
+        ctx.fillStyle = '#f4ece0'; ctx.fillRect(0, 0, w, h);
+        const r = Math.max(1, Math.max(w, h) * e * 1.05);
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        grad.addColorStop(0, 'rgba(255,255,250,1)');
+        grad.addColorStop(Math.min(.98, .12 + (1 - e) * .1), 'rgba(210,215,255,.95)');
+        grad.addColorStop(1, 'rgba(12,14,22,1)');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+        if (p < .22) {
+          ctx.save();
+          ctx.globalAlpha = 1 - p / .22;
+          ctx.strokeStyle = 'rgba(255,255,245,.7)';
+          for (let i = 0; i < 8; i++) {
+            const a = (i / 8) * Math.PI * 2;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + Math.cos(a) * Math.max(w, h) * .4, cy + Math.sin(a) * Math.max(w, h) * .4);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+        if (p > .4) {
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, (p - .4) / .5);
+          for (let i = 0; i < 60; i++) {
+            const sx = Math.random() * w, sy = Math.random() * h;
+            ctx.fillStyle = 'rgba(220,215,255,.5)';
+            ctx.fillRect(sx, sy, 1, 1);
+          }
+          ctx.restore();
+        }
+        if (p < 1) requestAnimationFrame(frame);
+      })(start);
+    }
+
+    const RUNNERS = {
+      torn: playTorn, aperture: playAperture, ink: playInk, focus: playFocus, veil: playVeil, ember: playEmber,
+      coalesce: playCoalesce, loupe: playLoupe, point: playPoint,
+    };
+
+    /* 8차 — 후보별 재생 길이. 몰입 진입(focus)만 "다른 이세계로 빨려들어가는"
+       느낌을 온전히 담기 위해 약 5초로 늘렸다. 나머지 후보는 기존 3.4초를
+       유지한다. */
+    const DURATIONS = { focus: 5000 };
+    trigger.addEventListener('click', () => {
+      const { ctx, w, h } = sizeCanvas();
+      const dur = prefersReduced() ? 40 : (DURATIONS[anim] || 3400);
+      playSfxCandidate();
+      (RUNNERS[anim] || playTorn)(ctx, w, h, dur);
+    });
+    window.addEventListener('resize', () => { sizeCanvas(); }, { passive: true });
+    sizeCanvas();
+  })();
+  </script>
 </body>
 </html>

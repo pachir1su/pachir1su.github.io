@@ -527,7 +527,13 @@
     enter: 'assets/audio/sfx-06-enter-b-three-notes.wav',
   };
   const activeSfx = new Map();
-  function playApprovedSfx(cue) {
+  /* #114 6차 라운드 — "톤만 바꾼 변주"를 반려하고, 같은 악기(같은 wav 파일 =
+     같은 결의 배음·잔향·질감)를 유지한 채 재생 때마다 다른 음(피치)만 무작위로
+     골라 울리는 방식으로 다시 짰다. 풍경(윈드차임)이 같은 종을 매번 다른
+     음으로 울리는 것과 같은 원리다. playbackRate로 재생 속도를 바꾸면 음정과
+     길이가 함께 바뀌는데, 이는 실제 종을 다른 세기로 쳐서 다른 음이 나는
+     것과 같은 인상을 준다 — 새 타임브레(timbre)를 합성하지 않는다. */
+  function playApprovedSfx(cue, semitoneOffset) {
     const source = APPROVED_SFX[cue];
     if (!source) return;
     const previous = activeSfx.get(cue);
@@ -535,6 +541,14 @@
     const audio = new Audio(source);
     audio.preload = 'auto';
     audio.volume = cue === 'year' ? .48 : .58;
+    if (semitoneOffset) {
+      const rate = Math.pow(2, semitoneOffset / 12);
+      /* 브라우저 재생 속도 허용 범위를 벗어나지 않도록 안전하게 자른다. */
+      audio.playbackRate = Math.min(4, Math.max(0.25, rate));
+      audio.preservesPitch = false;
+      audio.mozPreservesPitch = false;
+      audio.webkitPreservesPitch = false;
+    }
     activeSfx.set(cue, audio);
     audio.addEventListener('ended', () => {
       if (activeSfx.get(cue) === audio) activeSfx.delete(cue);
@@ -542,6 +556,64 @@
     audio.play().catch(() => {
       if (activeSfx.get(cue) === audio) activeSfx.delete(cue);
     });
+  }
+
+  /* 근음(확정 take) 대비 반음 오프셋의 작은 집합. 전부 협화음정(장2도·장3도·
+     완전5도, 그리고 -장2도로 아래쪽도 하나)이라 무작위로 골라도 튀지 않는다.
+     SFX-05·SFX-06 둘 다 같은 집합을 공유한다 — "같은 종, 다른 음"이라는
+     동일한 원칙이므로 상황마다 다른 스케일을 새로 만들지 않는다. */
+  const PITCH_ROTATION_SEMITONES = [0, 2, 4, 7, -2];
+  /* cue(select/enter)마다 위 집합에서 하나를 무작위로 골라, 확정 wav를
+     그 음으로 재생한다. 이전 라운드의 "다른 타임브레 후보 중 하나를 고르는"
+     방식을 완전히 대체한다. */
+  function playRotatingSfx(cue) {
+    const semi = PITCH_ROTATION_SEMITONES[Math.floor(Math.random() * PITCH_ROTATION_SEMITONES.length)];
+    playApprovedSfx(cue, semi);
+  }
+
+  /* v2→v3 게이트웨이 전용 신규 후보음. #114 최종 지시대로 상세/우주 진입에
+     쓰는 SFX-06 B(세 음의 벨)를 그대로 재사용하지 않고, 다른 방향(느리게
+     열리는 낮은 스웰 + 위로 미끄러지는 글리산도)으로 새로 합성한다.
+     아직 사용자 판정 전이므로 확정 파일로 만들지 않고 Web Audio로만 재생하며,
+     같은 판정은 nebula-sound.html에 SFX-14 후보로도 기록해 둔다. */
+  let gatewaySfxCtx = null;
+  function playGatewayEnterSfx() {
+    if (prefersReduced()) return;
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!gatewaySfxCtx) gatewaySfxCtx = new Ctx();
+      const ctx = gatewaySfxCtx;
+      if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+      const at = ctx.currentTime + 0.01;
+
+      /* 저역 스웰 — 문이 천천히 열리는 느낌으로 3초 가까이 부풀렸다가 잦아든다. */
+      const swell = ctx.createOscillator();
+      swell.type = 'sine';
+      swell.frequency.setValueAtTime(90, at);
+      swell.frequency.exponentialRampToValueAtTime(58, at + 3.1);
+      const swellGain = ctx.createGain();
+      swellGain.gain.setValueAtTime(0.0001, at);
+      swellGain.gain.exponentialRampToValueAtTime(0.16, at + 1.3);
+      swellGain.gain.exponentialRampToValueAtTime(0.0001, at + 3.3);
+      swell.connect(swellGain).connect(ctx.destination);
+      swell.start(at); swell.stop(at + 3.4);
+
+      /* 위로 미끄러지는 글리산도 — 문이 열리며 빛이 새어드는 인상을 준다.
+         SFX-06 B의 세 개 개별 타건과 달리 끊기지 않는 연속 상승이다. */
+      const rise = ctx.createOscillator();
+      rise.type = 'triangle';
+      rise.frequency.setValueAtTime(220, at + 0.6);
+      rise.frequency.exponentialRampToValueAtTime(660, at + 3.0);
+      const riseGain = ctx.createGain();
+      riseGain.gain.setValueAtTime(0.0001, at + 0.6);
+      riseGain.gain.exponentialRampToValueAtTime(0.05, at + 1.8);
+      riseGain.gain.exponentialRampToValueAtTime(0.0001, at + 3.2);
+      rise.connect(riseGain).connect(ctx.destination);
+      rise.start(at + 0.6); rise.stop(at + 3.3);
+    } catch (err) {
+      /* 오디오 실패는 화면 전환을 막지 않는다. */
+    }
   }
 
   /* ------------------------------------------------------------------
@@ -576,6 +648,10 @@
     10: [[.100, .520], [.185, .365], [.300, .470], [.402, .255], [.518, .385],
          [.448, .565], [.585, .665], [.422, .725], [.280, .610], [.165, .735]],
     5: [[.135, .520], [.270, .335], [.435, .455], [.360, .650], [.180, .675]],
+    /* 2024와 2025는 완료 별이 둘 다 5개라 위 5점 형태가 그대로 겹쳐 보였다.
+       #114 3차 지시대로 같은 개수라도 연도가 다르면 다른 별자리로 읽히도록,
+       가로로 눕고 궤적이 반대로 도는 형태를 따로 둔다(pickShape가 2024에 배정). */
+    '5b': [[.115, .350], [.310, .270], [.470, .430], [.400, .630], [.560, .715]],
   };
   const TABLET_YEAR = {
     11: [[.125, .315], [.290, .245], [.435, .350], [.310, .460], [.475, .535], [.330, .625],
@@ -583,6 +659,7 @@
     10: [[.125, .315], [.290, .245], [.435, .350], [.310, .460], [.475, .535],
          [.330, .625], [.485, .705], [.315, .785], [.165, .695], [.105, .560]],
     5: [[.150, .385], [.330, .300], [.490, .435], [.340, .635], [.145, .600]],
+    '5b': [[.130, .270], [.330, .215], [.480, .360], [.410, .560], [.560, .640]],
   };
   /* 폰은 화면 폭이 좁은 대신 무대를 세로로 쓴다. 별 사이의 세로 간격은
      44px 터치 영역보다 항상 크게 잡는다. 이전 좌표(.035 간격)는 폴드에서
@@ -593,15 +670,22 @@
     10: [[.145, .195], [.715, .255], [.145, .315], [.715, .375], [.145, .435],
          [.715, .495], [.145, .555], [.715, .615], [.145, .675], [.715, .735]],
     5: [[.155, .275], [.710, .385], [.155, .495], [.710, .605], [.155, .715]],
+    '5b': [[.500, .240], [.220, .360], [.780, .430], [.280, .565], [.680, .700]],
   };
   /* 접힌 폴드는 이름이 두 줄이 되는 경우가 많으므로, 모바일보다 한 단계
      더 길게 벌린 전용 성도다. 양쪽을 번갈아 읽을 수 있게 궤적도 지그재그로 둔다. */
+  /* #114 5차 라운드 — 11개짜리 폴드 성도는 좁은 세로 폭 안에 균일 간격(.060)으로
+     11개를 한 무리로 몰아넣은 단일 표였고, 넉넉한 재시도 횟수로도 충돌 해소가
+     빠듯했다. 여백을 다시 넓히는 대신 표 자체를 "가까운 무리"(위 6개)와
+     "먼 무리"(아래 5개) 둘로 분리하고, 두 무리 사이에만 훨씬 큰 세로 간격
+     (.165, 기존 균일 간격의 약 세 배)을 둬서 시각적으로도 두 성도로 읽히게 한다. */
   const FOLD_YEAR = {
-    11: [[.135, .180], [.760, .240], [.135, .300], [.760, .360], [.135, .420], [.760, .480],
-         [.135, .540], [.760, .600], [.135, .660], [.760, .720], [.135, .780]],
+    11: [[.135, .150], [.760, .205], [.135, .260], [.760, .315], [.135, .370], [.760, .425],
+         [.135, .590], [.760, .645], [.135, .700], [.760, .755], [.135, .810]],
     10: [[.135, .190], [.760, .255], [.135, .320], [.760, .385], [.135, .450],
          [.760, .515], [.135, .580], [.760, .645], [.135, .710], [.760, .775]],
     5: [[.145, .285], [.755, .405], [.145, .525], [.755, .645], [.145, .765]],
+    '5b': [[.480, .200], [.180, .360], [.760, .440], [.240, .600], [.640, .760]],
   };
 
   const LAYOUTS = {
@@ -636,7 +720,15 @@
     },
   };
 
-  function pickShape(table, count) {
+  /* 완료 별 개수가 같은 두 연도가 같은 형태를 쓰면 별자리가 겹쳐 보인다(2024·2025가
+     둘 다 5개였던 경우). yearLabel이 대체 형태(count+'b')를 가리키면 그쪽을 우선한다. */
+  /* 별 개수가 우연히 같은 연도끼리 겹치지 않도록, 개수별로 대체 형태를 받을
+     연도를 하나씩 지정한다. 현재는 2024·2025가 둘 다 5개라 2024를 '5b'로 돌린다. */
+  const SHAPE_VARIANT_YEARS = { '5': '2024' };
+
+  function pickShape(table, count, yearLabel) {
+    const altKey = count + 'b';
+    if (yearLabel && SHAPE_VARIANT_YEARS[String(count)] === yearLabel && table[altKey]) return table[altKey];
     if (table[count]) return table[count];
     const base = table[10];
     if (count >= base.length) return base;
@@ -711,7 +803,7 @@
       if (item.detail) {
         const link = document.createElement('span');
         link.className = 'sky-link';
-        link.textContent = '자세히 →';
+        link.textContent = '상세 보기 →';
         text.append(link);
       }
 
@@ -733,11 +825,11 @@
       hit.addEventListener('blur', leave);
       hit.addEventListener('click', () => {
         if (state.open === body && item.detail) {
-          playApprovedSfx('enter');
+          playRotatingSfx('enter');
           window.setTimeout(() => { window.location.href = base + item.detail; }, 140);
           return;
         }
-        playApprovedSfx('select');
+        playRotatingSfx('select');
         toggle(body);
       });
       return body;
@@ -873,6 +965,12 @@
       body.hit.style.top = `${y}px`;
     }
 
+    /* 별과 선은 항상 이 좌표로 그린다. 카드가 펼쳐져 라벨(hit)이 충돌을
+       피해 옆으로 밀려도, 캔버스가 그리는 성도 자체는 흔들리지 않는다. */
+    function setBase(body, x, y) {
+      body.baseX = x; body.baseY = y;
+    }
+
     function stageRect(element, root) {
       const rect = element.getBoundingClientRect();
       return {
@@ -898,14 +996,19 @@
       const interactive = bodies.filter((body) => body.yearPhase !== 'leave');
       const placed = controls.slice();
       const labelMargin = (L === LAYOUTS.mobile || L === LAYOUTS.fold) ? w * .40 : w * .27;
+      /* 좁은 폭일수록 라벨이 서로 밀어낼 여지가 적으므로 충돌 판정 여백과
+         시도 횟수를 넓게 잡는다. 폴드에서 재현되던 잔여 겹침은 72회 시도가
+         부족해 attempt 상한 안에서 자리를 못 찾고 멈춘 것이 원인이었다. */
+      const gap = L === LAYOUTS.fold ? 16 : L === LAYOUTS.mobile ? 14 : 10;
+      const attempts = (L === LAYOUTS.fold || L === LAYOUTS.mobile) ? 140 : 96;
 
       interactive.forEach((body) => {
         const side = body.hit.dataset.side;
         const minX = side === 'left' ? labelMargin : 18;
         const maxX = side === 'right' ? w - labelMargin : w - 18;
-        for (let attempt = 0; attempt < 72; attempt++) {
+        for (let attempt = 0; attempt < attempts; attempt++) {
           const rect = stageRect(body.hit, root);
-          const conflict = placed.find((other) => collides(rect, other));
+          const conflict = placed.find((other) => collides(rect, other, gap));
           if (!conflict) { placed.push(rect); break; }
 
           const direction = side === 'left' ? -1 : 1;
@@ -933,7 +1036,7 @@
       bodies.forEach((body) => {
         if (body.group === 'year' && body.yearPhase === 'leave') return;
         const shape = body.group === 'year'
-          ? pickShape(L.year, state.data.years[state.year].cards.length)
+          ? pickShape(L.year, state.data.years[state.year].cards.length, state.data.years[state.year].label)
           : L[body.group];
         const pos = shape[body.index % shape.length];
         const requestedSide = L.side[body.group];
@@ -942,6 +1045,7 @@
           : requestedSide === 'balanced'
             ? ((body.index % 2 && pos[0] > .16) || pos[0] > .68 ? 'left' : 'right')
             : requestedSide;
+        setBase(body, pos[0] * w, pos[1] * h);
         positionBody(body, pos[0] * w, pos[1] * h);
       });
       resolveInteractiveCollisions(L);
@@ -1013,7 +1117,7 @@
         c.strokeStyle = rgba(T.gold, (T.mode === 'light' ? .40 : .46) * alpha);
         c.lineWidth = Math.max(1, Math.min(w, h) * .0014);
         c.beginPath();
-        lineBodies.forEach((b, i) => (i ? c.lineTo(b.x, b.y) : c.moveTo(b.x, b.y)));
+        lineBodies.forEach((b, i) => (i ? c.lineTo(b.baseX, b.baseY) : c.moveTo(b.baseX, b.baseY)));
         c.stroke();
         c.restore();
       };
@@ -1024,15 +1128,15 @@
         body.focus = lerp(body.focus, body.target, k);
         if (body.group === 'year') {
           const f = body.focus;
-          star(c, body.x, body.y, R * (.30 + f * .10), T.ink,
+          star(c, body.baseX, body.baseY, R * (.30 + f * .10), T.ink,
             (T.mode === 'light' ? .84 : .94) * body.yearAlpha, R * (1.5 + f * .9),
             ((T.mode === 'light' ? .34 : .13) + f * .12) * body.yearAlpha, T);
         } else if (body.group === 'wip') {
-          protostar(c, body.x, body.y, R, T, body, state.t, body.focus);
+          protostar(c, body.baseX, body.baseY, R, T, body, state.t, body.focus);
         } else if (body.item.stage === 'drift') {
-          drifted(c, body.x, body.y, R, T, body, state.t, body.focus);
+          drifted(c, body.baseX, body.baseY, R, T, body, state.t, body.focus);
         } else {
-          remnant(c, body.x, body.y, R, T, body, state.t, body.focus);
+          remnant(c, body.baseX, body.baseY, R, T, body, state.t, body.focus);
         }
       });
     }
@@ -1536,20 +1640,40 @@
     veil.className = 'gate-veil';
     document.body.append(veil);
     let entering = false;
+
+    /* 진입점을 리셋한다. 클릭 뒤 v2로 되돌아오면(뒤로 가기, bfcache 복원)
+       gate.disabled와 is-opening이 그대로 남아 진입점이 다시는 눌리지 않는
+       것처럼 보이는 원인이었다. 페이지가 다시 보일 때마다 원상태로 되돌린다. */
+    function resetGate() {
+      entering = false;
+      gate.disabled = false;
+      field.classList.remove('is-opening');
+      veil.classList.remove('open');
+      if (burstCanvas) burstCanvas.classList.remove('is-active');
+    }
+
     gate.addEventListener('click', () => {
       if (entering) return;
       entering = true;
       gate.disabled = true;
       const box = gate.getBoundingClientRect();
-      playApprovedSfx('enter');
+      playGatewayEnterSfx();
       veil.style.setProperty('--gx', `${box.left + box.width / 2}px`);
       veil.style.setProperty('--gy', `${box.top + box.height / 2}px`);
       field.classList.add('is-opening');
       drawEntryBurst({ x:box.left + box.width / 2, y:box.top + box.height / 2 });
       veil.classList.add('open');
-      /* SFX-06 B의 세 음과 마지막 잔향을 읽을 수 있도록, 기존 0.76초보다
-         전환을 길게 잡는다. 애니메이션과 소리가 같은 끝점으로 모인다. */
-      window.setTimeout(() => { window.location.href = target; }, prefersReduced() ? 200 : 1200);
+      /* v2→v3 진입은 기존 1.2초보다 훨씬 길게 늘여 약 4초로 잡는다.
+         새 게이트웨이 전용 사운드(비확정 후보, SFX-06 B와는 다른 방향)의
+         잔향과 화면 전환이 같은 끝점에서 만나야 한다. */
+      window.setTimeout(() => { window.location.href = target; }, prefersReduced() ? 200 : 4000);
+    });
+
+    /* bfcache로 복원되거나(pageshow persisted), 탭이 다시 보이게 될 때도
+       같은 이유로 리셋한다. v2 홈의 진입점이 다시는 반응하지 않는 문제의 대응. */
+    window.addEventListener('pageshow', (event) => { if (event.persisted) resetGate(); });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && gate.disabled) resetGate();
     });
   }
 
