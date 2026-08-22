@@ -1,0 +1,57 @@
+name: TEMP v2 source and KGA capture retry
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Korean fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          fc-cache -f
+
+      - name: Archive source snapshot
+        run: |
+          zip -qr repo-source.zip . -x '.git/*' -x 'repo-source.zip'
+
+      - name: Capture verified KGA public screens
+        env:
+          KGA_BASE: https://que-tune-earnings-ahead.trycloudflare.com/web
+        run: |
+          set -euo pipefail
+          mkdir -p kga-captures
+          routes=(
+            "home|${KGA_BASE}#/"
+            "notice|${KGA_BASE}#/notice"
+            "shuttle|${KGA_BASE}#/shuttle"
+            "cafeteria|${KGA_BASE}#/cafeteria"
+            "library|${KGA_BASE}#/library"
+          )
+          for item in "${routes[@]}"; do
+            name="${item%%|*}"
+            url="${item#*|}"
+            google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars --lang=ko-KR \
+              --window-size=1440,1100 --virtual-time-budget=12000 \
+              --screenshot="kga-captures/${name}.png" "$url"
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: repo-source-retry
+          path: repo-source.zip
+          retention-days: 1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kga-public-captures-retry
+          path: kga-captures/
+          retention-days: 1
