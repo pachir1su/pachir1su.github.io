@@ -1,0 +1,79 @@
+name: TEMP PR204 media QA
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout product PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: chatgpt/v2-media-videos
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Chromium runner
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --save-dev playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Run media browser QA
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/pr204-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 1
+          cat > .tmp-pr204-qa.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          const browser = await chromium.launch({ headless: true });
+          const projects = [
+            { path: 'computingSAGO', id: '4xF9-N9jKvc', label: 'Daily Report AI' },
+            { path: 'MultiMind', id: 'CyX0PryfrRI', label: 'MultiMind' },
+          ];
+          const cases = [
+            { width: 1440, height: 1000, lang: 'ko', theme: 'light' },
+            { width: 390, height: 844, lang: 'en', theme: 'dark' },
+          ];
+          let passed = 0;
+          const assert = (ok, msg) => { if (!ok) throw new Error(msg); };
+          for (const project of projects) {
+            for (const cfg of cases) {
+              const context = await browser.newContext({ viewport: { width: cfg.width, height: cfg.height }, colorScheme: cfg.theme });
+              await context.addInitScript(({lang, theme}) => {
+                localStorage.setItem('lang', lang);
+                localStorage.setItem('theme', theme);
+              }, { lang: cfg.lang, theme: cfg.theme });
+              const page = await context.newPage();
+              const errors = [];
+              page.on('pageerror', e => errors.push(String(e)));
+              await page.goto(`http://127.0.0.1:4173/projects/${project.path}/`, { waitUntil: 'networkidle' });
+              const frame = page.locator(`iframe[src*="${project.id}"]`);
+              assert(await frame.count() === 1, `${project.label}: expected one YouTube iframe`);
+              const src = await frame.getAttribute('src');
+              assert(src?.includes('youtube-nocookie.com/embed/'), `${project.label}: privacy-enhanced embed missing`);
+              assert(!src?.includes('autoplay=1'), `${project.label}: autoplay must stay off`);
+              assert(await frame.getAttribute('loading') === 'lazy', `${project.label}: lazy loading missing`);
+              const box = await frame.boundingBox();
+              assert(box && box.width > 0 && box.height > 0, `${project.label}: iframe not rendered`);
+              const ratio = box.width / box.height;
+              assert(ratio > 1.65 && ratio < 1.9, `${project.label}: iframe is not near 16:9 (${ratio})`);
+              const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+              assert(overflow <= 1, `${project.label}: horizontal overflow ${overflow}px @${cfg.width}`);
+              assert(errors.length === 0, `${project.label}: page errors ${errors.join(' | ')}`);
+              console.log(`PASS ${project.label} ${cfg.width}px ${cfg.lang}/${cfg.theme}`);
+              passed += 1;
+              await context.close();
+            }
+          }
+          console.log(`PR204 media QA: ${passed}/${projects.length * cases.length} cases passed`);
+          await browser.close();
+          EOF
+          node .tmp-pr204-qa.mjs
+          rm -f .tmp-pr204-qa.mjs package.json package-lock.json
