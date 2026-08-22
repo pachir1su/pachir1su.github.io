@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* =====================================================================
    build.js — projects.json 데이터로 index.html의 프로젝트 목록을 생성
-   - 단일 데이터 소스(projects.json)에서 연도별/진행중/실패 카드 HTML을 생성
+   - 단일 데이터 소스(projects.json)에서 연도별/진행중/진행중단/실패 카드 HTML을 생성
    - index.html 의 BUILD:PROJECTS 마커 사이를 교체 (정적 HTML 유지 → SEO 보존)
    - 의존성 없음(Node 내장 모듈만 사용). 사용법: `node build.js`
    ===================================================================== */
@@ -40,11 +40,17 @@ function i18nHtml(value, koSuffix, enSuffix) {
   };
 }
 
-/* 단일 프로젝트 카드 HTML 생성 (kind: 'year' | 'wip' | 'failed') */
+/* 단일 프로젝트 카드 HTML 생성 (kind: 'year' | 'wip' | 'discontinued' | 'failed') */
 function renderCard(card, kind) {
   const I = "              "; // 14칸 들여쓰기(카드 내부 요소)
   const extraClass =
-    kind === "wip" ? " project-wip" : kind === "failed" ? " project-failed" : "";
+    kind === "wip"
+      ? " project-wip"
+      : kind === "discontinued"
+      ? " project-discontinued"
+      : kind === "failed"
+      ? " project-failed"
+      : "";
   const lines = [];
 
   if (card.comment) lines.push(`            <!-- ${card.comment} -->`);
@@ -74,7 +80,12 @@ function renderCard(card, kind) {
   lines.push(`${I}</div>`);
 
   if (card.badge) {
-    const badgeCls = kind === "failed" ? "failed-badge" : "wip-badge";
+    const badgeCls =
+      kind === "failed"
+        ? "failed-badge"
+        : kind === "discontinued"
+        ? "discontinued-badge"
+        : "wip-badge";
     lines.push(
       `${I}<div class="${badgeCls}" data-en="${esc(card.badge.en)}" data-ko="${esc(
         card.badge.ko
@@ -108,7 +119,8 @@ function renderCard(card, kind) {
   /* 진행 상태 — 자기신고 %(0% · 5%는 빈 막대) 대신 상태 라벨 한 줄 (#114) */
   if (card.status) {
     const status = i18nText(card.status);
-    lines.push(`${I}<div class="wip-status"${status.attrs}>${status.inner}</div>`);
+    const statusCls = kind === "discontinued" ? "discontinued-status" : "wip-status";
+    lines.push(`${I}<div class="${statusCls}"${status.attrs}>${status.inner}</div>`);
   }
 
   if (card.failedReason) {
@@ -134,11 +146,19 @@ function renderGroup(group) {
   const cls =
     group.kind === "wip"
       ? " year-group-wip"
+      : group.kind === "discontinued"
+      ? " year-group-discontinued"
       : group.kind === "failed"
       ? " year-group-failed"
       : "";
   const dataYear =
-    group.kind === "wip" ? "wip" : group.kind === "failed" ? "failed" : group.year;
+    group.kind === "wip"
+      ? "wip"
+      : group.kind === "discontinued"
+      ? "discontinued"
+      : group.kind === "failed"
+      ? "failed"
+      : group.year;
   const heading = group.kind === "year" ? group.year : group.heading;
   const cards = group.cards.map((c) => renderCard(c, group.kind)).join("\n\n");
 
