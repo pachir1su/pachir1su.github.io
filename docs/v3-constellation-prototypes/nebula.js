@@ -527,7 +527,13 @@
     enter: 'assets/audio/sfx-06-enter-b-three-notes.wav',
   };
   const activeSfx = new Map();
-  function playApprovedSfx(cue) {
+  /* #114 6차 라운드 — "톤만 바꾼 변주"를 반려하고, 같은 악기(같은 wav 파일 =
+     같은 결의 배음·잔향·질감)를 유지한 채 재생 때마다 다른 음(피치)만 무작위로
+     골라 울리는 방식으로 다시 짰다. 풍경(윈드차임)이 같은 종을 매번 다른
+     음으로 울리는 것과 같은 원리다. playbackRate로 재생 속도를 바꾸면 음정과
+     길이가 함께 바뀌는데, 이는 실제 종을 다른 세기로 쳐서 다른 음이 나는
+     것과 같은 인상을 준다 — 새 타임브레(timbre)를 합성하지 않는다. */
+  function playApprovedSfx(cue, semitoneOffset) {
     const source = APPROVED_SFX[cue];
     if (!source) return;
     const previous = activeSfx.get(cue);
@@ -535,6 +541,14 @@
     const audio = new Audio(source);
     audio.preload = 'auto';
     audio.volume = cue === 'year' ? .48 : .58;
+    if (semitoneOffset) {
+      const rate = Math.pow(2, semitoneOffset / 12);
+      /* 브라우저 재생 속도 허용 범위를 벗어나지 않도록 안전하게 자른다. */
+      audio.playbackRate = Math.min(4, Math.max(0.25, rate));
+      audio.preservesPitch = false;
+      audio.mozPreservesPitch = false;
+      audio.webkitPreservesPitch = false;
+    }
     activeSfx.set(cue, audio);
     audio.addEventListener('ended', () => {
       if (activeSfx.get(cue) === audio) activeSfx.delete(cue);
@@ -544,57 +558,17 @@
     });
   }
 
-  /* #114 5차 라운드 — SFX-05(별 선택)·SFX-06 B(상세 진입)는 확정안의 결을
-     유지한 유사 변주를 여러 개 만들어 등장할 때마다 무작위로 순환 재생하라는
-     지시를 반영한다. 확정 wav 파일(select/enter)은 그대로 두고, 새 변주만
-     Web Audio로 합성해 자산 파일을 늘리지 않는다. nebula-sound.html의
-     s5a2/s5a3, s6b2/s6b3 후보와 같은 정의를 그대로 옮겼다. */
-  let variantSfxCtx = null;
-  function variantAudio() {
-    if (!variantSfxCtx) variantSfxCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (variantSfxCtx.state === 'suspended') variantSfxCtx.resume().catch(() => {});
-    return variantSfxCtx;
-  }
-  /* 확정 SFX-05/06과 같은 "종" 계열 배음비(비조화 부분음)로 짧은 종 한 점을 합성한다. */
-  function synthBellVariant(freq, ratios, dur, gain) {
-    try {
-      const ctx = variantAudio();
-      const at = ctx.currentTime + 0.01;
-      ratios.forEach((r, i) => {
-        const osc = ctx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq * r, at);
-        const life = dur * Math.pow(0.6, i) * (i ? 1 : 1.2);
-        const g = ctx.createGain();
-        g.gain.setValueAtTime(0.0001, at);
-        g.gain.exponentialRampToValueAtTime(Math.max(0.0003, gain * Math.pow(0.5, i)), at + 0.006);
-        g.gain.exponentialRampToValueAtTime(0.0001, at + life);
-        osc.connect(g).connect(ctx.destination);
-        osc.start(at); osc.stop(at + life + 0.05);
-      });
-    } catch (err) {
-      /* 오디오 실패는 상호작용을 막지 않는다. */
-    }
-  }
-  /* SFX-05 A(확정) — 짧고 낮은 종 한 점 — 의 결을 유지한 유사 변주 A2/A3. */
-  const SELECT_SFX_VARIANTS = [
-    'confirmed',
-    () => synthBellVariant(830.61, [1, 2, 2.76, 5.4], 0.7, 0.075),
-    () => synthBellVariant(739.99, [1, 2, 2.76], 0.85, 0.08),
-  ];
-  /* SFX-06 B(확정) — 세 음이 차례로 겹치며 상승하는 종 — 의 결을 유지한 변주 B2/B3. */
-  const ENTER_SFX_VARIANTS = [
-    'confirmed',
-    () => [493.88, 622.25, 932.33].forEach((f, i) => window.setTimeout(() =>
-      synthBellVariant(f, [1, 2, 2.76, 5.4], i === 2 ? 1.2 : 0.42, 0.07), i * 70)),
-    () => [587.33, 739.99, 1108.73].forEach((f, i) => window.setTimeout(() =>
-      synthBellVariant(f, [1, 2, 2.76], i === 2 ? 1.1 : 0.4, 0.065), i * 60)),
-  ];
-  /* cue별 후보 목록(확정 wav 포함)에서 하나를 무작위로 골라 재생한다. */
-  function playRotatingSfx(cue, variants) {
-    const pick = variants[Math.floor(Math.random() * variants.length)];
-    if (pick === 'confirmed') playApprovedSfx(cue);
-    else pick();
+  /* 근음(확정 take) 대비 반음 오프셋의 작은 집합. 전부 협화음정(장2도·장3도·
+     완전5도, 그리고 -장2도로 아래쪽도 하나)이라 무작위로 골라도 튀지 않는다.
+     SFX-05·SFX-06 둘 다 같은 집합을 공유한다 — "같은 종, 다른 음"이라는
+     동일한 원칙이므로 상황마다 다른 스케일을 새로 만들지 않는다. */
+  const PITCH_ROTATION_SEMITONES = [0, 2, 4, 7, -2];
+  /* cue(select/enter)마다 위 집합에서 하나를 무작위로 골라, 확정 wav를
+     그 음으로 재생한다. 이전 라운드의 "다른 타임브레 후보 중 하나를 고르는"
+     방식을 완전히 대체한다. */
+  function playRotatingSfx(cue) {
+    const semi = PITCH_ROTATION_SEMITONES[Math.floor(Math.random() * PITCH_ROTATION_SEMITONES.length)];
+    playApprovedSfx(cue, semi);
   }
 
   /* v2→v3 게이트웨이 전용 신규 후보음. #114 최종 지시대로 상세/우주 진입에
@@ -851,11 +825,11 @@
       hit.addEventListener('blur', leave);
       hit.addEventListener('click', () => {
         if (state.open === body && item.detail) {
-          playRotatingSfx('enter', ENTER_SFX_VARIANTS);
+          playRotatingSfx('enter');
           window.setTimeout(() => { window.location.href = base + item.detail; }, 140);
           return;
         }
-        playRotatingSfx('select', SELECT_SFX_VARIANTS);
+        playRotatingSfx('select');
         toggle(body);
       });
       return body;
