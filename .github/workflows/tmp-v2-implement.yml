@@ -1,0 +1,242 @@
+name: TEMP implement v2 discontinued + KGA link
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configure clean implementation branch
+        run: |
+          git config user.name "chatgpt-codex-connector"
+          git config user.email "noreply@openai.com"
+          git checkout -B chatgpt/v2-discontinued-kga-link origin/main
+
+      - name: Apply #191 and #193
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json, re
+
+          root = Path('.')
+
+          # projects.json — SSOT: 한맵만 WIP, 6개 discontinued, KGA invite link only removed.
+          p = root / 'projects.json'
+          data = json.loads(p.read_text(encoding='utf-8'))
+          for group in data['groups']:
+              for card in group['cards']:
+                  if card.get('detail') == 'projects/koreatechGongjiAgent/':
+                      card['links'] = [
+                          link for link in card.get('links', [])
+                          if 'discord.com/oauth2/authorize' not in link.get('href', '')
+                      ]
+
+          wip = next(group for group in data['groups'] if group['kind'] == 'wip')
+          y2026 = next(group for group in data['groups'] if group.get('year') == '2026')
+
+          keep, moved = [], []
+          for card in wip['cards']:
+              (keep if card.get('detail') == 'projects/Koreatech_map/' else moved).append(card)
+          wip['cards'] = keep
+
+          sh_index = next(i for i, card in enumerate(y2026['cards']) if card.get('detail') == 'projects/SH_bot/')
+          moved.append(y2026['cards'].pop(sh_index))
+
+          for card in moved:
+              card['badge'] = {'en': 'Discontinued', 'ko': '개발 중단'}
+              card['status'] = {'en': 'Development discontinued', 'ko': '개발 중단'}
+
+          discontinued = {'kind': 'discontinued', 'heading': '진행 중단', 'cards': moved}
+          groups = []
+          for group in data['groups']:
+              if group.get('kind') == 'discontinued':
+                  continue
+              groups.append(group)
+              if group is wip:
+                  groups.append(discontinued)
+          data['groups'] = groups
+          p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          # build.js — formal discontinued state.
+          p = root / 'build.js'
+          s = p.read_text(encoding='utf-8')
+          s = s.replace(
+              '- 단일 데이터 소스(projects.json)에서 연도별/진행중/실패 카드 HTML을 생성',
+              '- 단일 데이터 소스(projects.json)에서 연도별/진행중/진행중단/실패 카드 HTML을 생성'
+          )
+          s = s.replace(
+              "/* 단일 프로젝트 카드 HTML 생성 (kind: 'year' | 'wip' | 'failed') */",
+              "/* 단일 프로젝트 카드 HTML 생성 (kind: 'year' | 'wip' | 'discontinued' | 'failed') */"
+          )
+          s = s.replace(
+              '  const extraClass =\n    kind === "wip" ? " project-wip" : kind === "failed" ? " project-failed" : "";',
+              '  const extraClass =\n    kind === "wip"\n      ? " project-wip"\n      : kind === "discontinued"\n      ? " project-discontinued"\n      : kind === "failed"\n      ? " project-failed"\n      : "";'
+          )
+          s = s.replace(
+              '    const badgeCls = kind === "failed" ? "failed-badge" : "wip-badge";',
+              '    const badgeCls =\n      kind === "failed"\n        ? "failed-badge"\n        : kind === "discontinued"\n        ? "discontinued-badge"\n        : "wip-badge";'
+          )
+          s = s.replace(
+              '    lines.push(`${I}<div class="wip-status"${status.attrs}>${status.inner}</div>`);',
+              '    const statusCls = kind === "discontinued" ? "discontinued-status" : "wip-status";\n    lines.push(`${I}<div class="${statusCls}"${status.attrs}>${status.inner}</div>`);'
+          )
+          s = s.replace(
+              '    group.kind === "wip"\n      ? " year-group-wip"\n      : group.kind === "failed"',
+              '    group.kind === "wip"\n      ? " year-group-wip"\n      : group.kind === "discontinued"\n      ? " year-group-discontinued"\n      : group.kind === "failed"'
+          )
+          s = s.replace(
+              '  const dataYear =\n    group.kind === "wip" ? "wip" : group.kind === "failed" ? "failed" : group.year;',
+              '  const dataYear =\n    group.kind === "wip"\n      ? "wip"\n      : group.kind === "discontinued"\n      ? "discontinued"\n      : group.kind === "failed"\n      ? "failed"\n      : group.year;'
+          )
+          p.write_text(s, encoding='utf-8')
+
+          # script.js — filter, count, KO/EN.
+          p = root / 'script.js'
+          s = p.read_text(encoding='utf-8')
+          s = s.replace(
+              "          || (filter === 'failed' && card.classList.contains('project-failed'))",
+              "          || (filter === 'discontinued' && card.classList.contains('project-discontinued'))\n          || (filter === 'failed' && card.classList.contains('project-failed'))"
+          )
+          s = s.replace(
+              "  let done = 0;\n  let wip = 0;\n  document.querySelectorAll('.project-card').forEach((card) => {\n    if (card.classList.contains('project-wip')) wip++;\n    else if (!card.classList.contains('project-failed')) done++;\n  });\n  badge.textContent = (localStorage.getItem('lang') || 'ko') === 'en'\n    ? `${done} done · ${wip} upcoming`\n    : `${done}개 완료 · ${wip}개 예정`;",
+              "  let done = 0;\n  let wip = 0;\n  let discontinued = 0;\n  document.querySelectorAll('.project-card').forEach((card) => {\n    if (card.classList.contains('project-wip')) wip++;\n    else if (card.classList.contains('project-discontinued')) discontinued++;\n    else if (!card.classList.contains('project-failed')) done++;\n  });\n  badge.textContent = (localStorage.getItem('lang') || 'ko') === 'en'\n    ? `${done} done · ${wip} upcoming · ${discontinued} discontinued`\n    : `${done}개 완료 · ${wip}개 예정 · ${discontinued}개 중단`;"
+          )
+          s = s.replace(
+              "      '.pfilter[data-filter=\"failed\"]': 'Failed',",
+              "      '.pfilter[data-filter=\"discontinued\"]': 'Discontinued',\n      '.pfilter[data-filter=\"failed\"]': 'Failed',"
+          )
+          s = s.replace(
+              "      '.year-group-wip .year-heading': 'In Progress / Planned',\n      '.year-group-failed .year-heading': 'Failed Projects',",
+              "      '.year-group-wip .year-heading': 'In Progress / Planned',\n      '.year-group-discontinued .year-heading': 'Discontinued Projects',\n      '.year-group-failed .year-heading': 'Failed Projects',"
+          )
+          s = s.replace(
+              "      '.pfilter[data-filter=\"failed\"]': '실패',",
+              "      '.pfilter[data-filter=\"discontinued\"]': '진행 중단',\n      '.pfilter[data-filter=\"failed\"]': '실패',"
+          )
+          s = s.replace(
+              "      '.year-group-wip .year-heading': '진행 중 · 예정',\n      '.year-group-failed .year-heading': '실패한 프로젝트',",
+              "      '.year-group-wip .year-heading': '진행 중 · 예정',\n      '.year-group-discontinued .year-heading': '진행 중단',\n      '.year-group-failed .year-heading': '실패한 프로젝트',"
+          )
+          p.write_text(s, encoding='utf-8')
+
+          # style.css — low-saturation slate discontinued state, distinct from failed.
+          p = root / 'style.css'
+          s = p.read_text(encoding='utf-8')
+          s = s.replace(
+              '의미에 고정한다. 빨강=대표/기본, 금색=진행 중, 회색=중단. */',
+              '의미에 고정한다. 빨강=대표/기본, 금색=진행 중, 회청색=진행 중단, 회색+적색 배지=실패. */'
+          )
+          s = s.replace(
+              '  --tab-wip: var(--gold);\n  --tab-failed: rgba(107, 100, 83, 0.55);',
+              '  --tab-wip: var(--gold);\n  --tab-discontinued: #667085;\n  --discontinued-text: #596273;\n  --discontinued-soft: rgba(102, 112, 133, 0.14);\n  --tab-failed: rgba(107, 100, 83, 0.55);'
+          )
+          anchor = '''.wip-badge {\n  display: inline-block;\n  font-family: var(--font-mono);\n  font-size: 0.7rem;\n  padding: 4px 12px;\n  background: var(--tape-solid);\n  color: var(--ink);\n  letter-spacing: 0.04em;\n  transform: rotate(-2deg);\n  box-shadow: 1px 2px 4px rgba(31, 28, 20, 0.12);\n  align-self: flex-start;\n  border-radius: 1px;\n}\n'''
+          insert = anchor + '''\n/* 진행 중단 — 실패와 분리된 현재 상태. 노트의 회청색 보관 탭처럼 낮은 채도로 표시한다. */\n.project-discontinued {\n  --tab: var(--tab-discontinued);\n  opacity: 0.9;\n}\n.project-discontinued:hover {\n  opacity: 1;\n}\n.discontinued-badge {\n  display: inline-block;\n  font-family: var(--font-mono);\n  font-size: 0.7rem;\n  padding: 4px 12px;\n  background: var(--tab-discontinued);\n  color: #fffdf6;\n  letter-spacing: 0.04em;\n  transform: rotate(-1deg);\n  box-shadow: 1px 2px 4px rgba(31, 28, 20, 0.12);\n  align-self: flex-start;\n  border-radius: 1px;\n}\n'''
+          if anchor not in s:
+              raise SystemExit('style wip badge anchor not found')
+          s = s.replace(anchor, insert, 1)
+          anchor = '.year-group-wip .year-heading::after { border-top-color: var(--line); }\n'
+          s = s.replace(anchor, anchor + '''\n.year-group-discontinued .year-heading { color: var(--discontinued-text); }\n.year-group-discontinued .year-heading::before {\n  background: var(--tab-discontinued);\n  box-shadow: none;\n}\n.year-group-discontinued .year-heading::after { border-top-color: var(--discontinued-soft); }\n''', 1)
+          anchor = '''.wip-status::before {\n  content: "";\n  width: 6px;\n  height: 6px;\n  border-radius: 50%;\n  background: var(--gold);\n  flex-shrink: 0;\n}\n'''
+          s = s.replace(anchor, anchor + '''\n.discontinued-status {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  margin-top: 4px;\n  padding: 3px 10px;\n  border: 1px dashed var(--discontinued-soft);\n  border-radius: 2px;\n  background: var(--paper-2);\n  font-family: var(--font-mono);\n  font-size: 0.7rem;\n  font-weight: 700;\n  color: var(--discontinued-text);\n  white-space: nowrap;\n}\n.discontinued-status::before {\n  content: "";\n  width: 6px;\n  height: 6px;\n  border-radius: 50%;\n  background: var(--tab-discontinued);\n  flex-shrink: 0;\n}\n''', 1)
+          s = s.replace(
+              '  --tab-failed: rgba(229, 229, 229, 0.28);',
+              '  --tab-discontinued: #596579;\n  --discontinued-text: #b8c1d0;\n  --discontinued-soft: rgba(184, 193, 208, 0.2);\n  --tab-failed: rgba(229, 229, 229, 0.28);'
+          )
+          p.write_text(s, encoding='utf-8')
+
+          # index.html — only non-generated filter / featured KGA link; generated region rebuilt below.
+          p = root / 'index.html'
+          s = p.read_text(encoding='utf-8')
+          s = s.replace(
+              '          <button type="button" class="pfilter" data-filter="wip">WIP</button>\n          <button type="button" class="pfilter" data-filter="failed">실패</button>',
+              '          <button type="button" class="pfilter" data-filter="wip">WIP</button>\n          <button type="button" class="pfilter" data-filter="discontinued">진행 중단</button>\n          <button type="button" class="pfilter" data-filter="failed">실패</button>'
+          )
+          s = re.sub(
+              r'\n\s*<a href="https://discord\.com/oauth2/authorize\?client_id=1518630779922546759"[^\n]*>.*?</a>',
+              '', s, count=1
+          )
+          p.write_text(s, encoding='utf-8')
+
+          # KGA detail — remove the two invite anchors only; project/content remains untouched.
+          p = root / 'projects/koreatechGongjiAgent/index.html'
+          s = p.read_text(encoding='utf-8')
+          pattern = r'\n\s*<a\b(?:(?!</a\s*>).)*?1518630779922546759(?:(?!</a\s*>).)*?</a\s*>'
+          s, removed = re.subn(pattern, '', s, flags=re.S)
+          if removed != 2 or '1518630779922546759' in s:
+              raise SystemExit(f'expected two KGA invite links, removed={removed}')
+          p.write_text(s, encoding='utf-8')
+
+          # verifier — lock the new state and the invite-link-only removal.
+          p = root / 'tools/verify-build.js'
+          s = p.read_text(encoding='utf-8')
+          needle = '''check(\n  expectedCount === actualCount,\n  `카드 수 불일치: projects.json ${expectedCount}개 · 생성 결과 ${actualCount}개`\n);\n'''
+          extra = needle + '''\n/* --- 2-1) #191 프로젝트 상태 모델 회귀 방지 --- */\ncheck(expectedCount === 31, `프로젝트 총 수가 바뀌었습니다: ${expectedCount}개 (기대: 31개)`);\nconst wipGroup = data.groups.find((g) => g.kind === "wip");\nconst discontinuedGroup = data.groups.find((g) => g.kind === "discontinued");\nconst wipDetails = (wipGroup?.cards || []).map((card) => card.detail);\nconst discontinuedDetails = new Set((discontinuedGroup?.cards || []).map((card) => card.detail));\nconst expectedDiscontinued = [\n  "projects/SG_bot/",\n  "projects/HTML_Viewer/",\n  "projects/CentrifugeAI/",\n  "projects/Magic_Academy/",\n  "projects/DelphiRec/",\n  "projects/SH_bot/",\n];\ncheck(\n  wipDetails.length === 1 && wipDetails[0] === "projects/Koreatech_map/",\n  "#191 상태 회귀: 진행 중 · 예정에는 한맵 하나만 있어야 합니다."\n);\ncheck(\n  expectedDiscontinued.length === discontinuedDetails.size &&\n    expectedDiscontinued.every((detail) => discontinuedDetails.has(detail)),\n  "#191 상태 회귀: 진행 중단 그룹은 승기봇·HTML Viewer·CentrifugeAI·마법 아카데미·DelphiRec·성현봇 6개여야 합니다."\n);\n'''
+          if needle not in s:
+              raise SystemExit('verify card-count anchor not found')
+          s = s.replace(needle, extra, 1)
+          needle = '''for (const [source, pattern, message] of retiredUiPatterns) {\n  check(!source.includes(pattern), message);\n}\n'''
+          extra = needle + '''\n\n/* #193: KGA는 유지하되 미배포 상태의 Discord 봇 초대 링크만 제거한다. */\nconst kgaDetail = fs.readFileSync(path.join(root, "projects", "koreatechGongjiAgent", "index.html"), "utf8");\nconst kgaProjects = fs.readFileSync(path.join(root, "projects.json"), "utf8");\nconst inviteClientId = "1518630779922546759";\ncheck(!rootIndex.includes(inviteClientId), "#193 회귀: 메인 페이지에 KGA 봇 초대 링크가 남아 있습니다.");\ncheck(!kgaDetail.includes(inviteClientId), "#193 회귀: KGA 상세 페이지에 봇 초대 링크가 남아 있습니다.");\ncheck(!kgaProjects.includes(inviteClientId), "#193 회귀: projects.json에 KGA 봇 초대 링크가 남아 있습니다.");\n'''
+          if needle not in s:
+              raise SystemExit('verify retired-ui anchor not found')
+          s = s.replace(needle, extra, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+          node build.js
+          node --check build.js
+          node --check script.js
+          node tools/verify-build.js
+          git diff --check
+
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('projects.json').read_text(encoding='utf-8'))
+          assert sum(len(g['cards']) for g in data['groups']) == 31
+          assert [c['detail'] for g in data['groups'] if g['kind']=='wip' for c in g['cards']] == ['projects/Koreatech_map/']
+          disc = [c['detail'] for g in data['groups'] if g['kind']=='discontinued' for c in g['cards']]
+          assert disc == [
+              'projects/SG_bot/', 'projects/HTML_Viewer/', 'projects/CentrifugeAI/',
+              'projects/Magic_Academy/', 'projects/DelphiRec/', 'projects/SH_bot/'
+          ]
+          PY
+
+      - name: Commit one file per commit
+        run: |
+          set -euo pipefail
+          files=(
+            projects.json
+            build.js
+            script.js
+            style.css
+            index.html
+            projects/koreatechGongjiAgent/index.html
+            tools/verify-build.js
+          )
+          messages=(
+            "data: add discontinued project state and remove KGA invite"
+            "build: render discontinued project groups"
+            "feat: filter and count discontinued projects"
+            "style: distinguish discontinued project notes"
+            "build: regenerate v2 project markup"
+            "fix: remove KGA bot invite links only"
+            "test: guard v2 discontinued and KGA link state"
+          )
+          for i in "${!files[@]}"; do
+            git add "${files[$i]}"
+            git commit -m "${messages[$i]}"
+          done
+          test "$(git diff --name-only origin/main...HEAD | wc -l)" -eq "$(git rev-list --count origin/main..HEAD)"
+          test "$(git rev-list --count origin/main..HEAD)" -eq 7
+          git push --force-with-lease origin HEAD:chatgpt/v2-discontinued-kga-link
