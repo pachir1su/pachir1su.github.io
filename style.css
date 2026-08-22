@@ -59,9 +59,12 @@
   --sp-9: 96px;
 
   /* 카드 상단 색 띠의 역할 — nth-child(5n+k) 로 색을 돌려쓰던 방식을 버리고
-     의미에 고정한다. 빨강=대표/기본, 금색=진행 중, 회색=중단. */
+     의미에 고정한다. 빨강=대표/기본, 금색=진행 중, 회청색=진행 중단, 회색+적색 배지=실패. */
   --tab-default: var(--red);
   --tab-wip: var(--gold);
+  --tab-discontinued: #667085;
+  --discontinued-text: #596273;
+  --discontinued-soft: rgba(102, 112, 133, 0.14);
   --tab-failed: rgba(107, 100, 83, 0.55);
   /* 모션 커브 — emilkowalski/skills STANDARDS.md 권장값
      진입·퇴장은 ease-out, 화면 내 이동은 ease-in-out */
@@ -1149,6 +1152,28 @@ p {
   color: var(--ink);
   letter-spacing: 0.04em;
   transform: rotate(-2deg);
+  box-shadow: 1px 2px 4px rgba(31, 28, 20, 0.12);
+  align-self: flex-start;
+  border-radius: 1px;
+}
+
+/* 진행 중단 — 실패와 분리된 현재 상태. 노트의 회청색 보관 탭처럼 낮은 채도로 표시한다. */
+.project-discontinued {
+  --tab: var(--tab-discontinued);
+  opacity: 0.9;
+}
+.project-discontinued:hover {
+  opacity: 1;
+}
+.discontinued-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 4px 12px;
+  background: var(--tab-discontinued);
+  color: #fffdf6;
+  letter-spacing: 0.04em;
+  transform: rotate(-1deg);
   box-shadow: 1px 2px 4px rgba(31, 28, 20, 0.12);
   align-self: flex-start;
   border-radius: 1px;
@@ -2255,6 +2280,13 @@ html {
 }
 .year-group-wip .year-heading::after { border-top-color: var(--line); }
 
+.year-group-discontinued .year-heading { color: var(--discontinued-text); }
+.year-group-discontinued .year-heading::before {
+  background: var(--tab-discontinued);
+  box-shadow: none;
+}
+.year-group-discontinued .year-heading::after { border-top-color: var(--discontinued-soft); }
+
 /* 실패한 프로젝트 — 기본 접힘(collapsible) 토글 헤더 (미니멀 지향) */
 .year-group-failed .failed-toggle {
   display: flex;
@@ -2486,6 +2518,30 @@ html {
   height: 6px;
   border-radius: 50%;
   background: var(--gold);
+  flex-shrink: 0;
+}
+
+.discontinued-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 3px 10px;
+  border: 1px dashed var(--discontinued-soft);
+  border-radius: 2px;
+  background: var(--paper-2);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--discontinued-text);
+  white-space: nowrap;
+}
+.discontinued-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tab-discontinued);
   flex-shrink: 0;
 }
 
@@ -2792,6 +2848,9 @@ html {
   --gold-text: var(--gold);
   --bronze-text: var(--bronze);
   /* 중단 카드 띠 — 라이트의 rgba(107,100,83,…)는 어두운 종이에서 보이지 않는다 */
+  --tab-discontinued: #596579;
+  --discontinued-text: #b8c1d0;
+  --discontinued-soft: rgba(184, 193, 208, 0.2);
   --tab-failed: rgba(229, 229, 229, 0.28);
 }
 [data-theme="dark"] body {
