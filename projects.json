@@ -524,6 +524,36 @@
       "year": "2024",
       "cards": [
         {
+          "comment": "급식 줄 혼잡도 신호등 계수기 (2024 위드 AI 코딩 페스티벌, 이슈 #230)",
+          "category": "hardware contest",
+          "icon": "fas fa-traffic-light",
+          "detail": "projects/meal_queue_signal_counter/",
+          "links": [],
+          "title": {
+            "en": "Cafeteria Queue Signal Counter",
+            "ko": "급식 줄 혼잡도 신호등 계수기"
+          },
+          "subtitle": {
+            "en": "Button-operated queue counter with traffic-light flow control",
+            "ko": "버튼 계수와 신호등으로 급식 줄 유입을 조절하는 시제품"
+          },
+          "role": {
+            "en": "Project Development",
+            "ko": "프로젝트 개발"
+          },
+          "descHtml": {
+            "en": "Counts people entering the cafeteria line with a button<br />At roughly 20 people, shows red for about 10 seconds before returning to green",
+            "ko": "버튼으로 급식 줄에 들어오는 인원을 계수<br />약 20명 누적 시 약 10초간 빨간불을 켠 뒤 초록불로 복귀"
+          },
+          "tech": [
+            "Arduino",
+            "Entry",
+            "Button",
+            "LED",
+            "Counter Logic"
+          ]
+        },
+        {
           "comment": "비밀번호 도어락",
           "category": "hardware contest",
           "icon": "fas fa-hammer",
