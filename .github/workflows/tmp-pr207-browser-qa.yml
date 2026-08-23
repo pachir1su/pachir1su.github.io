@@ -1,0 +1,114 @@
+name: TEMP PR207 browser QA
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout product PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: chatgpt/v2-email-capybara
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install browser runner
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --save-dev playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Static verification
+        run: |
+          node --check script.js
+          node --check build.js
+          node tools/verify-build.js
+          git diff --check
+      - name: Browser QA
+        run: |
+          mkdir -p qa-artifacts
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/pr207-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 1
+          cat > .tmp-pr207-qa.mjs <<'EOF'
+          import { chromium } from 'playwright';
+          const browser = await chromium.launch({ headless: true });
+          const cases = [
+            { width: 1440, height: 1000, lang: 'ko', theme: 'light' },
+            { width: 390, height: 844, lang: 'en', theme: 'dark' },
+          ];
+          const assert = (ok, msg) => { if (!ok) throw new Error(msg); };
+          let passed = 0;
+          for (const cfg of cases) {
+            const context = await browser.newContext({ viewport: { width: cfg.width, height: cfg.height }, colorScheme: cfg.theme });
+            await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: 'http://127.0.0.1:4173' });
+            await context.addInitScript(({lang, theme}) => {
+              localStorage.setItem('lang', lang);
+              localStorage.setItem('theme', theme);
+            }, { lang: cfg.lang, theme: cfg.theme });
+            const page = await context.newPage();
+            const errors = [];
+            page.on('pageerror', e => errors.push(String(e)));
+            await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
+            const capy = page.locator('.hero-capybara');
+            const email = page.locator('.hero-email');
+            assert(await capy.count() === 1, `home ${cfg.width}: capybara missing`);
+            assert(await email.count() === 1, `home ${cfg.width}: email button missing`);
+            assert((await capy.getAttribute('src')) === 'assets/capybara-email.webp', `home ${cfg.width}: wrong capybara asset`);
+            const capyBox = await capy.boundingBox();
+            const emailBox = await email.boundingBox();
+            assert(capyBox && emailBox, `home ${cfg.width}: missing boxes`);
+            assert(capyBox.width >= 90 && capyBox.width <= 120, `home ${cfg.width}: capybara width ${capyBox.width}`);
+            assert(capyBox.y + capyBox.height > emailBox.y, `home ${cfg.width}: capybara does not overlap email top edge`);
+            assert(capyBox.y + capyBox.height < emailBox.y + emailBox.height * 0.7, `home ${cfg.width}: capybara covers too much of email`);
+            const px = emailBox.x + emailBox.width / 2;
+            const py = emailBox.y + emailBox.height / 2;
+            const hit = await page.evaluate(({px,py}) => {
+              const el = document.elementFromPoint(px, py);
+              return { tag: el?.tagName, capy: !!el?.closest?.('.hero-capybara'), email: !!el?.closest?.('.hero-email') };
+            }, {px,py});
+            assert(!hit.capy && hit.email, `home ${cfg.width}: capybara blocks email hit target`);
+            await email.click();
+            const overflowHome = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+            assert(overflowHome <= 1, `home ${cfg.width}: overflow ${overflowHome}px`);
+            assert(errors.length === 0, `home ${cfg.width}: ${errors.join(' | ')}`);
+            await page.screenshot({ path: `qa-artifacts/home-${cfg.width}-${cfg.lang}-${cfg.theme}.png`, fullPage: false });
+
+            errors.length = 0;
+            await page.goto('http://127.0.0.1:4173/projects/HEALTH_CHECK_PROJECT/', { waitUntil: 'networkidle' });
+            assert(await page.locator('.detail-photo-card').count() === 5, `health ${cfg.width}: expected 5 photo cards`);
+            assert(await page.locator('.healthcare-photo').count() === 5, `health ${cfg.width}: expected 5 photo frames`);
+            const bg = await page.locator('.healthcare-photo').first().evaluate(el => getComputedStyle(el).backgroundImage);
+            assert(bg.includes('field-photos.webp'), `health ${cfg.width}: sprite not applied`);
+            const newLinks = page.locator('a[href="https://pachir1su.notion.site/1b9f776d60dc8097ab51f6e8562c25e3"]');
+            assert(await newLinks.count() === 2, `health ${cfg.width}: current Notion links count != 2`);
+            assert(await page.locator('a[href*="2025-SDGs-1b9f776d60dc8058976bc03379ceaf06"]').count() === 0, `health ${cfg.width}: stale Notion URL remains`);
+            assert(await page.locator('[data-project-demo="health"]').count() === 1, `health ${cfg.width}: demo root missing`);
+            const overflowHealth = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+            assert(overflowHealth <= 1, `health ${cfg.width}: overflow ${overflowHealth}px`);
+            assert(errors.length === 0, `health ${cfg.width}: ${errors.join(' | ')}`);
+            await page.locator('.detail-photo-grid').scrollIntoViewIfNeeded();
+            await page.screenshot({ path: `qa-artifacts/health-${cfg.width}-${cfg.lang}-${cfg.theme}.png`, fullPage: false });
+            console.log(`PASS ${cfg.width}px ${cfg.lang}/${cfg.theme}`);
+            passed += 1;
+            await context.close();
+          }
+          console.log(`PR207 browser QA: ${passed}/${cases.length} viewport cases passed`);
+          await browser.close();
+          EOF
+          node .tmp-pr207-qa.mjs
+          rm -f .tmp-pr207-qa.mjs package.json package-lock.json
+      - name: Upload QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr207-browser-qa
+          path: qa-artifacts
+          retention-days: 1
