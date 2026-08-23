@@ -29,16 +29,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libimage-exiftool-perl ffmpeg
 
-      - name: Prepare invariant probe
+      - name: Prepare lossless invariant probe
         shell: bash
         run: |
           cat > /tmp/media_probe.py <<'PY'
           from pathlib import Path
-          import json, subprocess, sys
+          import hashlib, json, subprocess, sys
 
           root = Path('.')
-          image_exts = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
+          png_private = {b'eXIf', b'tEXt', b'zTXt', b'iTXt'}
           video_exts = {'.mp4', '.mov', '.m4v', '.3gp', '.webm', '.mkv', '.avi'}
+          sig = b'\x89PNG\r\n\x1a\n'
 
           def run(cmd):
               p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
@@ -46,33 +47,36 @@ jobs:
                   raise SystemExit(f"command failed ({p.returncode}): {' '.join(cmd)}\n{p.stderr.decode(errors='replace')}")
               return p.stdout
 
-          def files():
-              return sorted(p for p in root.rglob('*') if p.is_file() and '.git' not in p.parts and 'node_modules' not in p.parts and p.suffix.lower() in image_exts | video_exts)
+          def png_chunks(path):
+              data = path.read_bytes()
+              if not data.startswith(sig): raise SystemExit(f'invalid PNG: {path}')
+              pos = 8; chunks = []
+              while pos + 12 <= len(data):
+                  n = int.from_bytes(data[pos:pos+4], 'big')
+                  end = pos + 12 + n
+                  if end > len(data): raise SystemExit(f'truncated PNG: {path}')
+                  typ = data[pos+4:pos+8]
+                  payload = data[pos+8:pos+8+n]
+                  chunks.append((typ, payload))
+                  pos = end
+                  if typ == b'IEND': break
+              return chunks
 
-          def fingerprint(p):
-              rel = p.as_posix()
-              if p.suffix.lower() in image_exts:
-                  probe = json.loads(run(['ffprobe','-v','error','-select_streams','v:0','-show_entries','stream=codec_name,width,height,pix_fmt','-of','json',rel]))
-                  frame = run(['ffmpeg','-v','error','-i',rel,'-map','0:v:0','-f','framemd5','-']).decode()
-                  return {'kind':'image','probe':probe,'decodedFrameMd5':frame}
-              probe = json.loads(run(['ffprobe','-v','error','-show_entries','stream=index,codec_name,codec_type,width,height,sample_rate,channels,duration','-of','json',rel]))
-              stream = run(['ffmpeg','-v','error','-i',rel,'-map','0','-c','copy','-f','streamhash','-hash','sha256','-']).decode()
-              return {'kind':'video','probe':probe,'streamHash':stream}
-
-          media = files()
-          result = {'fingerprints': {p.as_posix(): fingerprint(p) for p in media}, 'pngChunks': {}, 'videoMetadata': {}}
-          sig = b'\x89PNG\r\n\x1a\n'
-          for p in media:
-              rel = p.as_posix()
-              if p.suffix.lower() == '.png':
-                  data = p.read_bytes(); pos = 8; chunks = []
-                  if not data.startswith(sig): raise SystemExit(f'invalid PNG: {rel}')
-                  while pos + 12 <= len(data):
-                      n = int.from_bytes(data[pos:pos+4], 'big'); typ = data[pos+4:pos+8].decode('ascii', errors='replace')
-                      chunks.append(typ); pos += 12 + n
-                      if typ == 'IEND': break
-                  result['pngChunks'][rel] = chunks
-              elif p.suffix.lower() in video_exts:
+          result = {'fingerprints': {}, 'pngChunks': {}, 'videoMetadata': {}}
+          for p in sorted(root.rglob('*')):
+              if not p.is_file() or '.git' in p.parts or 'node_modules' in p.parts: continue
+              rel = p.as_posix(); ext = p.suffix.lower()
+              if ext == '.png':
+                  chunks = png_chunks(p)
+                  result['pngChunks'][rel] = [t.decode('ascii', errors='replace') for t, _ in chunks]
+                  # Compare every non-private chunk byte-for-byte by type/order/payload digest.
+                  result['fingerprints'][rel] = [
+                      [t.decode('ascii', errors='replace'), hashlib.sha256(payload).hexdigest()]
+                      for t, payload in chunks if t not in png_private
+                  ]
+              elif ext in video_exts:
+                  stream = run(['ffmpeg','-v','error','-i',rel,'-map','0','-c','copy','-f','streamhash','-hash','sha256','-']).decode()
+                  result['fingerprints'][rel] = stream
                   result['videoMetadata'][rel] = json.loads(run(['ffprobe','-v','error','-show_format','-show_streams','-of','json',rel]))
           Path(sys.argv[1]).write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
           PY
@@ -86,10 +90,27 @@ jobs:
           node tools/verify-media-metadata.js > evidence/media-before.json
           printf '%s\n' "$?" > evidence/media-before-exit.txt
           set -e
+
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          allowed_video={'.mp4','.mov','.m4v','.3gp','.webm','.mkv','.avi'}
+          before=json.loads(Path('evidence/media-before.json').read_text())
+          unexpected=[]
+          for item in before.get('issues', []):
+              suffix=Path(item['file']).suffix.lower()
+              if suffix != '.png' and suffix not in allowed_video:
+                  unexpected.append(item['file'])
+          if unexpected:
+              raise SystemExit('unexpected offender type without lossless invariant probe: ' + ', '.join(unexpected))
+          print('pre offenders:', before.get('offenders', 0))
+          PY
+
           python3 /tmp/media_probe.py evidence/media-probe-before.json
           python3 tools/sanitize-media-metadata.py --report evidence/media-sanitize-report.json
           node tools/verify-media-metadata.js > evidence/media-after.json
           python3 /tmp/media_probe.py evidence/media-probe-after.json
+
           python3 - <<'PY'
           import json
           from pathlib import Path
@@ -97,13 +118,14 @@ jobs:
           after=json.loads(Path('evidence/media-probe-after.json').read_text())['fingerprints']
           if before != after:
               bad=sorted(k for k in set(before)|set(after) if before.get(k)!=after.get(k))
-              raise SystemExit('decoded/stream invariant changed: ' + ', '.join(bad))
+              raise SystemExit('non-private PNG bytes or video streams changed: ' + ', '.join(bad))
           report=json.loads(Path('evidence/media-sanitize-report.json').read_text())
           if report['after'].get('offenders') != 0:
               raise SystemExit('metadata offenders remain')
           print('changed:', report.get('changed', []))
           print('final offenders: 0')
           PY
+
           node --check tools/verify-media-metadata.js
           python3 -m py_compile tools/sanitize-media-metadata.py
           node tools/verify-build.js
