@@ -1,8 +1,8 @@
 name: TEMP PR212 hover fix
 
 on:
-  pull_request:
-    branches: [main]
+  push:
+    branches: [tmp/pr212-hover-fix]
 
 permissions:
   contents: write
