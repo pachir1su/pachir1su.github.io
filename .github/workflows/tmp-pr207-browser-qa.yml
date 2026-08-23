@@ -1,159 +1,154 @@
-name: TEMP PR211 regression media QA
+name: TEMP v2 card media preview implementation
 
 on:
-  pull_request:
-    branches: [main]
+  push:
+    branches: [tmp/pr207-browser-qa]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  qa:
+  implement:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout product PR branch
+      - name: Checkout product branch
         uses: actions/checkout@v4
         with:
-          ref: chatgpt/v2-regression-media-fix
+          ref: chatgpt/v2-card-media-preview
           fetch-depth: 0
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install browser runner
+      - name: Configure commit identity
         run: |
-          npm init -y >/dev/null 2>&1
-          npm install --save-dev playwright@1.55.0 >/dev/null 2>&1
-          npx playwright install --with-deps chromium >/dev/null
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Static verification
+      - name: Add preview media metadata
         run: |
-          node --check script.js
-          node --check build.js
-          node tools/verify-build.js
-          git diff --check
-          git diff --exit-code
-          test "$(git rev-list --count origin/main..HEAD)" -eq 10
-          test "$(git diff --name-only origin/main...HEAD | wc -l)" -eq 10
-          test "$(git diff --name-only origin/main...HEAD | grep -c '^__noop__\.tmp$' || true)" -eq 0
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
 
-      - name: Browser QA
-        run: |
-          mkdir -p qa-artifacts
-          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/pr211-server.log 2>&1 &
-          SERVER_PID=$!
-          trap 'kill $SERVER_PID || true' EXIT
-          sleep 1
-          cat > .tmp-pr211-qa.mjs <<'EOF'
-          import { chromium } from 'playwright';
-
-          const browser = await chromium.launch({ headless: true });
-          const cases = [
-            { width: 1440, height: 1000, lang: 'ko', theme: 'light' },
-            { width: 390, height: 844, lang: 'en', theme: 'dark' },
-          ];
-          const assert = (ok, msg) => { if (!ok) throw new Error(msg); };
-          const waitImages = async (page, selector) => {
-            const images = page.locator(selector);
-            const count = await images.count();
-            await images.evaluateAll((els) => Promise.all(els.map((img) => {
-              if (img.complete) return Promise.resolve();
-              return new Promise((resolve) => {
-                img.addEventListener('load', resolve, { once: true });
-                img.addEventListener('error', resolve, { once: true });
-              });
-            })));
-            const bad = await images.evaluateAll((els) => els.map((img) => ({ src: img.getAttribute('src'), complete: img.complete, width: img.naturalWidth, height: img.naturalHeight })).filter((x) => !x.complete || x.width <= 0 || x.height <= 0));
-            assert(bad.length === 0, `${selector}: broken images ${JSON.stringify(bad)}`);
-            return count;
-          };
-
-          let passed = 0;
-          for (const cfg of cases) {
-            const context = await browser.newContext({ viewport: { width: cfg.width, height: cfg.height }, colorScheme: cfg.theme });
-            await context.addInitScript(({lang, theme}) => {
-              localStorage.setItem('lang', lang);
-              localStorage.setItem('theme', theme);
-            }, { lang: cfg.lang, theme: cfg.theme });
-            const page = await context.newPage();
-            const errors = [];
-            page.on('pageerror', (e) => errors.push(String(e)));
-
-            await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
-            assert(await page.locator('.project-card').count() === 31, `root ${cfg.width}: project cards != 31`);
-            const expectedVideos = [
-              'https://youtu.be/4xF9-N9jKvc',
-              'https://youtu.be/CyX0PryfrRI',
-              'https://www.youtube.com/watch?v=z0q6D7zNWyw',
-            ];
-            for (const href of expectedVideos) {
-              assert(await page.locator(`.project-card a[href="${href}"]`).count() === 1, `root ${cfg.width}: video link missing ${href}`);
-            }
-            assert(await page.locator('.project-card a[title="YouTube"]').count() === 3, `root ${cfg.width}: YouTube card links != 3`);
-            assert(await page.locator('.year-group-wip .project-card').count() === 1, `root ${cfg.width}: WIP count != 1`);
-            assert(await page.locator('.year-group-discontinued .project-card').count() === 6, `root ${cfg.width}: discontinued count != 6`);
-            const rootOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-            assert(rootOverflow <= 1, `root ${cfg.width}: horizontal overflow ${rootOverflow}px`);
-            assert(errors.length === 0, `root ${cfg.width}: ${errors.join(' | ')}`);
-            await page.screenshot({ path: `qa-artifacts/root-${cfg.width}-${cfg.lang}-${cfg.theme}.png`, fullPage: false });
-
-            errors.length = 0;
-            await page.goto('http://127.0.0.1:4173/projects/HEALTH_CHECK_PROJECT/', { waitUntil: 'networkidle' });
-            assert(await page.locator('.detail-photo-card').count() === 5, `health ${cfg.width}: photo cards != 5`);
-            assert(await waitImages(page, '.detail-photo-card img') === 5, `health ${cfg.width}: photo img count != 5`);
-            assert(await page.locator('a[href="https://pachir1su.notion.site/1b9f776d60dc8097ab51f6e8562c25e3"]').count() === 2, `health ${cfg.width}: current Notion links != 2`);
-            assert(await page.locator('[data-project-demo="health"]').count() === 1, `health ${cfg.width}: demo root missing`);
-            const healthOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-            assert(healthOverflow <= 1, `health ${cfg.width}: horizontal overflow ${healthOverflow}px`);
-            assert(errors.length === 0, `health ${cfg.width}: ${errors.join(' | ')}`);
-            await page.locator('.detail-photo-grid').scrollIntoViewIfNeeded();
-            await page.screenshot({ path: `qa-artifacts/health-${cfg.width}-${cfg.lang}-${cfg.theme}.png`, fullPage: false });
-
-            errors.length = 0;
-            await page.goto('http://127.0.0.1:4173/projects/swordmaster/', { waitUntil: 'networkidle' });
-            assert(await page.locator('.detail-section[data-media-followup="v27-swordmaster-overview"] .detail-figure').count() === 2, `swordmaster ${cfg.width}: overview figures != 2`);
-            assert(await waitImages(page, '.detail-section[data-media-followup="v27-swordmaster-overview"] img') === 2, `swordmaster ${cfg.width}: overview images != 2`);
-            assert(await page.locator('img[src="assets/images/file-swordmaster.webp"]').count() === 1, `swordmaster ${cfg.width}: File screen missing`);
-            assert(await page.locator('img[src="assets/images/media-swordmaster-live.webp"]').count() === 1, `swordmaster ${cfg.width}: Media screen missing`);
-            const swordOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-            assert(swordOverflow <= 1, `swordmaster ${cfg.width}: horizontal overflow ${swordOverflow}px`);
-            assert(errors.length === 0, `swordmaster ${cfg.width}: ${errors.join(' | ')}`);
-            await page.locator('[data-media-followup="v27-swordmaster-overview"]').scrollIntoViewIfNeeded();
-            await page.screenshot({ path: `qa-artifacts/swordmaster-${cfg.width}-${cfg.lang}-${cfg.theme}.png`, fullPage: false });
-
-            errors.length = 0;
-            await page.goto('http://127.0.0.1:4173/projects/swordmaster/file_swordmaster.html', { waitUntil: 'networkidle' });
-            assert(await page.locator('[data-media-source="file-swordmaster-local"] img[src="assets/images/file-swordmaster.webp"]').count() === 1, `file swordmaster ${cfg.width}: own screen missing`);
-            assert(await waitImages(page, '[data-media-source="file-swordmaster-local"] img') === 1, `file swordmaster ${cfg.width}: own screen broken`);
-            const fileOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-            assert(fileOverflow <= 1, `file swordmaster ${cfg.width}: horizontal overflow ${fileOverflow}px`);
-            assert(errors.length === 0, `file swordmaster ${cfg.width}: ${errors.join(' | ')}`);
-
-            errors.length = 0;
-            await page.goto('http://127.0.0.1:4173/projects/swordmaster/media_swordmaster.html', { waitUntil: 'networkidle' });
-            assert(await page.locator('[data-media-source="media-swordmaster-local"] img[src="assets/images/media-swordmaster-live.webp"]').count() === 1, `media swordmaster ${cfg.width}: own screen missing`);
-            assert(await waitImages(page, '[data-media-source="media-swordmaster-local"] img') === 1, `media swordmaster ${cfg.width}: own screen broken`);
-            const mediaOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-            assert(mediaOverflow <= 1, `media swordmaster ${cfg.width}: horizontal overflow ${mediaOverflow}px`);
-            assert(errors.length === 0, `media swordmaster ${cfg.width}: ${errors.join(' | ')}`);
-
-            console.log(`PASS ${cfg.width}px ${cfg.lang}/${cfg.theme}`);
-            passed += 1;
-            await context.close();
+          path = Path('projects.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          previews = {
+              'projects/github_rank_insight/': {'src': 'projects/github_rank_insight/assets/images/live-demo.webp', 'fit': 'contain'},
+              'projects/koreatech_noob_guide/': {'src': 'projects/koreatech_noob_guide/assets/images/notion-guide.webp', 'fit': 'contain'},
+              'projects/swordmaster/': {'src': 'projects/swordmaster/assets/images/media-swordmaster-live.webp', 'fit': 'contain'},
+              'projects/koreatechGongjiAgent/': {'src': 'projects/koreatechGongjiAgent/assets/images/web-shuttle.webp', 'fit': 'contain'},
+              'projects/2026_U-CAST/': {'src': 'projects/2026_U-CAST/assets/images/prototype.webp', 'fit': 'cover'},
+              'projects/BerryIno/': {'src': 'projects/BerryIno/assets/images/nfc-photo-1.webp', 'fit': 'cover'},
+              'projects/PlantClock/': {'src': 'projects/PlantClock/assets/images/plantclock.webp', 'fit': 'cover'},
+              'projects/HEALTH_CHECK_PROJECT/': {'src': 'projects/HEALTH_CHECK_PROJECT/assets/images/prototype-front.webp', 'fit': 'cover'},
+              'projects/Legend_SakSak_GongGam_AI/': {'src': 'projects/Legend_SakSak_GongGam_AI/assets/images/app-home.webp', 'fit': 'contain'},
+              'projects/Master_Creator_Challenge/': {'src': 'projects/Master_Creator_Challenge/assets/images/doorlock-1.webp', 'fit': 'cover'},
+              'projects/Wall_Sina/': {'src': 'projects/Wall_Sina/assets/images/prototype-1.webp', 'fit': 'cover'},
+              'projects/2024_5th_CSRC/': {'src': 'projects/2024_5th_CSRC/assets/images/csrc-build-1.webp', 'fit': 'cover'},
           }
 
-          console.log(`PR211 regression media QA: ${passed}/${cases.length} viewport suites passed`);
-          await browser.close();
-          EOF
-          node .tmp-pr211-qa.mjs
-          rm -f .tmp-pr211-qa.mjs package.json package-lock.json
+          for group in data['groups']:
+              for card in group['cards']:
+                  detail = card.get('detail')
+                  if detail in previews:
+                      card['preview'] = previews[detail]
 
-      - name: Upload QA screenshots
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pr211-regression-media-qa
-          path: qa-artifacts
-          retention-days: 1
+          path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+          git add projects.json
+          git commit -m "feat: add project card preview media"
+
+      - name: Render card preview markup
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('build.js')
+          text = path.read_text(encoding='utf-8')
+
+          old = '''      : kind === "failed"\n      ? " project-failed"\n      : "";\n  const lines = [];'''
+          new = '''      : kind === "failed"\n      ? " project-failed"\n      : "";\n  const previewClass = card.preview ? " project-card-previewable" : "";\n  const lines = [];'''
+          if old not in text:
+              raise SystemExit('build.js previewClass anchor not found')
+          text = text.replace(old, new, 1)
+
+          old = '''    `            <div class="project-card${extraClass}" data-category="${card.category}"${cardHref} data-tilt>`\n  );'''
+          new = '''    `            <div class="project-card${extraClass}${previewClass}" data-category="${card.category}"${cardHref} data-tilt>`\n  );'''
+          if old not in text:
+              raise SystemExit('build.js card class anchor not found')
+          text = text.replace(old, new, 1)
+
+          old = '''  lines.push(`${I}</div>`);\n\n  if (card.badge) {'''
+          new = '''  lines.push(`${I}</div>`);\n\n  /* 클릭 전 미디어 프리뷰 — projects.json에 실제 로컬 자산이 지정된 카드만 렌더한다.\n     장식적 미리보기이므로 중복 스크린리더 낭독을 피하고 카드 자체가 클릭 경로를 유지한다. */\n  if (card.preview?.src) {\n    const fitClass = card.preview.fit === "contain" ? " project-preview-contain" : "";\n    lines.push(`${I}<figure class="project-preview${fitClass}" aria-hidden="true">`);\n    lines.push(`                <img src="${esc(card.preview.src)}" alt="" loading="lazy" decoding="async" />`);\n    lines.push(`${I}</figure>`);\n  }\n\n  if (card.badge) {'''
+          if old not in text:
+              raise SystemExit('build.js preview markup anchor not found')
+          text = text.replace(old, new, 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+          git add build.js
+          git commit -m "feat: render project card media previews"
+
+      - name: Rebuild generated project region
+        run: |
+          node build.js
+          git add index.html
+          git commit -m "chore: rebuild project card previews"
+
+      - name: Style compact polaroid previews
+        run: |
+          cat >> style.css <<'EOF'
+
+          /* ===== #191 프로젝트 카드 클릭 전 미디어 프리뷰 =====
+             실제 프로젝트 로컬 자산만 사용한다. 카드 내부에 항상 노출하고,
+             hover/focus에서는 레이아웃 이동 없이 종이 사진이 살짝 들리는 정도만 연출한다. */
+          .project-card-previewable .project-preview {
+            flex: 0 0 auto;
+            margin: 2px 0 4px;
+            padding: 5px;
+            background: var(--paper-2);
+            border: 1px solid var(--line);
+            border-radius: 3px;
+            box-shadow: 2px 4px 10px rgba(31, 28, 20, 0.12);
+            transform: rotate(-0.35deg);
+            transform-origin: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            pointer-events: none;
+          }
+          .project-preview img {
+            display: block;
+            width: 100%;
+            height: 104px;
+            object-fit: cover;
+            border-radius: 2px;
+            background: var(--paper);
+          }
+          .project-preview.project-preview-contain img {
+            object-fit: contain;
+          }
+          .project-card-previewable:hover .project-preview,
+          .project-card-previewable:focus-within .project-preview {
+            transform: translateY(-3px) rotate(0.25deg);
+            box-shadow: 3px 7px 14px rgba(31, 28, 20, 0.16);
+          }
+          @media (max-width: 768px), (pointer: coarse) {
+            .project-preview img {
+              height: 128px;
+            }
+            .project-card-previewable:hover .project-preview,
+            .project-card-previewable:focus-within .project-preview {
+              transform: none;
+            }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .project-card-previewable .project-preview,
+            .project-card-previewable:hover .project-preview,
+            .project-card-previewable:focus-within .project-preview {
+              transform: none;
+              transition: none;
+            }
+          }
+          EOF
+          git add style.css
+          git commit -m "feat: style project card media previews"
+
+      - name: Push product branch
+        run: git push origin HEAD:chatgpt/v2-card-media-preview
