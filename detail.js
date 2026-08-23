@@ -5,6 +5,22 @@
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
 
+  if ($('.detail-photo-grid') && !$('#detail-photo-grid-style')) {
+    const style = document.createElement('style');
+    style.id = 'detail-photo-grid-style';
+    style.textContent = `
+      .detail-photo-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+      .detail-photo-card { margin:0; background:var(--card); border:1px solid var(--line); border-radius:calc(var(--radius) + 2px); overflow:hidden; box-shadow:var(--shadow-soft); }
+      .detail-photo-card img { display:block; width:100%; height:220px; object-fit:cover; background:var(--paper-2); }
+      .detail-photo-card figcaption { padding:12px 14px 14px; font-size:.92rem; line-height:1.65; color:var(--ink); }
+      @media (max-width:720px) {
+        .detail-photo-grid { grid-template-columns:1fr; }
+        .detail-photo-card img { height:auto; aspect-ratio:4/3; }
+      }
+    `;
+    document.head.append(style);
+  }
+
   const hamburger = $('#hamburger');
   const mobileMenu = $('#mobileMenu');
   const overlay = $('#sidebarOverlay');
