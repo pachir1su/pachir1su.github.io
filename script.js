@@ -600,49 +600,4 @@ window._updateProjectCount();
   capybara.decoding = 'async';
   capybara.draggable = false;
   wrap.insertBefore(capybara, button);
-
-  const style = document.createElement('style');
-  style.dataset.heroEmailCapybara = '192';
-  style.textContent = `
-    .hero-email-wrap {
-      position: relative;
-      display: inline-flex;
-      align-items: flex-end;
-      padding-top: 34px;
-      isolation: isolate;
-    }
-    .hero-email-capybara {
-      position: absolute;
-      left: 50%;
-      bottom: 23px;
-      width: 112px;
-      max-width: none;
-      height: auto;
-      transform: translateX(-50%);
-      pointer-events: none;
-      user-select: none;
-      -webkit-user-drag: none;
-      z-index: 0;
-    }
-    .hero-email-wrap .hero-email {
-      position: relative;
-      z-index: 1;
-      max-width: 100%;
-    }
-    @media (max-width: 640px) {
-      .hero-email-wrap {
-        width: 100%;
-        padding-top: 40px;
-      }
-      .hero-email-capybara {
-        width: 104px;
-        bottom: 23px;
-      }
-      .hero-email-wrap .hero-email {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  `;
-  document.head.appendChild(style);
 })();
