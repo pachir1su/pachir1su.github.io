@@ -1,37 +1,289 @@
-/* v2 project detail browser demos — static, dependency-free simulations */
+/* v2 project detail browser demos — one-click, deterministic, dependency-free */
 (() => {
   'use strict';
+
   const roots = [...document.querySelectorAll('[data-project-demo]')];
   if (!roots.length) return;
-  const lang = () => document.documentElement.lang === 'en' ? 'en' : 'ko';
-  const tr = (ko, en) => lang() === 'en' ? en : ko;
-  const set = (el, ko, en) => { el.dataset.ko = ko; el.dataset.en = en; el.textContent = tr(ko, en); };
-  const button = (ko, en, cls = '') => { const b = document.createElement('button'); b.type='button'; b.className=`demo-btn ${cls}`; set(b,ko,en); return b; };
-  const row = (label, control) => { const d=document.createElement('label'); d.className='demo-control'; const s=document.createElement('span'); s.textContent=label; d.append(s,control); return d; };
-  const status = () => { const p=document.createElement('p'); p.className='demo-status'; p.setAttribute('role','status'); p.setAttribute('aria-live','polite'); return p; };
-  function shell(root, ko, en) {
-    root.innerHTML=''; root.classList.add('project-demo');
-    const note=document.createElement('p'); note.className='demo-note'; set(note,'실제 프로젝트의 동작 원리를 브라우저에서 재현한 정적 시뮬레이션입니다. 하드웨어나 서버에 연결하지 않습니다.','A static browser simulation of the real project behavior. It does not connect to hardware or a backend.');
-    const grid=document.createElement('div'); grid.className='demo-grid'; root.append(note,grid); return grid;
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lang = () => (document.documentElement.lang === 'en' ? 'en' : 'ko');
+  const tr = (ko, en) => (lang() === 'en' ? en : ko);
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, reduced ? 0 : ms));
+
+  function setText(el, ko, en) {
+    el.dataset.ko = ko;
+    el.dataset.en = en;
+    el.textContent = tr(ko, en);
   }
+
+  function status() {
+    const p = document.createElement('p');
+    p.className = 'demo-status';
+    p.setAttribute('role', 'status');
+    p.setAttribute('aria-live', 'polite');
+    return p;
+  }
+
+  function shell(root, noteKo, noteEn, actionKo = '시연 시작', actionEn = 'Run demo') {
+    root.innerHTML = '';
+    root.classList.add('project-demo');
+
+    const note = document.createElement('p');
+    note.className = 'demo-note';
+    setText(note, noteKo, noteEn);
+
+    const grid = document.createElement('div');
+    grid.className = 'demo-grid';
+    const controls = document.createElement('div');
+    controls.className = 'demo-controls';
+    const stage = document.createElement('div');
+    stage.className = 'demo-stage';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'demo-btn';
+    setText(button, actionKo, actionEn);
+
+    const live = status();
+    controls.append(button, live);
+    grid.append(controls, stage);
+    root.append(note, grid);
+
+    let busy = false;
+    let played = false;
+    async function run(task) {
+      if (busy) return;
+      busy = true;
+      button.disabled = true;
+      setText(button, '시연 중…', 'Running…');
+      try {
+        await task();
+        played = true;
+      } finally {
+        busy = false;
+        button.disabled = false;
+        setText(button, played ? '다시 실행' : actionKo, played ? 'Run again' : actionEn);
+      }
+    }
+
+    return { stage, button, live, run };
+  }
+
   function wall(root) {
-    const grid=shell(root); const controls=document.createElement('div'); controls.className='demo-controls'; const stage=document.createElement('div'); stage.className='demo-stage demo-tank';
-    const water=document.createElement('div'); water.className='demo-water'; const barrier=document.createElement('div'); barrier.className='demo-barrier'; stage.append(water,barrier);
-    const level=document.createElement('input'); level.type='range'; level.min='0'; level.max='100'; level.value='35'; level.setAttribute('aria-label','Water level');
-    const auto=document.createElement('input'); auto.type='checkbox'; auto.checked=true; const manual=button('장벽 수동 전환','Toggle barrier manually'); const st=status();
-    controls.append(row(tr('해수면','Sea level'),level),row(tr('센서 자동 제어','Automatic sensor control'),auto),manual,st); grid.append(controls,stage);
-    let manualUp=false; function render(){ const n=+level.value, up=auto.checked?n>=62:manualUp; water.style.height=`${n}%`; barrier.style.height=up?'78%':'18%'; st.textContent=up?tr(`수위 ${n}% · 장벽 상승 · 모터 정지`,`Level ${n}% · barrier raised · motor stopped`):tr(`수위 ${n}% · 장벽 대기`,`Level ${n}% · barrier standing by`); }
-    level.addEventListener('input',render); auto.addEventListener('change',render); manual.addEventListener('click',()=>{auto.checked=false;manualUp=!manualUp;render();}); render();
+    const ui = shell(
+      root,
+      '버튼 한 번으로 해수면 상승 → 센서 감지 → 장벽 상승 흐름을 재현합니다.',
+      'One click replays sea-level rise → sensor detection → barrier lift.',
+      '해수면 상승 시연',
+      'Run sea-level demo'
+    );
+    ui.stage.classList.add('demo-tank');
+
+    const water = document.createElement('div');
+    water.className = 'demo-water';
+    const barrier = document.createElement('div');
+    barrier.className = 'demo-barrier';
+    ui.stage.append(water, barrier);
+
+    function reset() {
+      water.style.height = '30%';
+      barrier.style.height = '18%';
+      setText(ui.live, '시연 버튼을 누르면 작동합니다.', 'Press the button to run the demo.');
+      ui.live.classList.remove('warn');
+    }
+    reset();
+
+    ui.button.addEventListener('click', () => ui.run(async () => {
+      reset();
+      setText(ui.live, '해수면 상승 중', 'Sea level rising');
+      water.style.height = '68%';
+      await wait(650);
+      setText(ui.live, '임계 수위 감지 → 모터 작동', 'Threshold detected → motor activated');
+      ui.live.classList.add('warn');
+      barrier.style.height = '78%';
+      await wait(700);
+      setText(ui.live, '장벽 상승 완료 · 모터 정지', 'Barrier raised · motor stopped');
+    }));
   }
-  function ucast(root){ const grid=shell(root); const stage=document.createElement('div'); stage.className='demo-stage'; const warn=document.createElement('div'); warn.className='demo-warning'; const channels=[];
-    for(let i=1;i<=2;i++){ const c=document.createElement('div'); c.className='demo-channel'; const title=document.createElement('strong'); title.textContent=`CH ${i}`; const strip=document.createElement('div'); strip.className='demo-strip'; const enter=button('시작 IR 감지','Start IR trigger'); const exit=button('끝 IR 감지','End IR trigger'); c.append(title,strip,enter,exit); stage.append(c); channels.push({active:false,strip,enter,exit}); }
-    const allOn=button('전체 시작','Start all'), allOff=button('전체 종료','Stop all'); const st=status(); const controls=document.createElement('div'); controls.className='demo-controls'; controls.append(allOn,allOff,st); grid.append(controls,stage);
-    function render(){channels.forEach(c=>c.strip.classList.toggle('active',c.active)); const any=channels.some(c=>c.active); warn.textContent=any?tr('운전자 경고 LED ON · 사이렌 ON','Driver warning LED ON · siren ON'):tr('대기 · 경고 OFF','Standby · warning OFF'); warn.classList.toggle('active',any); st.replaceChildren(warn);}
-    channels.forEach(c=>{c.enter.addEventListener('click',()=>{c.active=true;render();});c.exit.addEventListener('click',()=>{c.active=false;render();});}); allOn.addEventListener('click',()=>{channels.forEach(c=>c.active=true);render();}); allOff.addEventListener('click',()=>{channels.forEach(c=>c.active=false);render();}); render(); }
-  function health(root){ const grid=shell(root); const controls=document.createElement('div'); controls.className='demo-controls'; const stage=document.createElement('div'); stage.className='demo-stage demo-health'; const hr=document.createElement('input'); hr.type='range';hr.min='45';hr.max='150';hr.value='76'; const temp=document.createElement('input');temp.type='range';temp.min='350';temp.max='405';temp.value='367'; const memo=document.createElement('input');memo.type='text';memo.maxLength=60;memo.placeholder=tr('오늘 상태 메모','Today\'s status note'); const st=status(); controls.append(row(tr('심박수','Heart rate'),hr),row(tr('체온','Temperature'),temp),row(tr('상태 메모','Status note'),memo),st); const h=document.createElement('div');h.className='demo-health-card';stage.append(h);grid.append(controls,stage);
-    function render(){const t=(+temp.value/10).toFixed(1), pulse=+hr.value; h.innerHTML=`<strong>${pulse} BPM</strong><strong>${t} °C</strong><span>${memo.value||tr('기록 대기','Waiting for note')}</span>`; const flag=pulse<55||pulse>110||+temp.value<360||+temp.value>378; st.textContent=flag?tr('설정한 예시 범위를 벗어난 값이 있어 확인 표시를 냅니다. (의료 판단 아님)','A value is outside this demo\'s example range. (Not medical advice)'):tr('예시 범위 내 · 기록 가능','Within the demo range · ready to log'); st.classList.toggle('warn',flag);} [hr,temp,memo].forEach(x=>x.addEventListener('input',render));render(); }
-  function berry(root){ const grid=shell(root); const controls=document.createElement('div');controls.className='demo-controls'; const stage=document.createElement('div');stage.className='demo-stage'; const st=status(); const count=document.createElement('strong'); count.className='demo-big-number'; const log=document.createElement('ol');log.className='demo-log'; const ids=['20250001','20250002','20250003']; ids.forEach(id=>{const b=button(`NFC ${id}`,`NFC ${id}`);b.addEventListener('click',()=>scan(id,'NFC'));controls.append(b);}); const input=document.createElement('input');input.inputMode='numeric';input.placeholder=tr('키패드 학번 입력','Keypad student ID'); const submit=button('키패드 출석','Keypad check-in');controls.append(input,submit,st);stage.append(count,log);grid.append(controls,stage); const seen=new Set(); function scan(id,via){id=(id||'').trim();if(!id)return;if(seen.has(id)){st.textContent=tr(`${id} · 이미 출석 처리됨`,`${id} · already checked in`);return;}seen.add(id);const li=document.createElement('li');li.textContent=`${id} · ${via}`;log.prepend(li);count.textContent=tr(`${seen.size}명 출석`,`${seen.size} checked in`);st.textContent=tr(`${id} 출석 기록 완료`,`${id} check-in recorded`);} submit.addEventListener('click',()=>{scan(input.value,'KEYPAD');input.value='';}); count.textContent=tr('0명 출석','0 checked in'); }
-  function plant(root){ const grid=shell(root); const controls=document.createElement('div');controls.className='demo-controls';const stage=document.createElement('div');stage.className='demo-stage demo-plant';const humidity=document.createElement('input');humidity.type='range';humidity.min='0';humidity.max='100';humidity.value='52';const hours=document.createElement('input');hours.type='range';hours.min='0';hours.max='72';hours.value='8';const water=button('방금 물 주기','Water now');const fan=button('팬 전환','Toggle fan');const st=status();controls.append(row(tr('토양 습도','Soil humidity'),humidity),row(tr('마지막 급수 후 시간','Hours since watering'),hours),water,fan,st);const lcd=document.createElement('div');lcd.className='demo-lcd';stage.append(lcd);grid.append(controls,stage);let fanOn=false;function render(){const h=+humidity.value,elapsed=+hours.value,alert=h<35||elapsed>24;lcd.innerHTML=`<b>HUM ${h}%</b><b>${elapsed}h</b><span>FAN ${fanOn?'ON':'OFF'}</span>`;st.textContent=alert?tr('급수 알림 · 부저/진동 ON','Watering alert · buzzer/vibration ON'):tr('상태 정상 · 알림 대기','Status normal · alerts standing by');st.classList.toggle('warn',alert);} humidity.addEventListener('input',render);hours.addEventListener('input',render);water.addEventListener('click',()=>{hours.value=0;humidity.value=Math.max(+humidity.value,65);render();});fan.addEventListener('click',()=>{fanOn=!fanOn;render();});render();}
-  const init={wall,ucast,health,berry,plant}; roots.forEach(root=>init[root.dataset.projectDemo]?.(root));
-  addEventListener('portfolio:language',()=>location.reload());
+
+  function ucast(root) {
+    const ui = shell(
+      root,
+      '버튼 한 번으로 보행자 진입 감지 → 구간 경고 → 종료 감지 흐름을 재현합니다.',
+      'One click replays pedestrian entry → channel warning → exit detection.',
+      '보행자 감지 시연',
+      'Run pedestrian demo'
+    );
+
+    const warning = document.createElement('div');
+    warning.className = 'demo-warning';
+    const channels = [];
+    for (let i = 1; i <= 2; i += 1) {
+      const row = document.createElement('div');
+      row.className = 'demo-channel';
+      const title = document.createElement('strong');
+      title.textContent = `CH ${i}`;
+      const strip = document.createElement('div');
+      strip.className = 'demo-strip';
+      const state = document.createElement('span');
+      state.style.cssText = 'font-size:.72rem;font-weight:700;text-align:right;color:var(--text-muted)';
+      setText(state, '대기', 'Standby');
+      row.append(title, strip, state);
+      ui.stage.append(row);
+      channels.push({ strip, state });
+    }
+    ui.stage.append(warning);
+
+    function setChannel(index, active) {
+      channels[index].strip.classList.toggle('active', active);
+      setText(channels[index].state, active ? '경고' : '대기', active ? 'Warning' : 'Standby');
+    }
+    function reset() {
+      channels.forEach((_, index) => setChannel(index, false));
+      warning.classList.remove('active');
+      setText(warning, '운전자 경고 OFF · 사이렌 OFF', 'Driver warning OFF · siren OFF');
+      setText(ui.live, '시연 버튼을 누르면 작동합니다.', 'Press the button to run the demo.');
+    }
+    reset();
+
+    ui.button.addEventListener('click', () => ui.run(async () => {
+      reset();
+      setChannel(0, true);
+      warning.classList.add('active');
+      setText(warning, '운전자 경고 LED ON · 사이렌 ON', 'Driver warning LED ON · siren ON');
+      setText(ui.live, 'CH 1 시작 IR 감지', 'CH 1 start IR detected');
+      await wait(550);
+      setChannel(1, true);
+      setText(ui.live, 'CH 2 시작 IR 감지 · 두 구간 독립 경고', 'CH 2 start IR detected · independent channel warning');
+      await wait(850);
+      setChannel(0, false);
+      setText(ui.live, 'CH 1 끝 IR 감지 · CH 2 경고 유지', 'CH 1 end IR detected · CH 2 remains active');
+      await wait(550);
+      setChannel(1, false);
+      warning.classList.remove('active');
+      setText(warning, '운전자 경고 OFF · 사이렌 OFF', 'Driver warning OFF · siren OFF');
+      setText(ui.live, '모든 구간 통과 완료 · 대기 상태 복귀', 'All channels cleared · returned to standby');
+    }));
+  }
+
+  function health(root) {
+    const ui = shell(
+      root,
+      '버튼 한 번으로 예시 측정값을 읽고 한 건의 건강 기록을 만드는 흐름을 보여줍니다. 의료 판단 기능이 아닙니다.',
+      'One click shows an example measurement and creates one health log. This is not medical advice.',
+      '건강 기록 시연',
+      'Run health-log demo'
+    );
+    ui.stage.classList.add('demo-health');
+
+    const card = document.createElement('div');
+    card.className = 'demo-health-card';
+    const pulse = document.createElement('strong');
+    const temp = document.createElement('strong');
+    const memo = document.createElement('span');
+    card.append(pulse, temp, memo);
+    ui.stage.append(card);
+
+    function reset() {
+      pulse.textContent = '— BPM';
+      temp.textContent = '— °C';
+      setText(memo, '측정 대기', 'Waiting for measurement');
+      setText(ui.live, '시연 버튼을 누르면 예시 기록을 생성합니다.', 'Press the button to create an example log.');
+      ui.live.classList.remove('warn');
+    }
+    reset();
+
+    ui.button.addEventListener('click', () => ui.run(async () => {
+      reset();
+      setText(ui.live, '센서 값 읽는 중', 'Reading sensor values');
+      await wait(450);
+      pulse.textContent = '76 BPM';
+      temp.textContent = '36.7 °C';
+      setText(memo, '상태 메모: 컨디션 양호', 'Status note: feeling well');
+      await wait(450);
+      setText(ui.live, '예시 기록 1건 저장 완료 · 의료 판단 없음', 'Example log saved · no medical diagnosis');
+    }));
+  }
+
+  function berry(root) {
+    const ui = shell(
+      root,
+      '버튼 한 번으로 NFC 태그 3개가 순서대로 출석 처리되는 흐름을 재현합니다.',
+      'One click replays three NFC tags being checked in one by one.',
+      'NFC 출석 시연',
+      'Run NFC check-in demo'
+    );
+
+    const count = document.createElement('strong');
+    count.className = 'demo-big-number';
+    const log = document.createElement('ol');
+    log.className = 'demo-log';
+    ui.stage.append(count, log);
+    const ids = ['20250001', '20250002', '20250003'];
+
+    function reset() {
+      log.replaceChildren();
+      setText(count, '0명 출석', '0 checked in');
+      setText(ui.live, '시연 버튼을 누르면 NFC 태그 입력을 재현합니다.', 'Press the button to replay NFC tag input.');
+    }
+    reset();
+
+    ui.button.addEventListener('click', () => ui.run(async () => {
+      reset();
+      for (let i = 0; i < ids.length; i += 1) {
+        await wait(i === 0 ? 250 : 500);
+        const li = document.createElement('li');
+        li.textContent = `${ids[i]} · NFC`;
+        log.prepend(li);
+        setText(count, `${i + 1}명 출석`, `${i + 1} checked in`);
+        setText(ui.live, `${ids[i]} 출석 기록 완료`, `${ids[i]} check-in recorded`);
+      }
+      await wait(350);
+      setText(ui.live, '3명 출석 처리 완료', '3 check-ins completed');
+    }));
+  }
+
+  function plant(root) {
+    const ui = shell(
+      root,
+      '버튼 한 번으로 건조 상태 감지 → 급수 → 알림 해제 흐름을 재현합니다.',
+      'One click replays dry-soil detection → watering → alert cleared.',
+      '식물 관리 시연',
+      'Run plant-care demo'
+    );
+    ui.stage.classList.add('demo-plant');
+
+    const lcd = document.createElement('div');
+    lcd.className = 'demo-lcd';
+    const humidity = document.createElement('b');
+    const elapsed = document.createElement('b');
+    const alert = document.createElement('span');
+    lcd.append(humidity, elapsed, alert);
+    ui.stage.append(lcd);
+
+    function dry() {
+      humidity.textContent = 'HUM 28%';
+      elapsed.textContent = '30h';
+      alert.textContent = 'ALERT ON';
+      setText(ui.live, '토양 건조 · 급수 알림 상태', 'Dry soil · watering alert active');
+      ui.live.classList.add('warn');
+    }
+    dry();
+
+    ui.button.addEventListener('click', () => ui.run(async () => {
+      dry();
+      setText(ui.live, '건조 상태 감지 → 급수 시작', 'Dry state detected → watering started');
+      await wait(650);
+      humidity.textContent = 'HUM 68%';
+      elapsed.textContent = '0h';
+      alert.textContent = 'ALERT OFF';
+      ui.live.classList.remove('warn');
+      setText(ui.live, '급수 기록 완료 · 알림 해제', 'Watering logged · alert cleared');
+    }));
+  }
+
+  const init = { wall, ucast, health, berry, plant };
+  roots.forEach((root) => init[root.dataset.projectDemo]?.(root));
+
+  addEventListener('portfolio:language', () => location.reload());
 })();
