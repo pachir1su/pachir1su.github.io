@@ -1,0 +1,257 @@
+name: One-time final media metadata pass
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/media-metadata-final.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-time-media-metadata-final
+  cancel-in-progress: false
+
+jobs:
+  sanitize-and-verify:
+    if: github.repository == 'pachir1su/pachir1su.github.io'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install metadata tooling
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libimage-exiftool-perl ffmpeg
+          exiftool -ver
+          ffmpeg -version | head -n 1
+
+      - name: Capture pre-sanitize evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          set +e
+          node tools/verify-media-metadata.js > evidence/media-before.json
+          printf '%s\n' "$?" > evidence/media-before-exit.txt
+          set -e
+
+          python3 <<'PY'
+          from pathlib import Path
+          import json
+          import subprocess
+
+          root = Path('.')
+          image_exts = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
+          video_exts = {'.mp4', '.mov', '.m4v', '.3gp', '.webm', '.mkv', '.avi'}
+
+          def run(cmd):
+              p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+              if p.returncode:
+                  raise SystemExit(f"command failed ({p.returncode}): {' '.join(cmd)}\n{p.stderr.decode(errors='replace')}")
+              return p.stdout
+
+          def media_files():
+              out = []
+              for p in root.rglob('*'):
+                  if not p.is_file() or '.git' in p.parts or 'node_modules' in p.parts:
+                      continue
+                  if p.suffix.lower() in image_exts | video_exts:
+                      out.append(p)
+              return sorted(out)
+
+          def fingerprint(p):
+              ext = p.suffix.lower()
+              rel = p.as_posix()
+              if ext in image_exts:
+                  probe = run([
+                      'ffprobe', '-v', 'error', '-select_streams', 'v:0',
+                      '-show_entries', 'stream=codec_name,width,height,pix_fmt',
+                      '-of', 'json', rel,
+                  ]).decode()
+                  decoded = run([
+                      'ffmpeg', '-v', 'error', '-i', rel, '-map', '0:v:0',
+                      '-f', 'framemd5', '-',
+                  ])
+                  return {'kind': 'image', 'probe': json.loads(probe), 'decodedFrameMd5': decoded.decode()}
+              streams = run([
+                  'ffmpeg', '-v', 'error', '-i', rel, '-map', '0', '-c', 'copy',
+                  '-f', 'streamhash', '-hash', 'sha256', '-',
+              ]).decode()
+              probe = run([
+                  'ffprobe', '-v', 'error', '-show_entries',
+                  'stream=index,codec_name,codec_type,width,height,sample_rate,channels,duration',
+                  '-of', 'json', rel,
+              ]).decode()
+              return {'kind': 'video', 'probe': json.loads(probe), 'streamHash': streams}
+
+          fp = {p.as_posix(): fingerprint(p) for p in media_files()}
+          Path('evidence/media-fingerprints-before.json').write_text(json.dumps(fp, ensure_ascii=False, indent=2) + '\n')
+
+          pngs = {}
+          sig = b'\x89PNG\r\n\x1a\n'
+          for p in media_files():
+              if p.suffix.lower() != '.png':
+                  continue
+              data = p.read_bytes()
+              types = []
+              if data.startswith(sig):
+                  pos = 8
+                  while pos + 12 <= len(data):
+                      length = int.from_bytes(data[pos:pos+4], 'big')
+                      typ = data[pos+4:pos+8].decode('ascii', errors='replace')
+                      types.append(typ)
+                      pos += 12 + length
+                      if typ == 'IEND':
+                          break
+              pngs[p.as_posix()] = types
+          Path('evidence/png-chunks-before.json').write_text(json.dumps(pngs, indent=2) + '\n')
+
+          videos = [p for p in media_files() if p.suffix.lower() in video_exts]
+          details = {}
+          for p in videos:
+              details[p.as_posix()] = json.loads(run([
+                  'ffprobe', '-v', 'error', '-show_format', '-show_streams', '-of', 'json', p.as_posix()
+              ]).decode())
+          Path('evidence/video-metadata-before.json').write_text(json.dumps(details, ensure_ascii=False, indent=2) + '\n')
+          PY
+
+      - name: Sanitize flagged public media
+        run: |
+          python3 tools/sanitize-media-metadata.py --report evidence/media-sanitize-report.json
+
+      - name: Verify zero offenders and byte-level rendering invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          node tools/verify-media-metadata.js > evidence/media-after.json
+
+          python3 <<'PY'
+          from pathlib import Path
+          import json
+          import subprocess
+
+          root = Path('.')
+          image_exts = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
+          video_exts = {'.mp4', '.mov', '.m4v', '.3gp', '.webm', '.mkv', '.avi'}
+
+          def run(cmd):
+              p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
+              if p.returncode:
+                  raise SystemExit(f"command failed ({p.returncode}): {' '.join(cmd)}\n{p.stderr.decode(errors='replace')}")
+              return p.stdout
+
+          def media_files():
+              out = []
+              for p in root.rglob('*'):
+                  if not p.is_file() or '.git' in p.parts or 'node_modules' in p.parts:
+                      continue
+                  if p.suffix.lower() in image_exts | video_exts:
+                      out.append(p)
+              return sorted(out)
+
+          def fingerprint(p):
+              ext = p.suffix.lower()
+              rel = p.as_posix()
+              if ext in image_exts:
+                  probe = run([
+                      'ffprobe', '-v', 'error', '-select_streams', 'v:0',
+                      '-show_entries', 'stream=codec_name,width,height,pix_fmt',
+                      '-of', 'json', rel,
+                  ]).decode()
+                  decoded = run([
+                      'ffmpeg', '-v', 'error', '-i', rel, '-map', '0:v:0',
+                      '-f', 'framemd5', '-',
+                  ])
+                  return {'kind': 'image', 'probe': json.loads(probe), 'decodedFrameMd5': decoded.decode()}
+              streams = run([
+                  'ffmpeg', '-v', 'error', '-i', rel, '-map', '0', '-c', 'copy',
+                  '-f', 'streamhash', '-hash', 'sha256', '-',
+              ]).decode()
+              probe = run([
+                  'ffprobe', '-v', 'error', '-show_entries',
+                  'stream=index,codec_name,codec_type,width,height,sample_rate,channels,duration',
+                  '-of', 'json', rel,
+              ]).decode()
+              return {'kind': 'video', 'probe': json.loads(probe), 'streamHash': streams}
+
+          after = {p.as_posix(): fingerprint(p) for p in media_files()}
+          Path('evidence/media-fingerprints-after.json').write_text(json.dumps(after, ensure_ascii=False, indent=2) + '\n')
+          before = json.loads(Path('evidence/media-fingerprints-before.json').read_text())
+          if before != after:
+              bad = sorted(k for k in set(before) | set(after) if before.get(k) != after.get(k))
+              raise SystemExit('decoded media/stream invariant changed: ' + ', '.join(bad))
+
+          pngs = {}
+          sig = b'\x89PNG\r\n\x1a\n'
+          for p in media_files():
+              if p.suffix.lower() != '.png':
+                  continue
+              data = p.read_bytes()
+              types = []
+              if data.startswith(sig):
+                  pos = 8
+                  while pos + 12 <= len(data):
+                      length = int.from_bytes(data[pos:pos+4], 'big')
+                      typ = data[pos+4:pos+8].decode('ascii', errors='replace')
+                      types.append(typ)
+                      pos += 12 + length
+                      if typ == 'IEND':
+                          break
+              pngs[p.as_posix()] = types
+          Path('evidence/png-chunks-after.json').write_text(json.dumps(pngs, indent=2) + '\n')
+
+          videos = [p for p in media_files() if p.suffix.lower() in video_exts]
+          details = {}
+          for p in videos:
+              details[p.as_posix()] = json.loads(run([
+                  'ffprobe', '-v', 'error', '-show_format', '-show_streams', '-of', 'json', p.as_posix()
+              ]).decode())
+          Path('evidence/video-metadata-after.json').write_text(json.dumps(details, ensure_ascii=False, indent=2) + '\n')
+          PY
+
+          node --check tools/verify-media-metadata.js
+          python3 -m py_compile tools/sanitize-media-metadata.py
+          node tools/verify-build.js
+          node build.js
+          git diff --check
+
+      - name: Push sanitized media branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          python3 <<'PY' > /tmp/media-changed.txt
+          import json
+          from pathlib import Path
+          report = json.loads(Path('evidence/media-sanitize-report.json').read_text())
+          for path in report.get('changed', []):
+              print(path)
+          PY
+
+          git switch -C chatgpt/media-metadata-final
+          if [[ -s /tmp/media-changed.txt ]]; then
+            while IFS= read -r file; do
+              git add -- "$file"
+            done < /tmp/media-changed.txt
+            git commit -m 'chore: strip public media metadata'
+          fi
+          git push --force origin HEAD:refs/heads/chatgpt/media-metadata-final
+          git diff --stat HEAD^ HEAD 2>/dev/null > evidence/committed-diff-stat.txt || true
+
+      - name: Upload audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: media-metadata-final-evidence
+          path: evidence/
+          if-no-files-found: warn
+          retention-days: 14
