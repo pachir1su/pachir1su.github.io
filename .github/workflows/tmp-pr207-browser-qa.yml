@@ -35,8 +35,8 @@ jobs:
           node tools/verify-build.js
           git diff --check
           git diff --exit-code
-          test "$(git rev-list --count origin/main..HEAD)" -eq 9
-          test "$(git diff --name-only origin/main...HEAD | wc -l)" -eq 9
+          test "$(git rev-list --count origin/main..HEAD)" -eq 10
+          test "$(git diff --name-only origin/main...HEAD | wc -l)" -eq 10
           test "$(git diff --name-only origin/main...HEAD | grep -c '^__noop__\.tmp$' || true)" -eq 0
 
       - name: Browser QA
