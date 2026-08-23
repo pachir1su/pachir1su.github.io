@@ -577,3 +577,72 @@ window._updateProjectCount();
     });
   });
 })();
+
+/* ------------------------------------------------------------- */
+/* 19. Hero email capybara (#192)                                */
+/* ------------------------------------------------------------- */
+(function initHeroEmailCapybara() {
+  const button = document.querySelector('.hero-btns > .hero-email');
+  if (!button || button.closest('.hero-email-wrap')) return;
+
+  const wrap = document.createElement('span');
+  wrap.className = 'hero-email-wrap';
+  button.parentNode.insertBefore(wrap, button);
+  wrap.appendChild(button);
+
+  const capybara = document.createElement('img');
+  capybara.className = 'hero-email-capybara';
+  capybara.src = 'assets/capybara-mail-peek.webp';
+  capybara.width = 256;
+  capybara.height = 256;
+  capybara.alt = '';
+  capybara.setAttribute('aria-hidden', 'true');
+  capybara.decoding = 'async';
+  capybara.draggable = false;
+  wrap.insertBefore(capybara, button);
+
+  const style = document.createElement('style');
+  style.dataset.heroEmailCapybara = '192';
+  style.textContent = `
+    .hero-email-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: flex-end;
+      padding-top: 34px;
+      isolation: isolate;
+    }
+    .hero-email-capybara {
+      position: absolute;
+      left: 50%;
+      bottom: 23px;
+      width: 112px;
+      max-width: none;
+      height: auto;
+      transform: translateX(-50%);
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      z-index: 0;
+    }
+    .hero-email-wrap .hero-email {
+      position: relative;
+      z-index: 1;
+      max-width: 100%;
+    }
+    @media (max-width: 640px) {
+      .hero-email-wrap {
+        width: 100%;
+        padding-top: 40px;
+      }
+      .hero-email-capybara {
+        width: 104px;
+        bottom: 23px;
+      }
+      .hero-email-wrap .hero-email {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+})();
