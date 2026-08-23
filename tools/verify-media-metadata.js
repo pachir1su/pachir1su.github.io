@@ -106,8 +106,12 @@ function detectVideo(buf, ext) {
   for (const [label, needles] of patterns) if (needles.some((n) => latin.includes(n))) hits.add(label);
 
   if (['.mp4', '.mov', '.m4v', '.3gp'].includes(ext)) {
-    // QuickTime user-data atoms that can carry location/title/author metadata.
-    for (const atom of ['©xyz', '©nam', '©art', '©cmt', '©cpy']) if (latin.includes(atom)) hits.add(`atom:${atom}`);
+    // QuickTime user-data atoms that can carry location/title/author/date/tool metadata.
+    // ©too is the encoding-tool tag (for example an FFmpeg/Lavf version), and ©day
+    // can carry a creation/release date. Both are stripped under the public-media policy.
+    for (const atom of ['©xyz', '©nam', '©art', '©cmt', '©cpy', '©too', '©day']) {
+      if (latin.includes(atom)) hits.add(`atom:${atom}`);
+    }
   }
   return [...hits];
 }
