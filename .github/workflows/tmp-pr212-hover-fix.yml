@@ -1,106 +1,44 @@
-# trigger existing push workflow
-name: TEMP PR212 hover fix
+name: TEMP health media runner
 
 on:
   push:
     branches: [tmp/pr212-hover-fix]
+    paths:
+      - '.tmp-health/READY'
 
 permissions:
   contents: write
 
 jobs:
-  fix:
+  apply:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout product branch
+      - name: Checkout temp payload
         uses: actions/checkout@v4
-        with:
-          ref: chatgpt/v2-card-media-preview
-          fetch-depth: 0
 
-      - name: Replace preview CSS with hover-only floating polaroid
+      - name: Rebuild uploaded WebP payloads
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path('style.css')
-          s = p.read_text(encoding='utf-8')
-          marker = '/* ===== #191 프로젝트 카드 클릭 전 미디어 프리뷰 ====='
-          if marker not in s:
-              raise SystemExit('preview marker not found')
-          before = s.split(marker, 1)[0].rstrip() + '\n\n'
-          block = r'''/* ===== #191 프로젝트 카드 클릭 전 미디어 프리뷰 =====
-   평상시에는 기존 카드 레이아웃을 그대로 유지하고, hover/focus에서만
-   카드 위로 작은 폴라로이드가 살짝 튀어나온다. 터치 환경에서는 숨긴다. */
-.project-card-previewable {
-  position: relative;
-}
-.project-card-previewable .project-preview {
-  position: absolute;
-  left: 50%;
-  top: 18px;
-  z-index: 30;
-  width: min(76%, 220px);
-  margin: 0;
-  padding: 6px 6px 22px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 2px;
-  box-shadow: 3px 8px 18px rgba(31, 28, 20, 0.18);
-  opacity: 0;
-  visibility: hidden;
-  transform: translate(-50%, 12px) rotate(-4deg) scale(0.94);
-  transform-origin: center bottom;
-  transition: opacity 0.16s ease-out, transform 0.22s var(--ease-out), visibility 0.16s;
-  pointer-events: none;
-}
-.project-preview img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: 1px;
-  background: var(--paper-2);
-}
-.project-preview.project-preview-contain img {
-  object-fit: contain;
-}
-.project-card-previewable:hover,
-.project-card-previewable:focus-within {
-  z-index: 40;
-}
-.project-card-previewable:hover .project-preview,
-.project-card-previewable:focus-within .project-preview {
-  opacity: 1;
-  visibility: visible;
-  transform: translate(-50%, -42%) rotate(3deg) scale(1);
-}
-@media (hover: none), (pointer: coarse) {
-  .project-card-previewable .project-preview {
-    display: none;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .project-card-previewable .project-preview {
-    transition: opacity 0.01ms linear, visibility 0.01ms linear;
-    transform: translate(-50%, -38%) rotate(2deg);
-  }
-  .project-card-previewable:hover .project-preview,
-  .project-card-previewable:focus-within .project-preview {
-    transform: translate(-50%, -38%) rotate(2deg);
-  }
-}
-'''
-          p.write_text(before + block, encoding='utf-8')
-          PY
+          cat .tmp-health/sensor-*.part | base64 -d > /tmp/sensor.webp
+          cat .tmp-health/gui-*.part | base64 -d > /tmp/gui.webp
+          file /tmp/sensor.webp /tmp/gui.webp
+          test "$(head -c 4 /tmp/sensor.webp)" = "RIFF"
+          test "$(head -c 4 /tmp/gui.webp)" = "RIFF"
 
-      - name: Amend final style commit only
+      - name: Commit one product file at a time
         run: |
-          test "$(git diff --name-only | wc -l)" -eq 1
-          test "$(git diff --name-only)" = "style.css"
+          git fetch origin chatgpt/v2-healthcare-original-photos
+          git checkout chatgpt/v2-healthcare-original-photos
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add style.css
-          git commit --amend --no-edit
-          test "$(git rev-list --count origin/main..HEAD)" -eq 4
-          test "$(git diff --name-only origin/main...HEAD | wc -l)" -eq 4
-          git push --force origin HEAD:chatgpt/v2-card-media-preview
+
+          cp /tmp/sensor.webp projects/HEALTH_CHECK_PROJECT/assets/images/sensor.webp
+          git add projects/HEALTH_CHECK_PROJECT/assets/images/sensor.webp
+          git commit -m "fix: replace healthcare sensor photo"
+
+          cp /tmp/gui.webp projects/HEALTH_CHECK_PROJECT/assets/images/gui.webp
+          git add projects/HEALTH_CHECK_PROJECT/assets/images/gui.webp
+          git commit -m "fix: replace healthcare GUI photo"
+
+          test "$(git diff --name-only origin/main...HEAD | wc -l)" -eq 6
+          test "$(git rev-list --count origin/main..HEAD)" -eq 6
+          git push origin HEAD:chatgpt/v2-healthcare-original-photos
