@@ -3202,7 +3202,7 @@ html {
   .signal-counter-device { grid-template-columns:94px minmax(0,1fr); }
   .signal-counter-tower .signal-lamp { width:44px; }
 }
-@media (orientation:landscape) and (max-height:560px) and (max-width:1024px) {
+@media (orientation:landscape) and (min-width:641px) and (max-height:560px) and (max-width:1024px) {
   .detail-hero { min-height:0; padding-block:82px 36px; }
   .hardware-demo-layout { grid-template-columns:minmax(190px,.7fr) minmax(360px,1.3fr); }
   .hardware-control-panel,.berry-control-panel { display:flex; }
