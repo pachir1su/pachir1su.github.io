@@ -36,7 +36,11 @@
             "HTML/CSS/JS",
             "GitHub API",
             "ES Modules"
-          ]
+          ],
+          "preview": {
+            "src": "projects/github_rank_insight/assets/images/live-demo.webp",
+            "fit": "contain"
+          }
         },
         {
           "comment": "한기대 26학번 신입생 가이드",
@@ -74,7 +78,11 @@
           "tech": [
             "Notion",
             "Documentation"
-          ]
+          ],
+          "preview": {
+            "src": "projects/koreatech_noob_guide/assets/images/notion-guide.webp",
+            "fit": "contain"
+          }
         },
         {
           "comment": "Swordmaster (File + Media 통합 허브)",
@@ -115,7 +123,11 @@
             "Python",
             "Gradio",
             "HuggingFace"
-          ]
+          ],
+          "preview": {
+            "src": "projects/swordmaster/assets/images/media-swordmaster-live.webp",
+            "fit": "contain"
+          }
         },
         {
           "comment": "데일리 리포트 AI",
@@ -260,7 +272,11 @@
             "FastAPI",
             "SQLite",
             "PySide6"
-          ]
+          ],
+          "preview": {
+            "src": "projects/koreatechGongjiAgent/assets/images/web-shuttle.webp",
+            "fit": "contain"
+          }
         },
         {
           "comment": "raspi-mc-server (라즈베리파이 마인크래프트 서버 + 디스코드 관리봇)",
@@ -334,7 +350,11 @@
             "NeoPixel",
             "Passive Buzzer",
             "Mentoring"
-          ]
+          ],
+          "preview": {
+            "src": "projects/2026_U-CAST/assets/images/prototype.webp",
+            "fit": "cover"
+          }
         }
       ]
     },
@@ -374,7 +394,11 @@
             "Arduino",
             "Raspberry Pi",
             "IoT"
-          ]
+          ],
+          "preview": {
+            "src": "projects/BerryIno/assets/images/nfc-photo-1.webp",
+            "fit": "cover"
+          }
         },
         {
           "comment": "식물 타이머",
@@ -407,7 +431,11 @@
           "tech": [
             "IoT",
             "Hackathon"
-          ]
+          ],
+          "preview": {
+            "src": "projects/PlantClock/assets/images/plantclock.webp",
+            "fit": "cover"
+          }
         },
         {
           "comment": "헬스 케어 시스템",
@@ -448,7 +476,11 @@
             "Arduino",
             "Raspberry Pi",
             "Gemini API"
-          ]
+          ],
+          "preview": {
+            "src": "projects/HEALTH_CHECK_PROJECT/assets/images/prototype-front.webp",
+            "fit": "cover"
+          }
         },
         {
           "comment": "면진봇",
@@ -515,7 +547,11 @@
             "AI",
             "Gemini API",
             "Flask"
-          ]
+          ],
+          "preview": {
+            "src": "projects/Legend_SakSak_GongGam_AI/assets/images/app-home.webp",
+            "fit": "contain"
+          }
         }
       ]
     },
@@ -557,7 +593,11 @@
             "Servo Motor",
             "Keypad",
             "LCD"
-          ]
+          ],
+          "preview": {
+            "src": "projects/Master_Creator_Challenge/assets/images/doorlock-1.webp",
+            "fit": "cover"
+          }
         },
         {
           "comment": "해안 장벽 프로젝트",
@@ -591,7 +631,11 @@
             "Engineering",
             "Environment",
             "Modeling"
-          ]
+          ],
+          "preview": {
+            "src": "projects/Wall_Sina/assets/images/prototype-1.webp",
+            "fit": "cover"
+          }
         },
         {
           "comment": "산불 조기 감지 알림 시스템",
@@ -695,7 +739,11 @@
             "Robot",
             "Embedded",
             "HuskyLens"
-          ]
+          ],
+          "preview": {
+            "src": "projects/2024_5th_CSRC/assets/images/csrc-build-1.webp",
+            "fit": "cover"
+          }
         }
       ]
     },
