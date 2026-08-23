@@ -127,6 +127,11 @@
               "href": "https://github.com/pachir1su/computingSAGO",
               "title": "GitHub",
               "icon": "fab fa-github"
+            },
+            {
+              "href": "https://youtu.be/4xF9-N9jKvc",
+              "title": "YouTube",
+              "icon": "fab fa-youtube"
             }
           ],
           "title": {
@@ -164,6 +169,11 @@
               "href": "https://github.com/pachir1su/MultiMind",
               "title": "GitHub",
               "icon": "fab fa-github"
+            },
+            {
+              "href": "https://youtu.be/CyX0PryfrRI",
+              "title": "YouTube",
+              "icon": "fab fa-youtube"
             }
           ],
           "title": "MultiMind",
@@ -593,6 +603,11 @@
               "href": "https://github.com/chae03yb/hstree-makerthon",
               "title": "GitHub",
               "icon": "fab fa-github"
+            },
+            {
+              "href": "https://www.youtube.com/watch?v=z0q6D7zNWyw",
+              "title": "YouTube",
+              "icon": "fab fa-youtube"
             }
           ],
           "title": {
