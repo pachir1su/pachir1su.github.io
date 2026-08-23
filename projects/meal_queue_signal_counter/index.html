@@ -55,7 +55,7 @@
           <div class="detail-hero-icon"><i class="fas fa-traffic-light"></i></div>
           <h1 class="detail-title" data-aos="fade-up"><span data-en="Cafeteria Queue Signal Counter" data-ko="급식 줄 혼잡도 신호등 계수기">급식 줄 혼잡도 신호등 계수기</span></h1>
           <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
-            <span class="detail-badge">Arduino</span><span class="detail-badge">Entry</span><span class="detail-badge">Counter</span><span class="detail-badge" data-en="2024 With AI Coding Festival" data-ko="2024 위드 AI 코딩 페스티벌">2024 위드 AI 코딩 페스티벌</span>
+            <span class="detail-badge">Arduino</span><span class="detail-badge">mBlock</span><span class="detail-badge">Gorilla Cell</span><span class="detail-badge" data-en="Physical Computing" data-ko="피지컬 컴퓨팅">피지컬 컴퓨팅</span>
           </div>
           <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
             <a href="../../index.html#projects" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a>
@@ -69,8 +69,8 @@
             <div class="detail-main">
               <div class="detail-section" data-aos="fade-up">
                 <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
-                <p data-en="A traffic-light counter prototype built for the 2024 With AI Coding Festival. Students or queue guides press a button as people join the cafeteria line. At roughly 20 counts, the signal turns red for about 10 seconds to pause incoming traffic, then returns to green.">
-                  2024 위드 AI 코딩 페스티벌에서 제작한 급식 줄 계수 시제품입니다. 급식 줄에 사람이 들어올 때 학생이나 선도 위원이 버튼을 눌러 인원을 세고, 약 20명이 누적되면 약 10초 동안 빨간불을 켜 유입을 잠시 막은 뒤 다시 초록불로 전환합니다.
+                <p data-en="A physical-computing prototype built for the 2024 With AI Coding Festival using mBlock, a Gorilla Cell, and Arduino. Students or queue guides press a button as people join the cafeteria line. At roughly 20 counts, the signal turns red for about 10 seconds to pause incoming traffic, then returns to green.">
+                  2024 위드 AI 코딩 페스티벌 피지컬 컴퓨팅 분야에서 mBlock·고릴라셀·아두이노로 제작한 급식 줄 계수 시제품입니다. 급식 줄에 사람이 들어올 때 학생이나 선도 위원이 버튼을 눌러 인원을 세고, 약 20명이 누적되면 약 10초 동안 빨간불을 켜 유입을 잠시 막은 뒤 다시 초록불로 전환합니다.
                 </p>
               </div>
 
@@ -81,7 +81,8 @@
                   <li data-en="Congestion threshold at approximately 20 people">약 20명을 기준으로 혼잡도 임계값 판단</li>
                   <li data-en="Red signal for about 10 seconds to limit incoming traffic">혼잡 시 약 10초간 빨간불로 추가 유입 제한</li>
                   <li data-en="Automatic return to the green signal">대기 시간 이후 초록불로 자동 복귀</li>
-                  <li data-en="Entry block logic connected to Arduino traffic-light LEDs">Entry 블록 로직과 아두이노 신호등 LED 연동</li>
+                  <li data-en="mBlock logic connected to Arduino traffic-light LEDs">mBlock 블록 로직과 아두이노 신호등 LED 연동</li>
+                  <li data-en="Portable power supplied by a Gorilla Cell">고릴라셀을 활용한 휴대용 전원 구성</li>
                 </ul>
               </div>
 
@@ -93,12 +94,12 @@
                     <figcaption data-en="Prototype interior wiring with the green signal active" data-ko="초록 신호가 켜진 시제품 내부 배선">초록 신호가 켜진 시제품 내부 배선</figcaption>
                   </figure>
                   <figure class="detail-figure">
-                    <img src="assets/images/entry-code-main.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="급식 줄 인원 계수와 신호 제어를 구현한 Entry 블록 코드" />
-                    <figcaption data-en="Main Entry blocks for counting and signal control" data-ko="인원 계수·신호 제어 Entry 블록 코드">인원 계수·신호 제어 Entry 블록 코드</figcaption>
+                    <img src="assets/images/entry-code-main.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="급식 줄 인원 계수와 신호 제어를 구현한 mBlock 블록 코드" />
+                    <figcaption data-en="Main mBlock blocks for counting and signal control" data-ko="인원 계수·신호 제어 mBlock 블록 코드">인원 계수·신호 제어 mBlock 블록 코드</figcaption>
                   </figure>
                   <figure class="detail-figure">
-                    <img src="assets/images/entry-code-condition.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="버튼 입력과 임계값 조건을 구현한 Entry 블록 코드 확대" />
-                    <figcaption data-en="Button input and threshold conditions in Entry" data-ko="버튼 입력·임계값 조건 블록 확대">버튼 입력·임계값 조건 블록 확대</figcaption>
+                    <img src="assets/images/entry-code-condition.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="버튼 입력과 임계값 조건을 구현한 mBlock 블록 코드 확대" />
+                    <figcaption data-en="Button input and threshold conditions in mBlock" data-ko="mBlock 버튼 입력·임계값 조건 블록 확대">mBlock 버튼 입력·임계값 조건 블록 확대</figcaption>
                   </figure>
                   <figure class="detail-figure">
                     <img src="assets/images/festival-venue.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="2024 위드 AI 코딩 페스티벌 행사장" />
@@ -134,8 +135,8 @@
                 <p class="role-position"><i class="fas fa-user-tag"></i> <span data-en="Project Development" data-ko="프로젝트 개발">프로젝트 개발</span></p>
                 <ul>
                   <li data-en="Counter and signal-flow planning">계수·신호 전환 로직 기획</li>
-                  <li data-en="Entry block programming">Entry 블록 코딩</li>
-                  <li data-en="Arduino and LED wiring">아두이노·LED 배선</li>
+                  <li data-en="mBlock programming">mBlock 블록 코딩</li>
+                  <li data-en="Arduino, Gorilla Cell, and LED wiring">아두이노·고릴라셀·LED 배선</li>
                   <li data-en="Traffic-light prototype fabrication">신호등 시제품 제작</li>
                 </ul>
               </div>
@@ -145,14 +146,8 @@
               <div class="sidebar-card" data-aos="fade-left">
                 <h4 role="heading" aria-level="3">Tech Stack</h4>
                 <div class="sidebar-stack">
-                  <span class="tech-stack"><span>Arduino</span></span><span class="tech-stack"><span>Entry</span></span><span class="tech-stack"><span>Button</span></span><span class="tech-stack"><span>LED</span></span><span class="tech-stack"><span>Counter Logic</span></span>
+                  <span class="tech-stack"><span>mBlock</span></span><span class="tech-stack"><span>Gorilla Cell</span></span><span class="tech-stack"><span>Arduino</span></span><span class="tech-stack"><span>Button</span></span><span class="tech-stack"><span>LED</span></span>
                 </div>
-              </div>
-              <div class="sidebar-card" data-aos="fade-left" data-aos-delay="100">
-                <h4 role="heading" aria-level="3" data-en="Project Info" data-ko="프로젝트 정보">프로젝트 정보</h4>
-                <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.6" data-en-html="2024 With AI Coding Festival<br />Hardware prototype<br />Issue #230">
-                  2024 위드 AI 코딩 페스티벌<br />하드웨어 시제품<br />이슈 #230
-                </p>
               </div>
             </div>
           </div>
