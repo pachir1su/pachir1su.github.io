@@ -1,0 +1,395 @@
+name: v2 final big pass runner
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write
+
+jobs:
+  v2-final-big-pass:
+    if: github.head_ref == 'chatgpt/v2-final-big-pass-runner'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout production branch
+        uses: actions/checkout@v4
+        with:
+          ref: chatgpt/v2-final-big-pass
+          path: target
+          fetch-depth: 0
+
+      - name: Prepare evidence directory
+        run: mkdir -p evidence/screens
+
+      - name: Audit media metadata before cleanup
+        shell: bash
+        run: |
+          set +e
+          cd target
+          node tools/verify-media-metadata.js > ../evidence/media-before.json
+          echo "MEDIA_AUDIT_BEFORE_EXIT=$?" >> "$GITHUB_ENV"
+          exit 0
+
+      - name: Install metadata tools
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libimage-exiftool-perl ffmpeg
+
+      - name: Patch home capybara composition
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+
+          index = Path('target/index.html')
+          text = index.read_text(encoding='utf-8')
+          old = '''<button type="button" class="btn btn-ghost contact-email hero-email" title="클릭하면 복사됩니다">
+  <i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span><span class="copy-hint sr-only">복사</span>
+</button>'''
+          new = '''<div class="hero-email-wrap">
+  <img class="hero-email-capybara" src="assets/capybara-mail-peek.webp" width="256" height="256" alt="" aria-hidden="true" decoding="async" draggable="false" />
+  <button type="button" class="btn btn-ghost contact-email hero-email" title="클릭하면 복사됩니다">
+    <i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span><span class="copy-hint sr-only">복사</span>
+  </button>
+</div>'''
+          if text.count(old) != 1:
+              raise SystemExit(f'index hero email anchor count != 1: {text.count(old)}')
+          index.write_text(text.replace(old, new), encoding='utf-8')
+
+          style = Path('target/style.css')
+          css = style.read_text(encoding='utf-8')
+          anchor = '''.hero-email {
+  max-width: 100%;
+}
+.hero-email .email-addr {
+  overflow-wrap: anywhere;
+}'''
+          replacement = '''/* #192 — 이메일 버튼 뒤에서 카피바라가 얼굴과 앞발을 내미는 장식.\n   버튼 자체가 클릭/키보드 hit area를 계속 담당하고 이미지는 완전한 장식이다. */
+.hero-email-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-end;
+  padding-top: 34px;
+  isolation: isolate;
+}
+.hero-email-capybara {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  width: 112px;
+  max-width: none;
+  height: auto;
+  transform: translateX(-50%);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  z-index: 0;
+}
+.hero-email {
+  position: relative;
+  z-index: 1;
+  max-width: 100%;
+}
+.hero-email .email-addr {
+  overflow-wrap: anywhere;
+}'''
+          if css.count(anchor) != 1:
+              raise SystemExit(f'style hero email anchor count != 1: {css.count(anchor)}')
+          css = css.replace(anchor, replacement)
+
+          mobile = '''@media (max-width: 640px) {
+  .hero-btns > * {
+    width: 100%;
+    justify-content: center;
+  }
+  .hero-email {
+    font-size: 0.78rem;
+  }
+}'''
+          mobile_new = '''@media (max-width: 640px) {
+  .hero-btns > * {
+    width: 100%;
+    justify-content: center;
+  }
+  .hero-email-wrap {
+    width: 100%;
+    padding-top: 40px;
+  }
+  .hero-email-capybara {
+    width: 104px;
+    bottom: 22px;
+  }
+  .hero-email-wrap .hero-email {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.78rem;
+  }
+}'''
+          if css.count(mobile) != 1:
+              raise SystemExit(f'style mobile anchor count != 1: {css.count(mobile)}')
+          style.write_text(css.replace(mobile, mobile_new), encoding='utf-8')
+          PY
+
+      - name: Strip privacy metadata from flagged public media
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          import json, os, pathlib, shutil, subprocess, tempfile
+
+          root = pathlib.Path('target')
+          report = pathlib.Path('evidence/media-before.json')
+          data = json.loads(report.read_text(encoding='utf-8'))
+          image_exts = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
+          video_exts = {'.mp4', '.mov', '.m4v', '.3gp', '.webm', '.mkv', '.avi'}
+          changed = []
+
+          for item in data.get('issues', []):
+              rel = item['file']
+              f = root / rel
+              if not f.exists():
+                  raise SystemExit(f'missing flagged file: {rel}')
+              ext = f.suffix.lower()
+              before = f.read_bytes()
+              if ext in image_exts:
+                  # Preserve only color profile and orientation; remove EXIF/XMP/IPTC/text/comments.
+                  cmd = [
+                      'exiftool', '-overwrite_original', '-all=', '-tagsfromfile', '@',
+                      '-ICC_Profile', '-Orientation', str(f)
+                  ]
+                  p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                  if p.returncode != 0:
+                      raise SystemExit(f'exiftool failed for {rel}: {p.stdout}')
+              elif ext in video_exts:
+                  # Re-mux streams without container metadata; audio/video streams are copied bit-for-bit.
+                  fd, tmpname = tempfile.mkstemp(suffix=ext)
+                  os.close(fd)
+                  tmp = pathlib.Path(tmpname)
+                  try:
+                      cmd = [
+                          'ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', str(f),
+                          '-map', '0', '-map_metadata', '-1', '-map_chapters', '-1', '-c', 'copy', str(tmp)
+                      ]
+                      p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                      if p.returncode != 0:
+                          raise SystemExit(f'ffmpeg failed for {rel}: {p.stdout}')
+                      shutil.move(str(tmp), str(f))
+                  finally:
+                      if tmp.exists(): tmp.unlink()
+              else:
+                  continue
+              if f.read_bytes() != before:
+                  changed.append(rel)
+
+          pathlib.Path('evidence/media-sanitized-files.json').write_text(
+              json.dumps({'changed': changed, 'count': len(changed)}, ensure_ascii=False, indent=2),
+              encoding='utf-8'
+          )
+          print(json.dumps({'sanitized': len(changed), 'files': changed}, ensure_ascii=False, indent=2))
+          PY
+
+      - name: Verify metadata cleanup and static contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd target
+          node --check build.js
+          node --check script.js
+          node --check detail.js
+          node --check assets/project-demos.js
+          node --check tools/verify-media-metadata.js
+          node tools/verify-media-metadata.js | tee ../evidence/media-after.json
+          node tools/verify-build.js
+          node build.js
+          git diff --check
+          test -f assets/capybara-mail-peek.webp
+          test "$(wc -c < assets/capybara-mail-peek.webp)" -gt 5000
+          node <<'NODE'
+          const fs = require('fs');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const css = fs.readFileSync('style.css', 'utf8');
+          if ((html.match(/hero-email-capybara/g) || []).length !== 1) throw new Error('capybara markup count');
+          if (!html.includes('assets/capybara-mail-peek.webp')) throw new Error('capybara asset ref');
+          if (!css.includes('.hero-email-wrap') || !css.includes('pointer-events: none')) throw new Error('capybara CSS contract');
+          const demos = fs.readFileSync('assets/project-demos.js', 'utf8');
+          if (!demos.includes('one-click, deterministic, dependency-free')) throw new Error('one-click demo contract missing');
+          for (const id of ['wall','ucast','health','berry','plant']) {
+            if (!demos.includes(`function ${id}(`)) throw new Error(`demo missing: ${id}`);
+          }
+          NODE
+
+      - name: Install browser QA dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/v2-big-pass-node
+          cd /tmp/v2-big-pass-node
+          npm init -y >/dev/null
+          npm install playwright@1.55.0 >/dev/null
+          CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+          echo "NODE_PATH=/tmp/v2-big-pass-node/node_modules" >> "$GITHUB_ENV"
+
+      - name: Serve patched target
+        shell: bash
+        run: |
+          python3 -m http.server 4188 --directory target >/tmp/v2-big-pass-http.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4188/ >/dev/null && exit 0; sleep 1; done
+          cat /tmp/v2-big-pass-http.log
+          exit 1
+
+      - name: Run root and one-click demo browser QA
+        env:
+          BASE_URL: http://127.0.0.1:4188
+        shell: bash
+        run: |
+          set -euo pipefail
+          NODE_PATH="$NODE_PATH" CHROME_PATH="$CHROME_PATH" node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const { chromium } = require('playwright');
+          const base = process.env.BASE_URL;
+          const failures = [];
+          const cases = [];
+          const check = (ok, name, detail='') => { if (!ok) failures.push({name, detail:String(detail)}); };
+          const heights = (w) => w <= 390 ? 844 : w <= 768 ? 1024 : 900;
+
+          (async () => {
+            const browser = await chromium.launch({ headless:true, executablePath:process.env.CHROME_PATH, args:['--no-sandbox'] });
+            async function open(w, theme='light', reduced=false) {
+              const context = await browser.newContext({ viewport:{width:w,height:heights(w)}, colorScheme:theme, reducedMotion:reduced?'reduce':'no-preference', hasTouch:w<=390, isMobile:w<=390 });
+              const page = await context.newPage();
+              const errors = [];
+              page.on('pageerror', e => errors.push(`pageerror:${e.message}`));
+              page.on('console', m => { if (m.type()==='error') errors.push(`console:${m.text()}`); });
+              await page.addInitScript(({theme}) => { localStorage.setItem('theme', theme); localStorage.setItem('lang','ko'); }, {theme});
+              return {context,page,errors};
+            }
+
+            for (const w of [320,360,390,768,1280,1440]) for (const theme of ['light','dark']) {
+              const label = `root-${w}-${theme}`;
+              const {context,page,errors} = await open(w,theme,true);
+              try {
+                await page.goto(base+'/', {waitUntil:'networkidle', timeout:60000});
+                const state = await page.evaluate(() => {
+                  const img = document.querySelector('.hero-email-capybara');
+                  const btn = document.querySelector('.hero-email');
+                  const wrap = document.querySelector('.hero-email-wrap');
+                  const ir = img?.getBoundingClientRect();
+                  const br = btn?.getBoundingClientRect();
+                  return {
+                    overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+                    imgCount: document.querySelectorAll('.hero-email-capybara').length,
+                    wrapCount: document.querySelectorAll('.hero-email-wrap').length,
+                    naturalWidth: img?.naturalWidth || 0,
+                    pointerEvents: img ? getComputedStyle(img).pointerEvents : '',
+                    ariaHidden: img?.getAttribute('aria-hidden'),
+                    alt: img?.getAttribute('alt'),
+                    buttonWidth: br?.width || 0,
+                    imageAbove: !!(ir && br && ir.top < br.top),
+                    overlapTop: !!(ir && br && ir.bottom >= br.top - 2),
+                    broken: [...document.images].filter(i => i.complete && i.naturalWidth === 0).map(i => i.src)
+                  };
+                });
+                check(!state.overflow, `${label}:overflow`, JSON.stringify(state));
+                check(state.imgCount===1 && state.wrapCount===1, `${label}:capybara-count`, JSON.stringify(state));
+                check(state.naturalWidth===256, `${label}:capybara-decode`, JSON.stringify(state));
+                check(state.pointerEvents==='none' && state.ariaHidden==='true' && state.alt==='', `${label}:decorative-a11y`, JSON.stringify(state));
+                check(state.imageAbove && state.overlapTop, `${label}:composition`, JSON.stringify(state));
+                check(w>640 || state.buttonWidth > w*0.72, `${label}:mobile-email-width`, JSON.stringify(state));
+                check(state.broken.length===0, `${label}:broken-images`, state.broken.join('\n'));
+                check(errors.length===0, `${label}:errors`, errors.join('\n'));
+                if (w===1440 && theme==='light') await page.screenshot({path:'evidence/screens/root-1440-capybara.png', fullPage:false});
+                if (w===390 && theme==='light') await page.screenshot({path:'evidence/screens/root-390-capybara.png', fullPage:false});
+                cases.push(label);
+              } catch (e) { failures.push({name:label,detail:e.stack||String(e)}); }
+              await context.close();
+            }
+
+            const demos = {
+              Wall_Sina:'wall',
+              '2026_U-CAST':'ucast',
+              HEALTH_CHECK_PROJECT:'health',
+              BerryIno:'berry',
+              PlantClock:'plant'
+            };
+            for (const [dir,id] of Object.entries(demos)) {
+              const label = `demo-${dir}`;
+              const {context,page,errors} = await open(390,'dark',true);
+              try {
+                await page.goto(`${base}/projects/${dir}/`, {waitUntil:'networkidle',timeout:60000});
+                const root = page.locator(`[data-project-demo="${id}"]`);
+                await root.waitFor();
+                check(await root.locator('.demo-btn').count()===1, `${label}:one-button`);
+                check(await root.locator('input,select,textarea').count()===0, `${label}:no-fine-controls`);
+                const before = (await root.locator('.demo-status').innerText()).trim();
+                const button = root.locator('.demo-btn');
+                await button.click();
+                await page.waitForFunction(({id}) => {
+                  const r=document.querySelector(`[data-project-demo="${id}"]`);
+                  const b=r?.querySelector('.demo-btn');
+                  return !!b && !b.disabled && /다시 실행|Run again/.test(b.textContent||'');
+                }, {id}, {timeout:5000});
+                const after = (await root.locator('.demo-status').innerText()).trim();
+                check(after && after!==before, `${label}:status-changed`, `${before} -> ${after}`);
+                check(errors.length===0, `${label}:errors`, errors.join('\n'));
+                cases.push(label);
+              } catch (e) { failures.push({name:label,detail:e.stack||String(e)}); }
+              await context.close();
+            }
+
+            await browser.close();
+            const result = { cases:cases.length, expected:17, failures };
+            fs.writeFileSync('evidence/browser-results.json', JSON.stringify(result,null,2));
+            console.log(JSON.stringify(result,null,2));
+            if (cases.length!==17 || failures.length) process.exit(1);
+          })().catch(e => { console.error(e); process.exit(1); });
+          NODE
+
+      - name: Record and commit every changed production file atomically
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd target
+          git status --short | tee ../evidence/git-status-before-commit.txt
+          git diff --name-only | sort > ../evidence/changed-files.txt
+          test -s ../evidence/changed-files.txt
+          git config user.name "pachir1su"
+          git config user.email "crong3323@naver.com"
+
+          while IFS= read -r -d '' f; do
+            case "$f" in
+              index.html) msg="feat: add capybara mail composition" ;;
+              style.css) msg="feat: style capybara mail composition" ;;
+              *) msg="chore: strip media metadata $(basename "$f")" ;;
+            esac
+            git add -- "$f"
+            git commit -m "$msg"
+          done < <(git diff --name-only -z)
+
+          test -z "$(git status --porcelain)"
+          git push origin HEAD:chatgpt/v2-final-big-pass
+
+      - name: Verify production branch atomicity after push
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd target
+          git fetch origin main chatgpt/v2-final-big-pass
+          changed=$(git diff --name-only origin/main...origin/chatgpt/v2-final-big-pass | wc -l)
+          commits=$(git rev-list --count origin/main..origin/chatgpt/v2-final-big-pass)
+          printf 'changed_files=%s\ncommits=%s\n' "$changed" "$commits" | tee ../evidence/atomicity.txt
+          test "$changed" -eq "$commits"
+          git diff --check origin/main...origin/chatgpt/v2-final-big-pass
+
+      - name: Upload big-pass evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-final-big-pass-evidence
+          path: evidence
