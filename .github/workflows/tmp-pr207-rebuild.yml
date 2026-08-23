@@ -1,0 +1,224 @@
+name: TEMP PR207 rebuild
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    if: github.event.pull_request.head.ref == 'tmp/pr207-rebuild-runner'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout product branch
+        uses: actions/checkout@v4
+        with:
+          ref: chatgpt/v2-email-capybara
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "ChatGPT Runner"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Patch home email capybara
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = '''<button type="button" class="btn btn-ghost contact-email hero-email" title="클릭하면 복사됩니다">
+            <i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span><span class="copy-hint sr-only">복사</span>
+          </button>'''
+          new = '''<div class="hero-email-wrap">
+          <button type="button" class="btn btn-ghost contact-email hero-email" title="클릭하면 복사됩니다">
+            <i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span><span class="copy-hint sr-only">복사</span>
+          </button>
+          <img src="assets/capybara-email.webp" alt="" aria-hidden="true" class="hero-capybara" decoding="async" />
+          </div>'''
+          if s.count(old) != 1:
+              raise SystemExit(f'expected one hero email block, found {s.count(old)}')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+          git add index.html
+          test "$(git diff --cached --name-only | wc -l)" -eq 1
+          git commit -m "feat: place capybara around home email button"
+          git push origin HEAD:chatgpt/v2-email-capybara
+
+      - name: Patch capybara and photo gallery styles
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('style.css')
+          s = p.read_text(encoding='utf-8')
+          old = '''.hero-email {
+            max-width: 100%;
+          }
+          .hero-email .email-addr {'''
+          new = '''.hero-email-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: flex-end;
+            padding-top: 42px;
+            max-width: 100%;
+          }
+          .hero-capybara {
+            position: absolute;
+            left: 50%;
+            bottom: calc(100% - 10px);
+            transform: translateX(-50%);
+            width: clamp(92px, 11vw, 132px);
+            height: auto;
+            pointer-events: none;
+            user-select: none;
+            z-index: 2;
+            filter: drop-shadow(0 6px 8px rgba(36, 26, 14, 0.18));
+          }
+          .hero-email {
+            max-width: 100%;
+            position: relative;
+            z-index: 1;
+          }
+          .hero-email .email-addr {'''
+          if s.count(old) != 1:
+              raise SystemExit(f'expected one hero email style block, found {s.count(old)}')
+          s = s.replace(old, new, 1)
+
+          old_mobile = '''@media (max-width: 640px) {
+            .hero-btns > * {
+              width: 100%;
+              justify-content: center;
+            }
+            .hero-email {
+              font-size: 0.78rem;
+            }
+          }'''
+          new_mobile = '''@media (max-width: 640px) {
+            .hero-btns > * {
+              width: 100%;
+              justify-content: center;
+            }
+            .hero-email-wrap {
+              width: 100%;
+              justify-content: center;
+              padding-top: 34px;
+            }
+            .hero-email {
+              width: 100%;
+              font-size: 0.78rem;
+            }
+            .hero-capybara {
+              width: 96px;
+              bottom: calc(100% - 8px);
+            }
+          }'''
+          if s.count(old_mobile) != 1:
+              raise SystemExit(f'expected one mobile hero email block, found {s.count(old_mobile)}')
+          s = s.replace(old_mobile, new_mobile, 1)
+
+          gallery = '''
+
+          /* Health Care field-photo gallery (#191) */
+          .detail-photo-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+          }
+          .detail-photo-card {
+            margin: 0;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: calc(var(--radius) + 2px);
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+          }
+          .detail-photo-card img {
+            display: block;
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            background: var(--paper-2);
+          }
+          .detail-photo-card figcaption {
+            padding: 12px 14px 14px;
+            font-size: 0.92rem;
+            line-height: 1.65;
+            color: var(--ink);
+          }
+          @media (max-width: 720px) {
+            .detail-photo-grid {
+              grid-template-columns: 1fr;
+            }
+            .detail-photo-card img {
+              height: auto;
+              aspect-ratio: 4 / 3;
+              object-fit: cover;
+            }
+          }
+          '''
+          if '.detail-photo-grid {' in s:
+              raise SystemExit('detail-photo-grid already exists')
+          s = s.rstrip() + gallery + '\n'
+          p.write_text(s, encoding='utf-8')
+          PY
+          git add style.css
+          test "$(git diff --cached --name-only | wc -l)" -eq 1
+          git commit -m "style: support email capybara and Health Care photo gallery"
+          git push origin HEAD:chatgpt/v2-email-capybara
+
+      - name: Patch Health Care page
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('projects/HEALTH_CHECK_PROJECT/index.html')
+          s = p.read_text(encoding='utf-8')
+          old_url = 'https://pachir1su.notion.site/2025-SDGs-1b9f776d60dc8058976bc03379ceaf06'
+          new_url = 'https://pachir1su.notion.site/1b9f776d60dc8097ab51f6e8562c25e3'
+          if s.count(old_url) != 2:
+              raise SystemExit(f'expected two old Notion URLs, found {s.count(old_url)}')
+          s = s.replace(old_url, new_url)
+
+          marker = '''            <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
+              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>'''
+          gallery = '''            <div class="detail-section" data-aos="fade-up" data-aos-delay="40">
+              <h2 data-en="Field Photos" data-ko="현장 사진">현장 사진</h2>
+              <p data-en="Real build photos from development and testing: the health chatbot GUI, sensor setup, Raspberry Pi integration, and the physical prototype." data-ko="개발과 테스트 과정에서 직접 촬영한 사진입니다. 건강 체크 챗봇 GUI, 센서 구성, 라즈베리파이 연동, 실제 시연용 프로토타입까지 확인할 수 있습니다.">
+                개발과 테스트 과정에서 직접 촬영한 사진입니다. 건강 체크 챗봇 GUI, 센서 구성, 라즈베리파이 연동, 실제 시연용 프로토타입까지 확인할 수 있습니다.
+              </p>
+              <div class="detail-photo-grid">
+                <figure class="detail-photo-card">
+                  <img src="assets/images/gui.webp" alt="건강 체크 챗봇 GUI에서 음성 입력과 심박수·체온을 표시하는 화면" loading="lazy" decoding="async" />
+                  <figcaption data-en="Health-check chatbot GUI showing voice input, heart rate, and temperature." data-ko="음성 입력과 심박수·체온을 함께 표시하는 건강 체크 챗봇 GUI">음성 입력과 심박수·체온을 함께 표시하는 건강 체크 챗봇 GUI</figcaption>
+                </figure>
+                <figure class="detail-photo-card">
+                  <img src="assets/images/sensor.webp" alt="아두이노와 온도 센서를 연결한 하드웨어 구성" loading="lazy" decoding="async" />
+                  <figcaption data-en="Arduino and temperature-sensor setup used to read real measurements." data-ko="아두이노와 온도 센서를 연결해 실측 데이터를 읽는 하드웨어 구성">아두이노와 온도 센서를 연결해 실측 데이터를 읽는 하드웨어 구성</figcaption>
+                </figure>
+                <figure class="detail-photo-card">
+                  <img src="assets/images/pi-integration.webp" alt="라즈베리파이와 아두이노, 센서를 연결해 통합 테스트하는 모습" loading="lazy" decoding="async" />
+                  <figcaption data-en="Integrated field test connecting the Raspberry Pi, Arduino, and sensors." data-ko="라즈베리파이·아두이노·센서를 연결해 현장에서 통합 테스트한 모습">라즈베리파이·아두이노·센서를 연결해 현장에서 통합 테스트한 모습</figcaption>
+                </figure>
+                <figure class="detail-photo-card">
+                  <img src="assets/images/prototype-front.webp" alt="목업 하우징과 화면을 결합한 헬스 케어 시스템 시연용 프로토타입" loading="lazy" decoding="async" />
+                  <figcaption data-en="Physical demo prototype combining the enclosure and display." data-ko="목업 하우징과 화면을 결합해 시연 가능한 형태로 제작한 프로토타입">목업 하우징과 화면을 결합해 시연 가능한 형태로 제작한 프로토타입</figcaption>
+                </figure>
+                <figure class="detail-photo-card">
+                  <img src="assets/images/prototype-inside.webp" alt="시연용 프로토타입 내부의 배선과 전자부품 구성" loading="lazy" decoding="async" />
+                  <figcaption data-en="Internal wiring and electronics inside the demo prototype." data-ko="시연용 프로토타입 내부 배선과 전자부품 구성">시연용 프로토타입 내부 배선과 전자부품 구성</figcaption>
+                </figure>
+              </div>
+            </div>
+'''
+          if s.count(marker) != 1:
+              raise SystemExit(f'expected one key-features marker, found {s.count(marker)}')
+          if 'class="detail-photo-grid"' in s:
+              raise SystemExit('Health Care photo gallery already exists')
+          s = s.replace(marker, gallery + marker, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+          git add projects/HEALTH_CHECK_PROJECT/index.html
+          test "$(git diff --cached --name-only | wc -l)" -eq 1
+          git commit -m "feat: add Health Care field-photo gallery and current Notion link"
+          git push origin HEAD:chatgpt/v2-email-capybara
