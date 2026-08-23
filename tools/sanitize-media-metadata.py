@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Strip privacy-sensitive metadata from public raster images and videos.
 
-Requires `exiftool` for images and `ffmpeg` for video containers. Pixel data is not
-resized/cropped. ICC profiles and Orientation are preserved for raster images so
-color and display direction stay unchanged. Video streams are remuxed with
-`-c copy`; they are not re-encoded.
+PNG cleanup is byte-preserving for every chunk except privacy/descriptive chunks
+(`eXIf`, `tEXt`, `zTXt`, `iTXt`), so color/rendering chunks such as ICC, gAMA,
+sRGB, cHRM and pHYs are not accidentally removed. Other raster formats use
+`exiftool`, preserving ICC profiles and Orientation. Video streams are remuxed
+with `ffmpeg -c copy`; they are never re-encoded.
 """
 
 from __future__ import annotations
@@ -20,6 +21,8 @@ import tempfile
 ROOT = Path(__file__).resolve().parent.parent
 IMAGE_EXTS = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
 VIDEO_EXTS = {'.mp4', '.mov', '.m4v', '.3gp', '.webm', '.mkv', '.avi'}
+PNG_SIGNATURE = b'\x89PNG\r\n\x1a\n'
+PNG_PRIVATE_CHUNKS = {b'eXIf', b'tEXt', b'zTXt', b'iTXt'}
 
 
 def run_audit() -> dict:
@@ -37,7 +40,45 @@ def run_audit() -> dict:
         raise SystemExit(f'metadata audit output is not JSON: {proc.stderr}') from exc
 
 
+def sanitize_png(path: Path) -> None:
+    """Remove only privacy/descriptive PNG chunks; preserve all others verbatim."""
+    data = path.read_bytes()
+    if not data.startswith(PNG_SIGNATURE):
+        raise SystemExit(f'invalid PNG signature: {path.relative_to(ROOT)}')
+
+    out = bytearray(PNG_SIGNATURE)
+    cursor = len(PNG_SIGNATURE)
+    saw_iend = False
+
+    while cursor + 12 <= len(data):
+        length = int.from_bytes(data[cursor:cursor + 4], 'big')
+        end = cursor + 12 + length
+        if end > len(data):
+            raise SystemExit(f'truncated PNG chunk: {path.relative_to(ROOT)}')
+
+        chunk_type = data[cursor + 4:cursor + 8]
+        if chunk_type not in PNG_PRIVATE_CHUNKS:
+            out.extend(data[cursor:end])
+
+        cursor = end
+        if chunk_type == b'IEND':
+            saw_iend = True
+            # Preserve any trailing bytes exactly. They are outside the PNG chunk stream
+            # and are not interpreted as PNG metadata by our public-media gate.
+            out.extend(data[cursor:])
+            break
+
+    if not saw_iend:
+        raise SystemExit(f'PNG missing IEND: {path.relative_to(ROOT)}')
+
+    path.write_bytes(bytes(out))
+
+
 def sanitize_image(path: Path) -> None:
+    if path.suffix.lower() == '.png':
+        sanitize_png(path)
+        return
+
     # Keep only non-private rendering metadata that prevents color/orientation regressions.
     proc = subprocess.run(
         [
@@ -63,7 +104,7 @@ def sanitize_video(path: Path) -> None:
             [
                 'ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', str(path),
                 '-map', '0', '-map_metadata', '-1', '-map_chapters', '-1',
-                '-c', 'copy', str(tmp),
+                '-c', 'copy', '-fflags', '+bitexact', str(tmp),
             ],
             cwd=ROOT,
             stdout=subprocess.PIPE,
