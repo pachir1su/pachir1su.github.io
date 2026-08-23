@@ -1,0 +1,51 @@
+name: v2 big pass push executor
+
+on:
+  push:
+    branches: [chatgpt/v2-final-big-pass]
+
+permissions:
+  contents: write
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout production branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install system metadata tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libimage-exiftool-perl ffmpeg
+
+      - name: Install browser QA dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/v2-big-pass-node
+          cd /tmp/v2-big-pass-node
+          npm init -y >/dev/null
+          npm install playwright@1.55.0 >/dev/null
+          CHROME_PATH="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+          echo "NODE_PATH=/tmp/v2-big-pass-node/node_modules" >> "$GITHUB_ENV"
+
+      - name: Execute big pass
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x tools/run-v2-final-big-pass.sh
+          tools/run-v2-final-big-pass.sh
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v2-big-pass-evidence
+          path: evidence
