@@ -1,0 +1,95 @@
+name: TEMP apply v2 capybara + healthcare media
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout product branch
+        uses: actions/checkout@v4
+        with:
+          ref: chatgpt/v2-email-capybara
+          fetch-depth: 0
+      - name: Configure git
+        run: |
+          git config user.name "chatgpt-portfolio-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+      - name: Apply home email capybara markup
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text()
+          old = '''<button type="button" class="btn btn-ghost contact-email hero-email" title="클릭하면 복사됩니다">
+            <i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span><span class="copy-hint sr-only">복사</span>
+          </button>'''
+          new = '''<div class="hero-email-wrap">
+          <button type="button" class="btn btn-ghost contact-email hero-email" title="클릭하면 복사됩니다">
+            <i class="fas fa-envelope"></i><span class="email-addr">capybara@koreatech.ac.kr</span><span class="copy-hint sr-only">복사</span>
+          </button>
+          <img src="assets/capybara-email.webp" alt="" aria-hidden="true" class="hero-capybara" decoding="async" />
+          </div>'''
+          if old not in s:
+              raise SystemExit('hero email block not found')
+          p.write_text(s.replace(old, new, 1))
+          PY
+          git add index.html
+          git commit -m "feat: place capybara around hero email button"
+
+      - name: Apply capybara and healthcare gallery styles
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('style.css')
+          s = p.read_text()
+          s = s.replace('''  flex-wrap: wrap;\n}\n.hero-email {\n  max-width: 100%;\n}\n''', '''  flex-wrap: wrap;\n  align-items: flex-end;\n}\n.hero-email-wrap {\n  position: relative;\n  display: inline-flex;\n  align-items: flex-end;\n  padding-top: 38px;\n  max-width: 100%;\n}\n.hero-capybara {\n  position: absolute;\n  left: 50%;\n  top: -46px;\n  width: 112px;\n  height: auto;\n  transform: translateX(-50%);\n  pointer-events: none;\n  user-select: none;\n  z-index: 2;\n  filter: drop-shadow(0 5px 6px rgba(36, 26, 14, 0.16));\n}\n.hero-email {\n  max-width: 100%;\n  position: relative;\n  z-index: 1;\n}\n''', 1)
+          old_mobile = '''@media (max-width: 640px) {\n  .hero-btns > * {\n    width: 100%;\n    justify-content: center;\n  }\n  .hero-email {\n    font-size: 0.78rem;\n  }\n}\n'''
+          new_mobile = '''@media (max-width: 640px) {\n  .hero-btns > * {\n    width: 100%;\n    justify-content: center;\n  }\n  .hero-email-wrap {\n    width: 100%;\n    padding-top: 36px;\n  }\n  .hero-email {\n    width: 100%;\n    font-size: 0.78rem;\n  }\n  .hero-capybara {\n    width: 104px;\n    top: -42px;\n  }\n}\n'''
+          if old_mobile not in s:
+              raise SystemExit('mobile hero email block not found')
+          s = s.replace(old_mobile, new_mobile, 1)
+          gallery_css = '''\n/* HEALTH_CHECK_PROJECT — 실제 개발/시연 사진 갤러리 (#4, #191) */\n.detail-photo-grid {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 16px;\n  margin-top: 18px;\n}\n.detail-photo-card {\n  margin: 0;\n  overflow: hidden;\n  border: 1px solid var(--line);\n  border-radius: var(--radius);\n  background: var(--card);\n  box-shadow: var(--shadow-soft);\n}\n.detail-photo-card figcaption {\n  padding: 11px 13px 13px;\n  color: var(--text-muted);\n  font-size: 0.82rem;\n  line-height: 1.55;\n}\n.healthcare-photo {\n  width: 100%;\n  aspect-ratio: 4 / 3;\n  background-image: url('projects/HEALTH_CHECK_PROJECT/assets/images/field-photos.webp');\n  background-size: 100% 500%;\n  background-repeat: no-repeat;\n  background-color: var(--paper-2);\n}\n.healthcare-photo-1 { background-position: center 0%; }\n.healthcare-photo-2 { background-position: center 25%; }\n.healthcare-photo-3 { background-position: center 50%; }\n.healthcare-photo-4 { background-position: center 75%; }\n.healthcare-photo-5 { background-position: center 100%; }\n@media (max-width: 720px) {\n  .detail-photo-grid { grid-template-columns: 1fr; }\n}\n'''
+          marker = '\n/* 15. Footer */'
+          if marker not in s:
+              raise SystemExit('footer marker not found')
+          s = s.replace(marker, gallery_css + marker, 1)
+          p.write_text(s)
+          PY
+          git add style.css
+          git commit -m "feat: style capybara email and healthcare photo gallery"
+
+      - name: Add healthcare field photos and update Notion link
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('projects/HEALTH_CHECK_PROJECT/index.html')
+          s = p.read_text()
+          old_url = 'https://pachir1su.notion.site/2025-SDGs-1b9f776d60dc8058976bc03379ceaf06'
+          new_url = 'https://pachir1su.notion.site/1b9f776d60dc8097ab51f6e8562c25e3'
+          if old_url not in s:
+              raise SystemExit('old Notion URL not found')
+          s = s.replace(old_url, new_url)
+          marker = '''            <div class="detail-section" data-aos="fade-up" data-aos-delay="50">\n              <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>'''
+          gallery = '''            <div class="detail-section" data-aos="fade-up" data-aos-delay="40">\n              <h2 data-en="Field Photos" data-ko="현장 사진">현장 사진</h2>\n              <p data-en="Real photos from development and testing: the healthcare GUI, sensor wiring, Raspberry Pi integration, and the physical demo prototype." data-ko="개발과 테스트 과정에서 직접 촬영한 사진입니다. 헬스케어 GUI, 센서 배선, 라즈베리파이 연동, 실제 시연용 프로토타입을 확인할 수 있습니다.">개발과 테스트 과정에서 직접 촬영한 사진입니다. 헬스케어 GUI, 센서 배선, 라즈베리파이 연동, 실제 시연용 프로토타입을 확인할 수 있습니다.</p>\n              <div class="detail-photo-grid">\n                <figure class="detail-photo-card">\n                  <div class="healthcare-photo healthcare-photo-1" role="img" aria-label="헬스케어 GUI에서 음성 입력과 심박수·체온 분석 결과를 보여주는 화면"></div>\n                  <figcaption data-en="Voice input and health-response GUI with live heart-rate and temperature values" data-ko="음성 입력과 심박수·체온 값을 함께 보여주는 헬스케어 GUI">음성 입력과 심박수·체온 값을 함께 보여주는 헬스케어 GUI</figcaption>\n                </figure>\n                <figure class="detail-photo-card">\n                  <div class="healthcare-photo healthcare-photo-2" role="img" aria-label="아두이노와 온도 센서를 연결한 실제 하드웨어"></div>\n                  <figcaption data-en="Arduino and temperature-sensor hardware used for live measurements" data-ko="실시간 측정에 사용한 아두이노와 온도 센서 하드웨어">실시간 측정에 사용한 아두이노와 온도 센서 하드웨어</figcaption>\n                </figure>\n                <figure class="detail-photo-card">\n                  <div class="healthcare-photo healthcare-photo-3" role="img" aria-label="라즈베리파이 화면과 아두이노 센서를 함께 연결한 통합 테스트"></div>\n                  <figcaption data-en="Raspberry Pi display, Arduino and sensors connected for an integrated field test" data-ko="라즈베리파이 화면·아두이노·센서를 연결한 통합 테스트">라즈베리파이 화면·아두이노·센서를 연결한 통합 테스트</figcaption>\n                </figure>\n                <figure class="detail-photo-card">\n                  <div class="healthcare-photo healthcare-photo-4" role="img" aria-label="두 개의 목업 하우징과 작동 중인 헬스케어 화면"></div>\n                  <figcaption data-en="Physical prototype housings with the healthcare interface running on the display" data-ko="헬스케어 화면을 실제로 구동한 시연용 목업 하우징">헬스케어 화면을 실제로 구동한 시연용 목업 하우징</figcaption>\n                </figure>\n                <figure class="detail-photo-card">\n                  <div class="healthcare-photo healthcare-photo-5" role="img" aria-label="프로토타입 내부 배선과 디스플레이를 함께 보여주는 사진"></div>\n                  <figcaption data-en="Prototype internals showing the display, wiring and embedded electronics" data-ko="디스플레이와 내부 배선·전자부품을 함께 보여주는 프로토타입">디스플레이와 내부 배선·전자부품을 함께 보여주는 프로토타입</figcaption>\n                </figure>\n              </div>\n            </div>\n\n'''
+          if marker not in s:
+              raise SystemExit('health key-features marker not found')
+          s = s.replace(marker, gallery + marker, 1)
+          p.write_text(s)
+          PY
+          git add projects/HEALTH_CHECK_PROJECT/index.html
+          git commit -m "feat: add real healthcare field photos and current Notion link"
+
+      - name: Verify and push product branch
+        run: |
+          node --check script.js
+          node --check build.js
+          node tools/verify-build.js
+          git diff --check HEAD~3..HEAD
+          git push origin HEAD:chatgpt/v2-email-capybara
