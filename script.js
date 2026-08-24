@@ -578,6 +578,41 @@ window._updateProjectCount();
   });
 })();
 
+
+/* ------------------------------------------------------------- */
+/* 18-1. Project link notices                                    */
+/* ------------------------------------------------------------- */
+(function initProjectLinkNotices() {
+  const buttons = document.querySelectorAll('.plink-notice');
+  if (!buttons.length) return;
+  let toast = null;
+  let hideTimer = null;
+
+  function showNotice(message) {
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'site-toast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      document.body.appendChild(toast);
+    }
+    clearTimeout(hideTimer);
+    toast.textContent = message;
+    toast.classList.add('show');
+    hideTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  buttons.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const lang = localStorage.getItem('lang') || 'ko';
+      const message = lang === 'en' ? button.dataset.noticeEn : button.dataset.noticeKo;
+      showNotice(message || (lang === 'en' ? 'Coming soon' : '준비 중'));
+    });
+  });
+})();
+
 /* ------------------------------------------------------------- */
 /* 19. Hero email capybara (#192)                                */
 /* ------------------------------------------------------------- */
