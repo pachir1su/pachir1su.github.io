@@ -3241,3 +3241,149 @@ html {
   .site-toast { transition: none; }
 }
 
+
+
+/* #239 / #240 user QA follow-up */
+#themeToggle,
+#themeToggleMobile { display: none !important; }
+
+#skills .devicon-notion-plain { color: var(--ink) !important; }
+
+.hero-email-wrap { min-height: 46px; overflow: visible; }
+.hero-email-wrap .hero-email { min-height: 46px; }
+.hero-email-capybara { width: 88px; bottom: 19px; }
+@media (min-width: 641px) and (max-width: 900px) {
+  .hero-email-capybara { width: 84px; bottom: 19px; }
+}
+@media (max-width: 640px) {
+  .hero-email-wrap { margin-top: 52px; overflow: visible; }
+  .hero-email-capybara { width: 90px; bottom: 21px; }
+}
+@media (max-width: 360px) {
+  .hero-email-wrap { margin-top: 58px; overflow: visible; }
+  .hero-email-capybara { display: block; width: 80px; bottom: 23px; }
+}
+
+.detail-gallery-uniform .detail-figure {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.detail-gallery-uniform .detail-figure img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  background: var(--paper-2);
+}
+.detail-gallery-screenshots .detail-figure img {
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  background: #111;
+}
+.detail-figure.media-crop-right { overflow: hidden; }
+.detail-figure.media-crop-right img { width: 124%; max-width: none; }
+
+.wall-city { left: 58%; right: 6%; bottom: 13%; }
+.wall-water-sensor { left: 28%; right: auto; bottom: 28%; }
+.wall-barrier-model {
+  left: 49%; right: auto; bottom: 0; width: 30px; height: 78%;
+  transform: translateY(82%); transform-origin: bottom center;
+  transition: transform .9s ease;
+}
+.wall-rig.barrier-raised .wall-barrier-model { transform: translateY(0); }
+.wall-rig.barrier-lowering .wall-barrier-model { transform: translateY(82%); }
+.wall-water-level {
+  left: 0; right: 50%; width: auto; height: 12%;
+  transition: height 1.35s ease;
+}
+.wall-rig.water-detected .wall-water-level { height: 56%; }
+.wall-rig.water-draining .wall-water-level { height: 12%; }
+
+.ucast-channel > strong,
+.ucast-state { color: #fff; text-shadow: 0 1px 2px #000; }
+.ucast-channel.is-reverse .ucast-pedestrian { left: calc(100% - 88px); }
+.ucast-channel.is-reverse.is-entering .ucast-pedestrian { left: 50%; }
+.ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left: 76px; }
+
+.plantclock-pot::before {
+  content: ""; position: absolute; left: 8px; right: 8px; top: 10px; height: 14px;
+  border-radius: 50%; background: #4f3426;
+}
+.plant-stem { bottom: 78px; }
+.plant-leaf { bottom: 130px; }
+.plant-fan-unit {
+  display: grid; grid-template-columns: 16px 30px;
+  grid-template-areas: "led rotor" "label label";
+  align-items: center; justify-items: center; gap: 4px 6px;
+}
+.plant-fan-led {
+  grid-area: led; width: 14px !important; height: 14px; aspect-ratio: 1;
+  border-radius: 50%; background: #d83a32 !important;
+  box-shadow: 0 0 8px rgba(216, 58, 50, .55);
+}
+.plant-fan-rotor {
+  grid-area: rotor; width: 30px !important; height: 30px;
+  display: grid !important; place-items: center; border: 2px solid #555;
+  border-radius: 50%; background: #d8d5ca !important; color: #333;
+  font-size: 1.25rem; line-height: 1;
+}
+.plant-fan-label { grid-area: label; font: 700 .52rem var(--font-mono); }
+.plantclock-device.fan-on .plant-fan-led {
+  background: #2ca24f !important;
+  box-shadow: 0 0 10px rgba(44, 162, 79, .75);
+}
+.plantclock-device.fan-on .plant-fan-rotor { animation: fan-spin .75s linear infinite; }
+
+.signal-counter-device { grid-template-areas: "tower display"; grid-template-rows: 1fr; }
+.signal-counter-display { min-height: 180px; align-content: center; border-width: 9px; }
+.signal-counter-display strong {
+  font-size: clamp(3.4rem, 10vw, 6.2rem); color: #d5ffd8;
+  text-shadow: 0 0 12px rgba(140, 247, 145, .8);
+}
+.signal-gorilla-cell { display: none !important; }
+
+.doorlock-device-demo .hardware-control-panel { min-width: 0; }
+.doorlock-keypad { display: grid; grid-template-columns: repeat(4, minmax(42px, 1fr)); gap: 7px; }
+.doorlock-key {
+  min-height: 42px; border: 1px solid var(--line); border-radius: 5px;
+  background: var(--card); box-shadow: 0 2px 0 rgba(0, 0, 0, .14);
+  font: 700 .8rem var(--font-mono);
+}
+.doorlock-key:active { transform: translateY(1px); }
+.doorlock-rig {
+  min-height: 340px; display: grid; grid-template-rows: auto 1fr auto; gap: 14px;
+  padding: 20px; border: 1px solid #69665f; border-radius: 10px;
+  background: linear-gradient(145deg, #d9d7cf, #aaa79d); color: #181818;
+}
+.doorlock-lcd {
+  min-height: 72px; padding: 12px; border: 7px solid #24272b; border-radius: 6px;
+  background: #c7e5b4; color: #18321a; font: 700 .8rem/1.6 var(--font-mono);
+}
+.doorlock-door {
+  position: relative; min-height: 170px; border: 7px solid #6a4d35;
+  border-radius: 5px; background: #b8875e; overflow: hidden;
+}
+.doorlock-bolt {
+  position: absolute; top: 50%; right: 0; width: 58px; height: 22px;
+  transform: translateY(-50%); border: 3px solid #4b4b4b;
+  background: linear-gradient(90deg, #777, #eee, #777);
+  transition: transform .35s ease;
+}
+.doorlock-rig.is-unlocked .doorlock-bolt { transform: translate(70%, -50%); }
+.doorlock-lights { display: flex; gap: 12px; justify-content: center; }
+.doorlock-lamp { width: 22px; aspect-ratio: 1; border-radius: 50%; background: #555; }
+.doorlock-red { background: #d43a35; box-shadow: 0 0 10px rgba(212, 58, 53, .65); }
+.doorlock-rig.is-unlocked .doorlock-red { background: #555; box-shadow: none; }
+.doorlock-rig.is-unlocked .doorlock-green {
+  background: #2ca24f; box-shadow: 0 0 10px rgba(44, 162, 79, .7);
+}
+.doorlock-rig.is-alarm { animation: hardware-blink .25s steps(1, end) 5 alternate; }
+
+@media (max-width: 390px) {
+  .ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left: 59px; }
+  .doorlock-keypad { grid-template-columns: repeat(4, minmax(36px, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plantclock-device.fan-on .plant-fan-rotor,
+  .doorlock-rig.is-alarm { animation: none; }
+}
