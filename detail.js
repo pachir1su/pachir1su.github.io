@@ -56,25 +56,16 @@
   back?.addEventListener('click', () => scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }));
   syncScroll();
 
-  const themeDesktop = $('#themeToggle');
-  const themeMobile = $('#themeToggleMobile');
-  function themeLabel(dark, lang) { return dark ? (lang === 'en' ? 'Light Mode' : '라이트 모드') : (lang === 'en' ? 'Dark Mode' : '다크 모드'); }
-  function applyTheme(theme) {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem('theme', theme);
-    const dark = theme === 'dark';
-    const lang = localStorage.getItem('lang') || 'ko';
-    const label = themeLabel(dark, lang);
-    const di = $('#themeIcon'); if (di) di.className = dark ? 'fas fa-sun' : 'fas fa-moon';
-    const mi = $('#themeIconMobile') || $('.theme-label-mobile')?.previousElementSibling; if (mi?.tagName === 'I') mi.className = dark ? 'fas fa-sun' : 'fas fa-moon';
-    const ml = $('.theme-label-mobile'); if (ml) ml.textContent = label;
-    if (themeDesktop) themeDesktop.title = label;
+  const systemScheme = window.matchMedia('(prefers-color-scheme: dark)');
+  function applySystemTheme() {
+    document.documentElement.dataset.theme = systemScheme.matches ? 'dark' : 'light';
   }
-  const initialTheme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  applyTheme(initialTheme);
-  const toggleTheme = () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
-  themeDesktop?.addEventListener('click', toggleTheme);
-  themeMobile?.addEventListener('click', toggleTheme);
+  localStorage.removeItem('theme');
+  $('#themeToggle')?.remove();
+  $('#themeToggleMobile')?.remove();
+  applySystemTheme();
+  if (typeof systemScheme.addEventListener === 'function') systemScheme.addEventListener('change', applySystemTheme);
+  else if (typeof systemScheme.addListener === 'function') systemScheme.addListener(applySystemTheme);
 
   $$('[data-en]:not([data-ko]):not(meta)').forEach((el) => { el.dataset.ko = el.textContent.trim(); });
   $$('[data-en-html]:not([data-ko-html])').forEach((el) => { el.dataset.koHtml = el.innerHTML; });
@@ -99,7 +90,6 @@
       langDesktop.setAttribute('aria-label', lang === 'ko' ? 'EN · English' : 'KO · 한국어');
     }
     if (langMobile) langMobile.setAttribute('aria-label', lang === 'ko' ? 'English · 언어 전환' : '한국어 · Switch language');
-    applyTheme(document.documentElement.dataset.theme || 'light');
     dispatchEvent(new CustomEvent('portfolio:language', { detail: { lang } }));
   }
   translate(lang);
