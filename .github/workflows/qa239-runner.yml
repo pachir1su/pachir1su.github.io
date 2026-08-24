@@ -4,22 +4,29 @@ on:
   pull_request:
     paths:
       - '.github/workflows/qa239-runner.yml'
+      - '.github/scripts/qa239_browser.mjs'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  crop-preview:
+  final-apply:
     if: github.event.pull_request.head.ref == 'chatgpt/qa239-runner'
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout runner scripts
+        uses: actions/checkout@v4
+        with:
+          path: runner
+
       - name: Checkout target implementation branch
         uses: actions/checkout@v4
         with:
           ref: chatgpt/qa239-fixes-theme240
           path: target
+          fetch-depth: 0
 
-      - name: Build crop candidates
+      - name: Crop cafeteria venue photo
         shell: bash
         run: |
           set -euo pipefail
@@ -27,19 +34,88 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           from PIL import Image
+
           src = Path('target/projects/meal_queue_signal_counter/assets/images/festival-venue.webp')
-          out = Path('crop-preview')
-          out.mkdir(exist_ok=True)
+          page = Path('target/projects/meal_queue_signal_counter/index.html')
           im = Image.open(src).convert('RGB')
-          im.save(out / 'original.webp', 'WEBP', quality=92)
-          for keep in (0.85, 0.80, 0.75):
-              crop = im.crop((0, 0, round(im.width * keep), im.height))
-              crop.save(out / f'keep-{int(keep*100)}.webp', 'WEBP', quality=92)
-          print('source', im.size)
+          if im.size == (1050, 1400):
+              im = im.crop((0, 0, 892, 1400))
+              im.save(src, 'WEBP', quality=92)
+          elif im.size != (892, 1400):
+              raise SystemExit(f'unexpected festival image size: {im.size}')
+
+          text = page.read_text(encoding='utf-8')
+          old = '<img src="assets/images/festival-venue.webp" width="1050" height="1400"'
+          new = '<img src="assets/images/festival-venue.webp" width="892" height="1400"'
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('festival image markup not found')
+          page.write_text(text, encoding='utf-8')
+          print('festival-venue.webp', Image.open(src).size)
           PY
 
-      - name: Upload crop candidates
+      - name: Static QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd target
+          node --check build.js
+          node --check script.js
+          node --check detail.js
+          node --check assets/project-demos.js
+          node tools/verify-build.js
+          node tools/verify-media-metadata.js
+
+      - name: Install Playwright Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/qa239-browser
+          cd /tmp/qa239-browser
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local site
+        shell: bash
+        run: |
+          cd target
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/qa239-http.log 2>&1 &
+          echo $! >/tmp/qa239-http.pid
+          for i in {1..30}; do
+            curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/qa239-http.log
+          exit 1
+
+      - name: Browser QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p qa-artifacts
+          cp runner/.github/scripts/qa239_browser.mjs /tmp/qa239-browser/qa239_browser.mjs
+          cd /tmp/qa239-browser
+          node qa239_browser.mjs
+          cp -R qa-artifacts/* "$GITHUB_WORKSPACE/qa-artifacts/"
+
+      - name: Commit and push final crop
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C target config user.name 'ChatGPT'
+          git -C target config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C target add projects/meal_queue_signal_counter/assets/images/festival-venue.webp projects/meal_queue_signal_counter/index.html
+          if ! git -C target diff --cached --quiet; then
+            git -C target commit -m 'fix: crop cafeteria venue photo for privacy'
+            git -C target push origin HEAD:chatgpt/qa239-fixes-theme240
+          fi
+
+      - name: Upload final QA artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: qa239-cafeteria-crop-preview
-          path: crop-preview
+          name: qa239-final-browser
+          path: qa-artifacts
+          if-no-files-found: warn
