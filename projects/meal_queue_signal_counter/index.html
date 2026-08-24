@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>급식 줄 혼잡도 신호등 계수기 | 이건영 포트폴리오</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=optional" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=optional" rel="stylesheet" /></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /></noscript>
+    <link rel="stylesheet" href="../../style.css" />
+  </head>
+  <body>
+    <div class="progress-container"><div class="progress-bar" id="myBar"></div></div>
+    <button type="button" id="btn-back-to-top" aria-label="맨 위로"><i class="fas fa-arrow-up"></i></button>
+
+    <nav class="navbar">
+      <div class="container nav-content">
+        <a href="../../index.html" class="logo"><span class="logo-bracket">{</span> GY <span class="logo-bracket">}</span></a>
+        <ul class="nav-links">
+          <li><a href="../../index.html#projects" data-en="← Project List" data-ko="← 프로젝트 목록">← 프로젝트 목록</a></li>
+          <li><a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" class="nav-github" aria-label="GitHub 프로필"><i class="fab fa-github"></i></a></li>
+        </ul>
+        <div class="nav-utils">
+          <button type="button" id="langToggle" class="nav-util-btn" title="English" aria-label="언어 전환"><span class="lang-label">EN</span></button>
+          <button type="button" id="themeToggle" class="nav-util-btn" title="다크 모드" aria-label="다크 모드 전환"><i class="fas fa-moon" id="themeIcon"></i></button>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <button class="sidebar-close" onclick="closeMobile()" aria-label="메뉴 닫기"><i class="fas fa-times"></i></button>
+      <a href="../../index.html#projects" onclick="closeMobile()"><i class="fas fa-arrow-left"></i> <span data-en="Project List" data-ko="프로젝트 목록">프로젝트 목록</span></a>
+      <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
+      <div class="sidebar-utils">
+        <button type="button" class="sidebar-util-btn" id="langToggleMobile" aria-label="언어 전환"><i class="fas fa-language"></i> <span class="lang-label-mobile">English</span></button>
+        <button type="button" class="sidebar-util-btn" id="themeToggleMobile" aria-label="다크 모드 전환"><i class="fas fa-moon" id="themeIconMobile"></i> <span class="theme-label-mobile">다크 모드</span></button>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main id="main-content">
+      <section class="detail-hero">
+        <div class="hero-grid-bg"></div>
+        <div class="detail-hero-glow"></div>
+        <div class="container" style="position: relative; z-index: 1">
+          <div class="detail-breadcrumb">
+            <a href="../../index.html"><span data-en="Home" data-ko="홈">홈</span></a> /
+            <a href="../../index.html#projects"><span data-en="Projects" data-ko="프로젝트">프로젝트</span></a> /
+            <span data-en="Cafeteria Queue Signal Counter" data-ko="급식 줄 혼잡도 신호등 계수기">급식 줄 혼잡도 신호등 계수기</span>
+          </div>
+          <div class="detail-hero-icon"><i class="fas fa-traffic-light"></i></div>
+          <h1 class="detail-title" data-aos="fade-up"><span data-en="Cafeteria Queue Signal Counter" data-ko="급식 줄 혼잡도 신호등 계수기">급식 줄 혼잡도 신호등 계수기</span></h1>
+          <div class="detail-meta" data-aos="fade-up" data-aos-delay="100">
+            <span class="detail-badge">Arduino</span><span class="detail-badge">mBlock</span><span class="detail-badge">Gorilla Cell</span><span class="detail-badge" data-en="Physical Computing" data-ko="피지컬 컴퓨팅">피지컬 컴퓨팅</span>
+          </div>
+          <div class="detail-actions" data-aos="fade-up" data-aos-delay="200">
+            <a href="#live-demo" class="btn btn-ghost"><i class="fas fa-play"></i> <span data-en="Try Demo" data-ko="데모 체험">데모 체험</span></a>
+            <a href="../../index.html#projects" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="detail-body">
+        <div class="container">
+          <div class="detail-grid">
+            <div class="detail-main">
+              <div class="detail-section" data-aos="fade-up">
+                <h2 data-en="Project Overview" data-ko="프로젝트 개요">프로젝트 개요</h2>
+                <p data-en="A physical-computing prototype built for the 2024 With AI Coding Festival using mBlock, a Gorilla Cell, and Arduino. Students or queue guides press a button as people join the cafeteria line. At roughly 20 counts, the signal turns red for about 10 seconds to pause incoming traffic, then returns to green.">
+                  2024 위드 AI 코딩 페스티벌 피지컬 컴퓨팅 분야에서 mBlock·고릴라셀·아두이노로 제작한 급식 줄 계수 시제품입니다. 급식 줄에 사람이 들어올 때 학생이나 선도 위원이 버튼을 눌러 인원을 세고, 약 20명이 누적되면 약 10초 동안 빨간불을 켜 유입을 잠시 막은 뒤 다시 초록불로 전환합니다.
+                </p>
+              </div>
+
+              <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
+                <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
+                <ul>
+                  <li data-en="Button-based cafeteria queue counting">버튼을 누를 때마다 급식 줄 인원 계수</li>
+                  <li data-en="Congestion threshold at approximately 20 people">약 20명을 기준으로 혼잡도 임계값 판단</li>
+                  <li data-en="Red signal for about 10 seconds to limit incoming traffic">혼잡 시 약 10초간 빨간불로 추가 유입 제한</li>
+                  <li data-en="Automatic return to the green signal">대기 시간 이후 초록불로 자동 복귀</li>
+                  <li data-en="mBlock logic connected to Arduino traffic-light LEDs">mBlock 블록 로직과 아두이노 신호등 LED 연동</li>
+                  <li data-en="Portable power supplied by a Gorilla Cell">고릴라셀을 활용한 휴대용 전원 구성</li>
+                </ul>
+              </div>
+
+              <div class="detail-section" data-aos="fade-up" data-aos-delay="75">
+                <h2 data-en="Project Media" data-ko="프로젝트 사진">프로젝트 사진</h2>
+                <div class="detail-gallery">
+                  <figure class="detail-figure">
+                    <img src="assets/images/prototype-wiring.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="초록 신호가 켜진 급식 줄 계수기 시제품 내부 배선" />
+                    <figcaption data-en="Prototype interior wiring with the green signal active" data-ko="초록 신호가 켜진 시제품 내부 배선">초록 신호가 켜진 시제품 내부 배선</figcaption>
+                  </figure>
+                  <figure class="detail-figure">
+                    <img src="assets/images/entry-code-main.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="급식 줄 인원 계수와 신호 제어를 구현한 mBlock 블록 코드" />
+                    <figcaption data-en="Main mBlock blocks for counting and signal control" data-ko="인원 계수·신호 제어 mBlock 블록 코드">인원 계수·신호 제어 mBlock 블록 코드</figcaption>
+                  </figure>
+                  <figure class="detail-figure">
+                    <img src="assets/images/entry-code-condition.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="버튼 입력과 임계값 조건을 구현한 mBlock 블록 코드 확대" />
+                    <figcaption data-en="Button input and threshold conditions in mBlock" data-ko="mBlock 버튼 입력·임계값 조건 블록 확대">mBlock 버튼 입력·임계값 조건 블록 확대</figcaption>
+                  </figure>
+                  <figure class="detail-figure">
+                    <img src="assets/images/festival-venue.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="2024 위드 AI 코딩 페스티벌 행사장" />
+                    <figcaption data-en="2024 With AI Coding Festival venue" data-ko="2024 위드 AI 코딩 페스티벌 행사장">2024 위드 AI 코딩 페스티벌 행사장</figcaption>
+                  </figure>
+                  <figure class="detail-figure">
+                    <img src="assets/images/controller-wiring.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="급식 줄 계수기 신호등 모형 내부의 제어 보드와 배선" />
+                    <figcaption data-en="Controller board and wiring inside the signal model" data-ko="신호등 모형 내부 제어 보드·배선">신호등 모형 내부 제어 보드·배선</figcaption>
+                  </figure>
+                  <figure class="detail-figure">
+                    <img src="assets/images/red-signal-demo.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="혼잡 상태를 나타내는 빨간불이 켜진 급식 줄 신호등 시제품" />
+                    <figcaption data-en="Red signal indicating a congested queue" data-ko="혼잡 상태를 나타내는 빨간 신호">혼잡 상태를 나타내는 빨간 신호</figcaption>
+                  </figure>
+                  <figure class="detail-figure">
+                    <img src="assets/images/green-signal-demo.webp" width="1050" height="1400" loading="lazy" decoding="async" alt="입장 가능 상태를 나타내는 초록불이 켜진 급식 줄 신호등 시제품" />
+                    <figcaption data-en="Green signal indicating that the line can accept people" data-ko="입장 가능 상태를 나타내는 초록 신호">입장 가능 상태를 나타내는 초록 신호</figcaption>
+                  </figure>
+                </div>
+              </div>
+
+              <div class="detail-section" data-aos="fade-up" data-aos-delay="80">
+                <h2 data-en="Prototype Demo" data-ko="시제품 동작 영상">시제품 동작 영상</h2>
+                <figure class="detail-figure detail-video-figure">
+                  <video class="detail-video" controls preload="metadata" playsinline muted poster="assets/images/green-signal-demo.webp">
+                    <source src="assets/video/signal-counter-demo.mp4" type="video/mp4" />
+                  </video>
+                  <figcaption data-en="Signal-counter prototype demonstration (audio removed)" data-ko="신호등 계수기 시제품 시연 (음성 제거)">신호등 계수기 시제품 시연 (음성 제거)</figcaption>
+                </figure>
+              </div>
+
+              <div class="detail-section" id="live-demo" data-aos="fade-up" data-aos-delay="90">
+                <h2 data-en="Interactive Counter" data-ko="신호등 계수기 체험">신호등 계수기 체험</h2>
+                <div data-project-demo="signal"></div>
+              </div>
+
+              <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
+                <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
+                <p class="role-position"><i class="fas fa-user-tag"></i> <span data-en="Project Development" data-ko="프로젝트 개발">프로젝트 개발</span></p>
+                <ul>
+                  <li data-en="Counter and signal-flow planning">계수·신호 전환 로직 기획</li>
+                  <li data-en="mBlock programming">mBlock 블록 코딩</li>
+                  <li data-en="Arduino, Gorilla Cell, and LED wiring">아두이노·고릴라셀·LED 배선</li>
+                  <li data-en="Traffic-light prototype fabrication">신호등 시제품 제작</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="detail-sidebar">
+              <div class="sidebar-card" data-aos="fade-left">
+                <h4 role="heading" aria-level="3">Tech Stack</h4>
+                <div class="sidebar-stack">
+                  <span class="tech-stack"><span>mBlock</span></span><span class="tech-stack"><span>Gorilla Cell</span></span><span class="tech-stack"><span>Arduino</span></span><span class="tech-stack"><span>Button</span></span><span class="tech-stack"><span>LED</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container footer-inner">
+        <div class="footer-logo"><span class="logo-bracket">{</span> GY <span class="logo-bracket">}</span></div>
+        <p class="footer-copy">&copy; 2026 Lee Geon Yeong. All rights reserved.</p>
+        <div class="social-links">
+          <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer" aria-label="GitHub 프로필"><i class="fab fa-github"></i></a>
+          <a href="mailto:capybara@koreatech.ac.kr" aria-label="이메일 보내기"><i class="fas fa-envelope"></i></a>
+        </div>
+      </div>
+    </footer>
+    <script defer src="../../detail.js"></script>
+    <script defer src="../../assets/project-demos.js"></script>
+  </body>
+</html>

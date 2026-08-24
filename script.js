@@ -578,6 +578,41 @@ window._updateProjectCount();
   });
 })();
 
+
+/* ------------------------------------------------------------- */
+/* 18-1. Project link notices                                    */
+/* ------------------------------------------------------------- */
+(function initProjectLinkNotices() {
+  const buttons = document.querySelectorAll('.plink-notice');
+  if (!buttons.length) return;
+  let toast = null;
+  let hideTimer = null;
+
+  function showNotice(message) {
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'site-toast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      document.body.appendChild(toast);
+    }
+    clearTimeout(hideTimer);
+    toast.textContent = message;
+    toast.classList.add('show');
+    hideTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  buttons.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const lang = localStorage.getItem('lang') || 'ko';
+      const message = lang === 'en' ? button.dataset.noticeEn : button.dataset.noticeKo;
+      showNotice(message || (lang === 'en' ? 'Coming soon' : '준비 중'));
+    });
+  });
+})();
+
 /* ------------------------------------------------------------- */
 /* 19. Hero email capybara (#192)                                */
 /* ------------------------------------------------------------- */
@@ -600,49 +635,4 @@ window._updateProjectCount();
   capybara.decoding = 'async';
   capybara.draggable = false;
   wrap.insertBefore(capybara, button);
-
-  const style = document.createElement('style');
-  style.dataset.heroEmailCapybara = '192';
-  style.textContent = `
-    .hero-email-wrap {
-      position: relative;
-      display: inline-flex;
-      align-items: flex-end;
-      padding-top: 34px;
-      isolation: isolate;
-    }
-    .hero-email-capybara {
-      position: absolute;
-      left: 50%;
-      bottom: 23px;
-      width: 112px;
-      max-width: none;
-      height: auto;
-      transform: translateX(-50%);
-      pointer-events: none;
-      user-select: none;
-      -webkit-user-drag: none;
-      z-index: 0;
-    }
-    .hero-email-wrap .hero-email {
-      position: relative;
-      z-index: 1;
-      max-width: 100%;
-    }
-    @media (max-width: 640px) {
-      .hero-email-wrap {
-        width: 100%;
-        padding-top: 40px;
-      }
-      .hero-email-capybara {
-        width: 104px;
-        bottom: 23px;
-      }
-      .hero-email-wrap .hero-email {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-  `;
-  document.head.appendChild(style);
 })();

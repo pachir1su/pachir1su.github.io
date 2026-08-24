@@ -71,7 +71,7 @@ check(
 );
 
 /* --- 2-1) #191 프로젝트 상태 모델 회귀 방지 --- */
-check(expectedCount === 31, `프로젝트 총 수가 바뀌었습니다: ${expectedCount}개 (기대: 31개)`);
+check(expectedCount === 32, `프로젝트 총 수가 바뀌었습니다: ${expectedCount}개 (기대: 32개)`);
 const wipGroup = data.groups.find((g) => g.kind === "wip");
 const discontinuedGroup = data.groups.find((g) => g.kind === "discontinued");
 const wipDetails = (wipGroup?.cards || []).map((card) => card.detail);

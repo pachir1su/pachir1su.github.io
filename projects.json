@@ -235,6 +235,15 @@
               "href": "https://github.com/pachir1su/koreatechGongjiAgent",
               "title": "GitHub",
               "icon": "fab fa-github"
+            },
+            {
+              "action": "notice",
+              "title": "Discord · 배포 준비 중",
+              "icon": "fab fa-discord",
+              "message": {
+                "en": "Deployment in preparation",
+                "ko": "배포 준비 중"
+              }
             }
           ],
           "title": {
@@ -523,6 +532,36 @@
       "kind": "year",
       "year": "2024",
       "cards": [
+        {
+          "comment": "급식 줄 혼잡도 신호등 계수기",
+          "category": "hardware contest",
+          "icon": "fas fa-traffic-light",
+          "detail": "projects/meal_queue_signal_counter/",
+          "links": [],
+          "title": {
+            "en": "Cafeteria Queue Signal Counter",
+            "ko": "급식 줄 혼잡도 신호등 계수기"
+          },
+          "subtitle": {
+            "en": "2024 With AI Coding Festival physical computing entry",
+            "ko": "2024 위드 AI 코딩 페스티벌 피지컬 컴퓨팅 분야 출품작"
+          },
+          "role": {
+            "en": "Project Development",
+            "ko": "프로젝트 개발"
+          },
+          "descHtml": {
+            "en": "Built with mBlock, a Gorilla Cell, and Arduino<br />Counts people with a button and pauses incoming traffic with a red signal at roughly 20 people",
+            "ko": "mBlock·고릴라셀·아두이노로 제작<br />버튼으로 인원을 세고 약 20명 누적 시 빨간불로 추가 유입을 잠시 제한"
+          },
+          "tech": [
+            "mBlock",
+            "Gorilla Cell",
+            "Arduino",
+            "Button",
+            "LED"
+          ]
+        },
         {
           "comment": "비밀번호 도어락",
           "category": "hardware contest",

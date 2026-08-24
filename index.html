@@ -101,6 +101,13 @@
     />
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /></noscript>
 
+    <!-- Devicon — 역량 기술 로고 (#236) -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/gh/devicons/devicon@2.16.0/devicon.min.css"
+    />
+
     <!-- 메인 스타일시트 — 노트 테마, 카드 레이아웃, 반응형 포함 -->
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -469,6 +476,7 @@
                 <div class="project-links">
                   <a href="projects/koreatechGongjiAgent/" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
                   <a href="https://github.com/pachir1su/koreatechGongjiAgent" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="GitHub"><i class="fab fa-github"></i></a>
+                  <button type="button" class="plink plink-github plink-notice" title="Discord · 배포 준비 중" aria-label="Discord · 배포 준비 중: 배포 준비 중" data-notice-ko="배포 준비 중" data-notice-en="Deployment in preparation"><i class="fab fa-discord"></i></button>
                 </div>
               </div>
               <h3 data-en="KOREATECH Unified Alert System" data-ko="코리아텍 통합 알림 시스템">코리아텍 통합 알림 시스템</h3>
@@ -604,6 +612,21 @@
         <div class="year-group" data-year="2024">
           <h3 class="year-heading">2024</h3>
           <div class="projects-grid">
+
+            <!-- 급식 줄 혼잡도 신호등 계수기 -->
+            <div class="project-card" data-category="hardware contest" data-card-href="projects/meal_queue_signal_counter/" data-tilt>
+              <div class="project-top">
+                <i class="fas fa-traffic-light project-icon"></i>
+                <div class="project-links">
+                  <a href="projects/meal_queue_signal_counter/" class="plink plink-detail" title="자세히 보기"><i class="fas fa-arrow-right"></i></a>
+                </div>
+              </div>
+              <h3 data-en="Cafeteria Queue Signal Counter" data-ko="급식 줄 혼잡도 신호등 계수기">급식 줄 혼잡도 신호등 계수기</h3>
+              <p class="project-subtitle" data-en="2024 With AI Coding Festival physical computing entry" data-ko="2024 위드 AI 코딩 페스티벌 피지컬 컴퓨팅 분야 출품작">2024 위드 AI 코딩 페스티벌 피지컬 컴퓨팅 분야 출품작</p>
+              <p class="project-role" data-en="Project Development" data-ko="프로젝트 개발"><i class="fas fa-user-tag"></i> 프로젝트 개발</p>
+              <p data-en-html="Built with mBlock, a Gorilla Cell, and Arduino&lt;br /&gt;Counts people with a button and pauses incoming traffic with a red signal at roughly 20 people" data-ko-html="mBlock·고릴라셀·아두이노로 제작&lt;br /&gt;버튼으로 인원을 세고 약 20명 누적 시 빨간불로 추가 유입을 잠시 제한">mBlock·고릴라셀·아두이노로 제작<br />버튼으로 인원을 세고 약 20명 누적 시 빨간불로 추가 유입을 잠시 제한</p>
+              <div class="tech-stack"><span>mBlock</span><span>Gorilla Cell</span><span>Arduino</span><span>Button</span><span>LED</span></div>
+            </div>
 
             <!-- 비밀번호 도어락 -->
             <div class="project-card" data-category="hardware contest" data-card-href="projects/Master_Creator_Challenge/" data-tilt>
@@ -940,14 +963,14 @@
             <div class="skill-icon"><i class="fas fa-code"></i></div>
             <h3 data-en="Core Languages" data-ko="핵심 언어">핵심 언어</h3>
             <ul class="skill-list">
-              <li><span class="skill-glyph" aria-hidden="true">Py</span> Python</li>
-              <li><span class="skill-glyph" aria-hidden="true">C</span> C / C++</li>
-              <li><span class="skill-glyph" aria-hidden="true">Jv</span> Java</li>
+              <li><i class="devicon-python-plain colored" aria-hidden="true"></i> Python</li>
+              <li><i class="devicon-c-plain colored" aria-hidden="true"></i> C / C++</li>
+              <li><i class="devicon-java-plain colored" aria-hidden="true"></i> Java</li>
               <li>
-                <span class="skill-glyph" aria-hidden="true">JS</span> JavaScript
+                <i class="devicon-javascript-plain colored" aria-hidden="true"></i> JavaScript
               </li>
               <li>
-                <span class="skill-glyph" aria-hidden="true">Pr</span> Processing
+                <i class="devicon-processing-plain colored" aria-hidden="true"></i> Processing
               </li>
             </ul>
           </div>
@@ -962,7 +985,7 @@
             <ul class="skill-list">
               <li data-en="LLM Proficiency" data-ko="LLM 활용 능력"><i class="fas fa-robot"></i> LLM 활용 능력</li>
               <li>
-                <span class="skill-glyph" aria-hidden="true">ML</span> Scikit-learn /
+                <i class="devicon-scikitlearn-plain colored" aria-hidden="true"></i> Scikit-learn /
                 Keras
               </li>
               <li><i class="fas fa-chart-pie"></i> Orange3</li>
@@ -980,14 +1003,14 @@
             <h3 data-en="Web &amp; App Dev" data-ko="웹 &amp; 앱 개발">웹 & 앱 개발</h3>
             <ul class="skill-list">
               <li>
-                <span class="skill-glyph" aria-hidden="true">Re</span> React / HTML /
+                <i class="devicon-react-original colored" aria-hidden="true"></i> React / HTML /
                 CSS
               </li>
-              <li><span class="skill-glyph" aria-hidden="true">Fl</span> Flask / FastAPI</li>
-              <li><span class="skill-glyph" aria-hidden="true">DB</span> SQLite</li>
+              <li><i class="devicon-flask-original colored" aria-hidden="true"></i> Flask / FastAPI</li>
+              <li><i class="devicon-sqlite-plain colored" aria-hidden="true"></i> SQLite</li>
               <li data-en="Selenium · pyautogui (crawling &amp; automation)" data-ko="Selenium · pyautogui (크롤링·자동화)"><i class="fas fa-robot"></i> Selenium · pyautogui (크롤링·자동화)</li>
-              <li><span class="skill-glyph" aria-hidden="true">Ft</span> Flutter</li>
-              <li><span class="skill-glyph" aria-hidden="true">Fg</span> Figma</li>
+              <li><i class="devicon-flutter-plain colored" aria-hidden="true"></i> Flutter</li>
+              <li><i class="devicon-figma-plain colored" aria-hidden="true"></i> Figma</li>
               <li data-en="Discord Bot Dev (Discord.py)" data-ko="Discord 봇 개발 (Discord.py)"><i class="fab fa-discord"></i> Discord 봇 개발 (Discord.py)</li>
             </ul>
           </div>
@@ -1001,7 +1024,7 @@
             <h3 data-en="Hardware &amp; Maker" data-ko="하드웨어 &amp; 메이커">하드웨어 & 메이커</h3>
             <ul class="skill-list">
               <li data-en="Arduino / Raspberry Pi" data-ko="아두이노 / 라즈베리파이">
-                <span class="skill-glyph" aria-hidden="true">Ar</span> 아두이노 /
+                <i class="devicon-arduino-plain colored" aria-hidden="true"></i> 아두이노 /
                 라즈베리파이
               </li>
               <li data-en="3D Printing / Modeling" data-ko="3D 프린팅 / 모델링"><i class="fas fa-cube"></i> 3D 프린팅 / 모델링</li>
@@ -1019,7 +1042,7 @@
             <div class="skill-icon"><i class="fas fa-file-alt"></i></div>
             <h3 data-en="Documentation &amp; Collaboration" data-ko="문서화 &amp; 협업">문서화 & 협업</h3>
             <ul class="skill-list">
-    <li><span class="skill-glyph" aria-hidden="true">Nt</span> Notion</li>
+    <li><i class="devicon-notion-plain colored" aria-hidden="true"></i> Notion</li>
     <li data-en="Excellent Report Writing" data-ko="탁월한 보고서 작성"><i class="fas fa-file-contract"></i> 탁월한 보고서 작성</li>
     <li data-en="Systematic File Organization" data-ko="체계적인 자료 정리"><i class="fas fa-folder-open"></i> 체계적인 자료 정리</li>
     <li data-en="Technical Documentation" data-ko="기술 문서 작성"><i class="fas fa-pen-nib"></i> 기술 문서 작성</li>
