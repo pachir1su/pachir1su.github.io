@@ -235,6 +235,15 @@
               "href": "https://github.com/pachir1su/koreatechGongjiAgent",
               "title": "GitHub",
               "icon": "fab fa-github"
+            },
+            {
+              "action": "notice",
+              "title": "Discord · 배포 준비 중",
+              "icon": "fab fa-discord",
+              "message": {
+                "en": "Deployment in preparation",
+                "ko": "배포 준비 중"
+              }
             }
           ],
           "title": {
