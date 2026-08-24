@@ -1,0 +1,37 @@
+name: QA 239 implementation runner
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/qa239-runner.yml'
+      - '.github/scripts/qa239_apply*'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout runner payload
+        uses: actions/checkout@v4
+        with:
+          path: runner
+
+      - name: Checkout target implementation branch
+        uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa239-fixes-theme240
+          path: target
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Apply QA 239 and issue 240 changes
+        run: python runner/.github/scripts/qa239_apply_loader.py target
+
+      - name: Push implementation branch
+        run: git -C target push origin HEAD:chatgpt/qa239-fixes-theme240
