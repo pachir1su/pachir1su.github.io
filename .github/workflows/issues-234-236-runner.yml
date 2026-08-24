@@ -1,0 +1,372 @@
+name: Issues 234 235 236 Runner
+
+on:
+  push:
+    branches:
+      - chatgpt/issues-234-236-runner
+
+permissions:
+  contents: write
+
+jobs:
+  implement-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout target PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: Codex/add-project-media-12
+          fetch-depth: 0
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Configure git
+        run: |
+          git config user.name 'ChatGPT workflow'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Issue 235 - make Claude auto check-in prohibition explicit
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          path = Path('CLAUDE.md')
+          text = path.read_text(encoding='utf-8')
+          needle = '- Draft PR까지만 만들고 자동 병합하지 않습니다.\n'
+          addition = '- 사용자가 명시적으로 요청하지 않은 자동 체크인, 주기적 상태 확인, PR 재검증을 예약하거나 반복 실행하지 않습니다.\n'
+          if addition not in text:
+              if needle not in text:
+                  raise SystemExit('CLAUDE.md insertion point not found')
+              text = text.replace(needle, needle + addition, 1)
+              path.write_text(text, encoding='utf-8')
+          PY
+          git add CLAUDE.md
+          git commit -m 'docs: disable unsolicited Claude auto check-ins'
+
+      - name: Issue 234 - add KGA Discord notice link data
+        run: |
+          python3 <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('projects.json')
+          data = json.loads(path.read_text(encoding='utf-8'))
+          target = None
+          for group in data['groups']:
+              for card in group.get('cards', []):
+                  if card.get('detail') == 'projects/koreatechGongjiAgent/':
+                      target = card
+                      break
+              if target:
+                  break
+          if not target:
+              raise SystemExit('KGA card not found')
+          notice = {
+              'action': 'notice',
+              'title': 'Discord · 배포 준비 중',
+              'icon': 'fab fa-discord',
+              'message': {
+                  'en': 'Deployment in preparation',
+                  'ko': '배포 준비 중'
+              }
+          }
+          links = target.setdefault('links', [])
+          links = [link for link in links if not (link.get('action') == 'notice' and link.get('icon') == 'fab fa-discord')]
+          links.append(notice)
+          target['links'] = links
+          path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+          git add projects.json
+          git commit -m 'feat: add KGA Discord deployment notice'
+
+      - name: Issue 234 - teach build about notice buttons
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          path = Path('build.js')
+          text = path.read_text(encoding='utf-8')
+          old = '''  for (const link of card.links || []) {
+    lines.push(
+      `                  <a href="${link.href}" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="${esc(
+        link.title
+      )}"><i class="${link.icon}"></i></a>`
+    );
+  }
+'''
+          new = '''  for (const link of card.links || []) {
+    if (link.action === "notice") {
+      const messageKo = link.message?.ko || "준비 중";
+      const messageEn = link.message?.en || "Coming soon";
+      lines.push(
+        `                  <button type="button" class="plink plink-github plink-notice" title="${esc(
+          link.title
+        )}" aria-label="${esc(link.title)}: ${esc(messageKo)}" data-notice-ko="${esc(
+          messageKo
+        )}" data-notice-en="${esc(messageEn)}"><i class="${link.icon}"></i></button>`
+      );
+      continue;
+    }
+    lines.push(
+      `                  <a href="${link.href}" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="${esc(
+        link.title
+      )}"><i class="${link.icon}"></i></a>`
+    );
+  }
+'''
+          if new not in text:
+              if old not in text:
+                  raise SystemExit('build.js link loop not found')
+              text = text.replace(old, new, 1)
+              path.write_text(text, encoding='utf-8')
+          PY
+          git add build.js
+          git commit -m 'feat: render project notice link buttons'
+
+      - name: Issue 234 - add reusable notice toast behavior
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          path = Path('script.js')
+          text = path.read_text(encoding='utf-8')
+          marker = '''(function initCardLinks() {
+  document.querySelectorAll('[data-card-href]').forEach((card) => {
+    card.addEventListener('click', (event) => {
+      if (event.target.closest('a, button')) return;
+      if (window.getSelection()?.toString().trim()) return;
+      window.location.href = card.dataset.cardHref;
+    });
+  });
+})();
+'''
+          addition = '''
+
+/* ------------------------------------------------------------- */
+/* 18-1. Project link notices                                    */
+/* ------------------------------------------------------------- */
+(function initProjectLinkNotices() {
+  const buttons = document.querySelectorAll('.plink-notice');
+  if (!buttons.length) return;
+  let toast = null;
+  let hideTimer = null;
+
+  function showNotice(message) {
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'site-toast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      document.body.appendChild(toast);
+    }
+    clearTimeout(hideTimer);
+    toast.textContent = message;
+    toast.classList.add('show');
+    hideTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  buttons.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const lang = localStorage.getItem('lang') || 'ko';
+      const message = lang === 'en' ? button.dataset.noticeEn : button.dataset.noticeKo;
+      showNotice(message || (lang === 'en' ? 'Coming soon' : '준비 중'));
+    });
+  });
+})();
+'''
+          if 'function initProjectLinkNotices()' not in text:
+              if marker not in text:
+                  raise SystemExit('script.js card-link block not found')
+              text = text.replace(marker, marker + addition, 1)
+              path.write_text(text, encoding='utf-8')
+          PY
+          git add script.js
+          git commit -m 'feat: show project link notice toast'
+
+      - name: Issues 234 and 236 - style toast and retire placeholder glyphs
+        run: |
+          python3 <<'PY'
+          import re
+          from pathlib import Path
+          path = Path('style.css')
+          text = path.read_text(encoding='utf-8')
+          text = re.sub(r'\n?\.skill-glyph \{[^\n]*\}\n?', '\n', text, count=1)
+          addition = '''
+
+/* Project link notice toast (#234) */
+.site-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 2100;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--card);
+  box-shadow: var(--shadow-lift);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.site-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-toast { transition: none; }
+}
+'''
+          if 'Project link notice toast (#234)' not in text:
+              text = text.rstrip() + addition + '\n'
+          path.write_text(text, encoding='utf-8')
+          PY
+          git add style.css
+          git commit -m 'fix: restore skill icon styling path'
+
+      - name: Regenerate cards and restore real Devicon skill icons
+        run: |
+          node build.js
+          python3 <<'PY'
+          from pathlib import Path
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+          devicon = '''    <!-- Devicon — 역량 기술 로고 (#236) -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/gh/devicons/devicon@2.16.0/devicon.min.css"
+    />
+
+'''
+          anchor = '''    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /></noscript>
+
+'''
+          if 'devicons/devicon@2.16.0/devicon.min.css' not in text:
+              if anchor not in text:
+                  raise SystemExit('Font Awesome anchor not found')
+              text = text.replace(anchor, anchor + devicon, 1)
+
+          replacements = {
+              '<span class="skill-glyph" aria-hidden="true">Py</span>': '<i class="devicon-python-plain colored" aria-hidden="true"></i>',
+              '<span class="skill-glyph" aria-hidden="true">C</span>': '<i class="devicon-c-plain colored" aria-hidden="true"></i>',
+              '<span class="skill-glyph" aria-hidden="true">Jv</span>': '<i class="devicon-java-plain colored" aria-hidden="true"></i>',
+              '<span class="skill-glyph" aria-hidden="true">JS</span>': '<i class="devicon-javascript-plain colored" aria-hidden="true"></i>',
+              '<span class="skill-glyph" aria-hidden="true">Pr</span>': '<i class="devicon-processing-plain colored" aria-hidden="true"></i>',
+              '<span class="skill-glyph" aria-hidden="true">ML</span>': '<i class="devicon-scikitlearn-plain colored" aria-hidden="true"></i>',
+              '<span class="skill-glyph" aria-hidden="true">Re</span>': '<i class="devicon-react-original colored" aria-hidden="true"></i>',
+              '<span class="skill-glyph" aria-hidden="true">Fl</span>': '<i class="devicon-flask-original colored" aria-hidden="true"></i>',
+              '<span class="skill-glyph" aria-hidden="true">DB</span>': '<i class="devicon-sqlite-plain colored" aria-hidden="true"></i>',
+              '<span class="skill-glyph" aria-hidden="true">Ft</span>': '<i class="devicon-flutter-plain colored" aria-hidden="true"></i>',
+              '<span class="skill-glyph" aria-hidden="true">Fg</span>': '<i class="devicon-figma-plain colored" aria-hidden="true"></i>',
+              '<span class="skill-glyph" aria-hidden="true">Ar</span>': '<i class="devicon-arduino-plain colored" aria-hidden="true"></i>',
+              '<span class="skill-glyph" aria-hidden="true">Nt</span>': '<i class="devicon-notion-plain colored" aria-hidden="true"></i>',
+          }
+          for old, new in replacements.items():
+              if old not in text and new not in text:
+                  raise SystemExit(f'skill icon placeholder not found: {old}')
+              text = text.replace(old, new)
+          if 'skill-glyph' in text:
+              raise SystemExit('skill-glyph placeholders remain in index.html')
+          path.write_text(text, encoding='utf-8')
+          PY
+          git add index.html
+          git commit -m 'fix: restore Devicon logos in skills section'
+
+      - name: Static verification
+        run: |
+          node --check build.js
+          node --check script.js
+          node --check detail.js
+          node --check assets/project-demos.js
+          node tools/verify-build.js
+          node tools/verify-media-metadata.js
+          node build.js
+          git diff --exit-code
+          grep -q 'class="plink plink-github plink-notice"' index.html
+          grep -q 'data-notice-ko="배포 준비 중"' index.html
+          grep -q 'devicon-python-plain colored' index.html
+          if grep -q 'skill-glyph' index.html; then exit 1; fi
+
+      - name: Browser verification
+        run: |
+          mkdir -p /tmp/browser-qa artifacts
+          cd /tmp/browser-qa
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null
+          cd "$GITHUB_WORKSPACE"
+          python3 -m http.server 4173 >/tmp/portfolio-http.log 2>&1 &
+          echo $! >/tmp/portfolio-http.pid
+          sleep 2
+          NODE_PATH=/tmp/browser-qa/node_modules node <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          (async () => {
+            const browser = await chromium.launch();
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
+            page.on('pageerror', err => errors.push(err.message));
+            await page.goto('http://127.0.0.1:4173/index.html', { waitUntil: 'networkidle' });
+
+            const glyphCount = await page.locator('#skills .skill-glyph').count();
+            if (glyphCount !== 0) throw new Error(`skill-glyph placeholders remain: ${glyphCount}`);
+            const icons = page.locator('#skills [class*="devicon-"]');
+            const iconCount = await icons.count();
+            if (iconCount < 13) throw new Error(`expected >=13 Devicon icons, got ${iconCount}`);
+            await page.waitForFunction(() => {
+              const icons = [...document.querySelectorAll('#skills [class*="devicon-"]')];
+              return icons.length >= 13 && icons.every((el) => {
+                const content = getComputedStyle(el, '::before').content;
+                return content && content !== 'none' && content !== 'normal' && content !== '""';
+              });
+            }, null, { timeout: 12000 });
+            await page.locator('#skills').screenshot({ path: 'artifacts/skills-1440.png' });
+
+            const kga = page.locator('.project-card', { hasText: '코리아텍 통합 알림 시스템' }).first();
+            const notice = kga.locator('.plink-notice');
+            if (await notice.count() !== 1) throw new Error('KGA Discord notice button missing');
+            const before = page.url();
+            await notice.click();
+            const toast = page.locator('.site-toast.show');
+            await toast.waitFor({ state: 'visible' });
+            if ((await toast.textContent()).trim() !== '배포 준비 중') throw new Error('Korean notice text mismatch');
+            if (page.url() !== before) throw new Error('notice button unexpectedly navigated');
+            await kga.screenshot({ path: 'artifacts/kga-card-1440.png' });
+
+            await page.evaluate(() => localStorage.setItem('lang', 'en'));
+            await page.reload({ waitUntil: 'networkidle' });
+            const kgaEn = page.locator('.project-card', { hasText: 'KOREATECH Unified Alert System' }).first();
+            await kgaEn.locator('.plink-notice').click();
+            const toastEn = page.locator('.site-toast.show');
+            await toastEn.waitFor({ state: 'visible' });
+            if ((await toastEn.textContent()).trim() !== 'Deployment in preparation') throw new Error('English notice text mismatch');
+
+            if (errors.length) throw new Error(`browser errors: ${errors.join(' | ')}`);
+            fs.writeFileSync('artifacts/browser-report.txt', `devicons=${iconCount}\nnotice=ko/en ok\nconsoleErrors=0\n`);
+            await browser.close();
+          })().catch((error) => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
+          kill $(cat /tmp/portfolio-http.pid) || true
+
+      - name: Push verified commits to PR branch
+        run: git push origin HEAD:Codex/add-project-media-12
+
+      - name: Upload QA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: issues-234-236-qa
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 3
