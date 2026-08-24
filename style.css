@@ -3031,7 +3031,6 @@ html {
 .reveal-enabled [data-aos="fade-left"] { transform:translateX(14px); }
 .reveal-enabled [data-aos="fade-right"] { transform:translateX(-14px); }
 .reveal-enabled [data-aos].is-revealed { opacity:1; transform:none; }
-.skill-glyph { display:inline-flex; align-items:center; justify-content:center; width:1.55em; height:1.55em; margin-right:.38em; border:1px solid var(--line); border-radius:5px; font-family:"Space Mono",monospace; font-size:.72em; font-weight:700; color:var(--accent); background:var(--paper); vertical-align:middle; }
 @supports (content-visibility:auto) {
   .year-group { content-visibility:auto; contain-intrinsic-size:auto 900px; }
   .detail-main > .detail-section { content-visibility:auto; contain-intrinsic-size:auto 520px; }
@@ -3212,3 +3211,33 @@ html {
   .reveal-enabled [data-aos],.wall-water-level,.wall-barrier-model,.ucast-pedestrian,.berry-student-card { opacity:1; transform:none; transition:none; }
   .wall-alert-lights span,.plantclock-device.has-alert span,.plantclock-device.fan-on .plant-fan { animation:none; }
 }
+
+/* Project link notice toast (#234) */
+.site-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 2100;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--card);
+  box-shadow: var(--shadow-lift);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.site-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-toast { transition: none; }
+}
+
