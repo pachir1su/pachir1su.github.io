@@ -1,0 +1,27 @@
+name: QA 239 target rebase runner
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/qa239-rebase-runner.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  rebase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout implementation branch
+        uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa239-fixes-theme240
+          fetch-depth: 0
+
+      - name: Rebase onto latest main
+        run: |
+          git config user.name ChatGPT
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main
+          git rebase origin/main
+          git push --force-with-lease origin HEAD:chatgpt/qa239-fixes-theme240
