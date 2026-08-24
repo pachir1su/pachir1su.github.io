@@ -547,8 +547,8 @@
             "ko": "2024 위드 AI 코딩 페스티벌 피지컬 컴퓨팅 분야 출품작"
           },
           "role": {
-            "en": "Project Development",
-            "ko": "프로젝트 개발"
+            "en": "Team Member · 2-person Team",
+            "ko": "팀원 · 2인 팀"
           },
           "descHtml": {
             "en": "Built with mBlock, a Gorilla Cell, and Arduino<br />Counts people with a button and pauses incoming traffic with a red signal at roughly 20 people",
