@@ -287,10 +287,12 @@
     const inputRow = create('div', 'berry-input-row');
     const input = create('input', 'berry-id-input');
     input.type = 'text';
+    input.id = 'berry-fictional-id';
     input.inputMode = 'numeric';
-    input.maxLength = 10;
-    input.placeholder = '2025-0004';
-    input.setAttribute('aria-label', translate('가상 학생 번호', 'Fictional student ID'));
+    input.maxLength = 4;
+    input.placeholder = '0004';
+    input.setAttribute('aria-label', translate('가상 학생 번호 4자리', 'Four-digit fictional student ID'));
+    label.htmlFor = input.id;
     const submitButton = createButton('직접 출석', 'Manual check-in');
     inputRow.append(input, submitButton);
     const resetButton = createButton('출석 기록 초기화', 'Clear attendance', 'demo-action demo-action-secondary');
@@ -299,7 +301,7 @@
 
     const workbench = create('div', 'berry-workbench');
     const cards = create('div', 'berry-card-stack');
-    const cardIds = ['2025-0001', '2025-0002', '2025-0003'];
+    const cardIds = ['DEMO-0001', 'DEMO-0002', 'DEMO-0003'];
     const cardElements = [];
     cardIds.forEach((id, index) => {
       const card = create('button', 'berry-student-card');
@@ -328,11 +330,11 @@
     const attendance = new Set();
     let selectedId = '';
 
-    // Formats a typed number into the same harmless demo-ID shape.
+    // Converts exactly four typed digits into an explicit demo-only namespace.
     function normalizeId(value) {
-      const digits = value.replace(/\D/g, '').slice(0, 8);
-      if (digits.length < 4) return '';
-      return digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits;
+      const digits = value.replace(/\D/g, '').slice(-4);
+      if (digits.length !== 4) return '';
+      return `DEMO-${digits}`;
     }
 
     // Repaints the attendance dashboard without storing or transmitting data.
@@ -350,7 +352,7 @@
     // Records one fictional ID and rejects duplicate scans.
     function checkIn(id, methodKo, methodEn) {
       if (!id) {
-        setText(status, '가상 학생 번호를 네 자리 이상 입력하세요.', 'Enter at least four digits for a fictional ID.');
+        setText(status, '가상 학생 번호 4자리를 입력하세요.', 'Enter four digits for a fictional ID.');
         status.classList.add('is-error');
         return;
       }
