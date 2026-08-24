@@ -1677,8 +1677,398 @@
     });
   }
 
+  /* ------------------------------------------------------------------
+     페이지 4 — 성장 별자리 (#59)
+
+     프로젝트 연도 축과 섞지 않는 독립된 별자리다. #114 3차 지시대로
+     "일반적인 성장형 개발자 문구"를 쓰지 않고, 이 저장소에서 확인되는
+     사건만 별로 만든다. 각 사건의 근거는 아래 source에 적어 둔다.
+
+     연결 진행은 정해진 순서를 지키되(#114 2차 승인), 열람은 어느 별에서나
+     가능하다. 이을 때마다 GitHub Rank가 한 단계 오른다 — 사건 7개를 잇는
+     선은 6개이고 C→A의 단계 변화도 정확히 6번이라 등급이 장식이 아니라
+     사건의 결과가 된다.
+     ------------------------------------------------------------------ */
+
+  const GROWTH_EVENTS = [
+    { when:'2024', title:'처음 팀을 맡다',
+      fact:'비밀번호 도어락 — 팀장 · 4인 팀. 저장소에 기록된 첫 팀 리드.',
+      source:'projects.json · Master_Creator_Challenge.role' },
+    { when:'2024', title:'전국 8위',
+      fact:'2024 SFPC — 581팀 / 1,661명 중 전체 8위(Top 1.3%).',
+      source:'index.html 수상 섹션 · 2024 SFPC' },
+    { when:'2024', title:'대회에서 두 번 부름을 받다',
+      fact:'디지털새싹 AI 어벤져스상(산불 조기 감지) · 천안 학생 로봇 대회 동상(졸음 방지).',
+      source:'index.html 수상 섹션 · 2건' },
+    { when:'2025', title:'가장 큰 팀',
+      fact:'NFC 출석 체크 시스템 — 팀장 · 6인 팀. 저장소에 기록된 최대 규모.',
+      source:'projects.json · BerryIno.role' },
+    { when:'2025', title:'실패를 지우지 않다',
+      fact:'InfoCatch · InvestAI · 건영운세를 삭제하지 않고 실패 그룹으로 남김.',
+      source:'projects.json · failed 그룹' },
+    { when:'2026', title:'혼자 끝까지',
+      fact:'코리아텍 통합 알림 시스템 · MultiMind · GitHub Rank Insight — 기획부터 배포까지 1인 개발.',
+      source:'projects.json · role "1인 개발"' },
+    { when:'2026', title:'가르치는 쪽으로',
+      fact:'2026 U-CAST — 5팀 멘토, 로컬임팩트상.',
+      source:'projects.json · 2026_U-CAST.role + 수상 섹션' },
+  ];
+
+  /* #114가 지정한 실제 상승 궤적. 사건 사이의 선 6개와 단계 변화 6번이 맞물린다. */
+  const GITHUB_RANKS = ['C', 'C+', 'B-', 'B', 'B+', 'A-', 'A'];
+
+  /* 성도 좌표. 화면군마다 따로 둔다 — 넓은 화면은 오른쪽 위로 오르는
+     지그재그, 좁은 화면은 위에서 아래로 번갈아 읽는 세로 지그재그다. */
+  /* 라벨이 뻗는 방향은 좌표의 x값으로 추정하지 않고 성도마다 직접 지정한다.
+     추정에 맡겼더니 넓은 화면에서 이웃한 두 사건의 라벨이 같은 쪽으로 뻗어
+     클릭 영역이 겹쳤다(폴드 내부 673x841, 노트북 1440x900에서 4·5번). 방향을
+     명시하면 이웃끼리 서로 반대로 벌어져 그 결함군 자체가 사라진다. */
+  const GROWTH_LAYOUT = {
+    /* 실제 북두칠성 좌표(위 DIPPER.pts)를 그대로 쓴다. 사건이 정확히 7개라
+       국자 4점 + 손잡이 3점 구조와 맞아떨어진다. 지그재그로 인위적으로
+       흩는 대신 이미 이 시안이 쓰는 별자리 형태를 재사용해 "진짜 별자리처럼
+       보이지 않는다"는 문제를 근본적으로 없앤다.
+       가로가 넓은 화면은 원본 그대로, 세로가 긴 화면은 국자가 세워져 보이도록
+       78도 회전한 좌표를 쓴다 — 북두칠성은 실제로 계절·시간에 따라 하늘에서
+       기울어져 보이므로 이 변형은 임의 장식이 아니라 그 현상을 반영한다. */
+    /* 첫 점을 v2 복귀 메모지(left 7%/top 22%, 좁은 화면 6%/12.5%) 영역
+       바깥으로 밀고, 인접한 0·2번이 국자 곡률 때문에 서로 붙던 것도
+       y 여유를 넓혀 피했다. */
+    /* 라벨 방향은 화면 가장자리로 나가지 않도록 각 점의 실제 x위치가
+       화면 절반의 어느 쪽인지로 정한다. 이전 값은 팔 구조(왼팔/오른팔)를
+       가정하고 고정 배열을 그대로 복붙한 것이라, 왼쪽에 있는 점에 'left'가
+       붙어 라벨이 화면 밖으로 잘리는 경우가 있었다(모바일 2·4번). */
+    wide:   { pts:[[.150,.615],[.291,.476],[.420,.580],[.549,.424],[.740,.180],[.920,.511],[.706,.840]],
+              sides:['right','right','right','left','left','left','left'], scale:1 },
+    tablet: { pts:[[.205,.240],[.364,.348],[.320,.471],[.490,.568],[.750,.710],[.537,.900],[.200,.747]],
+              sides:['right','right','right','right','left','left','right'], scale:.86 },
+    mobile: { pts:[[.185,.260],[.365,.368],[.316,.491],[.506,.588],[.800,.730],[.560,.920],[.180,.767]],
+              sides:['right','right','right','left','left','left','right'], scale:.76 },
+    fold:   { pts:[[.176,.270],[.364,.380],[.312,.505],[.512,.603],[.820,.747],[.569,.940],[.170,.785]],
+              sides:['right','right','right','left','left','left','right'], scale:.70 },
+  };
+
+  function growthLayout() {
+    const w = window.innerWidth;
+    if (w <= 390) return GROWTH_LAYOUT.fold;
+    if (w <= 640) return GROWTH_LAYOUT.mobile;
+    if (w <= 1200 || window.matchMedia('(max-aspect-ratio: 4/3)').matches) return GROWTH_LAYOUT.tablet;
+    return GROWTH_LAYOUT.wide;
+  }
+
+  /* MUS-01 — #114 8차에서 6초로 확정된 구조를 그대로 합성한다.
+     6차 판정("종/패드는 좋은데 화음은 왜 넣냐")대로 마무리 화음은 없고
+     종 → 패드 두 요소로만 끝난다. 오프라인 WAV는 11초판만 저장소에 있어
+     확정된 6초는 여기서 합성한다. 조건을 만족하기 전에는 호출되지 않는다. */
+  let growthMusicCtx = null;
+  let growthMusicGain = null;
+  function playGrowthMusic() {
+    if (prefersReduced()) return false;
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return false;
+      if (!growthMusicCtx) growthMusicCtx = new Ctx();
+      const ctx = growthMusicCtx;
+      if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+      const at = ctx.currentTime + 0.02;
+
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0.0001, at);
+      master.gain.exponentialRampToValueAtTime(0.9, at + 0.15);
+      master.gain.setValueAtTime(0.9, at + 5.3);
+      master.gain.exponentialRampToValueAtTime(0.0001, at + 6.0);
+      master.connect(ctx.destination);
+      growthMusicGain = master;
+
+      /* 종 — 흩어져 있던 사건이 하나씩 자리를 찾는 네 음. */
+      const bells = [[0, 523.25], [0.62, 659.25], [1.28, 783.99], [2.05, 1046.50]];
+      for (const [t, hz] of bells) {
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(hz, at + t);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, at + t);
+        g.gain.exponentialRampToValueAtTime(0.16, at + t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + t + 1.9);
+        osc.connect(g).connect(master);
+        osc.start(at + t); osc.stop(at + t + 2.0);
+      }
+
+      /* 패드 — 종이 다 울린 뒤 별자리가 완성된 자리를 채우고 사라진다. */
+      const pad = ctx.createOscillator();
+      pad.type = 'triangle';
+      pad.frequency.setValueAtTime(261.63, at + 1.6);
+      const padGain = ctx.createGain();
+      padGain.gain.setValueAtTime(0.0001, at + 1.6);
+      padGain.gain.exponentialRampToValueAtTime(0.075, at + 3.2);
+      padGain.gain.exponentialRampToValueAtTime(0.0001, at + 5.9);
+      pad.connect(padGain).connect(master);
+      pad.start(at + 1.6); pad.stop(at + 6.0);
+      return true;
+    } catch (err) {
+      /* 오디오 실패는 화면 동작을 막지 않는다. */
+      return false;
+    }
+  }
+  function stopGrowthMusic() {
+    if (!growthMusicCtx || !growthMusicGain) return;
+    try {
+      const now = growthMusicCtx.currentTime;
+      growthMusicGain.gain.cancelScheduledValues(now);
+      growthMusicGain.gain.setValueAtTime(Math.max(0.0001, growthMusicGain.gain.value), now);
+      growthMusicGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+    } catch (err) { /* 이미 끝난 컨텍스트는 무시한다. */ }
+  }
+
+  function initGrowth() {
+    const stage = document.querySelector('[data-stage]');
+    const canvas = stage && stage.querySelector('canvas');
+    const field = document.querySelector('[data-growth-field]');
+    const rankBox = document.querySelector('[data-growth-rank]');
+    const rankValue = document.querySelector('[data-growth-rank-value]');
+    const muteBtn = document.querySelector('[data-growth-mute]');
+    if (!stage || !canvas || !field || !rankBox || !rankValue || !muteBtn) return;
+
+    /* CSS의 무대 높이 분기가 다른 페이지와 섞이지 않게 표시해 둔다. */
+    stage.dataset.pageStage = 'growth';
+
+    const theme = () => (window.matchMedia('(prefers-color-scheme: dark)').matches ? PALETTE.dark : PALETTE.light);
+
+    let layout = growthLayout();
+    let linked = 0;                 /* 이어진 선의 개수 (0~6) */
+    let drawProgress = 1;           /* 지금 그려지는 선의 진행도 0~1 */
+    let dragFrom = -1;              /* 드래그 시작 별. -1이면 드래그 중이 아니다. */
+    let dragPoint = null;           /* 드래그 중 커서 좌표(px) */
+    let completed = false;
+    let sky = null;                 /* 성운 하늘 캐시 */
+    let frame = 0;
+    const nodes = [];
+
+    /* ---- 별 만들기 -------------------------------------------------- */
+    GROWTH_EVENTS.forEach((event, index) => {
+      const node = document.createElement('button');
+      node.type = 'button';
+      node.className = 'growth-node';
+      node.dataset.growthIndex = String(index);
+      node.setAttribute('aria-expanded', 'false');
+
+      const dot = document.createElement('span');
+      dot.className = 'growth-dot';
+      dot.setAttribute('aria-hidden', 'true');
+
+      const text = document.createElement('span');
+      text.className = 'growth-text';
+      const when = document.createElement('span');
+      when.className = 'growth-when';
+      when.textContent = event.when;
+      const title = document.createElement('span');
+      title.className = 'growth-title';
+      title.textContent = event.title;
+      const fact = document.createElement('span');
+      fact.className = 'growth-fact';
+      fact.textContent = event.fact;
+      text.append(when, title, fact);
+      node.append(dot, text);
+      field.append(node);
+      nodes.push(node);
+    });
+
+    /* ---- 상태 반영 --------------------------------------------------- */
+    function syncState() {
+      nodes.forEach((node, index) => {
+        node.dataset.reached = String(index <= linked);
+        node.dataset.next = String(index === linked + 1 && !completed);
+      });
+      rankValue.textContent = GITHUB_RANKS[Math.min(linked, GITHUB_RANKS.length - 1)];
+      rankBox.style.setProperty('--growth-progress', `${(linked / (GITHUB_RANKS.length - 1)) * 100}%`);
+      rankBox.dataset.complete = String(completed);
+    }
+
+    function place() {
+      layout = growthLayout();
+      nodes.forEach((node, index) => {
+        const [x, y] = layout.pts[index];
+        node.style.left = `${x * 100}%`;
+        node.style.top = `${y * 100}%`;
+        /* 성도가 지정한 방향을 쓰고, 없으면 화면 안쪽으로 접는다. */
+        node.dataset.side = (layout.sides && layout.sides[index]) || (x > .58 ? 'left' : 'right');
+      });
+    }
+
+    /* ---- 캔버스 ------------------------------------------------------ */
+    function paint() {
+      const size = sizeCanvas(canvas);
+      if (!size) return;
+      const { c, w, h } = size;
+      const T = theme();
+      const S = Math.min(w, h);
+
+      /* 성운 하늘은 크기가 바뀔 때만 다시 그려 캐시에 둔다. box를 넘기지 않아
+         북두칠성 층은 건너뛴다 — 성장 별을 따로 그리기 때문이다. */
+      if (!sky || sky.w !== w || sky.h !== h || sky.mode !== T.mode) {
+        const off = document.createElement('canvas');
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        off.width = w * dpr; off.height = h * dpr;
+        const oc = off.getContext('2d');
+        oc.setTransform(dpr, 0, 0, dpr, 0, 0);
+        paintSky(oc, w, h, T, null, layout.scale, 'growth');
+        sky = { canvas: off, w, h, mode: T.mode };
+      }
+      c.drawImage(sky.canvas, 0, 0, w, h);
+
+      const P = layout.pts.map(([x, y]) => [x * w, y * h]);
+
+      /* 이어진 선 — 낡은 금빛 실선 하나만 쓴다. */
+      c.save();
+      c.lineCap = 'round';
+      c.strokeStyle = rgba(T.gold, T.mode === 'light' ? .58 : .66);
+      c.lineWidth = Math.max(1, S * .0018);
+      for (let i = 0; i < linked; i++) {
+        const isDrawing = i === linked - 1 && drawProgress < 1;
+        const k = isDrawing ? drawProgress : 1;
+        c.beginPath();
+        c.moveTo(P[i][0], P[i][1]);
+        c.lineTo(lerp(P[i][0], P[i + 1][0], k), lerp(P[i][1], P[i + 1][1], k));
+        c.stroke();
+      }
+      /* 드래그 중에는 선이 커서를 따라온다. */
+      if (dragFrom >= 0 && dragPoint) {
+        c.globalAlpha = .55;
+        c.setLineDash([S * .006, S * .008]);
+        c.beginPath();
+        c.moveTo(P[dragFrom][0], P[dragFrom][1]);
+        c.lineTo(dragPoint.x, dragPoint.y);
+        c.stroke();
+        c.setLineDash([]);
+        c.globalAlpha = 1;
+      }
+      c.restore();
+
+      /* 별 — 이어진 별은 금빛, 아직 닿지 않은 별은 조용한 잉크색이다. */
+      P.forEach(([x, y], i) => {
+        const reached = i <= linked;
+        star(c, x, y, S * (reached ? .0036 : .0026) * layout.scale,
+          reached ? T.gold : T.ink,
+          T.mode === 'light' ? (reached ? .86 : .52) : (reached ? .95 : .58),
+          S * (reached ? .026 : .016) * layout.scale,
+          T.mode === 'light' ? .40 : .16, T);
+      });
+    }
+
+    /* 선이 그려지는 동안에만 프레임을 돈다. 다 그리면 루프가 멈춘다 —
+       #113이 지적한 상시 rAF를 새 화면에서 되살리지 않는다. */
+    function animate() {
+      drawProgress = Math.min(1, drawProgress + 1 / 42);
+      paint();
+      if (drawProgress < 1) frame = requestAnimationFrame(animate);
+      else frame = 0;
+    }
+
+    function runDrawing() {
+      cancelAnimationFrame(frame);
+      if (prefersReduced()) { drawProgress = 1; paint(); return; }
+      drawProgress = 0;
+      frame = requestAnimationFrame(animate);
+    }
+
+    /* ---- 연결 --------------------------------------------------------- */
+    function connectTo(index) {
+      if (completed || index !== linked + 1) return false;
+      linked += 1;
+      syncState();
+      runDrawing();
+      playRotatingSfx('select');
+      if (linked === GROWTH_EVENTS.length - 1) finish();
+      return true;
+    }
+
+    /* 완성. 조건도 결과도 미리 알리지 않았으므로, 여기서 처음으로
+       소리가 나고 그 뒤에만 끄는 버튼이 나타난다. */
+    function finish() {
+      completed = true;
+      syncState();
+      if (playGrowthMusic()) {
+        muteBtn.hidden = false;
+        window.setTimeout(() => { muteBtn.hidden = true; }, 6200);
+      }
+    }
+
+    function expand(index) {
+      nodes.forEach((node, i) => node.setAttribute('aria-expanded', String(i === index)));
+    }
+
+    function pointFrom(event) {
+      const box = canvas.getBoundingClientRect();
+      return { x: event.clientX - box.left, y: event.clientY - box.top };
+    }
+
+    function nearestIndex(point) {
+      const box = canvas.getBoundingClientRect();
+      const hit = Math.max(44, Math.min(box.width, box.height) * .06);
+      let best = -1, bestDist = hit;
+      layout.pts.forEach(([x, y], i) => {
+        const dx = x * box.width - point.x, dy = y * box.height - point.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < bestDist) { bestDist = dist; best = i; }
+      });
+      return best;
+    }
+
+    /* ---- 입력 --------------------------------------------------------- */
+    nodes.forEach((node, index) => {
+      /* 어느 별이든 눌러 읽을 수 있다. 연결 진행만 순서를 지킨다. */
+      node.addEventListener('click', () => {
+        expand(index);
+        connectTo(index);
+      });
+
+      /* 현재 별에서 다음 별까지 끌어서 잇는다. 터치도 같은 경로를 쓴다. */
+      node.addEventListener('pointerdown', (event) => {
+        if (completed || index !== linked) return;
+        dragFrom = index;
+        dragPoint = pointFrom(event);
+        node.setPointerCapture(event.pointerId);
+        paint();
+      });
+      node.addEventListener('pointermove', (event) => {
+        if (dragFrom < 0) return;
+        dragPoint = pointFrom(event);
+        paint();
+      });
+      const endDrag = (event) => {
+        if (dragFrom < 0) return;
+        const target = nearestIndex(pointFrom(event));
+        dragFrom = -1; dragPoint = null;
+        if (target >= 0 && connectTo(target)) expand(target);
+        else paint();
+      };
+      node.addEventListener('pointerup', endDrag);
+      node.addEventListener('pointercancel', () => { dragFrom = -1; dragPoint = null; paint(); });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') expand(-1);
+    });
+
+    muteBtn.addEventListener('click', () => {
+      stopGrowthMusic();
+      muteBtn.hidden = true;
+    });
+
+    /* ---- 시작 --------------------------------------------------------- */
+    place();
+    syncState();
+    paint();
+    observe([stage], () => { place(); sky = null; paint(); });
+    const scheme = window.matchMedia('(prefers-color-scheme: dark)');
+    const onScheme = () => { sky = null; paint(); };
+    if (typeof scheme.addEventListener === 'function') scheme.addEventListener('change', onScheme);
+    else if (typeof scheme.addListener === 'function') scheme.addListener(onScheme);
+  }
+
   const page = document.body.dataset.page;
   if (page === 'nebula-keyvisual') initKeyvisual();
   if (page === 'nebula-transit') initTransit();
   if (page === 'nebula-gateway') initGateway();
+  if (page === 'nebula-growth') initGrowth();
 })();

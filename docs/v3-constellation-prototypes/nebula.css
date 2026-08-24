@@ -353,3 +353,139 @@ footer b { color:var(--ink); font-weight:500; }
   .gate-veil { transition:opacity .2s ease; clip-path:none; }
   .gate-burst { display:none; }
 }
+
+/* =====================================================================
+   성장 별자리 (#59)
+
+   프로젝트 연도 축과 섞지 않는 독립된 별자리다. 사건 일곱 개를 순서대로
+   이으면 GitHub Rank 궤적이 C에서 A까지 여섯 단계 올라간다.
+   연결 진행만 순서를 지키고, 열람은 어느 별에서나 가능하다(#114 2차 승인).
+   해금 조건과 그 결과는 화면에서 예고하지 않는다.
+   ===================================================================== */
+
+/* GitHub Rank 궤적 — #59가 요청한 실제 기록이므로 장식이 아니라 본문이다.
+   화면에 흩뿌리는 시스템 라벨을 늘리지 않도록 읽을 곳은 여기 하나뿐이다. */
+.growth-rank {
+  position:absolute; right:7%; top:9%; z-index:2;
+  display:flex; flex-direction:column; align-items:flex-end; gap:4px; pointer-events:none;
+}
+.growth-rank i {
+  font-style:normal; color:var(--f-subtle); font-family:var(--mono);
+  font-size:clamp(8px,.82vw,10px); letter-spacing:.28em;
+}
+.growth-rank b {
+  color:var(--f-ink); font-weight:200; font-size:clamp(26px,3.4vw,46px);
+  letter-spacing:-.03em; line-height:1; font-variant-numeric:tabular-nums;
+  text-shadow:var(--f-shadow); transition:color .5s ease;
+}
+.growth-rank[data-complete="true"] b { color:var(--f-gold); }
+/* 여섯 칸짜리 눈금. 채워진 칸이 지금까지 이은 사건 수다. */
+.growth-rank-track {
+  display:block; width:clamp(72px,9vw,124px); height:2px; margin-top:5px;
+  background:linear-gradient(to right, var(--f-gold) 0 var(--growth-progress,0%), transparent var(--growth-progress,0%));
+  border-bottom:1px solid var(--line);
+  transition:background .55s cubic-bezier(.2,.8,.2,1);
+}
+
+.growth-field { position:absolute; inset:0; z-index:2; }
+
+/* 사건 하나. 이름은 언제나 보이고, 설명은 눌렀을 때만 펼쳐진다 —
+   전환 화면의 sky-body와 같은 정보 원칙을 그대로 쓴다. */
+.growth-node {
+  --dot:40px;
+  position:absolute; display:flex; width:fit-content; align-items:flex-start; gap:8px;
+  min-height:44px; max-width:min(34vw,300px); padding:0; border:0; background:none;
+  color:var(--f-muted); font-family:inherit; text-align:left; cursor:pointer;
+  /* 세로 스와이프는 페이지 스크롤로 흘려보내고 가로 성분이 있는 드래그만
+     연결에 쓴다. 모바일·폴드 성도가 좌우 지그재그라 다음 별로 끄는 동작은
+     원래 가로가 크다. 무대 위에서 손가락이 묶이는 회귀를 만들지 않는다. */
+  touch-action:pan-y;
+}
+/* 세로 기준은 박스 중앙이 아니라 별점 중앙이다. -50%로 잡으면 사건 카드가
+   펼쳐질 때 커진 박스가 다시 가운데로 정렬되면서 별점이 캔버스가 그린 별에서
+   떨어져 나가고(최대 약 55px), 위쪽 요소와도 겹친다. 별점 높이의 절반만
+   올리면 카드가 아래로만 자라고 별은 제자리에 남는다. */
+.growth-node[data-side="right"] { transform:translate(calc(var(--dot) / -2), calc(var(--dot) / -2)); }
+.growth-node[data-side="left"]  { transform:translate(calc(-100% + var(--dot) / 2), calc(var(--dot) / -2));
+                                  flex-direction:row-reverse; text-align:right; }
+.growth-node[data-side="left"] .growth-text { align-items:flex-end; }
+
+/* 캔버스가 그린 별이 이 자리에 온다. 최소 터치 영역을 여기서 확보한다. */
+.growth-dot { display:block; flex:none; width:var(--dot); height:var(--dot); }
+
+.growth-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-width:0; padding-top:3px; }
+.growth-when {
+  color:var(--f-subtle); font-family:var(--mono); font-size:clamp(8.5px,.78vw,10px);
+  letter-spacing:.2em; text-shadow:var(--f-shadow);
+}
+.growth-title {
+  font-weight:300; font-size:clamp(11px,1.02vw,14px); line-height:1.4; letter-spacing:-.01em;
+  color:var(--f-ink); text-shadow:var(--f-shadow); white-space:nowrap;
+  /* 한국어는 어절 단위로 끊는다. anywhere로 두면 "전국 8/위", "혼자/끝까/지"처럼
+     단어 중간이 갈라져 한 글자만 남는 줄이 생긴다. */
+  word-break:keep-all;
+}
+.growth-fact {
+  max-height:0; overflow:hidden; opacity:0;
+  font-weight:300; font-size:clamp(10px,.88vw,12px); line-height:1.55;
+  color:var(--f-muted); text-shadow:var(--f-shadow); word-break:keep-all;
+  transition:max-height .3s ease, opacity .25s ease;
+}
+.growth-node:not([aria-expanded="true"]) .growth-fact { display:none; }
+.growth-node[aria-expanded="true"] { z-index:5; }
+.growth-node[aria-expanded="true"] .growth-fact { max-height:8em; opacity:1; margin-top:4px; }
+
+.growth-node:hover .growth-title,
+.growth-node:focus-visible .growth-title { color:var(--f-gold); }
+.growth-node:focus-visible { outline:1px solid var(--f-gold); outline-offset:4px; }
+
+/* 아직 닿지 않은 사건은 한 단계 조용하다. 이어진 사건은 이름이 또렷해진다. */
+.growth-node[data-reached="false"] .growth-title { color:var(--f-muted); }
+.growth-node[data-reached="true"] .growth-title { color:var(--f-ink); }
+/* 다음에 이어야 할 별. 글자로 지시하지 않고 밝기로만 알린다. */
+.growth-node[data-next="true"] .growth-title { color:var(--f-ink); }
+
+/* 실제 재생이 시작된 뒤에만 나타난다. 그 전에는 자리도 차지하지 않는다. */
+.growth-mute {
+  position:absolute; right:7%; bottom:9%; z-index:6;
+  padding:9px 15px; border:1px solid var(--line); background:var(--surface);
+  color:var(--ink); font-family:inherit; font-size:12px; cursor:pointer;
+  transition:border-color .25s ease, color .25s ease;
+}
+.growth-mute:hover, .growth-mute:focus-visible { border-color:var(--f-gold); color:var(--f-gold); }
+.growth-mute[hidden] { display:none; }
+
+@media (min-width:641px) and (max-width:1200px), (min-width:641px) and (max-aspect-ratio:4/3) {
+  /* 코드의 tablet 성도와 같은 조건. 등급 읽는 자리를 위로 올려
+     별자리 상단과 클릭 영역이 만나지 않게 한다. */
+  .stage[data-page-stage="growth"] { min-height:1000px; }
+  .growth-rank { right:6%; top:6%; }
+  .orbit-back-note { left:6%; top:13%; }
+  .growth-node { max-width:min(26vw,240px); }
+  .growth-title { font-size:clamp(11px,1.45vw,13px); }
+  .growth-fact { font-size:clamp(10px,1.25vw,11.5px); }
+}
+
+@media (max-width:640px) {
+  /* 모바일은 좌우 번갈아 읽는 지그재그 성도를 쓴다. 세로 간격이
+     44px 터치 영역보다 항상 크도록 무대를 길게 잡는다. */
+  .stage[data-page-stage="growth"] { height:max(100svh,1280px); min-height:1280px; }
+  .growth-rank { right:6%; top:3%; }
+  .growth-rank b { font-size:clamp(24px,7vw,32px); }
+  .growth-node { --dot:44px; max-width:46vw; gap:7px; }
+  .growth-title { font-size:clamp(11px,3vw,12.5px); line-height:1.32;
+                  white-space:normal; overflow-wrap:break-word; }
+  .growth-fact { font-size:clamp(10px,2.6vw,11.5px); }
+  .growth-mute { right:auto; left:6%; bottom:4%; }
+}
+
+@media (max-width:390px) {
+  /* 접힌 폴드는 사건 제목이 두 줄이 되는 경우가 많아 한 단계 더 벌린다. */
+  .stage[data-page-stage="growth"] { height:max(100svh,1420px); min-height:1420px; }
+  .growth-node { max-width:52vw; }
+  .growth-title { font-size:11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .growth-fact, .growth-rank b, .growth-rank-track, .growth-mute { transition:none; }
+}
