@@ -70,6 +70,18 @@ function renderCard(card, kind) {
     );
   }
   for (const link of card.links || []) {
+    if (link.action === "notice") {
+      const messageKo = link.message?.ko || "준비 중";
+      const messageEn = link.message?.en || "Coming soon";
+      lines.push(
+        `                  <button type="button" class="plink plink-github plink-notice" title="${esc(
+          link.title
+        )}" aria-label="${esc(link.title)}: ${esc(messageKo)}" data-notice-ko="${esc(
+          messageKo
+        )}" data-notice-en="${esc(messageEn)}"><i class="${link.icon}"></i></button>`
+      );
+      continue;
+    }
     lines.push(
       `                  <a href="${link.href}" target="_blank" rel="noopener noreferrer" class="plink plink-github" title="${esc(
         link.title
