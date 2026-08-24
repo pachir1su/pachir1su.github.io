@@ -1,0 +1,108 @@
+name: Post 233 Live QA
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  live-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Wait for GitHub Pages to serve merged markers
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://pachir1su.github.io/?post233qa=${GITHUB_RUN_ID}"
+          for attempt in $(seq 1 30); do
+            html="$(curl -fsSL -H 'Cache-Control: no-cache' "$url" || true)"
+            if grep -Fq 'data-notice-ko="배포 준비 중"' <<<"$html" \
+              && grep -Fq 'devicon-python-plain colored' <<<"$html" \
+              && ! grep -Fq 'skill-glyph' <<<"$html"; then
+              printf '%s' "$html" > /tmp/live-index.html
+              echo "Live deployment markers found on attempt $attempt"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo 'GitHub Pages did not expose the merged markers within the QA window.' >&2
+          exit 1
+
+      - name: Install Playwright
+        run: |
+          mkdir -p /tmp/liveqa artifacts
+          cd /tmp/liveqa
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Verify live interactions and icons
+        env:
+          NODE_PATH: /tmp/liveqa/node_modules
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          (async () => {
+            const browser = await chromium.launch();
+            const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+            const errors = [];
+            page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+            page.on('pageerror', e => errors.push(e.message));
+            const live = `https://pachir1su.github.io/?post233qa=${Date.now()}`;
+            await page.goto(live, { waitUntil: 'networkidle' });
+
+            const glyphCount = await page.locator('#skills .skill-glyph').count();
+            if (glyphCount !== 0) throw new Error(`placeholder skill glyphs remain: ${glyphCount}`);
+            const icons = page.locator('#skills [class*="devicon-"]');
+            const iconCount = await icons.count();
+            if (iconCount < 13) throw new Error(`expected at least 13 Devicon elements, got ${iconCount}`);
+            await page.waitForFunction(() => {
+              const els = [...document.querySelectorAll('#skills [class*="devicon-"]')];
+              return els.length >= 13 && els.every(el => {
+                const c = getComputedStyle(el, '::before').content;
+                return c && c !== 'none' && c !== 'normal' && c !== '""';
+              });
+            }, null, { timeout: 15000 });
+            await page.locator('#skills').screenshot({ path: 'artifacts/live-skills.png' });
+
+            const kga = page.locator('.project-card', { hasText: '코리아텍 통합 알림 시스템' }).first();
+            const notice = kga.locator('.plink-notice');
+            if (await notice.count() !== 1) throw new Error('KGA Discord notice button missing');
+            const before = page.url();
+            await notice.click();
+            const toast = page.locator('.site-toast.show');
+            await toast.waitFor({ state: 'visible' });
+            if ((await toast.textContent()).trim() !== '배포 준비 중') throw new Error('Korean toast mismatch');
+            if (page.url() !== before) throw new Error('Discord notice navigated unexpectedly');
+            await kga.screenshot({ path: 'artifacts/live-kga-card.png' });
+
+            await page.evaluate(() => localStorage.setItem('lang', 'en'));
+            await page.reload({ waitUntil: 'networkidle' });
+            const kgaEn = page.locator('.project-card', { hasText: 'KOREATECH Unified Alert System' }).first();
+            await kgaEn.locator('.plink-notice').click();
+            const toastEn = page.locator('.site-toast.show');
+            await toastEn.waitFor({ state: 'visible' });
+            if ((await toastEn.textContent()).trim() !== 'Deployment in preparation') throw new Error('English toast mismatch');
+
+            if (errors.length) throw new Error(`live console/page errors: ${errors.join(' | ')}`);
+            fs.writeFileSync('artifacts/live-report.txt', `devicons=${iconCount}\nplaceholders=0\nnotice=ko/en ok\nconsoleErrors=0\n`);
+            await browser.close();
+          })().catch(err => { console.error(err); process.exit(1); });
+          NODE
+
+      - name: Upload live QA evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-233-live-qa
+          path: artifacts/
+          retention-days: 3
