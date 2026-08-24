@@ -51,13 +51,13 @@
     return root;
   }
 
-  // Recreates the Wall_Sina Arduino sequence from the public source repository.
+  // Recreates the Wall_Sina warning flow with the user-reviewed physical orientation.
   function wallDemo(root) {
     prepare(
       root,
       'wall-device-demo',
-      '원본 장치처럼 시스템을 켠 뒤 수위 센서에 물을 감지시키세요. 실제 110초 경고 흐름은 짧게 압축됩니다.',
-      'Power on the system, then trigger the water sensor. The original 110-second warning sequence is compressed.'
+      '왼쪽 해수면이 천천히 차오른 뒤 장벽이 올라가 도시 유입을 막고, 배수가 끝난 뒤에만 장벽이 내려갑니다.',
+      'The sea level rises slowly on the left; the barrier protects the city and lowers only after drainage finishes.'
     );
 
     const layout = create('div', 'hardware-demo-layout wall-layout');
@@ -65,7 +65,7 @@
     const controlTitle = create('strong', 'hardware-panel-title');
     setText(controlTitle, '해안 장벽 제어반', 'Coastal barrier controls');
     const powerButton = createButton('시스템 켜기', 'Power on');
-    const detectButton = createButton('수위 센서에 물 감지', 'Trigger water sensor');
+    const detectButton = createButton('해수면 상승 감지', 'Detect rising water');
     const resetButton = createButton('처음 상태로', 'Reset', 'demo-action demo-action-secondary');
     const status = createStatus('시스템이 꺼져 있습니다.', 'The system is powered off.');
     controls.append(controlTitle, powerButton, detectButton, resetButton, status);
@@ -87,12 +87,12 @@
     controller.append(operation, traffic, display, alertLights, buzzer);
 
     const tank = create('div', 'wall-tank');
-    const city = create('div', 'wall-city');
-    city.append(create('span'), create('span'), create('span'));
+    const water = create('span', 'wall-water-level');
     const sensor = create('span', 'wall-water-sensor');
     const barrier = create('span', 'wall-barrier-model');
-    const water = create('span', 'wall-water-level');
-    tank.append(city, sensor, barrier, water);
+    const city = create('div', 'wall-city');
+    city.append(create('span'), create('span'), create('span'));
+    tank.append(water, sensor, barrier, city);
     rig.append(controller, tank);
     layout.append(controls, rig);
     root.append(layout);
@@ -101,63 +101,67 @@
     let running = false;
     let sequenceId = 0;
 
-    // Applies one traffic-light phase and mirrors its countdown display.
     function setPhase(phase, value) {
       rig.dataset.phase = phase;
       display.textContent = String(value).padStart(4, '0');
     }
 
-    // Returns every indicator and mechanical part to the source-code idle state.
     function resetDevice(keepPower = false) {
       sequenceId += 1;
       running = false;
       powered = keepPower && powered;
       rig.classList.toggle('is-powered', powered);
-      rig.classList.remove('water-detected', 'barrier-raised', 'barrier-lowering', 'buzzer-on');
+      rig.classList.remove('water-detected', 'water-draining', 'barrier-raised', 'barrier-lowering', 'buzzer-on');
       rig.dataset.phase = 'off';
       display.textContent = powered ? '0000' : '----';
       detectButton.disabled = !powered;
       setText(powerButton, powered ? '시스템 끄기' : '시스템 켜기', powered ? 'Power off' : 'Power on');
-      setText(status, powered ? '시스템 ON · 수위 감지 대기' : '시스템이 꺼져 있습니다.', powered ? 'System ON · waiting for water' : 'The system is powered off.');
+      setText(status, powered ? '시스템 ON · 해수면 감지 대기' : '시스템이 꺼져 있습니다.', powered ? 'System ON · monitoring sea level' : 'The system is powered off.');
     }
 
-    // Runs the five real warning stages on an intentionally compressed timeline.
     async function runWaterSequence() {
       if (!powered || running) return;
       running = true;
       const currentSequence = ++sequenceId;
       detectButton.disabled = true;
-      rig.classList.add('water-detected', 'barrier-raised', 'buzzer-on');
+      rig.classList.add('water-detected');
       setPhase('green', 27);
-      setText(status, '물 감지 · 초록 신호 · 모터 정회전 · 장벽 상승', 'Water detected · green · motor forward · barrier rising');
-      await wait(850);
+      setText(status, '해수면 상승 감지 · 왼쪽 수위 상승 중', 'Rising sea detected · water level increasing on the left');
+      await wait(1450);
+      if (sequenceId !== currentSequence) return;
+
+      rig.classList.add('barrier-raised', 'buzzer-on');
+      setText(status, '장벽 상승 · 도시 방향 유입 차단', 'Barrier rising · protecting the city side');
+      await wait(900);
       if (sequenceId !== currentSequence) return;
 
       rig.classList.remove('buzzer-on');
       setPhase('yellow', 20);
-      setText(status, '주의 단계 · 노란 신호 · 모터 정지', 'Caution · yellow signal · motor stopped');
-      await wait(650);
-      if (sequenceId !== currentSequence) return;
-
-      setPhase('yellow-flash', 23);
-      setText(status, '노란 신호와 보조 경고등 점멸', 'Yellow signal and auxiliary warning lights flashing');
-      await wait(650);
+      setText(status, '주의 단계 · 장벽 유지', 'Caution · barrier remains raised');
+      await wait(750);
       if (sequenceId !== currentSequence) return;
 
       setPhase('danger-flash', 20);
-      setText(status, '위험 단계 · 빨강과 노랑 교차 경고', 'Danger · red and yellow alternating');
-      await wait(650);
+      setText(status, '위험 단계 · 장벽 유지 · 배수 대기', 'Danger · barrier held · waiting to drain');
+      await wait(750);
       if (sequenceId !== currentSequence) return;
 
-      rig.classList.add('barrier-lowering');
+      rig.classList.remove('water-detected');
+      rig.classList.add('water-draining');
       setPhase('red', 20);
-      setText(status, '복구 단계 · 빨간 신호 · 모터 역회전', 'Recovery · red signal · motor reversing');
-      await wait(850);
+      setText(status, '배수 중 · 장벽은 계속 올라간 상태', 'Draining · barrier stays fully raised');
+      await wait(1450);
       if (sequenceId !== currentSequence) return;
 
-      rig.classList.remove('barrier-raised', 'barrier-lowering', 'water-detected');
+      rig.classList.remove('water-draining');
+      rig.classList.add('barrier-lowering');
+      setText(status, '배수 완료 · 장벽 하강', 'Drainage complete · lowering barrier');
+      await wait(900);
+      if (sequenceId !== currentSequence) return;
+
+      rig.classList.remove('barrier-raised', 'barrier-lowering');
       setPhase('cycle', 110);
-      setText(status, '장벽 복귀 완료 · 신호등 순환 상태', 'Barrier restored · signal cycle active');
+      setText(status, '장벽 복귀 완료 · 감시 상태', 'Barrier restored · monitoring active');
       running = false;
       detectButton.disabled = false;
     }
@@ -175,47 +179,49 @@
     resetDevice(false);
   }
 
-  // Builds two independent U-CAST channels that can be triggered in any order.
+  // Builds two independent U-CAST channels with forward and reverse crossing.
   function ucastDemo(root) {
     prepare(
       root,
       'ucast-device-demo',
-      '보행자를 각 구간에 진입시켜 보세요. 두 채널은 서로 독립적으로 경고하고, 끝 센서를 지나면 해당 구간만 꺼집니다.',
-      'Send pedestrians into either zone. Each channel warns independently and clears at its own exit sensor.'
+      '각 채널에서 정방향·역방향 횡단을 모두 시험할 수 있습니다. 어느 쪽 센서에서 시작해도 해당 채널만 경고하고 반대편 센서를 지나면 해제됩니다.',
+      'Test either direction on each channel. Entering from either sensor triggers only that channel and clears at the opposite sensor.'
     );
 
     const layout = create('div', 'hardware-demo-layout ucast-layout');
     const controls = create('div', 'hardware-control-panel');
     const controlTitle = create('strong', 'hardware-panel-title');
-    setText(controlTitle, '보행자 투입', 'Pedestrian controls');
-    const channelButtons = [
-      createButton('보행자 A · 1구간 진입', 'Pedestrian A · enter zone 1'),
-      createButton('보행자 B · 2구간 진입', 'Pedestrian B · enter zone 2')
+    setText(controlTitle, '보행자 횡단', 'Pedestrian crossing');
+    const configs = [
+      { channel: 0, reverse: false, ko: 'CH-1 정방향', en: 'CH-1 forward' },
+      { channel: 0, reverse: true, ko: 'CH-1 역방향', en: 'CH-1 reverse' },
+      { channel: 1, reverse: false, ko: 'CH-2 정방향', en: 'CH-2 forward' },
+      { channel: 1, reverse: true, ko: 'CH-2 역방향', en: 'CH-2 reverse' }
     ];
+    const channelButtons = configs.map((config) => createButton(config.ko, config.en));
     const resetButton = createButton('모든 구간 초기화', 'Reset all zones', 'demo-action demo-action-secondary');
     const status = createStatus('두 구간 모두 대기 중입니다.', 'Both zones are standing by.');
     controls.append(controlTitle, ...channelButtons, resetButton, status);
 
     const road = create('div', 'ucast-road');
     const driverWarning = create('div', 'ucast-driver-warning');
-    setText(driverWarning, '운전자 경고 OFF', 'Driver warning OFF');
+    setText(driverWarning, '보행자 없음', 'No pedestrian');
     road.append(driverWarning);
     const channels = [];
 
-    // Creates one independently animated road-safety channel.
     for (let index = 0; index < 2; index += 1) {
       const lane = create('div', 'ucast-channel');
       lane.dataset.channel = String(index + 1);
       const label = create('strong');
-      label.textContent = `CH ${index + 1}`;
+      label.textContent = `CH-${index + 1}`;
       const startSensor = create('span', 'ucast-sensor ucast-sensor-start');
-      const endSensor = create('span', 'ucast-sensor ucast-sensor-end');
       const strip = create('span', 'ucast-neopixel');
+      const endSensor = create('span', 'ucast-sensor ucast-sensor-end');
       const pedestrian = create('span', 'ucast-pedestrian');
       pedestrian.textContent = '●';
       const state = create('span', 'ucast-state');
       setText(state, '대기', 'Standby');
-      lane.append(label, startSensor, strip, pedestrian, endSensor, state);
+      lane.append(label, startSensor, strip, endSensor, state, pedestrian);
       road.append(lane);
       channels.push({ lane, pedestrian, state, version: 0 });
     }
@@ -223,47 +229,58 @@
     layout.append(controls, road);
     root.append(layout);
 
-    // Updates the shared driver warning based on active channel count.
+    function setChannelDisabled(index, disabled) {
+      configs.forEach((config, buttonIndex) => {
+        if (config.channel === index) channelButtons[buttonIndex].disabled = disabled;
+      });
+    }
+
     function updateWarning() {
       const activeCount = channels.filter(({ lane }) => lane.classList.contains('is-active')).length;
       road.classList.toggle('has-warning', activeCount > 0);
       setText(
         driverWarning,
-        activeCount ? `운전자 경고 ON · ${activeCount}개 구간` : '운전자 경고 OFF',
-        activeCount ? `Driver warning ON · ${activeCount} zone${activeCount > 1 ? 's' : ''}` : 'Driver warning OFF'
+        activeCount ? `보행자 횡단 중 · ${activeCount}개 구간` : '보행자 없음',
+        activeCount ? `Pedestrian crossing · ${activeCount} zone${activeCount > 1 ? 's' : ''}` : 'No pedestrian'
       );
     }
 
-    // Moves one pedestrian through its start and end sensors.
-    async function runChannel(index) {
+    async function runChannel(index, reverse) {
       const channel = channels[index];
       const currentVersion = ++channel.version;
-      channelButtons[index].disabled = true;
+      setChannelDisabled(index, true);
+      channel.lane.classList.toggle('is-reverse', reverse);
       channel.lane.classList.add('is-active', 'is-entering');
-      setText(channel.state, '경고', 'Warning');
-      setText(status, `CH ${index + 1} 시작 IR 감지`, `CH ${index + 1} start IR detected`);
+      setText(channel.state, reverse ? '역방향 경고' : '정방향 경고', reverse ? 'Reverse warning' : 'Forward warning');
+      setText(
+        status,
+        `CH-${index + 1} ${reverse ? '오른쪽' : '왼쪽'} 진입 센서 감지`,
+        `CH-${index + 1} ${reverse ? 'right' : 'left'} entry sensor detected`
+      );
       updateWarning();
       await wait(1000);
       if (channel.version !== currentVersion) return;
       channel.lane.classList.remove('is-entering');
       channel.lane.classList.add('is-exiting');
-      setText(status, `CH ${index + 1} 끝 IR 접근`, `CH ${index + 1} approaching exit sensor`);
-      await wait(650);
+      setText(status, `CH-${index + 1} 반대편 센서 접근`, `CH-${index + 1} approaching opposite sensor`);
+      await wait(700);
       if (channel.version !== currentVersion) return;
-      channel.lane.classList.remove('is-active', 'is-exiting');
+      channel.lane.classList.remove('is-active', 'is-exiting', 'is-reverse');
       setText(channel.state, '대기', 'Standby');
-      channelButtons[index].disabled = false;
+      setChannelDisabled(index, false);
       updateWarning();
-      setText(status, `CH ${index + 1} 통과 완료`, `CH ${index + 1} cleared`);
+      setText(status, `CH-${index + 1} 횡단 완료`, `CH-${index + 1} crossing complete`);
     }
 
-    channelButtons.forEach((button, index) => button.addEventListener('click', () => runChannel(index)));
+    configs.forEach((config, buttonIndex) => {
+      channelButtons[buttonIndex].addEventListener('click', () => runChannel(config.channel, config.reverse));
+    });
     resetButton.addEventListener('click', () => {
       channels.forEach((channel, index) => {
         channel.version += 1;
-        channel.lane.classList.remove('is-active', 'is-entering', 'is-exiting');
+        channel.lane.classList.remove('is-active', 'is-entering', 'is-exiting', 'is-reverse');
         setText(channel.state, '대기', 'Standby');
-        channelButtons[index].disabled = false;
+        setChannelDisabled(index, false);
       });
       updateWarning();
       setText(status, '두 구간 모두 초기화했습니다.', 'Both zones were reset.');
@@ -327,7 +344,7 @@
     layout.append(controls, workbench);
     root.append(layout);
 
-    const attendance = new Set();
+    const attendance = new Map();
     let selectedId = '';
 
     // Converts exactly four typed digits into an explicit demo-only namespace.
@@ -341,9 +358,15 @@
     function renderAttendance() {
       count.textContent = translate(`${attendance.size}명 출석`, `${attendance.size} checked in`);
       list.replaceChildren();
-      [...attendance].slice(-4).reverse().forEach((id) => {
+      [...attendance.entries()].slice(-4).reverse().forEach(([id, checkedAt]) => {
         const item = create('li');
-        item.textContent = `${id} · ${translate('출석 완료', 'Checked in')}`;
+        const date = checkedAt.toLocaleDateString(language() === 'en' ? 'en-CA' : 'ko-KR', {
+          year: 'numeric', month: '2-digit', day: '2-digit'
+        });
+        const time = checkedAt.toLocaleTimeString(language() === 'en' ? 'en-GB' : 'ko-KR', {
+          hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+        });
+        item.textContent = `${id} · ${date} ${time} · ${translate('출석 완료', 'Checked in')}`;
         list.append(item);
       });
       cardElements.forEach((card) => card.classList.toggle('is-checked', attendance.has(card.dataset.studentId)));
@@ -363,7 +386,7 @@
         window.setTimeout(() => reader.classList.remove('is-duplicate'), 500);
         return;
       }
-      attendance.add(id);
+      attendance.set(id, new Date());
       renderAttendance();
       setText(status, `${id} · ${methodKo} 출석 완료`, `${id} · checked in by ${methodEn}`);
       reader.classList.add('is-success');
@@ -413,13 +436,13 @@
     renderAttendance();
   }
 
-  // Recreates PlantClock's timer, watering button, fan lever, LCD and alert devices.
+  // Recreates PlantClock from the public Arduino source: RTC/FND, live soil reading, lever-controlled fan and RGB state.
   function plantDemo(root) {
     prepare(
       root,
       'plant-device-demo',
-      '시간을 보내 30분 급수 알림을 확인하고, 실제 장치처럼 급수 버튼과 팬 레버를 조작해 보세요.',
-      'Advance time to trigger the 30-minute reminder, then use the watering button and fan lever.'
+      '원본 코드처럼 급수 시각·경과 시간·토양 습도를 표시하고, 레버로 팬을 켜면 RGB 상태 LED가 빨강에서 초록으로 바뀝니다.',
+      'Like the source device, this shows watering time, elapsed time and soil moisture; the fan lever changes its RGB state from red to green.'
     );
 
     const layout = create('div', 'hardware-demo-layout plant-layout');
@@ -427,8 +450,8 @@
     const controlTitle = create('strong', 'hardware-panel-title');
     setText(controlTitle, 'PlantClock 조작부', 'PlantClock controls');
     const timeButton = createButton('시간 +10분', 'Advance +10 min');
-    const waterButton = createButton('급수 기록', 'Log watering');
-    const fanButton = createButton('팬 켜기', 'Turn fan on');
+    const waterButton = createButton('급수 버튼', 'Watering button');
+    const fanButton = createButton('팬 레버 ON', 'Fan lever ON');
     const resetButton = createButton('처음 상태로', 'Reset', 'demo-action demo-action-secondary');
     const status = createStatus('마지막 급수 후 0분 · 알림 없음', '0 minutes since watering · no alert');
     controls.append(controlTitle, timeButton, waterButton, fanButton, resetButton, status);
@@ -448,8 +471,14 @@
     const alertLed = create('span', 'plant-alert-led');
     const vibration = create('span', 'plant-vibration');
     const buzzer = create('span', 'plant-buzzer');
-    const fan = create('span', 'plant-fan');
-    indicators.append(alertLed, vibration, buzzer, fan);
+    const fanUnit = create('div', 'plant-fan-unit');
+    const fanLed = create('span', 'plant-fan-led');
+    const fanRotor = create('span', 'plant-fan-rotor');
+    fanRotor.textContent = '✣';
+    const fanLabel = create('small', 'plant-fan-label');
+    fanLabel.textContent = 'FAN';
+    fanUnit.append(fanLed, fanRotor, fanLabel);
+    indicators.append(alertLed, vibration, buzzer, fanUnit);
     device.append(plant, lcd, displays, indicators);
     layout.append(controls, device);
     root.append(layout);
@@ -458,39 +487,40 @@
     let clockMinutes = 9 * 60;
     let lastWaterMinutes = clockMinutes;
     let fanOn = false;
+    let soilValue = 612;
 
-    // Converts minute counts to the four-digit display format used by the device.
     function formatTime(totalMinutes) {
       const hours = Math.floor(totalMinutes / 60) % 24;
       const minutes = totalMinutes % 60;
       return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
     }
 
-    // Updates both displays and all physical indicators from current state.
     function renderPlantClock() {
       const alertActive = elapsedMinutes >= 30;
       device.classList.toggle('has-alert', alertActive);
       device.classList.toggle('fan-on', fanOn);
-      soilLine.textContent = 'Soil: 612';
+      soilLine.textContent = `Soil: ${soilValue}`;
       timeLine.textContent = `Time: ${formatTime(clockMinutes)}`;
       lastWater.innerHTML = `<small>${translate('마지막 급수', 'Last water')}</small><strong>${formatTime(lastWaterMinutes)}</strong>`;
       elapsed.innerHTML = `<small>${translate('경과 시간', 'Elapsed')}</small><strong>${elapsedMinutes}</strong>`;
-      setText(fanButton, fanOn ? '팬 끄기' : '팬 켜기', fanOn ? 'Turn fan off' : 'Turn fan on');
+      setText(fanButton, fanOn ? '팬 레버 OFF' : '팬 레버 ON', fanOn ? 'Fan lever OFF' : 'Fan lever ON');
       setText(
         status,
-        alertActive ? `${elapsedMinutes}분 경과 · LED·진동·부저 알림` : `마지막 급수 후 ${elapsedMinutes}분 · 알림 없음`,
-        alertActive ? `${elapsedMinutes} min · LED, vibration and buzzer alert` : `${elapsedMinutes} min since watering · no alert`
+        alertActive ? `${elapsedMinutes}분 경과 · LED·진동·부저 알림` : `마지막 급수 후 ${elapsedMinutes}분 · 토양 ${soilValue} · 알림 없음`,
+        alertActive ? `${elapsedMinutes} min · LED, vibration and buzzer alert` : `${elapsedMinutes} min since watering · soil ${soilValue} · no alert`
       );
     }
 
     timeButton.addEventListener('click', () => {
       elapsedMinutes += 10;
       clockMinutes += 10;
+      soilValue = Math.max(260, soilValue - 18);
       renderPlantClock();
     });
     waterButton.addEventListener('click', () => {
       lastWaterMinutes = clockMinutes;
       elapsedMinutes = 0;
+      soilValue = Math.min(900, soilValue + 165);
       renderPlantClock();
       setText(status, '급수 시각을 기록하고 알림을 해제했습니다.', 'Watering time saved and alert cleared.');
     });
@@ -503,6 +533,7 @@
       clockMinutes = 9 * 60;
       lastWaterMinutes = clockMinutes;
       fanOn = false;
+      soilValue = 612;
       renderPlantClock();
     });
     renderPlantClock();
@@ -535,9 +566,7 @@
     const counterLabel = create('span');
     setText(counterLabel, '현재 입장 인원', 'Current entries');
     counter.append(counterNumber, counterLabel);
-    const power = create('div', 'signal-gorilla-cell');
-    power.innerHTML = '<span aria-hidden="true">▰</span><strong>GORILLA CELL</strong>';
-    device.append(tower, counter, power);
+    device.append(tower, counter);
     layout.append(controls, device);
     root.append(layout);
 
@@ -591,12 +620,92 @@
     renderSignal();
   }
 
+  // Password door-lock demo based on pachir1su/Master_Creator_Challenge/main.ino.
+  function doorlockDemo(root) {
+    prepare(
+      root,
+      'doorlock-device-demo',
+      '원본 코드의 4×4 키패드·6자리 비밀번호(123456)·LCD·서보 잠금·성공/실패 신호를 로컬 데모로 재현합니다.',
+      'A local demo of the source 4×4 keypad, six-digit password (123456), LCD, servo lock and success/failure signals.'
+    );
+
+    const layout = create('div', 'hardware-demo-layout doorlock-layout');
+    const controls = create('div', 'hardware-control-panel');
+    const controlTitle = create('strong', 'hardware-panel-title');
+    setText(controlTitle, '4×4 키패드', '4×4 keypad');
+    const keypad = create('div', 'doorlock-keypad');
+    const status = createStatus('비밀번호를 입력하세요.', 'Enter the password.');
+    controls.append(controlTitle, keypad, status);
+
+    const rig = create('div', 'doorlock-rig');
+    const lcd = create('div', 'doorlock-lcd');
+    const door = create('div', 'doorlock-door');
+    const bolt = create('span', 'doorlock-bolt');
+    door.append(bolt);
+    const lights = create('div', 'doorlock-lights');
+    const red = create('span', 'doorlock-lamp doorlock-red');
+    const green = create('span', 'doorlock-lamp doorlock-green');
+    lights.append(red, green);
+    rig.append(lcd, door, lights);
+    layout.append(controls, rig);
+    root.append(layout);
+
+    const password = '123456';
+    let input = '';
+    let locked = true;
+
+    function render(messageKo = '', messageEn = '') {
+      rig.classList.toggle('is-unlocked', !locked);
+      lcd.innerHTML = `<strong>${locked ? 'LOCKED' : 'OPEN'}</strong><br>${input ? `Password: ${input}` : 'Enter Password:'}`;
+      if (messageKo || messageEn) setText(status, messageKo, messageEn);
+    }
+
+    function clearInput() {
+      input = '';
+      render('입력을 초기화했습니다.', 'Input cleared.');
+    }
+    function unlock() {
+      locked = false; input = '';
+      render('Access Granted · 서보 90° · 초록 신호', 'Access Granted · servo 90° · green signal');
+    }
+    function lock() {
+      locked = true; input = '';
+      render('Door Locked · 서보 0° · 빨간 신호', 'Door Locked · servo 0° · red signal');
+    }
+    function alarm() {
+      locked = true; input = '';
+      rig.classList.add('is-alarm');
+      render('Access Denied · 경보음 및 빨간 신호', 'Access Denied · alarm and red signal');
+      window.setTimeout(() => rig.classList.remove('is-alarm'), 1300);
+    }
+
+    [['1','2','3','A'],['4','5','6','B'],['7','8','9','C'],['*','0','#','D']].flat().forEach((key) => {
+      const button = create('button', 'doorlock-key');
+      button.type = 'button';
+      button.textContent = key;
+      button.addEventListener('click', () => {
+        if (key === '#') {
+          if (input === password) unlock(); else alarm();
+          return;
+        }
+        if (key === '*') { clearInput(); return; }
+        if (key === 'C' && !locked) { lock(); return; }
+        input += key;
+        render('키 입력 · #으로 확인', 'Key entered · press # to confirm');
+      });
+      keypad.append(button);
+    });
+    render();
+  }
+
+
   const demos = {
     wall: wallDemo,
     ucast: ucastDemo,
     berry: berryDemo,
     plant: plantDemo,
-    signal: signalCounterDemo
+    signal: signalCounterDemo,
+    doorlock: doorlockDemo
   };
 
   // Initializes only demos explicitly declared by their project pages.
