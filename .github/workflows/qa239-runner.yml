@@ -4,13 +4,13 @@ on:
   pull_request:
     paths:
       - '.github/workflows/qa239-runner.yml'
-      - '.github/scripts/qa239_apply*'
 
 permissions:
   contents: write
 
 jobs:
-  apply:
+  restore:
+    if: github.event.pull_request.head.ref == 'chatgpt/qa239-runner'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout runner payload
@@ -25,13 +25,43 @@ jobs:
           path: target
           fetch-depth: 0
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      - name: Restore QA screenshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          out='target/projects/Legend_SakSak_GongGam_AI/assets/images'
+          mkdir -p "$out"
+          base64 -d runner/.github/payload/qa239-images/empathy.b64 > "$out/empathy-chat.webp"
+          base64 -d runner/.github/payload/qa239-images/dark.b64 > "$out/recipe-dark.webp"
+          cat runner/.github/payload/qa239-images/light.0.b64 runner/.github/payload/qa239-images/light.1.b64 | base64 -d > "$out/recipe-light.webp"
+          echo 'e768685cdadd33964ddace3a94272436df456ed223396ebb072795cf8a1f311d  target/projects/Legend_SakSak_GongGam_AI/assets/images/empathy-chat.webp' | sha256sum -c -
+          echo '51c24cbb2ecf8879fdf823e9d412a083bb872d84cfe4938890050bbfa97dcb26  target/projects/Legend_SakSak_GongGam_AI/assets/images/recipe-dark.webp' | sha256sum -c -
+          echo '119b80fc764ee1f48da63ac1eaec7b04590f77f1f2d578cbb5b339f82575a7b0  target/projects/Legend_SakSak_GongGam_AI/assets/images/recipe-light.webp' | sha256sum -c -
+          page='target/projects/Legend_SakSak_GongGam_AI/index.html'
+          sed -i 's/width="1415" height="910"/width="1000" height="643"/' "$page"
+          sed -i 's/width="1440" height="896"/width="1000" height="622"/' "$page"
+          sed -i 's/width="1438" height="908"/width="1000" height="631"/' "$page"
 
-      - name: Apply QA 239 and issue 240 changes
-        run: python runner/.github/scripts/qa239_apply_loader.py target
+      - name: Static QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd target
+          node --check build.js
+          node --check script.js
+          node --check detail.js
+          node --check assets/project-demos.js
+          node tools/verify-build.js
+          node tools/verify-media-metadata.js
 
-      - name: Push implementation branch
-        run: git -C target push origin HEAD:chatgpt/qa239-fixes-theme240
+      - name: Commit and push screenshots
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C target config user.name 'ChatGPT'
+          git -C target config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C target add projects/Legend_SakSak_GongGam_AI/index.html projects/Legend_SakSak_GongGam_AI/assets/images/empathy-chat.webp projects/Legend_SakSak_GongGam_AI/assets/images/recipe-dark.webp projects/Legend_SakSak_GongGam_AI/assets/images/recipe-light.webp
+          if ! git -C target diff --cached --quiet; then
+            git -C target commit -m 'feat: add GongGam and recipe QA screenshots'
+            git -C target push origin HEAD:chatgpt/qa239-fixes-theme240
+          fi
