@@ -4,64 +4,42 @@ on:
   pull_request:
     paths:
       - '.github/workflows/qa239-runner.yml'
-      - '.github/scripts/qa239_browser.mjs'
 
 permissions:
   contents: read
 
 jobs:
-  browser-qa:
+  crop-preview:
     if: github.event.pull_request.head.ref == 'chatgpt/qa239-runner'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout runner scripts
-        uses: actions/checkout@v4
-        with:
-          path: runner
-
       - name: Checkout target implementation branch
         uses: actions/checkout@v4
         with:
           ref: chatgpt/qa239-fixes-theme240
           path: target
 
-      - name: Install Playwright Chromium
+      - name: Build crop candidates
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p /tmp/qa239-browser
-          cd /tmp/qa239-browser
-          npm init -y >/dev/null 2>&1
-          npm install --no-save playwright@1.55.0
-          npx playwright install --with-deps chromium
+          python3 -m pip install --user pillow >/dev/null
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          src = Path('target/projects/meal_queue_signal_counter/assets/images/festival-venue.webp')
+          out = Path('crop-preview')
+          out.mkdir(exist_ok=True)
+          im = Image.open(src).convert('RGB')
+          im.save(out / 'original.webp', 'WEBP', quality=92)
+          for keep in (0.85, 0.80, 0.75):
+              crop = im.crop((0, 0, round(im.width * keep), im.height))
+              crop.save(out / f'keep-{int(keep*100)}.webp', 'WEBP', quality=92)
+          print('source', im.size)
+          PY
 
-      - name: Start local site
-        shell: bash
-        run: |
-          cd target
-          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/qa239-http.log 2>&1 &
-          echo $! >/tmp/qa239-http.pid
-          for i in {1..30}; do
-            curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
-            sleep 1
-          done
-          cat /tmp/qa239-http.log
-          exit 1
-
-      - name: Browser QA
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p qa-artifacts
-          cp runner/.github/scripts/qa239_browser.mjs /tmp/qa239-browser/qa239_browser.mjs
-          cd /tmp/qa239-browser
-          node qa239_browser.mjs
-          cp -R qa-artifacts/* "$GITHUB_WORKSPACE/qa-artifacts/"
-
-      - name: Upload QA artifact
-        if: always()
+      - name: Upload crop candidates
         uses: actions/upload-artifact@v4
         with:
-          name: qa239-browser
-          path: qa-artifacts
-          if-no-files-found: warn
+          name: qa239-cafeteria-crop-preview
+          path: crop-preview
