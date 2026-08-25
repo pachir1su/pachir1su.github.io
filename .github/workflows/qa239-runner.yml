@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  final-apply:
+  final-review-fix:
     if: github.event.pull_request.head.ref == 'chatgpt/qa239-runner'
     runs-on: ubuntu-latest
     steps:
@@ -26,33 +26,27 @@ jobs:
           path: target
           fetch-depth: 0
 
-      - name: Crop cafeteria venue photo
+      - name: Remove duplicate CSS crop
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m pip install --user pillow >/dev/null
           python3 - <<'PY'
           from pathlib import Path
-          from PIL import Image
 
-          src = Path('target/projects/meal_queue_signal_counter/assets/images/festival-venue.webp')
           page = Path('target/projects/meal_queue_signal_counter/index.html')
-          im = Image.open(src).convert('RGB')
-          if im.size == (1050, 1400):
-              im = im.crop((0, 0, 892, 1400))
-              im.save(src, 'WEBP', quality=92)
-          elif im.size != (892, 1400):
-              raise SystemExit(f'unexpected festival image size: {im.size}')
+          css = Path('target/style.css')
 
           text = page.read_text(encoding='utf-8')
-          old = '<img src="assets/images/festival-venue.webp" width="1050" height="1400"'
-          new = '<img src="assets/images/festival-venue.webp" width="892" height="1400"'
-          if old in text:
-              text = text.replace(old, new, 1)
-          elif new not in text:
-              raise SystemExit('festival image markup not found')
+          text = text.replace('<figure class="detail-figure media-crop-right">', '<figure class="detail-figure">', 1)
+          if 'media-crop-right' in text:
+              raise SystemExit('meal page still contains media-crop-right')
           page.write_text(text, encoding='utf-8')
-          print('festival-venue.webp', Image.open(src).size)
+
+          styles = css.read_text(encoding='utf-8')
+          styles = styles.replace('.detail-figure.media-crop-right { overflow: hidden; }\n.detail-figure.media-crop-right img { width: 124%; max-width: none; }\n', '')
+          if 'media-crop-right' in styles:
+              raise SystemExit('style.css still contains media-crop-right')
+          css.write_text(styles, encoding='utf-8')
           PY
 
       - name: Static QA
@@ -66,6 +60,7 @@ jobs:
           node --check assets/project-demos.js
           node tools/verify-build.js
           node tools/verify-media-metadata.js
+          ! grep -R "media-crop-right" projects/meal_queue_signal_counter/index.html style.css
 
       - name: Install Playwright Chromium
         shell: bash
@@ -100,22 +95,22 @@ jobs:
           node qa239_browser.mjs
           cp -R qa-artifacts/* "$GITHUB_WORKSPACE/qa-artifacts/"
 
-      - name: Commit and push final crop
+      - name: Commit and push review fix
         shell: bash
         run: |
           set -euo pipefail
           git -C target config user.name 'ChatGPT'
           git -C target config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git -C target add projects/meal_queue_signal_counter/assets/images/festival-venue.webp projects/meal_queue_signal_counter/index.html
+          git -C target add style.css projects/meal_queue_signal_counter/index.html
           if ! git -C target diff --cached --quiet; then
-            git -C target commit -m 'fix: crop cafeteria venue photo for privacy'
+            git -C target commit -m 'fix: avoid double cropping cafeteria venue photo'
             git -C target push origin HEAD:chatgpt/qa239-fixes-theme240
           fi
 
-      - name: Upload final QA artifact
+      - name: Upload QA artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: qa239-final-browser
+          name: qa239-final-review
           path: qa-artifacts
           if-no-files-found: warn
