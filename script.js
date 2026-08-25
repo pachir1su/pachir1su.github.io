@@ -387,38 +387,18 @@ window._updateProjectCount();
 })();
 
 /* ------------------------------------------------------------- */
-/* 16. Theme                                                     */
+/* 16. Theme — follows OS setting only (#240)                    */
 /* ------------------------------------------------------------- */
 (function initTheme() {
-  const desktop = document.getElementById('themeToggle');
-  const mobile = document.getElementById('themeToggleMobile');
-  const desktopIcon = document.getElementById('themeIcon');
-  const mobileIcon = document.getElementById('themeIconMobile');
-  const mobileLabel = document.querySelector('.theme-label-mobile');
+  const scheme = window.matchMedia('(prefers-color-scheme: dark)');
 
-  function preferred() {
-    return localStorage.getItem('theme')
-      || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  function applySystemTheme() {
+    document.documentElement.dataset.theme = scheme.matches ? 'dark' : 'light';
   }
-  function apply(theme) {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem('theme', theme);
-    const dark = theme === 'dark';
-    const lang = localStorage.getItem('lang') || 'ko';
-    if (desktopIcon) desktopIcon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
-    if (mobileIcon) mobileIcon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
-    const label = dark
-      ? (lang === 'en' ? 'Light Mode' : '라이트 모드')
-      : (lang === 'en' ? 'Dark Mode' : '다크 모드');
-    if (mobileLabel) mobileLabel.textContent = label;
-    if (desktop) desktop.title = label;
-  }
-  function toggle() {
-    apply((document.documentElement.dataset.theme || 'light') === 'dark' ? 'light' : 'dark');
-  }
-  apply(preferred());
-  desktop?.addEventListener('click', toggle);
-  mobile?.addEventListener('click', toggle);
+
+  localStorage.removeItem('theme');
+  applySystemTheme();
+  onMediaChange(scheme, applySystemTheme);
 })();
 
 /* ------------------------------------------------------------- */

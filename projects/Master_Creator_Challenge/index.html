@@ -94,6 +94,8 @@
             ><i class="fab fa-github"></i> GitHub</a
           >
 
+          <a href="#live-demo" class="btn btn-ghost"><i class="fas fa-play"></i> <span data-en="Try Demo" data-ko="데모 체험">데모 체험</span></a>
+
           <a href="../../index.html#projects" class="btn btn-ghost"
             ><i class="fas fa-arrow-left"></i> <span data-en="Back" data-ko="돌아가기">돌아가기</span></a
           >
@@ -116,16 +118,24 @@
             <div class="detail-section" data-aos="fade-up" data-aos-delay="50">
               <h2 data-en="Key Features / Contents" data-ko="주요 기능 / 내용">주요 기능 / 내용</h2>
               <ul>
-                <li data-en="4-digit password input system">4자리 비밀번호 입력 시스템 구현</li>
+                <li data-en="6-digit password input system">6자리 비밀번호 입력 시스템 구현</li>
                 <li data-en="Keypad interface design">키패드 인터페이스 설계</li>
                 <li data-en="Servo motor unlock on correct password">맞는 비밀번호 입력 시 서보모터로 잠금 해제</li>
-                <li data-en="Alarm on 3 incorrect password attempts">틀린 비밀번호 3회 입력 시 경보음 출력</li>
+                <li data-en="Immediate alarm on an incorrect confirmed password">틀린 비밀번호 확인 시 즉시 경보음 출력</li>
                 <li data-en="LCD display for status indication">LCD 디스플레이로 상태 표시</li>
               </ul>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="75" data-media-pass="v26">
               <h2 data-en="Project Media" data-ko="프로젝트 사진">프로젝트 사진</h2>
               <div class="detail-gallery">
+                <figure class="detail-figure">
+                  <img src="assets/images/doorlock-workbench.webp" width="1081" height="1440" loading="lazy" decoding="async" alt="비밀번호 도어락의 키패드와 LCD 및 센서를 연결하는 제작 현장" />
+                  <figcaption data-en="Keypad, LCD, and sensor integration in progress" data-ko="키패드·LCD·센서 연동 작업">키패드·LCD·센서 연동 작업</figcaption>
+                </figure>
+                <figure class="detail-figure">
+                  <img src="assets/images/doorlock-wiring-closeup.webp" width="1200" height="900" loading="lazy" decoding="async" alt="비밀번호 도어락 아두이노와 모듈 배선 확대 사진" />
+                  <figcaption data-en="Arduino and module wiring close-up" data-ko="아두이노·모듈 배선 확대">아두이노·모듈 배선 확대</figcaption>
+                </figure>
                 <figure class="detail-figure">
                   <img src="assets/images/doorlock-1.webp" width="1200" height="1600" loading="lazy" decoding="async" alt="제작 및 배선 작업 중인 비밀번호 도어락 시제품" />
                   <figcaption data-en="Door-lock prototype during assembly and wiring" data-ko="제작 및 배선 작업 중인 도어락 시제품">제작 및 배선 작업 중인 도어락 시제품</figcaption>
@@ -138,15 +148,12 @@
                   <img src="assets/images/doorlock-3.webp" width="1200" height="1600" loading="lazy" decoding="async" alt="비밀번호 도어락 완성 모형의 측면과 내부 배선" />
                   <figcaption data-en="Completed password door-lock model — side" data-ko="비밀번호 도어락 완성 모형 — 측면">비밀번호 도어락 완성 모형 — 측면</figcaption>
                 </figure>
-                <figure class="detail-figure">
-                  <img src="assets/images/doorlock-workbench.webp" width="1081" height="1440" loading="lazy" decoding="async" alt="비밀번호 도어락의 키패드와 LCD 및 센서를 연결하는 제작 현장" />
-                  <figcaption data-en="Keypad, LCD, and sensor integration in progress" data-ko="키패드·LCD·센서 연동 작업">키패드·LCD·센서 연동 작업</figcaption>
-                </figure>
-                <figure class="detail-figure">
-                  <img src="assets/images/doorlock-wiring-closeup.webp" width="1200" height="900" loading="lazy" decoding="async" alt="비밀번호 도어락 아두이노와 모듈 배선 확대 사진" />
-                  <figcaption data-en="Arduino and module wiring close-up" data-ko="아두이노·모듈 배선 확대">아두이노·모듈 배선 확대</figcaption>
-                </figure>
+              
               </div>
+            </div>
+            <div class="detail-section" id="live-demo" data-aos="fade-up" data-aos-delay="85">
+              <h2 data-en="Interactive Demo" data-ko="직접 체험 데모">직접 체험 데모</h2>
+              <div data-project-demo="doorlock"></div>
             </div>
             <div class="detail-section" data-aos="fade-up" data-aos-delay="100">
               <h2 data-en="My Role" data-ko="나의 역할">나의 역할</h2>
@@ -226,5 +233,6 @@
       </div>
     </footer>
     <script defer src="../../detail.js"></script>
+    <script defer src="../../assets/project-demos.js"></script>
   </body>
 </html>
