@@ -6,22 +6,32 @@ on:
       - '.github/workflows/kga-live-shuttle-capture.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   capture:
     if: github.event.pull_request.head.ref == 'chatgpt/kga-live-shuttle-capture'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Playwright
+      - name: Checkout runner branch
+        uses: actions/checkout@v4
+        with:
+          path: runner
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: chatgpt/kga-live-shuttle-update
+          path: target
+          fetch-depth: 0
+      - name: Install capture dependencies
         run: |
+          python3 -m pip install --user pillow >/dev/null
           mkdir -p /tmp/kga-capture
           cd /tmp/kga-capture
           npm init -y >/dev/null 2>&1
           npm install --no-save playwright@1.55.0 >/dev/null
           npx playwright install --with-deps chromium >/dev/null
-      - name: Capture live shuttle
+      - name: Capture current live shuttle
         shell: bash
         run: |
           cd /tmp/kga-capture
@@ -30,46 +40,105 @@ jobs:
           const fs = require('fs');
           (async () => {
             const url = 'https://que-tune-earnings-ahead.trycloudflare.com/web#/home';
-            const browser = await chromium.launch({headless:true});
+            const browser = await chromium.launch({ headless: true });
             const page = await browser.newPage({ viewport: { width: 1440, height: 1050 }, colorScheme: 'dark' });
             const errors = [];
             page.on('pageerror', e => errors.push(String(e)));
             await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
             await page.waitForTimeout(7000);
-            const bodyHome = await page.locator('body').innerText();
-            await page.screenshot({ path: 'home-live.png', fullPage: true });
-
+            const shuttleNav = page.getByText('셔틀', { exact: true });
             let clicked = false;
-            const exact = page.getByText('셔틀', { exact: true });
-            const count = await exact.count();
-            for (let i = 0; i < count; i++) {
-              const el = exact.nth(i);
+            for (let i = 0; i < await shuttleNav.count(); i++) {
+              const el = shuttleNav.nth(i);
               if (!(await el.isVisible().catch(() => false))) continue;
-              try {
-                await el.click({ timeout: 3000 });
-                clicked = true;
-                break;
-              } catch {}
+              try { await el.click({ timeout: 3000 }); clicked = true; break; } catch {}
             }
-            if (clicked) await page.waitForTimeout(4000);
-            await page.screenshot({ path: 'shuttle-live.png', fullPage: true });
-            const bodyShuttle = await page.locator('body').innerText();
+            if (!clicked) throw new Error('셔틀 메뉴를 찾지 못했습니다.');
+            await page.waitForTimeout(4000);
+            const body = await page.locator('body').innerText();
+            if (!body.includes('현재 운행') || !body.includes('운행 중')) {
+              throw new Error('실운행 상태가 확인되지 않았습니다.');
+            }
+            await page.screenshot({ path: 'shuttle-live-full.png', fullPage: true });
             fs.writeFileSync('report.txt', [
               `url=${page.url()}`,
-              `clickedShuttle=${clicked}`,
-              `homeHasShuttle=${bodyHome.includes('셔틀')}`,
-              `shuttleHasOperation=${/운행|잔여|좌석|출발|도착/.test(bodyShuttle)}`,
+              `hasCurrentOperation=${body.includes('현재 운행')}`,
+              `hasOperatingVehicle=${body.includes('운행 중')}`,
               `pageErrors=${errors.length}`,
               '',
-              bodyShuttle.slice(0, 5000)
+              body.slice(0, 5000)
             ].join('\n'));
+            if (errors.length) throw new Error(`page errors: ${errors.join(' | ')}`);
             await browser.close();
           })().catch(err => { console.error(err); process.exit(1); });
           JS
           node capture.cjs
-          mkdir -p "$GITHUB_WORKSPACE/kga-capture"
-          cp home-live.png shuttle-live.png report.txt "$GITHUB_WORKSPACE/kga-capture/"
-      - uses: actions/upload-artifact@v4
+      - name: Build portfolio shuttle image and sync captions
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          full = Path('/tmp/kga-capture/shuttle-live-full.png')
+          out = Path('target/projects/koreatechGongjiAgent/assets/images/web-shuttle-live.webp')
+          im = Image.open(full).convert('RGB')
+          if im.width != 1440 or im.height < 1000:
+              raise SystemExit(f'unexpected capture size: {im.size}')
+          crop = im.crop((0, 0, 1440, 1000)).resize((1200, 833), Image.Resampling.LANCZOS)
+          crop.save(out, 'WEBP', quality=90, method=6)
+
+          page = Path('target/projects/koreatechGongjiAgent/index.html')
+          text = page.read_text(encoding='utf-8')
+          text = text.replace(
+              'Screens captured from the live read-only web dashboard through the current Cloudflare Quick Tunnel on August 24, 2026.',
+              'Screens captured from the live read-only web dashboard through the current Cloudflare Quick Tunnel on August 24–25, 2026.'
+          )
+          text = text.replace(
+              '2026년 8월 24일 현재 Cloudflare Quick Tunnel로 공개 중인 읽기 전용 웹 대시보드를 실제 접속해 캡처했습니다.',
+              '2026년 8월 24~25일 Cloudflare Quick Tunnel로 공개 중인 읽기 전용 웹 대시보드를 실제 접속해 캡처했습니다.'
+          )
+          text = text.replace(
+              'Live shuttle dashboard — service status and timetable',
+              'Live shuttle dashboard — active vehicle, live location, remaining seats and timetable'
+          )
+          text = text.replace(
+              '실운영 셔틀 — 운행 상태와 시간표',
+              '실운영 셔틀 — 운행 차량·실시간 위치·잔여 좌석·시간표'
+          )
+          page.write_text(text, encoding='utf-8')
+          print('portfolio image', Image.open(out).size)
+          PY
+      - name: Verify update
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd target
+          node tools/verify-media-metadata.js
+          grep -q 'August 24–25, 2026' projects/koreatechGongjiAgent/index.html
+          grep -q '운행 차량·실시간 위치·잔여 좌석·시간표' projects/koreatechGongjiAgent/index.html
+          python3 - <<'PY'
+          from PIL import Image
+          p='projects/koreatechGongjiAgent/assets/images/web-shuttle-live.webp'
+          assert Image.open(p).size == (1200, 833), Image.open(p).size
+          print('image-size-ok')
+          PY
+      - name: Commit target update
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C target config user.name 'ChatGPT'
+          git -C target config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C target add projects/koreatechGongjiAgent/index.html projects/koreatechGongjiAgent/assets/images/web-shuttle-live.webp
+          if ! git -C target diff --cached --quiet; then
+            git -C target commit -m 'fix: update KGA shuttle with live operation capture'
+            git -C target push origin HEAD:chatgpt/kga-live-shuttle-update
+          fi
+      - name: Upload capture evidence
+        uses: actions/upload-artifact@v4
         with:
-          name: kga-live-shuttle-capture
-          path: kga-capture
+          name: kga-live-shuttle-final
+          path: |
+            /tmp/kga-capture/shuttle-live-full.png
+            /tmp/kga-capture/report.txt
+            target/projects/koreatechGongjiAgent/assets/images/web-shuttle-live.webp
