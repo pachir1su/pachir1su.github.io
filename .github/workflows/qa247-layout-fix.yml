@@ -70,7 +70,8 @@ jobs:
           node --check assets/project-demos.js
           node tools/verify-build.js
           node tools/verify-media-metadata.js
-          ! grep -q 'object-fit: contain' style.css
+          ! grep -Fq '.detail-gallery-uniform .detail-figure img' style.css
+          ! grep -Fq '.detail-gallery-screenshots .detail-figure img' style.css
 
       - name: Install browser QA
         shell: bash
