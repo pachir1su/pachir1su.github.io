@@ -3251,35 +3251,19 @@ html {
 
 .hero-email-wrap { min-height: 46px; overflow: visible; }
 .hero-email-wrap .hero-email { min-height: 46px; }
-.hero-email-capybara { width: 88px; bottom: 19px; }
+.hero-email-capybara { width: 88px; bottom: 38px; }
 @media (min-width: 641px) and (max-width: 900px) {
-  .hero-email-capybara { width: 84px; bottom: 19px; }
+  .hero-email-capybara { width: 84px; bottom: 36px; }
 }
 @media (max-width: 640px) {
   .hero-email-wrap { margin-top: 52px; overflow: visible; }
-  .hero-email-capybara { width: 90px; bottom: 21px; }
+  .hero-email-capybara { width: 90px; bottom: 36px; }
 }
 @media (max-width: 360px) {
   .hero-email-wrap { margin-top: 58px; overflow: visible; }
-  .hero-email-capybara { display: block; width: 80px; bottom: 23px; }
+  .hero-email-capybara { display: block; width: 80px; bottom: 36px; }
 }
 
-.detail-gallery-uniform .detail-figure {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.detail-gallery-uniform .detail-figure img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: contain;
-  background: var(--paper-2);
-}
-.detail-gallery-screenshots .detail-figure img {
-  aspect-ratio: 16 / 10;
-  object-fit: contain;
-  background: #111;
-}
 
 .wall-city { left: 58%; right: 6%; bottom: 13%; }
 .wall-water-sensor { left: 28%; right: auto; bottom: 28%; }
