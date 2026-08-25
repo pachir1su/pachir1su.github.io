@@ -3280,8 +3280,6 @@ html {
   object-fit: contain;
   background: #111;
 }
-.detail-figure.media-crop-right { overflow: hidden; }
-.detail-figure.media-crop-right img { width: 124%; max-width: none; }
 
 .wall-city { left: 58%; right: 6%; bottom: 13%; }
 .wall-water-sensor { left: 28%; right: auto; bottom: 28%; }
