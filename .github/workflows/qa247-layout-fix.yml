@@ -1,0 +1,179 @@
+name: QA247 layout fix
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/qa247-layout-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-verify:
+    if: github.event.pull_request.head.ref == 'chatgpt/qa247-layout-fixes'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa247-layout-fixes
+          fetch-depth: 0
+
+      - name: Restore natural project media sizing and fix capybara peek
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('style.css')
+          s = p.read_text(encoding='utf-8')
+
+          old = '''.detail-gallery-uniform .detail-figure {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+          }
+          .detail-gallery-uniform .detail-figure img {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: contain;
+            background: var(--paper-2);
+          }
+          .detail-gallery-screenshots .detail-figure img {
+            aspect-ratio: 16 / 10;
+            object-fit: contain;
+            background: #111;
+          }
+          '''
+          if old not in s:
+              raise SystemExit('forced media sizing block not found')
+          s = s.replace(old, '')
+
+          replacements = {
+            '.hero-email-capybara { width: 88px; bottom: 19px; }': '.hero-email-capybara { width: 88px; bottom: 38px; }',
+            '.hero-email-capybara { width: 84px; bottom: 19px; }': '.hero-email-capybara { width: 84px; bottom: 36px; }',
+            '.hero-email-capybara { width: 90px; bottom: 21px; }': '.hero-email-capybara { width: 90px; bottom: 36px; }',
+            '.hero-email-capybara { display: block; width: 80px; bottom: 23px; }': '.hero-email-capybara { display: block; width: 80px; bottom: 36px; }',
+          }
+          for before, after in replacements.items():
+              if before not in s:
+                  raise SystemExit(f'capybara rule not found: {before}')
+              s = s.replace(before, after)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Static verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check build.js
+          node --check script.js
+          node --check detail.js
+          node --check assets/project-demos.js
+          node tools/verify-build.js
+          node tools/verify-media-metadata.js
+          ! grep -q 'object-fit: contain' style.css
+
+      - name: Install browser QA
+        shell: bash
+        run: |
+          mkdir -p /tmp/qa247
+          cd /tmp/qa247
+          npm init -y >/dev/null 2>&1
+          npm install --no-save playwright@1.55.0 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Browser QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 >/tmp/qa247-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 2
+          cd /tmp/qa247
+          cat > qa.cjs <<'JS'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const assert = (ok, msg) => { if (!ok) throw new Error(msg); };
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const errors = [];
+            const results = [];
+            async function home(width, height, name) {
+              const page = await browser.newPage({ viewport: { width, height }, colorScheme: 'light' });
+              page.on('pageerror', e => errors.push(`${name}: ${e}`));
+              await page.goto('http://127.0.0.1:4173/index.html', { waitUntil: 'networkidle' });
+              const cap = page.locator('.hero-email-capybara');
+              const btn = page.locator('.hero-email-wrap .hero-email');
+              await cap.waitFor({ state: 'visible' });
+              const cb = await cap.boundingBox();
+              const bb = await btn.boundingBox();
+              assert(cb && bb, `${name}: capybara/email bounds missing`);
+              assert(cb.y + cb.height <= bb.y + 11, `${name}: capybara paws still buried behind email box`);
+              await page.screenshot({ path: `${name}.png`, fullPage: false });
+              results.push(`${name}: capBottom=${(cb.y+cb.height).toFixed(1)} buttonTop=${bb.y.toFixed(1)}`);
+              await page.close();
+            }
+            async function media(path, name) {
+              const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, colorScheme: 'light' });
+              page.on('pageerror', e => errors.push(`${name}: ${e}`));
+              await page.goto(`http://127.0.0.1:4173/${path}`, { waitUntil: 'networkidle' });
+              const imgs = page.locator('.detail-gallery-uniform img, .detail-gallery-screenshots img');
+              const count = await imgs.count();
+              assert(count > 0, `${name}: target gallery not found`);
+              for (let i = 0; i < count; i++) {
+                const v = await imgs.nth(i).evaluate(el => {
+                  const cs = getComputedStyle(el);
+                  return { objectFit: cs.objectFit, aspectRatio: cs.aspectRatio, h: el.getBoundingClientRect().height, naturalW: el.naturalWidth, naturalH: el.naturalHeight };
+                });
+                assert(v.objectFit !== 'contain', `${name}: contain still active`);
+                assert(v.aspectRatio === 'auto', `${name}: forced aspect ratio still active: ${v.aspectRatio}`);
+              }
+              const section = page.locator('.detail-gallery-uniform, .detail-gallery-screenshots').first();
+              await section.scrollIntoViewIfNeeded();
+              await page.waitForTimeout(250);
+              await section.screenshot({ path: `${name}.png` });
+              results.push(`${name}: ${count} images natural ratio`);
+              await page.close();
+            }
+            await home(1440, 900, 'home-1440');
+            await home(390, 844, 'home-390');
+            await media('projects/Wall_Sina/', 'wall-sina');
+            await media('projects/2024_5th_CSRC/', 'huskylens');
+            await media('projects/nonofire/', 'nonofire');
+            await media('projects/Legend_SakSak_GongGam_AI/', 'gonggam-recipe');
+            assert(errors.length === 0, `page errors: ${errors.join(' | ')}`);
+            fs.writeFileSync('report.txt', results.join('\n') + '\npageErrors=0\n');
+            await browser.close();
+          })().catch(e => { console.error(e); process.exit(1); });
+          JS
+          node qa.cjs
+
+      - name: Save product changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'ChatGPT'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add style.css
+          git commit -m 'fix: restore natural media sizing and capybara paws'
+          git push origin HEAD:chatgpt/qa247-layout-fixes
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qa247-layout-evidence
+          path: |
+            /tmp/qa247/home-1440.png
+            /tmp/qa247/home-390.png
+            /tmp/qa247/wall-sina.png
+            /tmp/qa247/huskylens.png
+            /tmp/qa247/nonofire.png
+            /tmp/qa247/gonggam-recipe.png
+            /tmp/qa247/report.txt
+
+      - name: Remove temporary workflow from product branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rm .github/workflows/qa247-layout-fix.yml
+          git commit -m 'chore: remove temporary QA 247 runner'
+          git push origin HEAD:chatgpt/qa247-layout-fixes
