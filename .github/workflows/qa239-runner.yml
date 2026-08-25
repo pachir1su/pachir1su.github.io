@@ -1,116 +1,108 @@
-name: QA 239 implementation runner
+name: QA 239 live Pages verification
 
 on:
   pull_request:
     paths:
       - '.github/workflows/qa239-runner.yml'
-      - '.github/scripts/qa239_browser.mjs'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  final-review-fix:
+  live-pages:
     if: github.event.pull_request.head.ref == 'chatgpt/qa239-runner'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - name: Checkout runner scripts
-        uses: actions/checkout@v4
-        with:
-          path: runner
-
-      - name: Checkout target implementation branch
-        uses: actions/checkout@v4
-        with:
-          ref: chatgpt/qa239-fixes-theme240
-          path: target
-          fetch-depth: 0
-
-      - name: Remove duplicate CSS crop
+      - name: Wait for merged Pages assets
         shell: bash
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-
-          page = Path('target/projects/meal_queue_signal_counter/index.html')
-          css = Path('target/style.css')
-
-          text = page.read_text(encoding='utf-8')
-          text = text.replace('<figure class="detail-figure media-crop-right">', '<figure class="detail-figure">', 1)
-          if 'media-crop-right' in text:
-              raise SystemExit('meal page still contains media-crop-right')
-          page.write_text(text, encoding='utf-8')
-
-          styles = css.read_text(encoding='utf-8')
-          styles = styles.replace('.detail-figure.media-crop-right { overflow: hidden; }\n.detail-figure.media-crop-right img { width: 124%; max-width: none; }\n', '')
-          if 'media-crop-right' in styles:
-              raise SystemExit('style.css still contains media-crop-right')
-          css.write_text(styles, encoding='utf-8')
-          PY
-
-      - name: Static QA
-        shell: bash
-        run: |
-          set -euo pipefail
-          cd target
-          node --check build.js
-          node --check script.js
-          node --check detail.js
-          node --check assets/project-demos.js
-          node tools/verify-build.js
-          node tools/verify-media-metadata.js
-          ! grep -R "media-crop-right" projects/meal_queue_signal_counter/index.html style.css
+          marker='Theme — follows OS setting only (#240)'
+          for i in $(seq 1 60); do
+            url="https://pachir1su.github.io/script.js?qa=$(date +%s)-$i"
+            if curl -fsSL --retry 2 "$url" | grep -Fq "$marker"; then
+              echo "Live script.js contains #240 marker."
+              exit 0
+            fi
+            echo "Waiting for Pages deployment ($i/60)..."
+            sleep 5
+          done
+          echo 'Timed out waiting for GitHub Pages deployment.' >&2
+          exit 1
 
       - name: Install Playwright Chromium
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p /tmp/qa239-browser
-          cd /tmp/qa239-browser
+          mkdir -p /tmp/live-pages-qa
+          cd /tmp/live-pages-qa
           npm init -y >/dev/null 2>&1
           npm install --no-save playwright@1.55.0
           npx playwright install --with-deps chromium
 
-      - name: Start local site
-        shell: bash
-        run: |
-          cd target
-          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/qa239-http.log 2>&1 &
-          echo $! >/tmp/qa239-http.pid
-          for i in {1..30}; do
-            curl -fsS http://127.0.0.1:4173/index.html >/dev/null && exit 0
-            sleep 1
-          done
-          cat /tmp/qa239-http.log
-          exit 1
-
-      - name: Browser QA
+      - name: Verify live site
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p qa-artifacts
-          cp runner/.github/scripts/qa239_browser.mjs /tmp/qa239-browser/qa239_browser.mjs
-          cd /tmp/qa239-browser
-          node qa239_browser.mjs
-          cp -R qa-artifacts/* "$GITHUB_WORKSPACE/qa-artifacts/"
+          cd /tmp/live-pages-qa
+          cat > live.mjs <<'JS'
+          import { chromium } from 'playwright';
 
-      - name: Commit and push review fix
-        shell: bash
-        run: |
-          set -euo pipefail
-          git -C target config user.name 'ChatGPT'
-          git -C target config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git -C target add style.css projects/meal_queue_signal_counter/index.html
-          if ! git -C target diff --cached --quiet; then
-            git -C target commit -m 'fix: avoid double cropping cafeteria venue photo'
-            git -C target push origin HEAD:chatgpt/qa239-fixes-theme240
-          fi
+          const base = 'https://pachir1su.github.io';
+          const stamp = () => `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+          const browser = await chromium.launch();
+          const context = await browser.newContext({ colorScheme: 'dark' });
+          const page = await context.newPage();
+          const pageErrors = [];
+          page.on('pageerror', error => pageErrors.push(String(error)));
 
-      - name: Upload QA artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: qa239-final-review
-          path: qa-artifacts
-          if-no-files-found: warn
+          function assert(condition, message) {
+            if (!condition) throw new Error(message);
+          }
+
+          await page.goto(`${base}/?qa=${stamp()}`, { waitUntil: 'networkidle', timeout: 60000 });
+          await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
+          assert(await page.locator('#themeToggle, #themeToggleMobile').count() === 0, 'manual theme buttons still exist on home');
+          console.log('PASS live home dark system theme + no manual buttons');
+
+          await page.emulateMedia({ colorScheme: 'light' });
+          await page.waitForFunction(() => document.documentElement.dataset.theme === 'light');
+          await page.emulateMedia({ colorScheme: 'dark' });
+          await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
+          console.log('PASS live home runtime system theme changes');
+
+          await page.goto(`${base}/projects/PlantClock/?qa=${stamp()}`, { waitUntil: 'networkidle', timeout: 60000 });
+          await page.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
+          assert(await page.locator('#themeToggle, #themeToggleMobile').count() === 0, 'manual theme buttons still exist on detail page');
+          await page.emulateMedia({ colorScheme: 'light' });
+          await page.waitForFunction(() => document.documentElement.dataset.theme === 'light');
+          console.log('PASS live detail page system theme');
+
+          await page.goto(`${base}/projects/meal_queue_signal_counter/?qa=${stamp()}`, { waitUntil: 'networkidle', timeout: 60000 });
+          const venue = page.locator('img[src="assets/images/festival-venue.webp"]');
+          await venue.waitFor({ state: 'visible' });
+          const venueInfo = await venue.evaluate(img => ({
+            naturalWidth: img.naturalWidth,
+            naturalHeight: img.naturalHeight,
+            figureClass: img.closest('figure')?.className || ''
+          }));
+          assert(venueInfo.naturalWidth === 892 && venueInfo.naturalHeight === 1400, `unexpected live venue dimensions: ${venueInfo.naturalWidth}x${venueInfo.naturalHeight}`);
+          assert(!venueInfo.figureClass.includes('media-crop-right'), `double-crop class still deployed: ${venueInfo.figureClass}`);
+          console.log('PASS live cafeteria privacy crop without double crop');
+
+          await page.goto(`${base}/projects/Legend_SakSak_GongGam_AI/?qa=${stamp()}`, { waitUntil: 'networkidle', timeout: 60000 });
+          for (const name of ['empathy-chat.webp', 'recipe-dark.webp', 'recipe-light.webp']) {
+            const image = page.locator(`img[src="assets/images/${name}"]`);
+            await image.waitFor({ state: 'attached' });
+            const loaded = await image.evaluate(img => img.complete && img.naturalWidth > 0 && img.naturalHeight > 0);
+            assert(loaded, `${name} did not load on live Pages`);
+          }
+          console.log('PASS live GongGam / Recipe screenshots');
+
+          assert(pageErrors.length === 0, `page errors: ${pageErrors.join(' | ')}`);
+          console.log('passed=5');
+          console.log('failed=0');
+          await browser.close();
+          JS
+          node live.mjs
