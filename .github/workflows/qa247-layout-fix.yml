@@ -124,10 +124,14 @@ jobs:
               for (let i = 0; i < count; i++) {
                 const v = await imgs.nth(i).evaluate(el => {
                   const cs = getComputedStyle(el);
-                  return { objectFit: cs.objectFit, aspectRatio: cs.aspectRatio, h: el.getBoundingClientRect().height, naturalW: el.naturalWidth, naturalH: el.naturalHeight };
+                  const r = el.getBoundingClientRect();
+                  return { objectFit: cs.objectFit, aspectRatio: cs.aspectRatio, w: r.width, h: r.height, naturalW: el.naturalWidth, naturalH: el.naturalHeight };
                 });
                 assert(v.objectFit !== 'contain', `${name}: contain still active`);
-                assert(v.aspectRatio === 'auto', `${name}: forced aspect ratio still active: ${v.aspectRatio}`);
+                assert(v.naturalW > 0 && v.naturalH > 0, `${name}: image failed to load`);
+                const rendered = v.w / v.h;
+                const natural = v.naturalW / v.naturalH;
+                assert(Math.abs(rendered - natural) < 0.025, `${name}: rendered ratio ${rendered.toFixed(3)} differs from natural ${natural.toFixed(3)} (${v.aspectRatio})`);
               }
               const section = page.locator('.detail-gallery-uniform, .detail-gallery-screenshots').first();
               await section.scrollIntoViewIfNeeded();
