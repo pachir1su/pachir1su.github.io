@@ -1,0 +1,28 @@
+name: qa252-inspect-media
+
+on:
+  push:
+    branches:
+      - chatgpt/qa252-regression-fix
+    paths:
+      - .github/workflows/qa252-inspect-media.yml
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect video dimensions
+        run: |
+          set -euo pipefail
+          for f in \
+            projects/meal_queue_signal_counter/assets/video/signal-counter-demo.mp4 \
+            projects/Wall_Sina/assets/video/prototype-demo.mp4 \
+            projects/Wall_Sina/assets/video/final-demo-overview.mp4 \
+            projects/Wall_Sina/assets/video/water-test.mp4; do
+            printf '%s ' "$f"
+            ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$f"
+          done
