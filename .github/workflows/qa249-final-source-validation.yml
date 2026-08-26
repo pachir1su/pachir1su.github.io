@@ -1,0 +1,90 @@
+name: qa249-final-source-validation
+
+on:
+  push:
+    branches:
+      - chatgpt/qa249-final-acceptance
+    paths:
+      - .github/workflows/qa249-final-source-validation.yml
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa249-final-acceptance
+          fetch-depth: 0
+      - name: Syntax, build, and source contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check detail.js
+          node --check assets/project-demos.js
+          node tools/verify-build.js
+          node build.js
+          git diff --exit-code -- index.html
+          git diff --check
+          git diff --exit-code origin/main -- detail.js
+          python3 - <<'PY'
+          from pathlib import Path
+          demos = Path('assets/project-demos.js').read_text(encoding='utf-8')
+          style = Path('style.css').read_text(encoding='utf-8')
+          kga = Path('projects/koreatechGongjiAgent/index.html').read_text(encoding='utf-8')
+          health = Path('projects/HEALTH_CHECK_PROJECT/index.html').read_text(encoding='utf-8')
+          fire = Path('projects/nonofire/index.html').read_text(encoding='utf-8')
+          assert '초 남음' not in demos
+          assert '실기 기준 약 10초 대기' in demos
+          assert '낮춘 위험 역치' in demos
+          assert "plant-tomato plant-tomato-a" in demos
+          assert "createButton('닫힘', 'Close / Lock'" in demos
+          assert "key === '*' ? translate('초기화', 'Reset')" in demos
+          assert "key === '#' ? translate('입력', 'Input')" in demos
+          assert '.wall-water-sensor { bottom:22%' in style
+          assert '.wall-water-level { transition:height 2.8s' in style
+          assert '.ucast-channel.is-reverse.is-entering' in style
+          assert '.detail-video { width:100%; height:auto' in style
+          assert '실운영 홈' not in kga and '실운영 셔틀' not in kga and '실운영 도서관' not in kga
+          assert 'web-shuttle-live.webp' in kga
+          assert 'detail-photo-grid' not in health and 'detail-photo-card' not in health
+          assert health.count('class="detail-figure"') >= 5
+          assert fire.index('fire-dashboard.webp') < fire.index('makerthon-poster.webp') < fire.index('camera-prototype.webp')
+          img = Path('projects/koreatechGongjiAgent/assets/images/web-shuttle-live.webp')
+          assert img.exists() and img.stat().st_size > 10000
+          PY
+      - name: Render changed pages in headless Chrome
+        shell: bash
+        run: |
+          set -euo pipefail
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$BROWSER"
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/qa249-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 1
+          pages=(
+            index.html
+            projects/koreatechGongjiAgent/index.html
+            projects/meal_queue_signal_counter/index.html
+            projects/Wall_Sina/index.html
+            projects/2026_U-CAST/index.html
+            projects/PlantClock/index.html
+            projects/Master_Creator_Challenge/index.html
+            projects/HEALTH_CHECK_PROJECT/index.html
+            projects/nonofire/index.html
+          )
+          for page in "${pages[@]}"; do
+            out="/tmp/$(echo "$page" | tr '/.' '__').html"
+            "$BROWSER" --headless --no-sandbox --disable-gpu --virtual-time-budget=1800 --dump-dom "http://127.0.0.1:8765/$page" > "$out"
+            test -s "$out"
+            grep -q '<main' "$out"
+          done
+      - name: Confirm final PR scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(git diff --name-only origin/main...HEAD | grep -v '^.github/workflows/qa249-final-source-validation.yml$' | grep -v '^.github/workflows/qa249-source-' | sort | tr '\n' ' ')"
+          expected="assets/project-demos.js projects/HEALTH_CHECK_PROJECT/index.html projects/koreatechGongjiAgent/assets/images/web-shuttle-live.webp projects/koreatechGongjiAgent/index.html projects/nonofire/index.html style.css "
+          echo "actual:   $actual"
+          echo "expected: $expected"
+          test "$actual" = "$expected"
