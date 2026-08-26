@@ -126,7 +126,7 @@
       detectButton.disabled = true;
       rig.classList.add('water-detected');
       setPhase('green', 27);
-      setText(status, '해수면 상승 감지 · 낮춘 위험 역치로 접근 중', 'Rising sea detected · approaching the lowered danger threshold');
+      setText(status, '해수면 상승 감지', 'Rising sea detected');
       await wait(900);
       if (sequenceId !== currentSequence) return;
 
