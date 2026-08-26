@@ -127,36 +127,36 @@
       rig.classList.add('water-detected');
       setPhase('green', 27);
       setText(status, '해수면 상승 감지', 'Rising sea detected');
-      await wait(900);
+      await wait(1100);
       if (sequenceId !== currentSequence) return;
 
       rig.classList.add('barrier-raised', 'buzzer-on');
       setText(status, '장벽 상승 · 도시 방향 유입 차단', 'Barrier rising · protecting the city side');
-      await wait(900);
+      await wait(1100);
       if (sequenceId !== currentSequence) return;
 
       rig.classList.remove('buzzer-on');
       setPhase('yellow', 20);
       setText(status, '주의 단계 · 장벽 유지', 'Caution · barrier remains raised');
-      await wait(750);
+      await wait(900);
       if (sequenceId !== currentSequence) return;
 
       setPhase('danger-flash', 20);
       setText(status, '위험 단계 · 장벽 유지 · 배수 대기', 'Danger · barrier held · waiting to drain');
-      await wait(750);
+      await wait(900);
       if (sequenceId !== currentSequence) return;
 
       rig.classList.remove('water-detected');
       rig.classList.add('water-draining');
       setPhase('red', 20);
       setText(status, '배수 중 · 장벽은 계속 올라간 상태', 'Draining · barrier stays fully raised');
-      await wait(1450);
+      await wait(1700);
       if (sequenceId !== currentSequence) return;
 
       rig.classList.remove('water-draining');
       rig.classList.add('barrier-lowering');
       setText(status, '배수 완료 · 장벽 하강', 'Drainage complete · lowering barrier');
-      await wait(900);
+      await wait(1100);
       if (sequenceId !== currentSequence) return;
 
       rig.classList.remove('barrier-raised', 'barrier-lowering');
@@ -250,6 +250,8 @@
       const currentVersion = ++channel.version;
       setChannelDisabled(index, true);
       channel.lane.classList.toggle('is-reverse', reverse);
+      channel.lane.classList.remove('is-entering', 'is-exiting');
+      if (reverse) void channel.pedestrian.offsetWidth;
       channel.lane.classList.add('is-active', 'is-entering');
       setText(channel.state, reverse ? '역방향 경고' : '정방향 경고', reverse ? 'Reverse warning' : 'Forward warning');
       setText(
@@ -263,7 +265,7 @@
       channel.lane.classList.remove('is-entering');
       channel.lane.classList.add('is-exiting');
       setText(status, `CH-${index + 1} 반대편 센서 접근`, `CH-${index + 1} approaching opposite sensor`);
-      await wait(700);
+      await wait(reverse ? 1000 : 700);
       if (channel.version !== currentVersion) return;
       channel.lane.classList.remove('is-active', 'is-exiting', 'is-reverse');
       setText(channel.state, '대기', 'Standby');
@@ -459,7 +461,7 @@
     const device = create('div', 'plantclock-device');
     const plant = create('div', 'plantclock-pot');
     plant.innerHTML = '<span class="plant-stem"></span><span class="plant-leaf plant-leaf-left"></span><span class="plant-leaf plant-leaf-right"></span>';
-    plant.append(create('span', 'plant-tomato plant-tomato-a'), create('span', 'plant-tomato plant-tomato-b'));
+    plant.append(create('span', 'plant-tomato plant-tomato-a'), create('span', 'plant-tomato plant-tomato-b'), create('span', 'plant-tomato plant-tomato-c'));
     const lcd = create('div', 'plantclock-lcd');
     const soilLine = create('span');
     const timeLine = create('span');
@@ -623,18 +625,19 @@
     prepare(
       root,
       'doorlock-device-demo',
-      '원본 코드의 4×4 키패드·6자리 비밀번호(123456)·LCD·서보 잠금·성공/실패 신호를 로컬 데모로 재현합니다.',
-      'A local demo of the source 4×4 keypad, six-digit password (123456), LCD, servo lock and success/failure signals.'
+      '6자리 비밀번호(123456)·LCD·서보 잠금·성공/실패 신호를 숫자 키패드로 재현합니다.',
+      'A numeric-keypad demo of the six-digit password (123456), LCD, servo lock and success/failure signals.'
     );
 
     const layout = create('div', 'hardware-demo-layout doorlock-layout');
     const controls = create('div', 'hardware-control-panel');
     const controlTitle = create('strong', 'hardware-panel-title');
-    setText(controlTitle, '4×4 키패드', '4×4 keypad');
+    setText(controlTitle, '숫자 키패드', 'Numeric keypad');
     const keypad = create('div', 'doorlock-keypad');
-    const status = createStatus('비밀번호를 입력하세요.', 'Enter the password.');
+    const inputButton = createButton('입력', 'Input', 'demo-action doorlock-input-action');
     const closeButton = createButton('닫힘', 'Close / Lock', 'demo-action demo-action-secondary doorlock-close-action');
-    controls.append(controlTitle, keypad, closeButton, status);
+    const status = createStatus('비밀번호를 입력하세요.', 'Enter the password.');
+    controls.append(controlTitle, keypad, inputButton, closeButton, status);
 
     const rig = create('div', 'doorlock-rig');
     const lcd = create('div', 'doorlock-lcd');
@@ -678,21 +681,29 @@
       window.setTimeout(() => rig.classList.remove('is-alarm'), 1300);
     }
 
-    [['1','2','3','A'],['4','5','6','B'],['7','8','9','C'],['*','0','#','D']].flat().forEach((key) => {
+    ['1','2','3','4','5','6','7','8','9','*','0','<-'].forEach((key) => {
       const button = create('button', 'doorlock-key');
       button.type = 'button';
-      button.textContent = key === '*' ? translate('초기화', 'Reset') : key === '#' ? translate('입력', 'Input') : key;
-      button.setAttribute('aria-label', key === '*' ? translate('입력 초기화', 'Reset input') : key === '#' ? translate('비밀번호 입력', 'Submit password') : key);
+      button.textContent = key === '*' ? translate('초기화', 'Reset') : key;
+      button.setAttribute('aria-label', key === '*' ? translate('입력 초기화', 'Reset input') : key === '<-' ? translate('한 글자 지우기', 'Delete one character') : key);
       button.addEventListener('click', () => {
-        if (key === '#') {
-          if (input === password) unlock(); else alarm();
+        if (key === '*') { clearInput(); return; }
+        if (key === '<-') {
+          if (input) input = input.slice(0, -1);
+          render(input ? '마지막 한 글자를 지웠습니다.' : '입력값이 없습니다.', input ? 'Deleted the last character.' : 'No input to delete.');
           return;
         }
-        if (key === '*') { clearInput(); return; }
+        if (input.length >= password.length) {
+          render('비밀번호는 6자리입니다.', 'The password is six digits.');
+          return;
+        }
         input += key;
         render('키 입력 · 입력 버튼으로 확인', 'Key entered · press Input to confirm');
       });
       keypad.append(button);
+    });
+    inputButton.addEventListener('click', () => {
+      if (input === password) unlock(); else alarm();
     });
     closeButton.addEventListener('click', () => {
       if (locked) {
