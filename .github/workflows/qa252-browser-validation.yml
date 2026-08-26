@@ -1,0 +1,29 @@
+name: qa252-browser-validation
+
+on:
+  push:
+    branches:
+      - chatgpt/qa252-regression-fix
+    paths:
+      - .github/workflows/qa252-browser-validation.yml
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa252-regression-fix
+      - name: Install Selenium
+        run: python3 -m pip install --quiet selenium
+      - name: Run changed-page regression suite
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8000 >/tmp/qa252-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 1
+          python3 .github/qa252_browser.py
