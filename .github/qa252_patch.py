@@ -4,10 +4,16 @@ from pathlib import Path
 def replace_once(path, old, new):
     p = Path(path)
     text = p.read_text(encoding='utf-8')
-    count = text.count(old)
-    if count != 1:
-        raise SystemExit(f'{path}: expected one target, got {count}: {old!r}')
-    p.write_text(text.replace(old, new, 1), encoding='utf-8')
+    old_count = text.count(old)
+    new_count = text.count(new)
+    if old_count == 1:
+        p.write_text(text.replace(old, new, 1), encoding='utf-8')
+        return
+    if old_count == 0 and new_count == 1:
+        return
+    raise SystemExit(
+        f'{path}: unexpected patch state old={old_count} new={new_count}: {old!r}'
+    )
 
 
 # KGA: user-selected portrait live shuttle screenshot (optimized copy is 600x820).
