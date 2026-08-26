@@ -1,0 +1,93 @@
+name: qa249-final-validation
+
+on:
+  push:
+    branches:
+      - chatgpt/qa249-final-acceptance
+    paths:
+      - .github/workflows/qa249-final-validation.yml
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa249-final-acceptance
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and build contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check detail.js
+          node tools/verify-build.js
+          node build.js
+          git diff --exit-code -- index.html
+          git diff --check
+      - name: #249 changed-only static assertions
+        shell: python
+        run: |
+          from pathlib import Path
+          import hashlib
+          style = Path('style.css').read_text(encoding='utf-8')
+          detail = Path('detail.js').read_text(encoding='utf-8')
+          kga = Path('projects/koreatechGongjiAgent/index.html').read_text(encoding='utf-8')
+          expected = [
+              '.hero-email-capybara { width: 88px; bottom: 28px; }',
+              '.hero-email-capybara { width: 84px; bottom: 27px; }',
+              '.hero-email-capybara { width: 90px; bottom: 28px; }',
+              '.hero-email-capybara { display: block; width: 80px; bottom: 27px; }',
+          ]
+          for item in expected:
+              assert item in style, item
+          for old in ['width: 88px; bottom: 38px', 'width: 84px; bottom: 36px', 'width: 90px; bottom: 36px', 'width: 80px; bottom: 36px']:
+              assert old not in style, old
+          for marker in [
+              '/HEALTH_CHECK_PROJECT/', '/nonofire/', '/koreatechGongjiAgent/',
+              '/meal_queue_signal_counter/', '/Wall_Sina/', '/PlantClock/',
+              '/Master_Creator_Challenge/', 'ucast-channel.is-reverse.is-exiting',
+              '.detail-video { width:100%; height:auto !important; aspect-ratio:auto !important;',
+          ]:
+              assert marker in detail, marker
+          image = Path('projects/koreatechGongjiAgent/assets/images/web-shuttle-live.webp')
+          assert image.exists() and image.stat().st_size > 10000
+          assert hashlib.sha256(image.read_bytes()).hexdigest() == '9fc893eaf701d84324e08ecc16172bf072ccb97c4505305df0b65e2fba61bbea'
+          assert 'web-shuttle-live.webp' in kga
+          assert 'width="1200" height="833"' in kga
+          assert not Path('.qa249').exists()
+      - name: Render changed pages in headless Chrome
+        shell: bash
+        run: |
+          set -euo pipefail
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$BROWSER"
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/qa249-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          sleep 1
+          pages=(
+            index.html
+            projects/koreatechGongjiAgent/index.html
+            projects/meal_queue_signal_counter/index.html
+            projects/Wall_Sina/index.html
+            projects/2026_U-CAST/index.html
+            projects/PlantClock/index.html
+            projects/Master_Creator_Challenge/index.html
+            projects/HEALTH_CHECK_PROJECT/index.html
+            projects/nonofire/index.html
+          )
+          for page in "${pages[@]}"; do
+            out="/tmp/$(echo "$page" | tr '/.' '__').html"
+            "$BROWSER" --headless --no-sandbox --disable-gpu --virtual-time-budget=1500 --dump-dom "http://127.0.0.1:8765/$page" > "$out"
+            test -s "$out"
+            grep -q '<main' "$out"
+          done
+      - name: Confirm final functional diff scope
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --name-only 75dc1175814310fbc1da4f8323f2ad2e824ea3ae...HEAD | sort
+          test "$(git diff --name-only 75dc1175814310fbc1da4f8323f2ad2e824ea3ae...HEAD | grep -v '^.github/workflows/qa249-final-validation.yml$' | sort | tr '\n' ' ')" = "detail.js projects/koreatechGongjiAgent/assets/images/web-shuttle-live.webp style.css "
