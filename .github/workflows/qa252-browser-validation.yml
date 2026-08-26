@@ -1,17 +1,17 @@
 name: qa252-browser-validation
 
 on:
-  push:
+  pull_request:
     branches:
-      - chatgpt/qa252-regression-fix
-    paths:
-      - .github/workflows/qa252-browser-validation.yml
+      - main
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
 
 jobs:
   browser:
+    if: github.head_ref == 'chatgpt/qa252-regression-fix'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
