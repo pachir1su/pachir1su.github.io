@@ -279,12 +279,16 @@
         const cKey = keys.find((button) => button.textContent.trim() === 'C');
         const english = document.documentElement.lang === 'en';
         if (resetKey) {
-          resetKey.textContent = english ? 'Reset' : '초기화';
-          resetKey.setAttribute('aria-label', english ? 'Reset input' : '입력 초기화');
+          resetKey.dataset.ko = '초기화';
+          resetKey.dataset.en = 'Reset';
+          resetKey.textContent = english ? resetKey.dataset.en : resetKey.dataset.ko;
+          resetKey.setAttribute('aria-label', '초기화 / Reset');
         }
         if (submitKey) {
-          submitKey.textContent = english ? 'Input' : '입력';
-          submitKey.setAttribute('aria-label', english ? 'Submit password' : '비밀번호 입력');
+          submitKey.dataset.ko = '입력';
+          submitKey.dataset.en = 'Input';
+          submitKey.textContent = english ? submitKey.dataset.en : submitKey.dataset.ko;
+          submitKey.setAttribute('aria-label', '입력 / Input');
         }
         if (cKey) {
           cKey.addEventListener('click', (event) => {
@@ -296,7 +300,10 @@
         const close = document.createElement('button');
         close.type = 'button';
         close.className = 'demo-action demo-action-secondary doorlock-close-action';
-        close.textContent = english ? 'Close / Lock' : '닫힘';
+        close.dataset.ko = '닫힘';
+        close.dataset.en = 'Close / Lock';
+        close.textContent = english ? close.dataset.en : close.dataset.ko;
+        close.setAttribute('aria-label', '닫힘 / Close & Lock');
         close.addEventListener('click', () => {
           const rig = $('.doorlock-rig', root);
           const status = $('.demo-live-status', root);
@@ -304,7 +311,7 @@
             if (status) {
               status.dataset.ko = '이미 잠긴 상태입니다.';
               status.dataset.en = 'The door is already locked.';
-              status.textContent = english ? status.dataset.en : status.dataset.ko;
+              status.textContent = document.documentElement.lang === 'en' ? status.dataset.en : status.dataset.ko;
             }
             return;
           }
