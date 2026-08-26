@@ -3251,17 +3251,17 @@ html {
 
 .hero-email-wrap { min-height: 46px; overflow: visible; }
 .hero-email-wrap .hero-email { min-height: 46px; }
-.hero-email-capybara { width: 88px; bottom: 38px; }
+.hero-email-capybara { width: 88px; bottom: 28px; }
 @media (min-width: 641px) and (max-width: 900px) {
-  .hero-email-capybara { width: 84px; bottom: 36px; }
+  .hero-email-capybara { width: 84px; bottom: 27px; }
 }
 @media (max-width: 640px) {
   .hero-email-wrap { margin-top: 52px; overflow: visible; }
-  .hero-email-capybara { width: 90px; bottom: 36px; }
+  .hero-email-capybara { width: 90px; bottom: 28px; }
 }
 @media (max-width: 360px) {
   .hero-email-wrap { margin-top: 58px; overflow: visible; }
-  .hero-email-capybara { display: block; width: 80px; bottom: 36px; }
+  .hero-email-capybara { display: block; width: 80px; bottom: 27px; }
 }
 
 
