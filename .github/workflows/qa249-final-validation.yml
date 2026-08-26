@@ -1,3 +1,4 @@
+# final rerun after doorlock language fix
 name: qa249-final-validation
 
 on:
@@ -50,6 +51,9 @@ jobs:
               '/meal_queue_signal_counter/', '/Wall_Sina/', '/PlantClock/',
               '/Master_Creator_Challenge/', 'ucast-channel.is-reverse.is-exiting',
               '.detail-video { width:100%; height:auto !important; aspect-ratio:auto !important;',
+              "resetKey.dataset.ko = '초기화'", "resetKey.dataset.en = 'Reset'",
+              "submitKey.dataset.ko = '입력'", "submitKey.dataset.en = 'Input'",
+              "close.dataset.ko = '닫힘'", "close.dataset.en = 'Close / Lock'",
           ]:
               assert marker in detail, marker
           image = Path('projects/koreatechGongjiAgent/assets/images/web-shuttle-live.webp')
