@@ -3251,17 +3251,17 @@ html {
 
 .hero-email-wrap { min-height: 46px; overflow: visible; }
 .hero-email-wrap .hero-email { min-height: 46px; }
-.hero-email-capybara { width: 88px; bottom: 38px; }
+.hero-email-capybara { width: 88px; bottom: 28px; }
 @media (min-width: 641px) and (max-width: 900px) {
-  .hero-email-capybara { width: 84px; bottom: 36px; }
+  .hero-email-capybara { width: 84px; bottom: 27px; }
 }
 @media (max-width: 640px) {
   .hero-email-wrap { margin-top: 52px; overflow: visible; }
-  .hero-email-capybara { width: 90px; bottom: 36px; }
+  .hero-email-capybara { width: 90px; bottom: 28px; }
 }
 @media (max-width: 360px) {
   .hero-email-wrap { margin-top: 58px; overflow: visible; }
-  .hero-email-capybara { display: block; width: 80px; bottom: 36px; }
+  .hero-email-capybara { display: block; width: 80px; bottom: 27px; }
 }
 
 
@@ -3369,3 +3369,33 @@ html {
   .plantclock-device.fan-on .plant-fan-rotor,
   .doorlock-rig.is-alarm { animation: none; }
 }
+
+/* #249 final acceptance — source-level fixes */
+.detail-video { width:100%; height:auto !important; aspect-ratio:auto !important; object-fit:contain !important; }
+
+/* Wall_Sina: lower the visible threshold and slow the water rise. */
+.wall-water-sensor { bottom:22% !important; }
+.wall-water-level { transition:height 2.8s ease !important; }
+
+/* U-CAST: reverse crossing starts at the right sensor and ends at the left sensor. */
+.ucast-channel.is-reverse.is-entering .ucast-pedestrian { left:calc(100% - 88px) !important; transition:none !important; }
+.ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:76px !important; transition:left .68s linear !important; }
+
+/* PlantClock: readable FND, tomato plant near the pot, and a physical fan rotor. */
+.plantclock-fnd { min-height:78px; align-content:center; }
+.plantclock-fnd small { color:#f3f3f3 !important; font-size:.68rem !important; opacity:1 !important; }
+.plantclock-fnd strong { color:#ff725f !important; font-size:clamp(1rem,2.2vw,1.3rem) !important; }
+.plant-stem { left:52px !important; bottom:90px !important; height:55px !important; width:6px !important; }
+.plant-leaf { bottom:112px !important; width:38px !important; height:20px !important; }
+.plant-leaf-left { left:17px !important; transform:rotate(18deg) !important; }
+.plant-leaf-right { right:17px !important; transform:scaleX(-1) rotate(18deg) !important; }
+.plant-tomato { position:absolute; z-index:3; width:17px; height:17px; border-radius:50%; background:#d94737; border:2px solid #9d2b25; box-shadow:inset -2px -2px 0 rgba(0,0,0,.12); }
+.plant-tomato::before { content:""; position:absolute; left:4px; top:-5px; width:6px; height:6px; background:#39743b; clip-path:polygon(50% 0,65% 34%,100% 28%,72% 53%,84% 88%,50% 67%,16% 88%,28% 53%,0 28%,35% 34%); }
+.plant-tomato-a { left:31px; top:5px; }
+.plant-tomato-b { right:29px; top:21px; width:15px; height:15px; }
+.plant-fan-rotor { font-size:0 !important; overflow:hidden; border:3px solid #555 !important; background:conic-gradient(#777 0 10%,#d7d4c9 10% 25%,#777 25% 35%,#d7d4c9 35% 50%,#777 50% 60%,#d7d4c9 60% 75%,#777 75% 85%,#d7d4c9 85% 100%) !important; box-shadow:inset 0 0 0 5px #bbb; }
+.plantclock-device.fan-on .plant-fan-rotor { animation:fan-spin 1.05s linear infinite !important; }
+.doorlock-close-action { margin-top:2px; }
+@media (max-width:640px) { .plant-stem { left:36px !important; bottom:72px !important; height:45px !important; } .plant-leaf { bottom:91px !important; width:30px !important; height:18px !important; } .plant-leaf-left { left:12px !important; } .plant-leaf-right { right:12px !important; } .plant-tomato-a { left:21px; top:5px; width:14px; height:14px; } .plant-tomato-b { right:20px; top:18px; width:13px; height:13px; } }
+@media (max-width:390px) { .ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:59px !important; } }
+@media (prefers-reduced-motion:reduce) { .plantclock-device.fan-on .plant-fan-rotor { animation:none !important; } }
