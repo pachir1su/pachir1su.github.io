@@ -1,0 +1,52 @@
+name: qa249-doorlock-language
+
+on:
+  push:
+    branches:
+      - chatgpt/qa249-final-acceptance
+    paths:
+      - .github/workflows/qa249-doorlock-language.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa249-final-acceptance
+      - name: Keep new door-lock controls bilingual
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('detail.js')
+          s = p.read_text(encoding='utf-8')
+          edits = [
+            ("""        if (resetKey) {\n          resetKey.textContent = english ? 'Reset' : '초기화';\n          resetKey.setAttribute('aria-label', english ? 'Reset input' : '입력 초기화');\n        }""",
+             """        if (resetKey) {\n          resetKey.dataset.ko = '초기화';\n          resetKey.dataset.en = 'Reset';\n          resetKey.textContent = english ? resetKey.dataset.en : resetKey.dataset.ko;\n          resetKey.setAttribute('aria-label', '초기화 / Reset');\n        }"""),
+            ("""        if (submitKey) {\n          submitKey.textContent = english ? 'Input' : '입력';\n          submitKey.setAttribute('aria-label', english ? 'Submit password' : '비밀번호 입력');\n        }""",
+             """        if (submitKey) {\n          submitKey.dataset.ko = '입력';\n          submitKey.dataset.en = 'Input';\n          submitKey.textContent = english ? submitKey.dataset.en : submitKey.dataset.ko;\n          submitKey.setAttribute('aria-label', '입력 / Input');\n        }"""),
+            ("""        close.className = 'demo-action demo-action-secondary doorlock-close-action';\n        close.textContent = english ? 'Close / Lock' : '닫힘';""",
+             """        close.className = 'demo-action demo-action-secondary doorlock-close-action';\n        close.dataset.ko = '닫힘';\n        close.dataset.en = 'Close / Lock';\n        close.textContent = english ? close.dataset.en : close.dataset.ko;\n        close.setAttribute('aria-label', '닫힘 / Close & Lock');"""),
+            ("""              status.textContent = english ? status.dataset.en : status.dataset.ko;""",
+             """              status.textContent = document.documentElement.lang === 'en' ? status.dataset.en : status.dataset.ko;"""),
+          ]
+          for old, new in edits:
+              count = s.count(old)
+              if count != 1:
+                  raise SystemExit(f'expected one patch target, got {count}: {old[:80]!r}')
+              s = s.replace(old, new)
+          p.write_text(s, encoding='utf-8')
+      - name: Commit fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check detail.js
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add detail.js
+          git commit -m 'fix: keep #249 doorlock controls bilingual'
+          git push origin HEAD:chatgpt/qa249-final-acceptance
