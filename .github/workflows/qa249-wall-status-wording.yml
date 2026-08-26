@@ -1,0 +1,43 @@
+name: qa249-wall-status-wording
+
+on:
+  push:
+    branches:
+      - chatgpt/qa249-final-acceptance
+    paths:
+      - .github/workflows/qa249-wall-status-wording.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa249-final-acceptance
+      - name: Shorten Wall_Sina status wording
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('assets/project-demos.js')
+          text = path.read_text(encoding='utf-8')
+          old = "setText(status, '해수면 상승 감지 · 낮춘 위험 역치로 접근 중', 'Rising sea detected · approaching the lowered danger threshold');"
+          new = "setText(status, '해수면 상승 감지', 'Rising sea detected');"
+          if text.count(old) != 1:
+              raise SystemExit(f'expected exactly one target, got {text.count(old)}')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+      - name: Validate and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check assets/project-demos.js
+          grep -Fq "setText(status, '해수면 상승 감지', 'Rising sea detected');" assets/project-demos.js
+          ! grep -Fq '낮춘 위험 역치로 접근 중' assets/project-demos.js
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/project-demos.js
+          git commit -m 'fix: shorten Wall_Sina detection status'
+          git push origin HEAD:chatgpt/qa249-final-acceptance
