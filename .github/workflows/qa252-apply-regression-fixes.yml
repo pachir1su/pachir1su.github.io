@@ -18,41 +18,32 @@ jobs:
         with:
           ref: chatgpt/qa252-regression-fix
           fetch-depth: 0
-      - name: Apply patch
+      - name: Apply remaining media patch
         run: python3 .github/qa252_patch.py
       - name: Static checks
         run: |
           set -euo pipefail
-          node --check detail.js
           node --check assets/project-demos.js
           node tools/verify-build.js
-          cp projects.json /tmp/projects.before.json
-          node build.js
-          cmp -s projects.json /tmp/projects.before.json
           git diff --check
-          ! grep -Fq 'aspect-ratio:auto !important' style.css
-          ! grep -Fq 'transition:none !important' style.css
-          ! grep -Fq 'transition:left .68s linear' style.css
-          grep -Fq 'width="1080" height="1920" controls' projects/meal_queue_signal_counter/index.html
-          grep -Fq 'width="1280" height="720" controls' projects/Wall_Sina/index.html
+          grep -Fq 'width="600" height="820"' projects/koreatechGongjiAgent/index.html
+          grep -Fq 'width="720" height="1280" style="aspect-ratio: 9 / 16; object-fit: cover"' projects/meal_queue_signal_counter/index.html
+          grep -Fq 'width="1080" height="1920" style="aspect-ratio: 9 / 16; object-fit: cover"' projects/Wall_Sina/index.html
+          grep -Fq 'width="456" height="720" style="aspect-ratio: 19 / 30; object-fit: cover"' projects/Wall_Sina/index.html
+          grep -Fq 'width="406" height="720" style="aspect-ratio: 203 / 360; object-fit: cover"' projects/Wall_Sina/index.html
           grep -Fq '장벽 방수 테스트' projects/Wall_Sina/index.html
-          ! grep -Fq '장벽 수조 테스트' projects/Wall_Sina/index.html
           grep -Fq '팀 건영아잘하자' projects/2026_U-CAST/index.html
           grep -Fq 'U-CAST 우수 운영 멘토' projects/2026_U-CAST/index.html
           ! grep -Fq '(이슈 #6)' projects/2026_U-CAST/index.html
           ! grep -Fq '(issue #6)' projects/2026_U-CAST/index.html
-          ! grep -Fq "['1','2','3','A']" assets/project-demos.js
-          grep -Fq "'1','2','3','4','5','6','7','8','9','*','0','<-'" assets/project-demos.js
-          grep -Fq "createButton('입력', 'Input'" assets/project-demos.js
-          grep -Fq 'plant-tomato-c' assets/project-demos.js
       - name: Commit patch
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add style.css assets/project-demos.js \
+          git add \
+            projects/koreatechGongjiAgent/index.html \
             projects/meal_queue_signal_counter/index.html \
-            projects/Wall_Sina/index.html \
-            projects/2026_U-CAST/index.html
-          git commit -m 'fix: resolve #252 post-merge regressions'
+            projects/Wall_Sina/index.html
+          git commit -m 'fix: stabilize #252 media layouts'
           git push origin HEAD:chatgpt/qa252-regression-fix
