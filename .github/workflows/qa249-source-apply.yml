@@ -1,0 +1,153 @@
+name: qa249-source-apply
+
+on:
+  push:
+    branches:
+      - chatgpt/qa249-final-acceptance
+    paths:
+      - .github/workflows/qa249-source-apply.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa249-final-acceptance
+          fetch-depth: 0
+      - name: Apply #249 source fixes
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          def read(path): return Path(path).read_text(encoding='utf-8')
+          def write(path, text): Path(path).write_text(text, encoding='utf-8')
+          def once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected 1 match, got {count}')
+              return text.replace(old, new, 1)
+
+          # KGA: keep the user-provided real shuttle image and remove redundant live-operation wording in source.
+          p = 'projects/koreatechGongjiAgent/index.html'; s = read(p)
+          marker = '<div class="detail-section" data-media-followup="v27-kga-audit">'
+          a = s.index(marker); b = s.find('<div class="detail-section"', a + len(marker))
+          if b < 0: raise SystemExit('KGA media section end missing')
+          section = s[a:b].replace('실운영 ', '').replace('Live ', '')
+          write(p, s[:a] + section + s[b:])
+
+          # Healthcare: use the same gallery UI classes as the other detail pages.
+          p = 'projects/HEALTH_CHECK_PROJECT/index.html'; s = read(p)
+          if s.count('detail-photo-grid') != 1 or s.count('detail-photo-card') != 5:
+              raise SystemExit('Healthcare gallery shape changed unexpectedly')
+          write(p, s.replace('detail-photo-grid', 'detail-gallery').replace('detail-photo-card', 'detail-figure'))
+
+          # Wildfire: dashboard first, makerthon event photo second, prototype third.
+          p = 'projects/nonofire/index.html'; s = read(p)
+          sec = s.index('<div class="detail-section" data-aos="fade-up" data-aos-delay="75" data-media-followup="v27-user">')
+          g1 = s.index('<div class="detail-gallery detail-gallery-uniform">', sec)
+          g2 = s.index('</div>', g1)
+          gallery = s[g1:g2]
+          figs = re.findall(r'\s*<figure class="detail-figure">.*?</figure>', gallery, flags=re.S)
+          if len(figs) != 3: raise SystemExit(f'Wildfire expected 3 figures, got {len(figs)}')
+          gallery = gallery.replace(figs[0] + figs[1], figs[1] + figs[0], 1)
+          write(p, s[:g1] + gallery + s[g2:])
+
+          # Demo behavior: update the actual demo source instead of monkey-patching detail.js.
+          p = 'assets/project-demos.js'; s = read(p)
+          s = once(s,
+              "      setText(status, '해수면 상승 감지 · 왼쪽 수위 상승 중', 'Rising sea detected · water level increasing on the left');\n      await wait(1450);",
+              "      setText(status, '해수면 상승 감지 · 낮춘 위험 역치로 접근 중', 'Rising sea detected · approaching the lowered danger threshold');\n      await wait(900);",
+              'Wall_Sina response timing')
+
+          s = once(s,
+              "    plant.innerHTML = '<span class=\"plant-stem\"></span><span class=\"plant-leaf plant-leaf-left\"></span><span class=\"plant-leaf plant-leaf-right\"></span>';",
+              "    plant.innerHTML = '<span class=\"plant-stem\"></span><span class=\"plant-leaf plant-leaf-left\"></span><span class=\"plant-leaf plant-leaf-right\"></span>';\n    plant.append(create('span', 'plant-tomato plant-tomato-a'), create('span', 'plant-tomato plant-tomato-b'));",
+              'PlantClock tomato')
+          s = once(s,
+              "    fanRotor.textContent = '✣';",
+              "    fanRotor.textContent = '';\n    fanRotor.setAttribute('aria-hidden', 'true');",
+              'PlantClock fan rotor')
+
+          old = "      const steps = [10, 5, 0];\n      for (const remaining of steps) {\n        if (runId !== currentRun) return;\n        setText(status, `20명 도달 · 빨간불 · ${remaining}초 남음`, `20 reached · red light · ${remaining}s remaining`);\n        await wait(650);\n      }"
+          new = "      setText(status, '20명 도달 · 빨간불 · 실기 기준 약 10초 대기', '20 reached · red light · about 10s on hardware');\n      await wait(1950);"
+          s = once(s, old, new, 'Meal counter wait wording')
+
+          old = "    const status = createStatus('비밀번호를 입력하세요.', 'Enter the password.');\n    controls.append(controlTitle, keypad, status);"
+          new = "    const status = createStatus('비밀번호를 입력하세요.', 'Enter the password.');\n    const closeButton = createButton('닫힘', 'Close / Lock', 'demo-action demo-action-secondary doorlock-close-action');\n    controls.append(controlTitle, keypad, closeButton, status);"
+          s = once(s, old, new, 'Doorlock close button')
+          s = once(s,
+              "      button.textContent = key;",
+              "      button.textContent = key === '*' ? translate('초기화', 'Reset') : key === '#' ? translate('입력', 'Input') : key;\n      button.setAttribute('aria-label', key === '*' ? translate('입력 초기화', 'Reset input') : key === '#' ? translate('비밀번호 입력', 'Submit password') : key);",
+              'Doorlock explicit keypad labels')
+          old = "        if (key === 'C' && !locked) { lock(); return; }\n        input += key;\n        render('키 입력 · #으로 확인', 'Key entered · press # to confirm');"
+          new = "        input += key;\n        render('키 입력 · 입력 버튼으로 확인', 'Key entered · press Input to confirm');"
+          s = once(s, old, new, 'Doorlock remove C lock')
+          old = "    });\n    render();\n  }\n\n\n  const demos = {"
+          new = "    });\n    closeButton.addEventListener('click', () => {\n      if (locked) {\n        setText(status, '이미 잠긴 상태입니다.', 'The door is already locked.');\n        return;\n      }\n      lock();\n    });\n    render();\n  }\n\n\n  const demos = {"
+          s = once(s, old, new, 'Doorlock close handler')
+          write(p, s)
+
+          # Shared visual rules for the #249 changes.
+          p = 'style.css'; s = read(p)
+          marker = '/* #249 final acceptance — source-level fixes */'
+          if marker in s: raise SystemExit('style #249 marker already exists')
+          css = [
+              '', marker,
+              '.detail-video { width:100%; height:auto !important; aspect-ratio:auto !important; object-fit:contain !important; }',
+              '', '/* Wall_Sina: lower the visible threshold and slow the water rise. */',
+              '.wall-water-sensor { bottom:22% !important; }',
+              '.wall-water-level { transition:height 2.8s ease !important; }',
+              '', '/* U-CAST: reverse crossing starts at the right sensor and ends at the left sensor. */',
+              '.ucast-channel.is-reverse.is-entering .ucast-pedestrian { left:calc(100% - 88px) !important; transition:none !important; }',
+              '.ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:76px !important; transition:left .68s linear !important; }',
+              '', '/* PlantClock: readable FND, tomato plant near the pot, and a physical fan rotor. */',
+              '.plantclock-fnd { min-height:78px; align-content:center; }',
+              '.plantclock-fnd small { color:#f3f3f3 !important; font-size:.68rem !important; opacity:1 !important; }',
+              '.plantclock-fnd strong { color:#ff725f !important; font-size:clamp(1rem,2.2vw,1.3rem) !important; }',
+              '.plant-stem { left:52px !important; bottom:90px !important; height:55px !important; width:6px !important; }',
+              '.plant-leaf { bottom:112px !important; width:38px !important; height:20px !important; }',
+              '.plant-leaf-left { left:17px !important; transform:rotate(18deg) !important; }',
+              '.plant-leaf-right { right:17px !important; transform:scaleX(-1) rotate(18deg) !important; }',
+              '.plant-tomato { position:absolute; z-index:3; width:17px; height:17px; border-radius:50%; background:#d94737; border:2px solid #9d2b25; box-shadow:inset -2px -2px 0 rgba(0,0,0,.12); }',
+              '.plant-tomato::before { content:""; position:absolute; left:4px; top:-5px; width:6px; height:6px; background:#39743b; clip-path:polygon(50% 0,65% 34%,100% 28%,72% 53%,84% 88%,50% 67%,16% 88%,28% 53%,0 28%,35% 34%); }',
+              '.plant-tomato-a { left:31px; top:5px; }',
+              '.plant-tomato-b { right:29px; top:21px; width:15px; height:15px; }',
+              '.plant-fan-rotor { font-size:0 !important; overflow:hidden; border:3px solid #555 !important; background:conic-gradient(#777 0 10%,#d7d4c9 10% 25%,#777 25% 35%,#d7d4c9 35% 50%,#777 50% 60%,#d7d4c9 60% 75%,#777 75% 85%,#d7d4c9 85% 100%) !important; box-shadow:inset 0 0 0 5px #bbb; }',
+              '.plantclock-device.fan-on .plant-fan-rotor { animation:fan-spin 1.05s linear infinite !important; }',
+              '.doorlock-close-action { margin-top:2px; }',
+              '@media (max-width:640px) { .plant-stem { left:36px !important; bottom:72px !important; height:45px !important; } .plant-leaf { bottom:91px !important; width:30px !important; height:18px !important; } .plant-leaf-left { left:12px !important; } .plant-leaf-right { right:12px !important; } .plant-tomato-a { left:21px; top:5px; width:14px; height:14px; } .plant-tomato-b { right:20px; top:18px; width:13px; height:13px; } }',
+              '@media (max-width:390px) { .ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:59px !important; } }',
+              '@media (prefers-reduced-motion:reduce) { .plantclock-device.fan-on .plant-fan-rotor { animation:none !important; } }'
+          ]
+          write(p, s.rstrip() + '\n' + '\n'.join(css) + '\n')
+
+      - name: Validate and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check detail.js
+          node --check assets/project-demos.js
+          node tools/verify-build.js
+          node build.js
+          git diff --exit-code -- index.html
+          git diff --check
+          git diff --exit-code origin/main -- detail.js
+          ! grep -q '초 남음' assets/project-demos.js
+          grep -q '실기 기준 약 10초 대기' assets/project-demos.js
+          grep -q '낮춘 위험 역치' assets/project-demos.js
+          grep -q 'plant-tomato' assets/project-demos.js
+          grep -q 'Close / Lock' assets/project-demos.js
+          grep -q 'wall-water-sensor { bottom:22%' style.css
+          ! grep -q 'detail-photo-grid' projects/HEALTH_CHECK_PROJECT/index.html
+          ! grep -q 'detail-photo-card' projects/HEALTH_CHECK_PROJECT/index.html
+          grep -q 'fire-dashboard.webp' projects/nonofire/index.html
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add style.css assets/project-demos.js projects/koreatechGongjiAgent/index.html projects/HEALTH_CHECK_PROJECT/index.html projects/nonofire/index.html
+          git commit -m 'fix: persist #249 QA changes in project sources'
+          git push origin HEAD:chatgpt/qa249-final-acceptance
