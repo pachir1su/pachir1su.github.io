@@ -14,7 +14,7 @@ opts.add_argument('--autoplay-policy=no-user-gesture-required')
 opts.add_argument('--window-size=1440,1000')
 
 driver = webdriver.Chrome(options=opts)
-wait = WebDriverWait(driver, 12)
+wait = WebDriverWait(driver, 15)
 
 
 def rect(el):
@@ -55,28 +55,46 @@ try:
     assert cr['w'] <= 86, ('home cap size', cr)
     no_overflow('HOME desktop')
 
-    # Video ratio regression: playing must not change the rendered box size.
-    for page, expected in [
-        ('projects/meal_queue_signal_counter/index.html', 1),
-        ('projects/Wall_Sina/index.html', 3),
-    ]:
+    # KGA: user-selected portrait shuttle capture is actually loaded.
+    driver.get(BASE + 'projects/koreatechGongjiAgent/index.html')
+    shuttle = wait.until(
+        lambda d: d.find_element(By.CSS_SELECTOR, 'img[src="assets/images/web-shuttle-live.webp"]')
+    )
+    wait.until(lambda d: d.execute_script('return arguments[0].complete', shuttle))
+    dims = driver.execute_script(
+        'return [arguments[0].naturalWidth, arguments[0].naturalHeight];', shuttle
+    )
+    assert dims == [600, 820], ('KGA shuttle dimensions', dims)
+    assert rect(shuttle)['h'] > rect(shuttle)['w'], ('KGA shuttle not portrait', rect(shuttle))
+    no_overflow('KGA desktop')
+
+    # Video regression: native dimensions are correct and play() must not resize the box.
+    video_cases = [
+        ('projects/meal_queue_signal_counter/index.html', [(720, 1280)]),
+        ('projects/Wall_Sina/index.html', [(1080, 1920), (456, 720), (406, 720)]),
+    ]
+    for page, expected_dims in video_cases:
         driver.get(BASE + page)
         vids = wait.until(lambda d: d.find_elements(By.CSS_SELECTOR, 'video.detail-video'))
-        assert len(vids) == expected, (page, len(vids), expected)
-        for index, video in enumerate(vids):
+        assert len(vids) == len(expected_dims), (page, len(vids), len(expected_dims))
+        for index, (video, expected_native) in enumerate(zip(vids, expected_dims)):
             driver.execute_script("arguments[0].scrollIntoView({block:'center'});", video)
-            wait.until(lambda d: video.get_attribute('readyState') != '0')
+            wait.until(lambda d: d.execute_script('return arguments[0].readyState >= 1', video))
+            native = driver.execute_script(
+                'return [arguments[0].videoWidth, arguments[0].videoHeight];', video
+            )
+            assert native == list(expected_native), (page, index, 'native', native, expected_native)
             before = rect(video)
             driver.execute_script(
                 'arguments[0].muted=true; const p=arguments[0].play(); if(p&&p.catch)p.catch(()=>{});',
                 video,
             )
-            time.sleep(0.75)
+            time.sleep(0.9)
             after = rect(video)
             driver.execute_script('arguments[0].pause();', video)
             assert same_size(before, after), (page, index, before, after)
 
-    # U-CAST reverse: movement begins immediately, stays progressive, and uses both phases.
+    # U-CAST reverse: movement begins immediately and stays progressive.
     driver.get(BASE + 'projects/2026_U-CAST/index.html#live-demo')
     reverse = wait.until(
         lambda d: next(
@@ -98,7 +116,7 @@ try:
     assert x0 > x1 > x2 > x3 > x4, ('U-CAST reverse positions', x0, x1, x2, x3, x4)
     assert (x0 - x1) > 8 and (x2 - x3) > 8, ('U-CAST reverse movement', x0, x1, x2, x3, x4)
 
-    # U-CAST exact KO/EN content contract.
+    # U-CAST KO/EN content contract.
     set_lang('en')
     body_text = driver.find_element(By.TAG_NAME, 'body').text
     assert 'Team Mentor' in body_text
@@ -110,7 +128,7 @@ try:
     assert 'U-CAST 우수 운영 멘토' in body_text
     assert '(이슈 #6)' not in driver.page_source
 
-    # Wall_Sina: longer flow must complete reliably three times.
+    # Wall_Sina: longer flow completes reliably three times.
     driver.get(BASE + 'projects/Wall_Sina/index.html#live-demo')
     power = wait.until(
         lambda d: next(
@@ -134,7 +152,7 @@ try:
         elapsed = time.monotonic() - started
         assert elapsed >= 6.4, ('Wall_Sina cycle too short', cycle + 1, elapsed)
 
-    # PlantClock: only the tomato visual changed; previously passed interactions still work.
+    # PlantClock: tomato visual changed; previously passed interactions still work.
     driver.get(BASE + 'projects/PlantClock/index.html#live-demo')
     wait.until(lambda d: len(d.find_elements(By.CSS_SELECTOR, '.plant-tomato')) == 3)
     pbuttons = driver.find_elements(By.CSS_SELECTOR, '.plant-device-demo .demo-action')
@@ -191,10 +209,11 @@ try:
     assert 'Reset' in dtexts and 'Input' in dtexts and 'Close / Lock' in dtexts, dtexts
     set_lang('ko')
 
-    # Mobile smoke: only changed pages, no global horizontal overflow.
+    # Mobile smoke: changed pages only, no horizontal overflow.
     driver.set_window_size(390, 844)
     for page in [
         'index.html',
+        'projects/koreatechGongjiAgent/index.html',
         'projects/meal_queue_signal_counter/index.html',
         'projects/Wall_Sina/index.html',
         'projects/2026_U-CAST/index.html',
