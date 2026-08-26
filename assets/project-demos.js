@@ -126,8 +126,8 @@
       detectButton.disabled = true;
       rig.classList.add('water-detected');
       setPhase('green', 27);
-      setText(status, '해수면 상승 감지 · 왼쪽 수위 상승 중', 'Rising sea detected · water level increasing on the left');
-      await wait(1450);
+      setText(status, '해수면 상승 감지 · 낮춘 위험 역치로 접근 중', 'Rising sea detected · approaching the lowered danger threshold');
+      await wait(900);
       if (sequenceId !== currentSequence) return;
 
       rig.classList.add('barrier-raised', 'buzzer-on');
@@ -459,6 +459,7 @@
     const device = create('div', 'plantclock-device');
     const plant = create('div', 'plantclock-pot');
     plant.innerHTML = '<span class="plant-stem"></span><span class="plant-leaf plant-leaf-left"></span><span class="plant-leaf plant-leaf-right"></span>';
+    plant.append(create('span', 'plant-tomato plant-tomato-a'), create('span', 'plant-tomato plant-tomato-b'));
     const lcd = create('div', 'plantclock-lcd');
     const soilLine = create('span');
     const timeLine = create('span');
@@ -474,7 +475,8 @@
     const fanUnit = create('div', 'plant-fan-unit');
     const fanLed = create('span', 'plant-fan-led');
     const fanRotor = create('span', 'plant-fan-rotor');
-    fanRotor.textContent = '✣';
+    fanRotor.textContent = '';
+    fanRotor.setAttribute('aria-hidden', 'true');
     const fanLabel = create('small', 'plant-fan-label');
     fanLabel.textContent = 'FAN';
     fanUnit.append(fanLed, fanRotor, fanLabel);
@@ -587,12 +589,8 @@
       locked = true;
       const currentRun = ++runId;
       renderSignal();
-      const steps = [10, 5, 0];
-      for (const remaining of steps) {
-        if (runId !== currentRun) return;
-        setText(status, `20명 도달 · 빨간불 · ${remaining}초 남음`, `20 reached · red light · ${remaining}s remaining`);
-        await wait(650);
-      }
+      setText(status, '20명 도달 · 빨간불 · 실기 기준 약 10초 대기', '20 reached · red light · about 10s on hardware');
+      await wait(1950);
       if (runId !== currentRun) return;
       count = 0;
       locked = false;
@@ -635,7 +633,8 @@
     setText(controlTitle, '4×4 키패드', '4×4 keypad');
     const keypad = create('div', 'doorlock-keypad');
     const status = createStatus('비밀번호를 입력하세요.', 'Enter the password.');
-    controls.append(controlTitle, keypad, status);
+    const closeButton = createButton('닫힘', 'Close / Lock', 'demo-action demo-action-secondary doorlock-close-action');
+    controls.append(controlTitle, keypad, closeButton, status);
 
     const rig = create('div', 'doorlock-rig');
     const lcd = create('div', 'doorlock-lcd');
@@ -682,18 +681,25 @@
     [['1','2','3','A'],['4','5','6','B'],['7','8','9','C'],['*','0','#','D']].flat().forEach((key) => {
       const button = create('button', 'doorlock-key');
       button.type = 'button';
-      button.textContent = key;
+      button.textContent = key === '*' ? translate('초기화', 'Reset') : key === '#' ? translate('입력', 'Input') : key;
+      button.setAttribute('aria-label', key === '*' ? translate('입력 초기화', 'Reset input') : key === '#' ? translate('비밀번호 입력', 'Submit password') : key);
       button.addEventListener('click', () => {
         if (key === '#') {
           if (input === password) unlock(); else alarm();
           return;
         }
         if (key === '*') { clearInput(); return; }
-        if (key === 'C' && !locked) { lock(); return; }
         input += key;
-        render('키 입력 · #으로 확인', 'Key entered · press # to confirm');
+        render('키 입력 · 입력 버튼으로 확인', 'Key entered · press Input to confirm');
       });
       keypad.append(button);
+    });
+    closeButton.addEventListener('click', () => {
+      if (locked) {
+        setText(status, '이미 잠긴 상태입니다.', 'The door is already locked.');
+        return;
+      }
+      lock();
     });
     render();
   }
