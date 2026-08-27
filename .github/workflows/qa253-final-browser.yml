@@ -1,0 +1,149 @@
+name: qa253-final-browser
+
+on:
+  pull_request:
+    types: [synchronize, ready_for_review, reopened]
+  workflow_dispatch:
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa252-regression-fix
+
+      - name: Syntax checks
+        run: |
+          node --check assets/project-demos.js
+          node --check detail.js
+          node --check script.js
+          git diff --check origin/main...HEAD || true
+
+      - name: Build browser QA runner
+        run: |
+          cat > qa253-runner.html <<'EOF'
+          <!doctype html><meta charset="utf-8"><title>QA253</title>
+          <style>body{font-family:monospace}iframe{border:0}#log{white-space:pre-wrap}</style>
+          <div id="log">RUNNING</div><iframe id="f"></iframe>
+          <script>
+          const logEl = document.getElementById('log');
+          const f = document.getElementById('f');
+          const results=[];
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const out=(name,ok,detail='')=>{results.push({name,ok,detail}); logEl.textContent += `\n${ok?'PASS':'FAIL'} ${name}${detail?' :: '+detail:''}`;};
+          const rect=e=>e.getBoundingClientRect();
+          const overlap=(a,b)=>!(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom);
+          async function load(path,w=1200,h=900,lang='ko'){
+            localStorage.setItem('lang',lang);
+            f.style.width=w+'px'; f.style.height=h+'px';
+            await new Promise((resolve,reject)=>{const t=setTimeout(()=>reject(new Error('load timeout '+path)),8000); f.onload=()=>{clearTimeout(t);setTimeout(resolve,350)}; f.src=path+'?qa='+Date.now();});
+            return f.contentDocument;
+          }
+          async function testHome(){
+            for(const w of [1200,390]){
+              const d=await load('/index.html',w,850,'ko');
+              const cap=d.querySelector('.hero-email-capybara'), btn=d.querySelector('.hero-email'), text=d.querySelector('.hero-email .email-addr');
+              const cr=rect(cap), br=rect(btn), tr=rect(text);
+              out(`HOME ${w}px capybara exists`,!!cap);
+              out(`HOME ${w}px capybara attached`,cr.bottom>=br.top-8 && cr.top<br.bottom,`capBottom=${cr.bottom.toFixed(1)} btnTop=${br.top.toFixed(1)}`);
+              out(`HOME ${w}px email text not covered`,!overlap(cr,tr),`cap=${cr.left.toFixed(0)}-${cr.right.toFixed(0)} text=${tr.left.toFixed(0)}-${tr.right.toFixed(0)}`);
+              out(`HOME ${w}px no overflow`,d.documentElement.scrollWidth<=d.documentElement.clientWidth+2,`${d.documentElement.scrollWidth}/${d.documentElement.clientWidth}`);
+            }
+          }
+          async function testKGA(){
+            const d=await load('/projects/koreatechGongjiAgent/index.html',1000,900,'ko');
+            const img=[...d.images].find(x=>x.src.includes('web-shuttle-live.webp'));
+            await img.decode().catch(()=>{});
+            out('KGA shuttle decodes',img.complete&&img.naturalWidth>0,`${img.naturalWidth}x${img.naturalHeight}`);
+            out('KGA portrait',img.naturalHeight>img.naturalWidth,`${img.naturalWidth}x${img.naturalHeight}`);
+          }
+          async function videoStable(path,label){
+            const d=await load(path,1000,900,'ko');
+            const videos=[...d.querySelectorAll('video.detail-video')];
+            out(`${label} videos exist`,videos.length>0,`count=${videos.length}`);
+            for(let i=0;i<videos.length;i++){
+              const v=videos[i];
+              await new Promise(r=>{if(v.readyState>=1)return r(); const t=setTimeout(r,2500); v.addEventListener('loadedmetadata',()=>{clearTimeout(t);r()},{once:true});});
+              const before=rect(v), fit=getComputedStyle(v).objectFit;
+              try{await v.play(); await sleep(250);}catch(e){}
+              const after=rect(v); v.pause();
+              const delta=Math.max(Math.abs(before.width-after.width),Math.abs(before.height-after.height));
+              out(`${label} video ${i+1} size stable`,delta<1.5,`before=${before.width.toFixed(1)}x${before.height.toFixed(1)} after=${after.width.toFixed(1)}x${after.height.toFixed(1)}`);
+              out(`${label} video ${i+1} not cover`,fit!=='cover',`object-fit=${fit}`);
+            }
+          }
+          async function testWall(){
+            const d=await load('/projects/Wall_Sina/index.html',1000,900,'ko');
+            const root=d.querySelector('[data-project-demo="wall"]');
+            const buttons=[...root.querySelectorAll('button')];
+            const power=buttons.find(b=>b.textContent.includes('시스템 켜기')); const detect=buttons.find(b=>b.textContent.includes('해수면 상승 감지'));
+            power.click(); detect.click(); await sleep(120);
+            const rig=root.querySelector('.wall-rig'), status=root.querySelector('.demo-live-status');
+            out('Wall initial status',status.textContent.trim()==='해수면 상승 감지',status.textContent.trim());
+            out('Wall sensor lowered',parseFloat(getComputedStyle(root.querySelector('.wall-water-sensor')).bottom)<rect(root.querySelector('.wall-tank')).height*0.3+1,getComputedStyle(root.querySelector('.wall-water-sensor')).bottom);
+            await sleep(1200);
+            out('Wall barrier rises early',rig.classList.contains('barrier-raised'),rig.className);
+            await sleep(6000);
+            out('Wall cycle completes',status.textContent.includes('장벽 복귀 완료'),status.textContent.trim());
+          }
+          async function testUcast(){
+            const d=await load('/projects/2026_U-CAST/index.html',1000,900,'ko');
+            const root=d.querySelector('[data-project-demo="ucast"]'); const lane=root.querySelector('.ucast-channel'); const p=lane.querySelector('.ucast-pedestrian');
+            const rev=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('CH-1 역방향'));
+            const fwd=[...root.querySelectorAll('button')].find(b=>b.textContent.includes('CH-1 정방향'));
+            const x=()=>rect(p).left;
+            const start=x(); rev.click(); await sleep(80); const r0=x(); await sleep(450); const r1=x(); await sleep(520); const r2=x(); await sleep(450); const r3=x(); await sleep(600); const r4=x();
+            out('UCAST reverse starts right',r0>start+80,`${start.toFixed(0)} -> ${r0.toFixed(0)}`);
+            out('UCAST reverse moves continuously first half',r1<r0-10 && r2<r1-10,`${r0.toFixed(0)},${r1.toFixed(0)},${r2.toFixed(0)}`);
+            out('UCAST reverse reaches left',r4<r2-50,`${r2.toFixed(0)} -> ${r4.toFixed(0)}`);
+            await sleep(300);
+            fwd.click(); await sleep(1050); const fCenter=x(); await sleep(620); const fNearEnd=x(); await sleep(180); const fAfter=x();
+            out('UCAST forward does not reset before .95s transition',fAfter>=fNearEnd-5,`${fCenter.toFixed(0)},${fNearEnd.toFixed(0)},${fAfter.toFixed(0)}`);
+            out('UCAST team KO',d.body.textContent.includes('팀 건영아잘하자'));
+            const den=await load('/projects/2026_U-CAST/index.html',1000,900,'en');
+            out('UCAST team EN',den.body.textContent.includes('Team Geonyeongajalhaja'));
+          }
+          async function testPlant(){
+            const d=await load('/projects/PlantClock/index.html',1000,900,'ko');
+            const root=d.querySelector('[data-project-demo="plant"]');
+            out('Plant has 3 tomatoes',root.querySelectorAll('.plant-tomato').length===3,`count=${root.querySelectorAll('.plant-tomato').length}`);
+            const btns=[...root.querySelectorAll('button')]; const time=btns.find(b=>b.textContent.includes('+10')); const water=btns.find(b=>b.textContent.includes('급수')); const fan=btns.find(b=>b.textContent.includes('팬 레버'));
+            time.click();time.click();time.click(); out('Plant alert after 30m',root.querySelector('.plantclock-device').classList.contains('has-alert'));
+            water.click(); out('Plant watering clears alert',!root.querySelector('.plantclock-device').classList.contains('has-alert'));
+            fan.click(); out('Plant fan toggles',root.querySelector('.plantclock-device').classList.contains('fan-on'));
+          }
+          async function testDoor(){
+            const d=await load('/projects/Master_Creator_Challenge/index.html',1000,900,'ko');
+            const root=d.querySelector('[data-project-demo="doorlock"]'); const rig=root.querySelector('.doorlock-rig'), door=root.querySelector('.doorlock-door');
+            const size0=rect(door); const keys=[...root.querySelectorAll('.doorlock-key')];
+            for(const n of '123456') keys.find(b=>b.textContent===n).click(); root.querySelector('.doorlock-input-action').click(); await sleep(80);
+            out('Door 123456 unlocks',rig.classList.contains('is-unlocked'));
+            const size1=rect(door); out('Door box stable open',Math.abs(size0.height-size1.height)<1 && Math.abs(size0.width-size1.width)<1,`${size0.width.toFixed(0)}x${size0.height.toFixed(0)} -> ${size1.width.toFixed(0)}x${size1.height.toFixed(0)}`);
+            root.querySelector('.doorlock-close-action').click(); out('Door closes',!rig.classList.contains('is-unlocked'));
+            keys.find(b=>b.textContent==='1').click(); keys.find(b=>b.textContent==='2').click(); keys.find(b=>b.textContent==='<-').click(); out('Door backspace',root.querySelector('.doorlock-lcd').textContent.includes('Password: 1'),root.querySelector('.doorlock-lcd').textContent.trim());
+            const reset=keys.find(b=>b.textContent==='초기화'); reset.click(); out('Door reset',root.querySelector('.doorlock-lcd').textContent.includes('Enter Password:'));
+            const den=await load('/projects/Master_Creator_Challenge/index.html',1000,900,'en'); const eroot=den.querySelector('[data-project-demo="doorlock"]');
+            out('Door EN controls',eroot.textContent.includes('Reset')&&eroot.textContent.includes('Input')&&eroot.textContent.includes('Close / Lock'));
+          }
+          async function testMobile(){
+            for(const p of ['/projects/meal_queue_signal_counter/index.html','/projects/Wall_Sina/index.html','/projects/2026_U-CAST/index.html','/projects/PlantClock/index.html','/projects/Master_Creator_Challenge/index.html','/projects/koreatechGongjiAgent/index.html']){
+              const d=await load(p,390,850,'ko'); out(`390px no overflow ${p}`,d.documentElement.scrollWidth<=d.documentElement.clientWidth+2,`${d.documentElement.scrollWidth}/${d.documentElement.clientWidth}`);
+            }
+          }
+          (async()=>{try{await testHome();await testKGA();await videoStable('/projects/meal_queue_signal_counter/index.html','Meal');await videoStable('/projects/Wall_Sina/index.html','Wall');await testWall();await testUcast();await testPlant();await testDoor();await testMobile();}catch(e){out('runner exception',false,e.stack||String(e));} const bad=results.filter(x=>!x.ok); logEl.textContent += `\nDONE failures=${bad.length}`; document.title=bad.length?'QA_FAIL':'QA_PASS'; document.body.dataset.done='1'; document.body.dataset.failures=String(bad.length);})();
+          </script>
+          EOF
+
+      - name: Run Chrome QA
+        run: |
+          python3 -m http.server 8000 >/tmp/qa253-http.log 2>&1 &
+          sleep 1
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME" || { echo 'Chrome not found'; exit 1; }
+          echo "Chrome: $CHROME"
+          "$CHROME" --headless=new --no-sandbox --disable-gpu --autoplay-policy=no-user-gesture-required --virtual-time-budget=45000 --window-size=1400,1000 --dump-dom http://127.0.0.1:8000/qa253-runner.html > /tmp/qa253-dom.txt
+          cat /tmp/qa253-dom.txt
+          grep -q 'data-done="1"' /tmp/qa253-dom.txt
+          grep -q 'data-failures="0"' /tmp/qa253-dom.txt
