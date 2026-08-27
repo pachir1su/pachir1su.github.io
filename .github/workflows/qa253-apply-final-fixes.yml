@@ -16,7 +16,7 @@ jobs:
         with:
           ref: chatgpt/qa252-regression-fix
           fetch-depth: 0
-      - name: Apply all QA fixes
+      - name: Apply final product fixes
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -27,12 +27,22 @@ jobs:
 
           p=Path('style.css'); s=p.read_text()
           pairs=[
-            ('.hero-email-capybara { width: 84px; bottom: 24px; }','.hero-email-capybara { width: 84px; bottom: 24px; left: auto; right: -66px; transform: none; }'),
-            ('.hero-email-capybara { width: 86px; bottom: 24px; }','.hero-email-capybara { width: 80px; bottom: 24px; right: -8px; }'),
-            ('.hero-email-capybara { display: block; width: 76px; bottom: 23px; }','.hero-email-capybara { display: block; width: 72px; bottom: 23px; right: -6px; }'),
+            ('.hero-email-capybara { width: 84px; bottom: 24px; left: auto; right: -66px; transform: none; }',
+             '.hero-email-capybara { width: 84px; bottom: 24px; left: auto; right: -74px; transform: none; }'),
+            ('.hero-email-capybara { width: 80px; bottom: 24px; right: -8px; }',
+             '.hero-email-capybara { width: 80px; bottom: 24px; right: -12px; }'),
+            ('.hero-email-capybara { display: block; width: 72px; bottom: 23px; right: -6px; }',
+             '.hero-email-capybara { display: block; width: 72px; bottom: 23px; right: -10px; }'),
           ]
           for old,new in pairs:
             if old in s: s=s.replace(old,new,1)
+            elif new not in s: raise SystemExit(f'missing HOME target: {old}')
+
+          anchor='/* U-CAST: reverse crossing starts at the right sensor and ends at the left sensor. */\n'
+          prep='.ucast-channel.is-reverse:not(.is-entering):not(.is-exiting) .ucast-pedestrian { left:calc(100% - 88px) !important; transition:none !important; }\n'
+          if prep not in s:
+            if anchor not in s: raise SystemExit('missing U-CAST override anchor')
+            s=s.replace(anchor,anchor+prep,1)
           p.write_text(s)
 
           p=Path('projects/koreatechGongjiAgent/index.html'); s=p.read_text()
@@ -48,9 +58,10 @@ jobs:
           node tools/verify-build.js
           git diff --check
           grep -Fq 'await wait(1000);' assets/project-demos.js
-          grep -Fq 'right: -66px' style.css
+          grep -Fq 'right: -74px' style.css
+          grep -Fq 'is-reverse:not(.is-entering):not(.is-exiting)' style.css
           grep -Fq 'width="400" height="546"' projects/koreatechGongjiAgent/index.html
-      - name: Commit fixes
+      - name: Commit product fixes
         run: |
           git config user.name 'chatgpt-qa'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -58,6 +69,6 @@ jobs:
           if git diff --cached --quiet; then
             echo 'Already applied.'
           else
-            git commit -m 'fix: #254 최종 QA 회귀 수정'
+            git commit -m 'fix: #254 브라우저 QA 회귀 수정'
             git push origin HEAD:chatgpt/qa252-regression-fix
           fi
