@@ -5,9 +5,6 @@ on:
     types: [synchronize, ready_for_review, reopened]
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   qa:
     runs-on: ubuntu-latest
@@ -17,39 +14,6 @@ jobs:
         with:
           ref: chatgpt/qa252-regression-fix
           fetch-depth: 0
-
-      - name: Apply QA-discovered fixes in working tree
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          demos = Path('assets/project-demos.js')
-          s = demos.read_text()
-          old = '      await wait(reverse ? 1000 : 700);'
-          new = '      await wait(1000);'
-          if old in s:
-              s = s.replace(old, new, 1)
-          elif new not in s:
-              raise SystemExit('U-CAST timing target not found')
-          demos.write_text(s)
-
-          css = Path('style.css')
-          s = css.read_text()
-          replacements = [
-            ('.hero-email-capybara { width: 84px; bottom: 24px; }',
-             '.hero-email-capybara { width: 84px; bottom: 24px; left: auto; right: -66px; transform: none; }'),
-            ('.hero-email-capybara { width: 86px; bottom: 24px; }',
-             '.hero-email-capybara { width: 80px; bottom: 24px; right: -8px; }'),
-            ('.hero-email-capybara { display: block; width: 76px; bottom: 23px; }',
-             '.hero-email-capybara { display: block; width: 72px; bottom: 23px; right: -6px; }'),
-          ]
-          for old, new in replacements:
-              if old in s:
-                  s = s.replace(old, new, 1)
-              elif new not in s:
-                  raise SystemExit(f'capybara target not found: {old}')
-          css.write_text(s)
-          PY
 
       - name: Syntax and build checks
         run: |
@@ -68,112 +32,28 @@ jobs:
       - name: Run final Chromium QA
         run: |
           python3 -m http.server 8000 >/tmp/qa253-http.log 2>&1 &
-          echo $! >/tmp/qa253-http.pid
           sleep 1
-          cat > /tmp/qa253.mjs <<'EOF'
+          cat > qa253.mjs <<'EOF'
           import puppeteer from 'puppeteer-core';
-          const browser = await puppeteer.launch({
-            executablePath: '/usr/bin/google-chrome', headless: true,
-            args: ['--no-sandbox','--disable-gpu','--autoplay-policy=no-user-gesture-required']
-          });
-          const base='http://127.0.0.1:8000';
-          const results=[];
-          const pass=(name,ok,detail='')=>{results.push({name,ok,detail});console.log(`${ok?'PASS':'FAIL'} ${name}${detail?' :: '+detail:''}`)};
+          const browser=await puppeteer.launch({executablePath:'/usr/bin/google-chrome',headless:true,args:['--no-sandbox','--disable-gpu','--autoplay-policy=no-user-gesture-required']});
+          const base='http://127.0.0.1:8000',results=[];
           const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-          async function pageFor(path,w=1200,h=900,lang='ko'){
-            const p=await browser.newPage();
-            await p.setViewport({width:w,height:h,deviceScaleFactor:1});
-            await p.setRequestInterception(true);
-            p.on('request',req=>{try{const u=new URL(req.url());if(u.hostname==='127.0.0.1'||u.hostname==='localhost')req.continue();else req.abort();}catch{req.continue();}});
-            await p.goto(base+'/index.html',{waitUntil:'domcontentloaded'});
-            await p.evaluate(l=>localStorage.setItem('lang',l),lang);
-            await p.goto(base+path,{waitUntil:'domcontentloaded',timeout:15000});
-            await sleep(350);
-            return p;
+          const check=(name,ok,detail='')=>{results.push({name,ok,detail});console.log(`${ok?'PASS':'FAIL'} ${name}${detail?' :: '+detail:''}`)};
+          async function open(path,w=1200,h=900,lang='ko'){
+            const p=await browser.newPage(); await p.setViewport({width:w,height:h,deviceScaleFactor:1});
+            await p.setRequestInterception(true); p.on('request',r=>{try{const u=new URL(r.url());(u.hostname==='127.0.0.1'||u.hostname==='localhost')?r.continue():r.abort()}catch{r.continue()}});
+            await p.goto(base+'/index.html',{waitUntil:'domcontentloaded'}); await p.evaluate(l=>localStorage.setItem('lang',l),lang);
+            await p.goto(base+path,{waitUntil:'domcontentloaded',timeout:15000}); await sleep(350); return p;
           }
-          async function testHome(){
-            for(const w of [1200,390]){
-              const p=await pageFor('/index.html',w,850,'ko');
-              const m=await p.evaluate(()=>{
-                const cap=document.querySelector('.hero-email-capybara'),btn=document.querySelector('.hero-email'),text=document.querySelector('.hero-email .email-addr');
-                if(!cap||!btn||!text)return {exists:false};
-                const c=cap.getBoundingClientRect(),b=btn.getBoundingClientRect(),t=text.getBoundingClientRect();
-                const overlap=!(c.right<=t.left||c.left>=t.right||c.bottom<=t.top||c.top>=t.bottom);
-                return {exists:true,c:{l:c.left,r:c.right,t:c.top,b:c.bottom},b:{l:b.left,r:b.right,t:b.top,b:b.bottom},t:{l:t.left,r:t.right,t:t.top,b:t.bottom},overlap,sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth};
-              });
-              pass(`HOME ${w} capybara exists`,m.exists);
-              if(m.exists){
-                pass(`HOME ${w} attached`,m.c.b>=m.b.t-8 && m.c.t<m.b.b,JSON.stringify({cap:m.c,button:m.b}));
-                pass(`HOME ${w} email text clear`,!m.overlap,JSON.stringify({cap:m.c,text:m.t}));
-                pass(`HOME ${w} no overflow`,m.sw<=m.cw+2,`${m.sw}/${m.cw}`);
-              }
-              await p.screenshot({path:`/tmp/home-${w}.png`,fullPage:false}); await p.close();
-            }
-          }
-          async function testKGA(){
-            const p=await pageFor('/projects/koreatechGongjiAgent/index.html',1000,900);
-            await p.waitForSelector('img[src*="web-shuttle-live.webp"]');
-            const m=await p.$eval('img[src*="web-shuttle-live.webp"]',async img=>{try{await img.decode()}catch{}return {complete:img.complete,nw:img.naturalWidth,nh:img.naturalHeight}});
-            pass('KGA shuttle decodes',m.complete&&m.nw>0,`${m.nw}x${m.nh}`); pass('KGA shuttle portrait',m.nh>m.nw,`${m.nw}x${m.nh}`); await p.close();
-          }
-          async function videoStable(path,label){
-            const p=await pageFor(path,1000,900); const count=await p.$$eval('video.detail-video',v=>v.length); pass(`${label} video count`,count>0,String(count));
-            for(let i=0;i<count;i++){
-              const m=await p.evaluate(async i=>{
-                const v=document.querySelectorAll('video.detail-video')[i]; const r0=v.getBoundingClientRect(); const fit=getComputedStyle(v).objectFit;
-                const meta=await new Promise(resolve=>{if(v.readyState>=1)return resolve(true);let done=false;const f=x=>{if(done)return;done=true;resolve(x)};v.addEventListener('loadedmetadata',()=>f(true),{once:true});v.addEventListener('error',()=>f(false),{once:true});v.load();setTimeout(()=>f(false),3000)});
-                let played=false;try{await v.play();played=true;await new Promise(r=>setTimeout(r,250))}catch{} const r1=v.getBoundingClientRect();v.pause();
-                return {before:[r0.width,r0.height],after:[r1.width,r1.height],fit,meta,played,vw:v.videoWidth,vh:v.videoHeight};
-              },i);
-              const delta=Math.max(Math.abs(m.before[0]-m.after[0]),Math.abs(m.before[1]-m.after[1]));
-              pass(`${label} ${i+1} size stable`,delta<1.5,`${m.before.map(x=>x.toFixed(1)).join('x')} -> ${m.after.map(x=>x.toFixed(1)).join('x')} meta=${m.meta} play=${m.played}`);
-              pass(`${label} ${i+1} no crop`,m.fit!=='cover',`fit=${m.fit} video=${m.vw}x${m.vh}`);
-            }
-            await p.close();
-          }
-          async function testWall(){
-            const p=await pageFor('/projects/Wall_Sina/index.html',1000,900); await p.waitForSelector('[data-project-demo="wall"] button');
-            const buttons=await p.$$('[data-project-demo="wall"] button'); await buttons[0].click(); await buttons[1].click(); await sleep(150);
-            let m=await p.evaluate(()=>{const root=document.querySelector('[data-project-demo="wall"]'),rig=root.querySelector('.wall-rig'),status=root.querySelector('.demo-live-status'),sensor=root.querySelector('.wall-water-sensor'),tank=root.querySelector('.wall-tank');return {status:status.textContent.trim(),bottom:parseFloat(getComputedStyle(sensor).bottom),tank:tank.getBoundingClientRect().height,raised:rig.classList.contains('barrier-raised')}});
-            pass('Wall status exact',m.status==='해수면 상승 감지',m.status); pass('Wall threshold lowered',m.bottom<m.tank*.3+1,`${m.bottom}/${m.tank}`);
-            await sleep(1200); m=await p.evaluate(()=>({raised:document.querySelector('.wall-rig').classList.contains('barrier-raised'),status:document.querySelector('[data-project-demo="wall"] .demo-live-status').textContent.trim()})); pass('Wall barrier rises early',m.raised,m.status);
-            await sleep(6200); m=await p.$eval('[data-project-demo="wall"] .demo-live-status',e=>e.textContent.trim()); pass('Wall cycle completes',m.includes('장벽 복귀 완료'),m); await p.close();
-          }
-          async function testUcast(){
-            const p=await pageFor('/projects/2026_U-CAST/index.html',1000,900); await p.waitForSelector('[data-project-demo="ucast"] button');
-            const buttons=await p.$$('[data-project-demo="ucast"] button');
-            const x=()=>p.$eval('[data-project-demo="ucast"] .ucast-channel .ucast-pedestrian',e=>e.getBoundingClientRect().left);
-            const start=await x(); await buttons[1].click(); await sleep(80); const r0=await x(); await sleep(450); const r1=await x(); await sleep(520); const r2=await x(); await sleep(450); const r3=await x(); await sleep(600); const r4=await x();
-            pass('U-CAST reverse starts right',r0>start+80,`${start.toFixed(0)} -> ${r0.toFixed(0)}`); pass('U-CAST reverse continuous',r1<r0-10&&r2<r1-10,`${r0.toFixed(0)},${r1.toFixed(0)},${r2.toFixed(0)}`); pass('U-CAST reverse reaches left',r4<r2-50,`${r2.toFixed(0)} -> ${r4.toFixed(0)}`);
-            await sleep(400); await buttons[0].click(); await sleep(1050); const f0=await x(); await sleep(600); const f1=await x(); await sleep(300); const f2=await x(); pass('U-CAST forward completes full transition',f2>f1+5,`${f0.toFixed(0)},${f1.toFixed(0)},${f2.toFixed(0)}`);
-            const ko=await p.evaluate(()=>document.body.innerText); pass('U-CAST KO content',ko.includes('팀 건영아잘하자')&&ko.includes('U-CAST 우수 운영 멘토'));
-            await p.close(); const en=await pageFor('/projects/2026_U-CAST/index.html',1000,900,'en'); const ent=await en.evaluate(()=>document.body.innerText); pass('U-CAST EN content',ent.includes('Team Geonyeongajalhaja')&&ent.includes('U-CAST Outstanding Operations Mentor')); await en.close();
-          }
-          async function testPlant(){
-            const p=await pageFor('/projects/PlantClock/index.html',1000,900); await p.waitForSelector('[data-project-demo="plant"] button');
-            pass('PlantClock has 3 tomatoes',(await p.$$('[data-project-demo="plant"] .plant-tomato')).length===3);
-            const b=await p.$$('[data-project-demo="plant"] button'); await b[0].click();await b[0].click();await b[0].click();pass('PlantClock 30m alert',await p.$eval('.plantclock-device',e=>e.classList.contains('has-alert')));await b[1].click();pass('PlantClock watering clears alert',!(await p.$eval('.plantclock-device',e=>e.classList.contains('has-alert'))));await b[2].click();pass('PlantClock fan toggles',await p.$eval('.plantclock-device',e=>e.classList.contains('fan-on')));await p.close();
-          }
-          async function testDoor(){
-            const p=await pageFor('/projects/Master_Creator_Challenge/index.html',1000,900);await p.waitForSelector('[data-project-demo="doorlock"] .doorlock-key');
-            const initial=await p.$eval('.doorlock-door',e=>{const r=e.getBoundingClientRect();return [r.width,r.height]});
-            for(const n of '123456')await p.evaluate(n=>[...document.querySelectorAll('.doorlock-key')].find(b=>b.textContent===n).click(),n);await p.click('.doorlock-input-action');await sleep(80);pass('Doorlock 123456 opens',await p.$eval('.doorlock-rig',e=>e.classList.contains('is-unlocked')));const opened=await p.$eval('.doorlock-door',e=>{const r=e.getBoundingClientRect();return [r.width,r.height]});pass('Doorlock box size stable',Math.max(Math.abs(initial[0]-opened[0]),Math.abs(initial[1]-opened[1]))<1,`${initial.join('x')} -> ${opened.join('x')}`);await p.click('.doorlock-close-action');pass('Doorlock closes',!(await p.$eval('.doorlock-rig',e=>e.classList.contains('is-unlocked'))));await p.evaluate(()=>{const k=[...document.querySelectorAll('.doorlock-key')];k.find(b=>b.textContent==='1').click();k.find(b=>b.textContent==='2').click();k.find(b=>b.textContent==='<-').click()});pass('Doorlock backspace',await p.$eval('.doorlock-lcd',e=>e.textContent.includes('Password: 1')));await p.evaluate(()=>[...document.querySelectorAll('.doorlock-key')].find(b=>b.textContent==='초기화').click());pass('Doorlock reset',await p.$eval('.doorlock-lcd',e=>e.textContent.includes('Enter Password:')));await p.close();
-            const en=await pageFor('/projects/Master_Creator_Challenge/index.html',1000,900,'en');const t=await en.$eval('[data-project-demo="doorlock"]',e=>e.innerText);pass('Doorlock EN controls',t.includes('Reset')&&t.includes('Input')&&t.includes('Close / Lock'));await en.close();
-          }
-          async function mobile(){for(const path of ['/projects/meal_queue_signal_counter/index.html','/projects/Wall_Sina/index.html','/projects/2026_U-CAST/index.html','/projects/PlantClock/index.html','/projects/Master_Creator_Challenge/index.html','/projects/koreatechGongjiAgent/index.html']){const p=await pageFor(path,390,850);const m=await p.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]);pass(`390px no overflow ${path}`,m[0]<=m[1]+2,`${m[0]}/${m[1]}`);await p.close();}}
-          try{await testHome();await testKGA();await videoStable('/projects/meal_queue_signal_counter/index.html','Meal');await videoStable('/projects/Wall_Sina/index.html','Wall');await testWall();await testUcast();await testPlant();await testDoor();await mobile();}finally{await browser.close();}
-          const failures=results.filter(x=>!x.ok);console.log(`TOTAL ${results.length} / FAIL ${failures.length}`);if(failures.length){console.log(JSON.stringify(failures,null,2));process.exit(1)}
+          async function home(){for(const w of [1200,390]){const p=await open('/index.html',w,850);const m=await p.evaluate(()=>{const c=document.querySelector('.hero-email-capybara')?.getBoundingClientRect(),b=document.querySelector('.hero-email')?.getBoundingClientRect(),t=document.querySelector('.hero-email .email-addr')?.getBoundingClientRect();if(!c||!b||!t)return null;return {c:[c.left,c.right,c.top,c.bottom],b:[b.left,b.right,b.top,b.bottom],t:[t.left,t.right,t.top,t.bottom],sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth}});check(`HOME ${w} elements`,!!m);if(m){const [cl,cr,ct,cb]=m.c,[bl,br,bt,bb]=m.b,[tl,tr,tt,tb]=m.t;const overlap=!(cr<=tl||cl>=tr||cb<=tt||ct>=tb);check(`HOME ${w} attached`,cb>=bt-8&&ct<bb,JSON.stringify(m));check(`HOME ${w} text clear`,!overlap,JSON.stringify(m));check(`HOME ${w} overflow`,m.sw<=m.cw+2,`${m.sw}/${m.cw}`)}await p.close()}}
+          async function kga(){const p=await open('/projects/koreatechGongjiAgent/index.html',1000,900);const m=await p.$eval('img[src*="web-shuttle-live.webp"]',async i=>{try{await i.decode()}catch{}return [i.complete,i.naturalWidth,i.naturalHeight]});check('KGA decode',m[0]&&m[1]>0,`${m[1]}x${m[2]}`);check('KGA portrait',m[2]>m[1],`${m[1]}x${m[2]}`);await p.close()}
+          async function videos(path,label){const p=await open(path,1000,900);const count=await p.$$eval('video.detail-video',v=>v.length);check(`${label} videos exist`,count>0,String(count));for(let i=0;i<count;i++){const m=await p.evaluate(async i=>{const v=document.querySelectorAll('video.detail-video')[i],a=v.getBoundingClientRect(),fit=getComputedStyle(v).objectFit;await new Promise(res=>{if(v.readyState>=1)return res();let done=false;const f=()=>{if(!done){done=true;res()}};v.addEventListener('loadedmetadata',f,{once:true});v.addEventListener('error',f,{once:true});v.load();setTimeout(f,2500)});let played=false;try{await v.play();played=true;await new Promise(r=>setTimeout(r,250))}catch{}const b=v.getBoundingClientRect();v.pause();return {a:[a.width,a.height],b:[b.width,b.height],fit,played,vw:v.videoWidth,vh:v.videoHeight}},i);const d=Math.max(Math.abs(m.a[0]-m.b[0]),Math.abs(m.a[1]-m.b[1]));check(`${label} ${i+1} stable`,d<1.5,`${m.a.join('x')} -> ${m.b.join('x')} play=${m.played}`);check(`${label} ${i+1} no crop`,m.fit!=='cover',`fit=${m.fit} source=${m.vw}x${m.vh}`)}await p.close()}
+          async function wall(){const p=await open('/projects/Wall_Sina/index.html',1000,900);await p.waitForSelector('[data-project-demo="wall"] button');const b=await p.$$('[data-project-demo="wall"] button');await b[0].click();await b[1].click();await sleep(150);let m=await p.evaluate(()=>{const r=document.querySelector('[data-project-demo="wall"]'),s=r.querySelector('.wall-water-sensor'),t=r.querySelector('.wall-tank');return {text:r.querySelector('.demo-live-status').textContent.trim(),bottom:parseFloat(getComputedStyle(s).bottom),h:t.getBoundingClientRect().height}});check('Wall status',m.text==='해수면 상승 감지',m.text);check('Wall threshold',m.bottom<m.h*.3+1,`${m.bottom}/${m.h}`);await sleep(1200);check('Wall early barrier',await p.$eval('.wall-rig',e=>e.classList.contains('barrier-raised')));await sleep(6200);m=await p.$eval('[data-project-demo="wall"] .demo-live-status',e=>e.textContent.trim());check('Wall cycle complete',m.includes('장벽 복귀 완료'),m);await p.close()}
+          async function ucast(){const p=await open('/projects/2026_U-CAST/index.html',1000,900);await p.waitForSelector('[data-project-demo="ucast"] button');const bs=await p.$$('[data-project-demo="ucast"] button'),x=()=>p.$eval('[data-project-demo="ucast"] .ucast-channel .ucast-pedestrian',e=>e.getBoundingClientRect().left);const idle=await x();await bs[1].click();await sleep(80);const r0=await x();await sleep(450);const r1=await x();await sleep(520);const r2=await x();await sleep(450);const r3=await x();await sleep(500);const r4=await x();check('UCAST reverse starts right',r0>idle+80,`${idle},${r0}`);check('UCAST reverse continuous',r1<r0-10&&r2<r1-10&&r3<r2-10,`${r0},${r1},${r2},${r3}`);check('UCAST reverse reaches left',r4<r2-40,`${r2}->${r4}`);await sleep(500);await bs[0].click();await sleep(1100);const f0=await x();await sleep(500);const f1=await x();await sleep(300);const f2=await x();check('UCAST forward full exit',f1>f0+10&&f2>f1+5,`${f0},${f1},${f2}`);const ko=await p.evaluate(()=>document.body.innerText);check('UCAST KO content',ko.includes('팀 건영아잘하자')&&ko.includes('U-CAST 우수 운영 멘토'));await p.close();const en=await open('/projects/2026_U-CAST/index.html',1000,900,'en');const et=await en.evaluate(()=>document.body.innerText);check('UCAST EN content',et.includes('Team Geonyeongajalhaja')&&et.includes('U-CAST Outstanding Operations Mentor'));await en.close()}
+          async function plant(){const p=await open('/projects/PlantClock/index.html',1000,900);await p.waitForSelector('[data-project-demo="plant"] button');check('Plant tomatoes 3',(await p.$$('[data-project-demo="plant"] .plant-tomato')).length===3);const bs=await p.$$('[data-project-demo="plant"] button');await bs[0].click();await bs[0].click();await bs[0].click();check('Plant alert 30m',await p.$eval('.plantclock-device',e=>e.classList.contains('has-alert')));await bs[1].click();check('Plant watering reset',!(await p.$eval('.plantclock-device',e=>e.classList.contains('has-alert'))));await bs[2].click();check('Plant fan',await p.$eval('.plantclock-device',e=>e.classList.contains('fan-on')));await p.close()}
+          async function door(){const p=await open('/projects/Master_Creator_Challenge/index.html',1000,900);await p.waitForSelector('.doorlock-key');const s0=await p.$eval('.doorlock-door',e=>{const r=e.getBoundingClientRect();return [r.width,r.height]});for(const n of '123456')await p.evaluate(n=>[...document.querySelectorAll('.doorlock-key')].find(b=>b.textContent===n).click(),n);await p.click('.doorlock-input-action');await sleep(80);check('Door unlock 123456',await p.$eval('.doorlock-rig',e=>e.classList.contains('is-unlocked')));const s1=await p.$eval('.doorlock-door',e=>{const r=e.getBoundingClientRect();return [r.width,r.height]});check('Door size stable',Math.max(Math.abs(s0[0]-s1[0]),Math.abs(s0[1]-s1[1]))<1,`${s0}->${s1}`);await p.click('.doorlock-close-action');check('Door close',!(await p.$eval('.doorlock-rig',e=>e.classList.contains('is-unlocked'))));await p.evaluate(()=>{const k=[...document.querySelectorAll('.doorlock-key')];k.find(b=>b.textContent==='1').click();k.find(b=>b.textContent==='2').click();k.find(b=>b.textContent==='<-').click()});check('Door backspace',await p.$eval('.doorlock-lcd',e=>e.textContent.includes('Password: 1')));await p.evaluate(()=>[...document.querySelectorAll('.doorlock-key')].find(b=>b.textContent==='초기화').click());check('Door reset',await p.$eval('.doorlock-lcd',e=>e.textContent.includes('Enter Password:')));await p.close();const en=await open('/projects/Master_Creator_Challenge/index.html',1000,900,'en');const t=await en.$eval('[data-project-demo="doorlock"]',e=>e.innerText);check('Door EN controls',t.includes('Reset')&&t.includes('Input')&&t.includes('Close / Lock'));await en.close()}
+          async function mobile(){for(const path of ['/projects/meal_queue_signal_counter/index.html','/projects/Wall_Sina/index.html','/projects/2026_U-CAST/index.html','/projects/PlantClock/index.html','/projects/Master_Creator_Challenge/index.html','/projects/koreatechGongjiAgent/index.html']){const p=await open(path,390,850);const m=await p.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]);check(`390 overflow ${path}`,m[0]<=m[1]+2,`${m[0]}/${m[1]}`);await p.close()}}
+          try{await home();await kga();await videos('/projects/meal_queue_signal_counter/index.html','Meal');await videos('/projects/Wall_Sina/index.html','Wall');await wall();await ucast();await plant();await door();await mobile()}finally{await browser.close()}
+          const bad=results.filter(x=>!x.ok);console.log(`TOTAL=${results.length} FAIL=${bad.length}`);if(bad.length){console.log(JSON.stringify(bad,null,2));process.exit(1)}
           EOF
-          node /tmp/qa253.mjs
-
-      - name: Commit QA fixes after all checks pass
-        run: |
-          git config user.name 'chatgpt-qa'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/project-demos.js style.css
-          if git diff --cached --quiet; then
-            echo 'No product fix commit needed.'
-          else
-            git commit -m 'fix: #254 최종 QA 회귀 수정'
-            git push origin HEAD:chatgpt/qa252-regression-fix
-          fi
+          node qa253.mjs
