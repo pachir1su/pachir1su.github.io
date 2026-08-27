@@ -265,7 +265,7 @@
       channel.lane.classList.remove('is-entering');
       channel.lane.classList.add('is-exiting');
       setText(status, `CH-${index + 1} 반대편 센서 접근`, `CH-${index + 1} approaching opposite sensor`);
-      await wait(reverse ? 1000 : 700);
+      await wait(1000);
       if (channel.version !== currentVersion) return;
       channel.lane.classList.remove('is-active', 'is-exiting', 'is-reverse');
       setText(channel.state, '대기', 'Standby');
