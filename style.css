@@ -3399,3 +3399,8 @@ html {
 @media (max-width:640px) { .plant-stem { left:36px !important; bottom:72px !important; height:45px !important; } .plant-leaf { bottom:91px !important; width:30px !important; height:18px !important; } .plant-leaf-left { left:12px !important; } .plant-leaf-right { right:12px !important; } .plant-tomato-a { left:16px; top:28px; width:15px; height:14px; } .plant-tomato-b { right:12px; top:40px; width:14px; height:13px; } .plant-tomato-c { left:33px; top:52px; width:13px; height:12px; } }
 @media (max-width:390px) { .ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:59px !important; } }
 @media (prefers-reduced-motion:reduce) { .plantclock-device.fan-on .plant-fan-rotor { animation:none !important; } }
+
+/* YouTube embeds use a fixed 16:9 frame; local MP4s keep their source ratio. */
+.detail-youtube-embed { width:100%; aspect-ratio:16 / 9; overflow:hidden; border-radius:2px; background:#000; }
+.detail-youtube-embed > iframe.detail-video { width:100%; height:100%; display:block; border:0; }
+video.detail-video { height:auto; }
