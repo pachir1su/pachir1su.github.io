@@ -3251,17 +3251,17 @@ html {
 
 .hero-email-wrap { min-height: 46px; overflow: visible; }
 .hero-email-wrap .hero-email { min-height: 46px; }
-.hero-email-capybara { width: 88px; bottom: 28px; }
+.hero-email-capybara { width: 84px; bottom: 24px; left: auto; right: -74px; transform: none; }
 @media (min-width: 641px) and (max-width: 900px) {
-  .hero-email-capybara { width: 84px; bottom: 27px; }
+  .hero-email-capybara { width: 80px; bottom: 23px; }
 }
 @media (max-width: 640px) {
   .hero-email-wrap { margin-top: 52px; overflow: visible; }
-  .hero-email-capybara { width: 90px; bottom: 28px; }
+  .hero-email-capybara { width: 80px; bottom: 24px; right: -12px; }
 }
 @media (max-width: 360px) {
   .hero-email-wrap { margin-top: 58px; overflow: visible; }
-  .hero-email-capybara { display: block; width: 80px; bottom: 27px; }
+  .hero-email-capybara { display: block; width: 72px; bottom: 23px; right: -10px; }
 }
 
 
@@ -3325,7 +3325,7 @@ html {
 .signal-gorilla-cell { display: none !important; }
 
 .doorlock-device-demo .hardware-control-panel { min-width: 0; }
-.doorlock-keypad { display: grid; grid-template-columns: repeat(4, minmax(42px, 1fr)); gap: 7px; }
+.doorlock-keypad { display: grid; grid-template-columns: repeat(3, minmax(42px, 1fr)); gap: 7px; }
 .doorlock-key {
   min-height: 42px; border: 1px solid var(--line); border-radius: 5px;
   background: var(--card); box-shadow: 0 2px 0 rgba(0, 0, 0, .14);
@@ -3342,7 +3342,7 @@ html {
   background: #c7e5b4; color: #18321a; font: 700 .8rem/1.6 var(--font-mono);
 }
 .doorlock-door {
-  position: relative; min-height: 170px; border: 7px solid #6a4d35;
+  position: relative; height: 170px; min-height: 170px; box-sizing: border-box; border: 7px solid #6a4d35;
   border-radius: 5px; background: #b8875e; overflow: hidden;
 }
 .doorlock-bolt {
@@ -3363,7 +3363,7 @@ html {
 
 @media (max-width: 390px) {
   .ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left: 59px; }
-  .doorlock-keypad { grid-template-columns: repeat(4, minmax(36px, 1fr)); }
+  .doorlock-keypad { grid-template-columns: repeat(3, minmax(36px, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) {
   .plantclock-device.fan-on .plant-fan-rotor,
@@ -3371,15 +3371,14 @@ html {
 }
 
 /* #249 final acceptance — source-level fixes */
-.detail-video { width:100%; height:auto !important; aspect-ratio:auto !important; object-fit:contain !important; }
-
 /* Wall_Sina: lower the visible threshold and slow the water rise. */
 .wall-water-sensor { bottom:22% !important; }
 .wall-water-level { transition:height 2.8s ease !important; }
 
 /* U-CAST: reverse crossing starts at the right sensor and ends at the left sensor. */
-.ucast-channel.is-reverse.is-entering .ucast-pedestrian { left:calc(100% - 88px) !important; transition:none !important; }
-.ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:76px !important; transition:left .68s linear !important; }
+.ucast-channel.is-reverse:not(.is-entering):not(.is-exiting) .ucast-pedestrian { left:calc(100% - 88px) !important; transition:none !important; }
+.ucast-channel.is-reverse.is-entering .ucast-pedestrian { left:50% !important; transition:left .95s linear !important; }
+.ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:76px !important; transition:left .95s linear !important; }
 
 /* PlantClock: readable FND, tomato plant near the pot, and a physical fan rotor. */
 .plantclock-fnd { min-height:78px; align-content:center; }
@@ -3389,13 +3388,19 @@ html {
 .plant-leaf { bottom:112px !important; width:38px !important; height:20px !important; }
 .plant-leaf-left { left:17px !important; transform:rotate(18deg) !important; }
 .plant-leaf-right { right:17px !important; transform:scaleX(-1) rotate(18deg) !important; }
-.plant-tomato { position:absolute; z-index:3; width:17px; height:17px; border-radius:50%; background:#d94737; border:2px solid #9d2b25; box-shadow:inset -2px -2px 0 rgba(0,0,0,.12); }
-.plant-tomato::before { content:""; position:absolute; left:4px; top:-5px; width:6px; height:6px; background:#39743b; clip-path:polygon(50% 0,65% 34%,100% 28%,72% 53%,84% 88%,50% 67%,16% 88%,28% 53%,0 28%,35% 34%); }
-.plant-tomato-a { left:31px; top:5px; }
-.plant-tomato-b { right:29px; top:21px; width:15px; height:15px; }
+.plant-tomato { position:absolute; z-index:4; width:20px; height:18px; border-radius:48% 52% 52% 48%; background:radial-gradient(circle at 34% 28%,#ff8a73 0 14%,#e94b39 34%,#bd2e28 78%,#99231f 100%); border:1px solid #81231f; box-shadow:0 2px 3px rgba(70,25,18,.28),inset -3px -3px 3px rgba(105,20,16,.18); }
+.plant-tomato::before { content:""; position:absolute; left:50%; top:-6px; width:13px; height:9px; transform:translateX(-50%); background:#35733b; clip-path:polygon(50% 0,61% 35%,100% 20%,72% 52%,88% 88%,52% 66%,18% 92%,30% 55%,0 28%,39% 36%); }
+.plant-tomato-a { left:25px; top:34px; }
+.plant-tomato-b { right:20px; top:48px; width:18px; height:17px; }
+.plant-tomato-c { left:48px; top:61px; width:16px; height:15px; }
 .plant-fan-rotor { font-size:0 !important; overflow:hidden; border:3px solid #555 !important; background:conic-gradient(#777 0 10%,#d7d4c9 10% 25%,#777 25% 35%,#d7d4c9 35% 50%,#777 50% 60%,#d7d4c9 60% 75%,#777 75% 85%,#d7d4c9 85% 100%) !important; box-shadow:inset 0 0 0 5px #bbb; }
 .plantclock-device.fan-on .plant-fan-rotor { animation:fan-spin 1.05s linear infinite !important; }
 .doorlock-close-action { margin-top:2px; }
-@media (max-width:640px) { .plant-stem { left:36px !important; bottom:72px !important; height:45px !important; } .plant-leaf { bottom:91px !important; width:30px !important; height:18px !important; } .plant-leaf-left { left:12px !important; } .plant-leaf-right { right:12px !important; } .plant-tomato-a { left:21px; top:5px; width:14px; height:14px; } .plant-tomato-b { right:20px; top:18px; width:13px; height:13px; } }
+@media (max-width:640px) { .plant-stem { left:36px !important; bottom:72px !important; height:45px !important; } .plant-leaf { bottom:91px !important; width:30px !important; height:18px !important; } .plant-leaf-left { left:12px !important; } .plant-leaf-right { right:12px !important; } .plant-tomato-a { left:16px; top:28px; width:15px; height:14px; } .plant-tomato-b { right:12px; top:40px; width:14px; height:13px; } .plant-tomato-c { left:33px; top:52px; width:13px; height:12px; } }
 @media (max-width:390px) { .ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:59px !important; } }
 @media (prefers-reduced-motion:reduce) { .plantclock-device.fan-on .plant-fan-rotor { animation:none !important; } }
+
+/* YouTube embeds use a fixed 16:9 frame; local MP4s keep their source ratio. */
+.detail-youtube-embed { width:100%; aspect-ratio:16 / 9; overflow:hidden; border-radius:2px; background:#000; }
+.detail-youtube-embed > iframe.detail-video { width:100%; height:100%; display:block; border:0; }
+video.detail-video { height:auto; }
