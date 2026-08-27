@@ -43,6 +43,10 @@ jobs:
           if prep not in s:
             if anchor not in s: raise SystemExit('missing U-CAST override anchor')
             s=s.replace(anchor,anchor+prep,1)
+
+          youtube_css='''\n/* YouTube embeds use a fixed 16:9 frame; local MP4s keep their source ratio. */\n.detail-youtube-embed { width:100%; aspect-ratio:16 / 9; overflow:hidden; border-radius:2px; background:#000; }\n.detail-youtube-embed > iframe.detail-video { width:100%; height:100%; display:block; border:0; }\nvideo.detail-video { height:auto; }\n'''
+          if '.detail-youtube-embed {' not in s:
+            s += youtube_css
           p.write_text(s)
 
           p=Path('projects/koreatechGongjiAgent/index.html'); s=p.read_text()
@@ -51,6 +55,20 @@ jobs:
           if old in s: s=s.replace(old,new,1)
           elif new not in s: raise SystemExit('KGA shuttle image tag not found')
           p.write_text(s)
+
+          for path in ['projects/computingSAGO/index.html','projects/MultiMind/index.html']:
+            p=Path(path); s=p.read_text()
+            if 'class="detail-youtube-embed"' not in s:
+              marker='<iframe\n                  class="detail-video"'
+              start=s.find(marker)
+              if start < 0: raise SystemExit(f'YouTube iframe not found: {path}')
+              end=s.find('</iframe>', start)
+              if end < 0: raise SystemExit(f'YouTube iframe end not found: {path}')
+              end += len('</iframe>')
+              iframe=s[start:end]
+              wrapped='<div class="detail-youtube-embed">\n' + iframe + '\n                </div>'
+              s=s[:start]+wrapped+s[end:]
+            p.write_text(s)
           PY
       - name: Validate product fixes
         run: |
@@ -61,14 +79,17 @@ jobs:
           grep -Fq 'right: -74px' style.css
           grep -Fq 'is-reverse:not(.is-entering):not(.is-exiting)' style.css
           grep -Fq 'width="400" height="546"' projects/koreatechGongjiAgent/index.html
+          grep -Fq '.detail-youtube-embed > iframe.detail-video' style.css
+          grep -Fq 'class="detail-youtube-embed"' projects/computingSAGO/index.html
+          grep -Fq 'class="detail-youtube-embed"' projects/MultiMind/index.html
       - name: Commit product fixes
         run: |
           git config user.name 'chatgpt-qa'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/project-demos.js style.css projects/koreatechGongjiAgent/index.html
+          git add assets/project-demos.js style.css projects/koreatechGongjiAgent/index.html projects/computingSAGO/index.html projects/MultiMind/index.html
           if git diff --cached --quiet; then
             echo 'Already applied.'
           else
-            git commit -m 'fix: #254 브라우저 QA 회귀 수정'
+            git commit -m 'fix: #254 YouTube 16대9 회귀 수정'
             git push origin HEAD:chatgpt/qa252-regression-fix
           fi
