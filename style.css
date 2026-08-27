@@ -3251,17 +3251,17 @@ html {
 
 .hero-email-wrap { min-height: 46px; overflow: visible; }
 .hero-email-wrap .hero-email { min-height: 46px; }
-.hero-email-capybara { width: 84px; bottom: 24px; left: auto; right: -66px; transform: none; }
+.hero-email-capybara { width: 84px; bottom: 24px; left: auto; right: -74px; transform: none; }
 @media (min-width: 641px) and (max-width: 900px) {
   .hero-email-capybara { width: 80px; bottom: 23px; }
 }
 @media (max-width: 640px) {
   .hero-email-wrap { margin-top: 52px; overflow: visible; }
-  .hero-email-capybara { width: 80px; bottom: 24px; right: -8px; }
+  .hero-email-capybara { width: 80px; bottom: 24px; right: -12px; }
 }
 @media (max-width: 360px) {
   .hero-email-wrap { margin-top: 58px; overflow: visible; }
-  .hero-email-capybara { display: block; width: 72px; bottom: 23px; right: -6px; }
+  .hero-email-capybara { display: block; width: 72px; bottom: 23px; right: -10px; }
 }
 
 
@@ -3376,6 +3376,7 @@ html {
 .wall-water-level { transition:height 2.8s ease !important; }
 
 /* U-CAST: reverse crossing starts at the right sensor and ends at the left sensor. */
+.ucast-channel.is-reverse:not(.is-entering):not(.is-exiting) .ucast-pedestrian { left:calc(100% - 88px) !important; transition:none !important; }
 .ucast-channel.is-reverse.is-entering .ucast-pedestrian { left:50% !important; transition:left .95s linear !important; }
 .ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:76px !important; transition:left .95s linear !important; }
 
