@@ -1,0 +1,88 @@
+name: qa253-final-assertions
+
+on:
+  pull_request:
+    types: [synchronize, ready_for_review, reopened]
+  workflow_dispatch:
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa252-regression-fix
+      - name: Static/build validation
+        run: |
+          node --check assets/project-demos.js
+          node --check detail.js
+          node --check script.js
+          node tools/verify-build.js
+          cp index.html /tmp/index-before.html
+          node build.js
+          cmp -s index.html /tmp/index-before.html
+          git diff --check
+          grep -Fq 'data-en="U-CAST Outstanding Operations Mentor" data-ko="U-CAST 우수 운영 멘토"' projects/2026_U-CAST/index.html
+          grep -Fq 'data-en="Team Geonyeongajalhaja" data-ko="팀 건영아잘하자"' projects/2026_U-CAST/index.html
+          grep -Fq "createButton('입력', 'Input'" assets/project-demos.js
+          grep -Fq "createButton('닫힘', 'Close / Lock'" assets/project-demos.js
+          grep -Fq "translate('초기화', 'Reset')" assets/project-demos.js
+          grep -Fq 'class="detail-youtube-embed"' projects/computingSAGO/index.html
+          grep -Fq 'class="detail-youtube-embed"' projects/MultiMind/index.html
+      - name: Install Puppeteer
+        run: npm install --no-save --ignore-scripts puppeteer-core@24
+      - name: Verify false-negative cases and YouTube layout
+        run: |
+          python3 -m http.server 8000 >/tmp/qa253-final-http.log 2>&1 &
+          sleep 1
+          cat > qa253-final.mjs <<'EOF'
+          import puppeteer from 'puppeteer-core';
+          const browser=await puppeteer.launch({executablePath:'/usr/bin/google-chrome',headless:true,args:['--no-sandbox','--disable-gpu']});
+          const base='http://127.0.0.1:8000';
+          let fails=0;
+          const check=(name,ok,detail='')=>{console.log(`${ok?'PASS':'FAIL'} ${name}${detail?' :: '+detail:''}`);if(!ok)fails++};
+          async function pageAt(path,width=1000){const p=await browser.newPage();await p.setViewport({width,height:850});await p.setRequestInterception(true);p.on('request',r=>{try{const u=new URL(r.url());(u.hostname==='127.0.0.1'||u.hostname==='localhost')?r.continue():r.abort()}catch{r.continue()}});await p.goto(base+path,{waitUntil:'domcontentloaded'});await new Promise(r=>setTimeout(r,450));return p}
+
+          // U-CAST: verify the exact translated nodes instead of body.innerText, which is unreliable with content-visibility:auto.
+          {
+            const p=await pageAt('/projects/2026_U-CAST/index.html');
+            const ko=await p.evaluate(()=>({
+              team:[...document.querySelectorAll('[data-ko="팀 건영아잘하자"]')].map(e=>e.textContent.trim()),
+              mentor:document.querySelector('[data-ko="U-CAST 우수 운영 멘토"]')?.textContent.trim(),
+              mentorEn:document.querySelector('[data-ko="U-CAST 우수 운영 멘토"]')?.dataset.en
+            }));
+            check('U-CAST KO team',ko.team.length>=2&&ko.team.every(x=>x==='팀 건영아잘하자'),JSON.stringify(ko));
+            check('U-CAST mentor source',ko.mentor==='U-CAST 우수 운영 멘토'&&ko.mentorEn==='U-CAST Outstanding Operations Mentor',JSON.stringify(ko));
+            await p.click('#langToggle');
+            await new Promise(r=>setTimeout(r,1200));
+            const en=await p.evaluate(()=>({lang:document.documentElement.lang,team:[...document.querySelectorAll('[data-ko="팀 건영아잘하자"]')].map(e=>e.textContent.trim()),mentor:document.querySelector('[data-ko="U-CAST 우수 운영 멘토"]')?.textContent.trim()}));
+            check('U-CAST EN nodes',en.lang==='en'&&en.team.length>=2&&en.team.every(x=>x==='Team Geonyeongajalhaja')&&en.mentor==='U-CAST Outstanding Operations Mentor',JSON.stringify(en));
+            await p.close();
+          }
+
+          // Doorlock: generated demo reloads on language event, so inspect the actual generated controls after reload.
+          {
+            const p=await pageAt('/projects/Master_Creator_Challenge/index.html');
+            await p.waitForSelector('.doorlock-key');
+            await p.click('#langToggle');
+            await new Promise(r=>setTimeout(r,1400));
+            const en=await p.evaluate(()=>({lang:document.documentElement.lang,reset:[...document.querySelectorAll('.doorlock-key')].some(b=>b.textContent.trim()==='Reset'),input:document.querySelector('.doorlock-input-action')?.textContent.trim(),close:document.querySelector('.doorlock-close-action')?.textContent.trim()}));
+            check('Doorlock EN generated controls',en.lang==='en'&&en.reset&&en.input==='Input'&&en.close==='Close / Lock',JSON.stringify(en));
+            await p.close();
+          }
+
+          // YouTube embeds: exact 16:9 on desktop/mobile and no overflow.
+          for(const [path,label] of [['/projects/computingSAGO/index.html','Daily Report AI'],['/projects/MultiMind/index.html','MultiMind']]){
+            for(const width of [1000,390]){
+              const p=await pageAt(path,width);
+              const m=await p.evaluate(()=>{const f=document.querySelector('.detail-youtube-embed > iframe.detail-video')?.getBoundingClientRect();return f?{w:f.width,h:f.height,sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth}:null});
+              const ratio=m?m.w/m.h:0;
+              check(`${label} ${width}px 16:9`,!!m&&Math.abs(ratio-16/9)<0.02&&m.sw<=m.cw+2,m?`${m.w}x${m.h} ratio=${ratio}`:'missing');
+              await p.close();
+            }
+          }
+          await browser.close();
+          if(fails)process.exit(1);
+          EOF
+          node qa253-final.mjs
