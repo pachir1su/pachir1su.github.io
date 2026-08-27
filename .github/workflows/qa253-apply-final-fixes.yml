@@ -1,0 +1,63 @@
+name: qa253-apply-final-fixes
+
+on:
+  pull_request:
+    types: [synchronize, ready_for_review, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa252-regression-fix
+          fetch-depth: 0
+      - name: Apply all QA fixes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p=Path('assets/project-demos.js'); s=p.read_text()
+          s=s.replace('      await wait(reverse ? 1000 : 700);','      await wait(1000);',1)
+          p.write_text(s)
+
+          p=Path('style.css'); s=p.read_text()
+          pairs=[
+            ('.hero-email-capybara { width: 84px; bottom: 24px; }','.hero-email-capybara { width: 84px; bottom: 24px; left: auto; right: -66px; transform: none; }'),
+            ('.hero-email-capybara { width: 86px; bottom: 24px; }','.hero-email-capybara { width: 80px; bottom: 24px; right: -8px; }'),
+            ('.hero-email-capybara { display: block; width: 76px; bottom: 23px; }','.hero-email-capybara { display: block; width: 72px; bottom: 23px; right: -6px; }'),
+          ]
+          for old,new in pairs:
+            if old in s: s=s.replace(old,new,1)
+          p.write_text(s)
+
+          p=Path('projects/koreatechGongjiAgent/index.html'); s=p.read_text()
+          old='<img src="assets/images/web-shuttle-live.webp" width="600" height="820" loading="lazy" decoding="async" alt="코리아텍 통합 알림 시스템 셔틀 화면" />'
+          new='<img src="assets/images/web-shuttle-live.webp" width="400" height="546" loading="lazy" decoding="async" alt="코리아텍 통합 알림 시스템 셔틀 화면" />'
+          if old in s: s=s.replace(old,new,1)
+          elif new not in s: raise SystemExit('KGA shuttle image tag not found')
+          p.write_text(s)
+          PY
+      - name: Validate product fixes
+        run: |
+          node --check assets/project-demos.js
+          node tools/verify-build.js
+          git diff --check
+          grep -Fq 'await wait(1000);' assets/project-demos.js
+          grep -Fq 'right: -66px' style.css
+          grep -Fq 'width="400" height="546"' projects/koreatechGongjiAgent/index.html
+      - name: Commit fixes
+        run: |
+          git config user.name 'chatgpt-qa'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/project-demos.js style.css projects/koreatechGongjiAgent/index.html
+          if git diff --cached --quiet; then
+            echo 'Already applied.'
+          else
+            git commit -m 'fix: #254 최종 QA 회귀 수정'
+            git push origin HEAD:chatgpt/qa252-regression-fix
+          fi
