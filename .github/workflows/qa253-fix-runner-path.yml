@@ -1,0 +1,40 @@
+name: qa253-fix-runner-path
+
+on:
+  pull_request:
+    types: [synchronize, ready_for_review, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/qa252-regression-fix
+          fetch-depth: 0
+      - name: Patch runner path
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/qa253-final-browser.yml')
+          s=p.read_text()
+          s=s.replace("cat > /tmp/qa253.mjs <<'EOF'", "cat > qa253.mjs <<'EOF'")
+          s=s.replace('node /tmp/qa253.mjs', 'node qa253.mjs')
+          p.write_text(s)
+          PY
+          git diff --check
+      - name: Commit workflow patch
+        run: |
+          git config user.name 'chatgpt-qa'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/qa253-final-browser.yml
+          if git diff --cached --quiet; then
+            echo 'Already patched.'
+          else
+            git commit -m 'test: fix #253 Puppeteer module resolution'
+            git push origin HEAD:chatgpt/qa252-regression-fix
+          fi
