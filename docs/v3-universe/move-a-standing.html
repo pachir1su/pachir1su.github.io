@@ -1,0 +1,208 @@
+<!doctype html>
+<!-- =====================================================================
+     이동 방식 가 · 서서 보기 (docs/v3-universe/move-a-standing.html)
+
+     2026-08-20에 승인된 무대 그대로다. 한 화면 고정, 연도 축으로 하늘 교체.
+     이동이 없다. 비교의 기준선이다.
+
+     로컬 확인에는 정적 서버가 필요하다(projects.json fetch).
+     ===================================================================== -->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>가 · 서서 보기 — 이동 방식 시안</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="../../assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="move.css" />
+    <style>
+      /* 가에서만 쓰는 것 — 연도 축. 채널 전환이지 이동이 아니다. */
+      body.move { height:100svh; overflow:hidden; }
+      .axis {
+        position:fixed; z-index:3; right:clamp(20px,5vw,64px); bottom:clamp(28px,7vh,84px);
+        display:flex; flex-direction:column; align-items:flex-end; gap:2px;
+      }
+      .axis::before {
+        content:""; position:absolute; right:-14px; top:6px; bottom:6px;
+        width:1px; background:var(--m-line);
+      }
+      .axis button {
+        display:flex; align-items:center; gap:12px; min-height:44px; padding:2px 0;
+        background:none; border:0; color:var(--m-subtle); font:inherit; cursor:pointer;
+        text-shadow:var(--m-halo); transition:color var(--m-dur) var(--m-ease);
+      }
+      .axis button b { font-weight:200; font-size:clamp(19px,2.6vw,32px); letter-spacing:-.02em; line-height:1; }
+      .axis button i {
+        font-style:normal; flex:none; width:6px; height:6px; border-radius:50%;
+        background:var(--m-line); margin-right:-17px;
+      }
+      .axis button:hover { color:var(--m-ink); }
+      .axis button[aria-current="true"] { color:var(--m-ink); }
+      .axis button[aria-current="true"] b { font-weight:300; font-size:clamp(24px,3.4vw,42px); }
+      .axis button[aria-current="true"] i { width:9px; height:9px; background:var(--m-gold); margin-right:-18.5px; }
+      @media (max-height:600px) and (orientation:landscape) {
+        .axis { bottom:14px; }
+        .axis button { min-height:34px; }
+      }
+    </style>
+  </head>
+
+  <body class="move">
+    <canvas class="sky" aria-hidden="true"></canvas>
+    <div class="stars" data-stars></div>
+
+    <div class="over who" data-who data-keepout>
+      <h1>이건영<span class="en">Lee Geon Yeong</span></h1>
+      <p class="lead">이윤을 넘어 <b>혁신</b>을 추구하는 기업가를 꿈꿉니다.</p>
+      <button type="button" class="mail" data-mail="capybara@koreatech.ac.kr">
+        <span>capybara@koreatech.ac.kr</span><span class="copied" aria-live="polite"></span>
+      </button>
+    </div>
+
+    <div class="over here" data-here data-keepout aria-live="polite">
+      <b></b><span></span>
+    </div>
+
+    <div class="over rank" data-rank aria-hidden="true" data-keepout>
+      <small>GitHub Rank</small><span class="rail" data-rank-rail></span><b data-rank-now>C</b>
+    </div>
+
+    <div class="over card" data-card role="group">
+      <button type="button" class="card-close" data-card-close aria-label="닫기">&times;</button>
+      <div data-card-body></div>
+    </div>
+
+    <!-- 연도 축 — 여기서 고르면 그 자리에서 하늘이 다시 짜인다. -->
+    <nav class="axis" data-axis aria-label="구역"></nav>
+
+    <div class="bar">
+      <button type="button" class="btn" data-mute hidden aria-pressed="false">&#9835;</button>
+    </div>
+
+    <a class="seam" href="../../index.html" aria-label="포트폴리오로 돌아가기"></a>
+
+    <p class="mark">
+      <b>가 · 서서 보기</b> — 이동 없음. 연도 축이 하늘을 교체한다.
+      <a href="index.html">시안 목록</a>
+    </p>
+
+    <noscript>
+      <p style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);max-width:38ch;text-align:center">
+        이 시안은 별자리를 캔버스로 그립니다.
+        <a href="https://pachir1su.github.io/#projects">포트폴리오의 프로젝트 목록</a>에서 같은 내용을 볼 수 있습니다.
+      </p>
+    </noscript>
+
+    <script src="../../universe/sky.js"></script>
+    <script src="move.js"></script>
+    <script>
+      (() => {
+        'use strict';
+        const Move = window.V3Move;
+        if (!Move) return;
+
+        const stage = Move.Stage({
+          canvas: document.querySelector('.sky'),
+          stars: document.querySelector('[data-stars]'),
+          card: document.querySelector('[data-card]'),
+          cardBody: document.querySelector('[data-card-body]'),
+        });
+
+        /* 축이 하늘을 통째로 교체한다. 한 번에 한 구역이 보이고,
+           그 구역의 이름은 전부 화면에 있다. 승인된 무대가 이 방식이다. */
+        let channel = '2026';
+        stage.setVisibleArea((a) => a.id === channel);
+
+        function frame() {
+          const a = stage.areas.find((x) => x.id === channel);
+          const box = { cx: a.x, cy: a.y, w: a.e.w * 1.24, h: a.e.h * 1.1 };
+          const W = stage.W, H = stage.H;
+          const narrow = W < 900;
+          /* #114 확정 구도 — 왼쪽 아래 이름 · 오른쪽 위 별자리.
+             오른쪽 아래는 축이, 왼쪽 위는 지금 있는 곳 표시가 쓴다. */
+          const f = narrow
+            ? { x: W * .06, y: H * .17, w: W * .88, h: H * .44 }
+            : { x: W * .30, y: H * .09, w: W * .62, h: H * .66 };
+          return stage.fitInto(box, f);
+        }
+
+        function apply(instant) {
+          const v = frame();
+          stage.cam.x = v.x; stage.cam.y = v.y; stage.cam.z = v.z;
+          stage.state.baseZ = v.z;
+          const a = stage.areas.find((x) => x.id === channel);
+          const here = document.querySelector('[data-here]');
+          here.querySelector('b').textContent = a.title;
+          here.querySelector('span').textContent = a.note;
+          document.querySelector('[data-rank]').classList.toggle('is-on', a.kind === 'growth');
+          document.querySelector('[data-axis]').querySelectorAll('button').forEach((b) => {
+            b.setAttribute('aria-current', String(b.dataset.go === channel));
+          });
+          stage.closeCard();
+          if (!instant) stage.startIntro();
+          stage.paintNow();
+          stage.kick();
+        }
+
+        function buildAxis() {
+          const nav = document.querySelector('[data-axis]');
+          nav.textContent = '';
+          stage.areas.forEach((a) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.dataset.go = a.id;
+            b.innerHTML = '<b></b><i></i>';
+            b.querySelector('b').textContent = a.title;
+            b.setAttribute('aria-label', a.title + ' — ' + a.note);
+            b.addEventListener('click', () => {
+              if (channel === a.id) return;
+              channel = a.id;
+              stage.sound.play('year');
+              apply(false);
+            });
+            nav.appendChild(b);
+          });
+        }
+
+        stage.measure();
+        stage.initMute();
+        stage.onCardClose();
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') stage.closeCard(); });
+
+        const mail = document.querySelector('[data-mail]');
+        mail.addEventListener('click', () => {
+          if (!navigator.clipboard) return;
+          navigator.clipboard.writeText(mail.dataset.mail).then(() => {
+            const out = mail.querySelector('.copied');
+            out.textContent = '복사됨';
+            setTimeout(() => { out.textContent = ''; }, 1600);
+          }, () => {});
+        });
+
+        let tm = 0;
+        addEventListener('resize', () => {
+          clearTimeout(tm);
+          tm = setTimeout(() => { stage.measure(); stage.relabel(); apply(true); }, 140);
+        });
+        window.V3Sky.onThemeChange(() => stage.paintNow());
+
+        Move.load().then((data) => {
+          stage.build(data, 'spread');
+          buildAxis();
+          stage.startIntro();
+          apply(true);
+          /* 어떤 이유로든 루프가 굶어도 완성된 하늘은 반드시 나온다. */
+          setTimeout(() => { stage.state.intro = 1; stage.paintNow(); }, 2800);
+        }).catch((err) => {
+          console.error('[시안 가] projects.json', err);
+          const here = document.querySelector('[data-here]');
+          here.querySelector('b').textContent = '';
+          here.querySelector('span').textContent = 'projects.json을 읽지 못했습니다. 정적 서버로 열어 주세요.';
+        });
+      })();
+    </script>
+  </body>
+</html>
