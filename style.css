@@ -1503,6 +1503,8 @@ p {
   display: block;
   border-radius: 2px;
   background: #000;
+  object-fit: cover;
+  object-position: center;
 }
 
 .detail-sidebar {
@@ -3061,10 +3063,16 @@ html {
 .wall-buzzer { width:30px; height:18px; border-radius:50%; background:repeating-radial-gradient(circle,#222 0 2px,#777 3px 4px); }
 .wall-rig.buzzer-on .wall-buzzer { box-shadow:0 0 0 5px rgba(214,51,51,.16); }
 .wall-tank { position:relative; min-width:0; overflow:hidden; border:5px solid rgba(121,155,164,.72); border-top-width:3px; border-radius:5px; background:linear-gradient(#dff0f3 0 58%,#c7b58d 58%); }
-.wall-city { position:absolute; z-index:2; left:12%; right:48%; bottom:16%; display:flex; align-items:flex-end; gap:6px; }
-.wall-city span { flex:1; height:82px; border:2px solid #4e4336; background:repeating-linear-gradient(0deg,#d0ba90 0 13px,#564a3a 14px 16px); }
-.wall-city span:nth-child(2) { height:115px; background:repeating-linear-gradient(0deg,#d7d0bc 0 15px,#5c5b54 16px 18px); }
-.wall-city span:nth-child(3) { height:67px; background:repeating-linear-gradient(0deg,#b98c6b 0 12px,#493b32 13px 15px); }
+.wall-city { position:absolute; z-index:2; left:10%; right:46%; bottom:16%; display:flex; align-items:flex-end; gap:6px; filter:drop-shadow(2px 3px 0 rgba(52,40,26,.18)); }
+.wall-city span { position:relative; flex:1 1 0; min-width:0; height:82px; border:2px solid #4e4336; background:linear-gradient(#d9c7a0 0 14px,#b79d72 14px 100%); box-shadow:inset -6px 0 0 rgba(75,59,42,.15); }
+.wall-city span::before { position:absolute; inset:17px 6px 8px; content:""; background:repeating-linear-gradient(90deg,rgba(55,47,41,.82) 0 5px,transparent 5px 13px),repeating-linear-gradient(0deg,rgba(55,47,41,.82) 0 5px,transparent 5px 13px); background-size:13px 13px; opacity:.78; }
+.wall-city span::after { position:absolute; top:-9px; left:3px; right:3px; height:9px; content:""; border:2px solid #4e4336; border-bottom:0; background:#6d5947; clip-path:polygon(0 100%,8% 0,92% 0,100% 100%); }
+.wall-city span:nth-child(2) { height:115px; background:linear-gradient(#e1dccd 0 16px,#aaa6a0 16px 100%); box-shadow:inset -7px 0 0 rgba(58,58,55,.14); }
+.wall-city span:nth-child(2)::before { inset:20px 7px 9px; background:repeating-linear-gradient(90deg,rgba(64,66,68,.78) 0 6px,transparent 6px 15px),repeating-linear-gradient(0deg,rgba(64,66,68,.78) 0 6px,transparent 6px 15px); background-size:15px 15px; }
+.wall-city span:nth-child(2)::after { top:-12px; height:12px; background:#555b60; clip-path:polygon(0 100%,0 35%,18% 35%,18% 0,82% 0,82% 35%,100% 35%,100% 100%); }
+.wall-city span:nth-child(3) { height:67px; background:linear-gradient(#cda27f 0 13px,#9b6f55 13px 100%); box-shadow:inset -5px 0 0 rgba(70,42,35,.16); }
+.wall-city span:nth-child(3)::before { inset:16px 5px 7px; background:repeating-linear-gradient(90deg,rgba(66,48,42,.82) 0 5px,transparent 5px 12px),repeating-linear-gradient(0deg,rgba(66,48,42,.82) 0 5px,transparent 5px 12px); background-size:12px 12px; }
+.wall-city span:nth-child(3)::after { top:-7px; height:7px; background:#745444; clip-path:polygon(0 100%,10% 0,90% 0,100% 100%); }
 .wall-water-sensor { position:absolute; z-index:5; right:24%; bottom:31%; width:12px; height:35px; border-radius:3px; background:#2f7e54; }
 .wall-barrier-model { position:absolute; z-index:4; right:36%; bottom:14%; width:26px; height:145px; border:3px solid #555; background:linear-gradient(90deg,#777,#d9d9d9,#6a6a6a); transform:translateY(72%); transition:transform .7s ease; }
 .wall-rig.barrier-raised .wall-barrier-model { transform:translateY(0); }
@@ -3112,7 +3120,9 @@ html {
 
 /* PlantClock: paired FND displays, LCD, alert hardware and fan lever state. */
 .plantclock-device { position:relative; display:grid; grid-template-columns:120px minmax(0,1fr); grid-template-areas:"plant lcd" "plant fnd" "plant indicators"; gap:12px; min-height:350px; padding:20px; border:1px solid #665b42; border-radius:10px; background:linear-gradient(145deg,#ded1a6,#ac9565); color:#1f251d; overflow:hidden; }
-.plantclock-pot { grid-area:plant; position:relative; align-self:end; width:110px; height:130px; border-radius:10px 10px 28px 28px; background:#8f5a38; box-shadow:inset 0 -12px 0 rgba(0,0,0,.12); }
+.plantclock-pot { grid-area:plant; position:relative; align-self:end; width:110px; height:175px; background:transparent; }
+.plant-pot-body { position:absolute; left:0; right:0; bottom:0; height:96px; border-radius:10px 10px 28px 28px; background:#8f5a38; box-shadow:inset 0 -12px 0 rgba(0,0,0,.12); }
+.plant-soil { position:absolute; left:8px; right:8px; top:10px; height:14px; border-radius:50%; background:#4f3426; }
 .plant-stem { position:absolute; left:52px; bottom:107px; width:7px; height:102px; background:#3d773d; }
 .plant-leaf { position:absolute; bottom:158px; width:55px; height:27px; border-radius:100% 0 100% 0; background:#4b9148; }
 .plant-leaf-left { left:6px; transform:rotate(20deg); }
@@ -3288,12 +3298,7 @@ html {
 .ucast-channel.is-reverse.is-entering .ucast-pedestrian { left: 50%; }
 .ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left: 76px; }
 
-.plantclock-pot::before {
-  content: ""; position: absolute; left: 8px; right: 8px; top: 10px; height: 14px;
-  border-radius: 50%; background: #4f3426;
-}
-.plant-stem { bottom: 78px; }
-.plant-leaf { bottom: 130px; }
+.plantclock-pot::before { content:none; }
 .plant-fan-unit {
   display: grid; grid-template-columns: 16px 30px;
   grid-template-areas: "led rotor" "label label";
@@ -3380,24 +3385,33 @@ html {
 .ucast-channel.is-reverse:not(.is-entering):not(.is-exiting) .ucast-pedestrian { left:calc(100% - 88px) !important; transition:none !important; }
 .ucast-channel.is-reverse.is-entering .ucast-pedestrian { left:50% !important; transition:left .95s linear !important; }
 .ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:76px !important; transition:left .95s linear !important; }
+.ucast-channel.is-forward-complete .ucast-pedestrian { left:calc(100% - 88px) !important; transition:none !important; }
+.ucast-channel.is-reverse-complete .ucast-pedestrian { left:76px !important; transition:none !important; }
 
 /* PlantClock: readable FND, tomato plant near the pot, and a physical fan rotor. */
 .plantclock-fnd { min-height:78px; align-content:center; }
 .plantclock-fnd small { color:#f3f3f3 !important; font-size:.68rem !important; opacity:1 !important; }
 .plantclock-fnd strong { color:#ff725f !important; font-size:clamp(1rem,2.2vw,1.3rem) !important; }
-.plant-stem { left:52px !important; bottom:90px !important; height:55px !important; width:6px !important; }
-.plant-leaf { bottom:112px !important; width:38px !important; height:20px !important; }
+.plantclock-pot { height:175px !important; background:transparent !important; box-shadow:none !important; }
+.plant-pot-body { height:96px !important; }
+.plant-soil { top:10px; height:14px; }
+.plant-stem { left:52px !important; top:10px !important; bottom:auto !important; height:88px !important; width:6px !important; }
+.plant-branch { position:absolute; z-index:3; left:52px; height:3px; border-radius:999px; background:#3d773d; box-shadow:1px 1px 0 rgba(35,85,38,.16); transform-origin:left center; }
+.plant-branch-left { top:30px; width:22px; transform:rotate(160deg); }
+.plant-branch-right { top:47px; width:30px; transform:rotate(11deg); }
+.plant-leaf { top:14px !important; bottom:auto !important; width:38px !important; height:20px !important; }
 .plant-leaf-left { left:17px !important; transform:rotate(18deg) !important; }
 .plant-leaf-right { right:17px !important; transform:scaleX(-1) rotate(18deg) !important; }
 .plant-tomato { position:absolute; z-index:4; width:20px; height:18px; border-radius:48% 52% 52% 48%; background:radial-gradient(circle at 34% 28%,#ff8a73 0 14%,#e94b39 34%,#bd2e28 78%,#99231f 100%); border:1px solid #81231f; box-shadow:0 2px 3px rgba(70,25,18,.28),inset -3px -3px 3px rgba(105,20,16,.18); }
 .plant-tomato::before { content:""; position:absolute; left:50%; top:-6px; width:13px; height:9px; transform:translateX(-50%); background:#35733b; clip-path:polygon(50% 0,61% 35%,100% 20%,72% 52%,88% 88%,52% 66%,18% 92%,30% 55%,0 28%,39% 36%); }
 .plant-tomato-a { left:25px; top:34px; }
 .plant-tomato-b { right:20px; top:48px; width:18px; height:17px; }
-.plant-tomato-c { left:48px; top:61px; width:16px; height:15px; }
+.plant-tomato-c { left:48px; top:67px; width:16px; height:15px; }
 .plant-fan-rotor { font-size:0 !important; overflow:hidden; border:3px solid #555 !important; background:conic-gradient(#777 0 10%,#d7d4c9 10% 25%,#777 25% 35%,#d7d4c9 35% 50%,#777 50% 60%,#d7d4c9 60% 75%,#777 75% 85%,#d7d4c9 85% 100%) !important; box-shadow:inset 0 0 0 5px #bbb; }
 .plantclock-device.fan-on .plant-fan-rotor { animation:fan-spin 1.05s linear infinite !important; }
 .doorlock-close-action { margin-top:2px; }
-@media (max-width:640px) { .plant-stem { left:36px !important; bottom:72px !important; height:45px !important; } .plant-leaf { bottom:91px !important; width:30px !important; height:18px !important; } .plant-leaf-left { left:12px !important; } .plant-leaf-right { right:12px !important; } .plant-tomato-a { left:16px; top:28px; width:15px; height:14px; } .plant-tomato-b { right:12px; top:40px; width:14px; height:13px; } .plant-tomato-c { left:33px; top:52px; width:13px; height:12px; } }
+@media (max-width:640px) { .plantclock-pot { width:78px !important; height:140px !important; } .plant-pot-body { height:82px !important; } .plant-soil { top:8px; height:11px; } .plant-stem { left:36px !important; top:12px !important; bottom:auto !important; height:72px !important; } .plant-branch { left:36px; height:2px; } .plant-branch-left { top:25px; width:17px; } .plant-branch-right { top:40px; width:24px; } .plant-leaf { top:13px !important; bottom:auto !important; width:30px !important; height:18px !important; } .plant-leaf-left { left:12px !important; } .plant-leaf-right { right:12px !important; } .plant-tomato-a { left:16px; top:29px; width:15px; height:14px; } .plant-tomato-b { right:12px; top:42px; width:14px; height:13px; } .plant-tomato-c { left:33px; top:56px; width:13px; height:12px; } }
+@media (max-width:640px) { .ucast-channel.is-reverse-complete .ucast-pedestrian { left:59px !important; } }
 @media (max-width:390px) { .ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:59px !important; } }
 @media (prefers-reduced-motion:reduce) { .plantclock-device.fan-on .plant-fan-rotor { animation:none !important; } }
 
