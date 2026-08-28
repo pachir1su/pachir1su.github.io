@@ -3385,6 +3385,8 @@ html {
 .ucast-channel.is-reverse:not(.is-entering):not(.is-exiting) .ucast-pedestrian { left:calc(100% - 88px) !important; transition:none !important; }
 .ucast-channel.is-reverse.is-entering .ucast-pedestrian { left:50% !important; transition:left .95s linear !important; }
 .ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:76px !important; transition:left .95s linear !important; }
+.ucast-channel.is-forward-complete .ucast-pedestrian { left:calc(100% - 88px) !important; transition:none !important; }
+.ucast-channel.is-reverse-complete .ucast-pedestrian { left:76px !important; transition:none !important; }
 
 /* PlantClock: readable FND, tomato plant near the pot, and a physical fan rotor. */
 .plantclock-fnd { min-height:78px; align-content:center; }
@@ -3409,6 +3411,7 @@ html {
 .plantclock-device.fan-on .plant-fan-rotor { animation:fan-spin 1.05s linear infinite !important; }
 .doorlock-close-action { margin-top:2px; }
 @media (max-width:640px) { .plantclock-pot { width:78px !important; height:140px !important; } .plant-pot-body { height:82px !important; } .plant-soil { top:8px; height:11px; } .plant-stem { left:36px !important; top:12px !important; bottom:auto !important; height:72px !important; } .plant-branch { left:36px; height:2px; } .plant-branch-left { top:25px; width:17px; } .plant-branch-right { top:40px; width:24px; } .plant-leaf { top:13px !important; bottom:auto !important; width:30px !important; height:18px !important; } .plant-leaf-left { left:12px !important; } .plant-leaf-right { right:12px !important; } .plant-tomato-a { left:16px; top:29px; width:15px; height:14px; } .plant-tomato-b { right:12px; top:42px; width:14px; height:13px; } .plant-tomato-c { left:33px; top:56px; width:13px; height:12px; } }
+@media (max-width:640px) { .ucast-channel.is-reverse-complete .ucast-pedestrian { left:59px !important; } }
 @media (max-width:390px) { .ucast-channel.is-reverse.is-exiting .ucast-pedestrian { left:59px !important; } }
 @media (prefers-reduced-motion:reduce) { .plantclock-device.fan-on .plant-fan-rotor { animation:none !important; } }
 

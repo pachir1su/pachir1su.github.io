@@ -255,9 +255,10 @@
       const channel = channels[index];
       const currentVersion = ++channel.version;
       setChannelDisabled(index, true);
+      channel.lane.classList.remove('is-forward-complete', 'is-reverse-complete');
       channel.lane.classList.toggle('is-reverse', reverse);
       channel.lane.classList.remove('is-entering', 'is-exiting');
-      if (reverse) void channel.pedestrian.offsetWidth;
+      void channel.pedestrian.offsetWidth;
       channel.lane.classList.add('is-active', 'is-entering');
       setText(channel.state, reverse ? '역방향 경고' : '정방향 경고', reverse ? 'Reverse warning' : 'Forward warning');
       setText(
@@ -274,6 +275,7 @@
       await wait(1000);
       if (channel.version !== currentVersion) return;
       channel.lane.classList.remove('is-active', 'is-exiting', 'is-reverse');
+      channel.lane.classList.add(reverse ? 'is-reverse-complete' : 'is-forward-complete');
       setText(channel.state, '대기', 'Standby');
       setChannelDisabled(index, false);
       updateWarning();
@@ -286,7 +288,7 @@
     resetButton.addEventListener('click', () => {
       channels.forEach((channel, index) => {
         channel.version += 1;
-        channel.lane.classList.remove('is-active', 'is-entering', 'is-exiting', 'is-reverse');
+        channel.lane.classList.remove('is-active', 'is-entering', 'is-exiting', 'is-reverse', 'is-forward-complete', 'is-reverse-complete');
         setText(channel.state, '대기', 'Standby');
         setChannelDisabled(index, false);
       });
