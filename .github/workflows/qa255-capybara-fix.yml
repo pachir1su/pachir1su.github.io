@@ -1,0 +1,100 @@
+name: qa255-capybara-fix
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: chatgpt/capybara-front-layer-qa
+          fetch-depth: 0
+
+      - name: Apply capybara front-layer fix
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('style.css')
+          s = p.read_text()
+          old = '''.hero-email-wrap { min-height: 46px; overflow: visible; }\n.hero-email-wrap .hero-email { min-height: 46px; }\n.hero-email-capybara { width: 84px; bottom: 24px; left: auto; right: -74px; transform: none; }\n@media (min-width: 641px) and (max-width: 900px) {\n  .hero-email-capybara { width: 80px; bottom: 23px; }\n}\n@media (max-width: 640px) {\n  .hero-email-wrap { margin-top: 52px; overflow: visible; }\n  .hero-email-capybara { width: 80px; bottom: 24px; right: -12px; }\n}\n@media (max-width: 360px) {\n  .hero-email-wrap { margin-top: 58px; overflow: visible; }\n  .hero-email-capybara { display: block; width: 72px; bottom: 23px; right: -10px; }\n}\n'''
+          new = '''.hero-email-wrap { min-height: 46px; overflow: visible; }\n.hero-email-wrap .hero-email { min-height: 46px; z-index: 1; }\n.hero-email-capybara { width: 84px; bottom: 10px; left: auto; right: -38px; transform: none; z-index: 3; }\n@media (min-width: 641px) and (max-width: 900px) {\n  .hero-email-capybara { width: 80px; bottom: 10px; right: -34px; }\n}\n@media (max-width: 640px) {\n  .hero-email-wrap { margin-top: 52px; overflow: visible; }\n  .hero-email-capybara { width: 80px; bottom: 10px; right: -18px; }\n}\n@media (max-width: 360px) {\n  .hero-email-wrap { margin-top: 58px; overflow: visible; }\n  .hero-email-capybara { display: block; width: 72px; bottom: 9px; right: -14px; }\n}\n'''
+          if old not in s:
+              raise SystemExit('target capybara block not found')
+          p.write_text(s.replace(old, new, 1))
+          PY
+
+      - name: Static validation
+        run: |
+          node tools/verify-build.js
+          cp index.html /tmp/index-before.html
+          node build.js
+          cmp -s index.html /tmp/index-before.html
+          git diff --check
+
+      - name: Install Puppeteer
+        run: npm install --no-save --ignore-scripts puppeteer-core@24
+
+      - name: Chromium layout QA
+        run: |
+          python3 -m http.server 8000 >/tmp/qa255-http.log 2>&1 &
+          sleep 1
+          cat > qa255.mjs <<'EOF'
+          import puppeteer from 'puppeteer-core';
+          const browser = await puppeteer.launch({ executablePath:'/usr/bin/google-chrome', headless:true, args:['--no-sandbox','--disable-gpu'] });
+          const base='http://127.0.0.1:8000';
+          let fails=0;
+          const check=(name,ok,detail='')=>{console.log(`${ok?'PASS':'FAIL'} ${name}${detail?' :: '+detail:''}`);if(!ok)fails++};
+          for (const width of [1200, 870, 390, 360]) {
+            const page=await browser.newPage();
+            await page.setViewport({width,height:800});
+            await page.goto(base+'/index.html',{waitUntil:'domcontentloaded'});
+            await new Promise(r=>setTimeout(r,400));
+            const m=await page.evaluate(()=>{
+              const cap=document.querySelector('.hero-email-capybara');
+              const btn=document.querySelector('.hero-email-wrap .hero-email');
+              const text=document.querySelector('.hero-email-wrap .email-addr');
+              const cr=cap?.getBoundingClientRect();
+              const br=btn?.getBoundingClientRect();
+              const tr=text?.getBoundingClientRect();
+              if(!cr||!br||!tr) return null;
+              const overlap=(a,b)=>!(a.right<=b.left||a.left>=b.right||a.bottom<=b.top||a.top>=b.bottom);
+              return {
+                cap:{l:cr.left,r:cr.right,t:cr.top,b:cr.bottom,z:getComputedStyle(cap).zIndex},
+                btn:{l:br.left,r:br.right,t:br.top,b:br.bottom,z:getComputedStyle(btn).zIndex},
+                text:{l:tr.left,r:tr.right,t:tr.top,b:tr.bottom},
+                capBtn:overlap(cr,br), capText:overlap(cr,tr),
+                sw:document.documentElement.scrollWidth,cw:document.documentElement.clientWidth
+              };
+            });
+            check(`HOME ${width} elements`,!!m,JSON.stringify(m));
+            if(m){
+              check(`HOME ${width} capybara overlaps mail box`,m.capBtn,JSON.stringify(m));
+              check(`HOME ${width} capybara is in front`,Number(m.cap.z)>Number(m.btn.z),`z=${m.cap.z}/${m.btn.z}`);
+              check(`HOME ${width} email text clear`,!m.capText,JSON.stringify(m));
+              check(`HOME ${width} no horizontal overflow`,m.sw<=m.cw+2,`${m.sw}/${m.cw}`);
+            }
+            await page.close();
+          }
+          await browser.close();
+          if(fails) process.exit(1);
+          EOF
+          node qa255.mjs
+
+      - name: Commit fix
+        run: |
+          git config user.name 'chatgpt-qa'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add style.css
+          if git diff --cached --quiet; then
+            echo 'No product change to commit.'
+          else
+            git commit -m 'fix: 카피바라를 이메일 박스 전면에 배치'
+            git push origin HEAD:chatgpt/capybara-front-layer-qa
+          fi
