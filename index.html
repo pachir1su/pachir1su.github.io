@@ -110,6 +110,10 @@
 
     <!-- 메인 스타일시트 — 노트 테마, 카드 레이아웃, 반응형 포함 -->
     <link rel="stylesheet" href="style.css" />
+
+    <!-- 우주 진입점(#114) — .v3-gate 선택자만 담은 최소 시트.
+         v2 토큰(--ink · --gold · --line)을 덮지 않는다. -->
+    <link rel="stylesheet" href="universe/gate.css" />
   </head>
   <body>
     <!-- 좌측 바인딩 레일 — 노트 크롬(빨간 마진선 · 펀치홀)을 문서 전체에서
@@ -250,6 +254,12 @@
         <span>스크롤</span>
         <div class="scroll-line"></div>
       </div>
+
+      <!-- 우주 진입점(#114) — 종이에 뚫린 찢긴 구멍 하나가 v3 별자리 공간으로 이어진다.
+           안에 들어가는 것은 전부 universe/gate.js가 만든다. 화면에 이름표를 두지 않고
+           목적지는 버튼의 aria-label에만 있다. 스크립트가 실패하면 이 칸은 비어 있고
+           히어로는 그대로 동작한다. -->
+      <div class="v3-gate-host" data-gate-host></div>
     </section>
 
     <!-- ============================================================
@@ -1295,5 +1305,8 @@
     </footer>
     <!-- 메인 인터랙션 스크립트 — 커서/스크롤/타이핑/필터/섹션 네비 등 모든 동작 포함 -->
     <script defer src="script.js"></script>
+    <!-- 우주 진입점(#114) — 홀로 서는 스크립트. 우주 엔진(sky.js · universe.js)은
+         /universe/ 안에서만 로드되고 홈은 이 파일 하나만 받는다. -->
+    <script defer src="universe/gate.js"></script>
   </body>
 </html>
