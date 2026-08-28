@@ -3250,18 +3250,19 @@ html {
 #skills .devicon-notion-plain { color: var(--ink) !important; }
 
 .hero-email-wrap { min-height: 46px; overflow: visible; }
-.hero-email-wrap .hero-email { min-height: 46px; }
-.hero-email-capybara { width: 84px; bottom: 24px; left: auto; right: -74px; transform: none; }
+.hero-email-wrap .hero-email { min-height: 46px; padding-right: 58px; z-index: 1; }
+.hero-email-capybara { width: 84px; bottom: 10px; left: auto; right: -38px; transform: none; z-index: 3; }
 @media (min-width: 641px) and (max-width: 900px) {
-  .hero-email-capybara { width: 80px; bottom: 23px; }
+  .hero-email-capybara { width: 80px; bottom: 10px; right: -34px; }
 }
 @media (max-width: 640px) {
   .hero-email-wrap { margin-top: 52px; overflow: visible; }
-  .hero-email-capybara { width: 80px; bottom: 24px; right: -12px; }
+  .hero-email-wrap .hero-email { padding-right: 58px; }
+  .hero-email-capybara { width: 80px; bottom: 10px; right: -18px; }
 }
 @media (max-width: 360px) {
   .hero-email-wrap { margin-top: 58px; overflow: visible; }
-  .hero-email-capybara { display: block; width: 72px; bottom: 23px; right: -10px; }
+  .hero-email-capybara { display: block; width: 72px; bottom: 9px; right: -14px; }
 }
 
 
