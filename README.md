@@ -12,9 +12,12 @@
 <br>v2.5.0 : #117 머지 기준 안정 릴리즈
 <br>v2.6.0 : Final Note — MBTI·불필요 인터랙션 제거, 재학 정보·상단 연락처·메뉴·반응형 UI 정리 (#114, #118, #119, #121, #122, #123, #16). [Release notes](docs/v2.6.0-release-notes.md)
 <br>v2.6.x : Freeze / Refactor — 정적 dead-code 제거, 실제 기기 반응형·성능 회귀 QA. [Freeze plan](docs/v2.6.x-freeze.md)
-<br>v2.7.0 : 현재 공개 릴리즈 — Visual / Media Pass와 상세 페이지 반응형 안정화
+<br>v2.7.0 : Visual / Media Pass와 상세 페이지 반응형 안정화
 <br>v2.7.x : Final Freeze / release hygiene — v3 전 마지막 v2 안정화 계열. [Final Freeze](docs/v2.7.x-final-freeze.md)
-<br>v3.0.0 ~ (예정) : 디자인 컨셉 변경 — [docs/design-concept-v3.md](docs/design-concept-v3.md)
+<br>v3.0.0 : 별자리 공간 — v2 노트 포트폴리오는 그대로 두고, 홈에 뚫린 찢긴 종이 구멍으로
+이어지는 `/universe/`를 새로 연다 (#114, #59, #119, #123, #173).
+[Release notes](docs/v3.0.0-release-notes.md) · [설계 기록](docs/v3-universe/README.md) ·
+[컨셉 결정 경위](docs/design-concept-v3.md)
 
 👉 **[실행](https://pachir1su.github.io)**
 
