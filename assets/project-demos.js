@@ -6,9 +6,15 @@
   if (!roots.length) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const languageRefreshers = [];
   const language = () => (document.documentElement.lang === 'en' ? 'en' : 'ko');
   const translate = (ko, en) => (language() === 'en' ? en : ko);
   const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, reducedMotion ? 0 : ms));
+
+  // Refreshes generated text after a language change without resetting demo state.
+  function registerLanguageRefresher(callback) {
+    if (typeof callback === 'function') languageRefreshers.push(callback);
+  }
 
   // Creates a DOM element with an optional class name.
   function create(tagName, className = '') {
@@ -435,6 +441,15 @@
       renderAttendance();
       setText(status, '출석 기록을 초기화했습니다.', 'Attendance was cleared.');
     });
+    registerLanguageRefresher(() => {
+      cardElements.forEach((card) => {
+        const label = card.querySelector('small');
+        if (label) setText(label, '가상 학생증', 'Demo student card');
+        card.setAttribute('aria-label', translate(`${card.dataset.studentId} 가상 학생증 선택`, `Select fictional card ${card.dataset.studentId}`));
+      });
+      reader.setAttribute('aria-label', translate('RFID 리더에 선택한 학생증 태그', 'Scan selected card on the RFID reader'));
+      renderAttendance();
+    });
     renderAttendance();
   }
 
@@ -514,6 +529,8 @@
         alertActive ? `${elapsedMinutes} min · LED, vibration and buzzer alert` : `${elapsedMinutes} min since watering · soil ${soilValue} · no alert`
       );
     }
+
+    registerLanguageRefresher(renderPlantClock);
 
     timeButton.addEventListener('click', () => {
       elapsedMinutes += 10;
@@ -681,11 +698,11 @@
       window.setTimeout(() => rig.classList.remove('is-alarm'), 1300);
     }
 
+    const keyButtons = [];
     ['1','2','3','4','5','6','7','8','9','*','0','<-'].forEach((key) => {
       const button = create('button', 'doorlock-key');
       button.type = 'button';
-      button.textContent = key === '*' ? translate('초기화', 'Reset') : key;
-      button.setAttribute('aria-label', key === '*' ? translate('입력 초기화', 'Reset input') : key === '<-' ? translate('한 글자 지우기', 'Delete one character') : key);
+      keyButtons.push({ key, button });
       button.addEventListener('click', () => {
         if (key === '*') { clearInput(); return; }
         if (key === '<-') {
@@ -702,6 +719,19 @@
       });
       keypad.append(button);
     });
+    function refreshKeypadLanguage() {
+      keyButtons.forEach(({ key, button }) => {
+        if (key === '*') {
+          setText(button, '초기화', 'Reset');
+          button.setAttribute('aria-label', translate('입력 초기화', 'Reset input'));
+          return;
+        }
+        button.textContent = key;
+        button.setAttribute('aria-label', key === '<-' ? translate('한 글자 지우기', 'Delete one character') : key);
+      });
+    }
+    registerLanguageRefresher(refreshKeypadLanguage);
+    refreshKeypadLanguage();
     inputButton.addEventListener('click', () => {
       if (input === password) unlock(); else alarm();
     });
@@ -728,6 +758,14 @@
   // Initializes only demos explicitly declared by their project pages.
   roots.forEach((root) => demos[root.dataset.projectDemo]?.(root));
 
-  // Rebuilds translated, dynamically generated controls after a language change.
-  window.addEventListener('portfolio:language', () => window.location.reload());
+  // Refreshes dynamic fragments after a language change while preserving scroll and demo state.
+  window.addEventListener('portfolio:language', () => {
+    languageRefreshers.forEach((refresh) => {
+      try {
+        refresh();
+      } catch (error) {
+        console.warn('Unable to refresh a project demo language fragment.', error);
+      }
+    });
+  });
 })();
