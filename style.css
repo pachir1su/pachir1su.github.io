@@ -3251,18 +3251,18 @@ html {
 
 .hero-email-wrap { min-height: 46px; overflow: visible; }
 .hero-email-wrap .hero-email { min-height: 46px; padding-right: 58px; z-index: 1; }
-.hero-email-capybara { width: 84px; bottom: 10px; left: auto; right: -38px; transform: none; z-index: 3; }
+.hero-email-capybara { width: 84px; bottom: 10px; left: auto; right: -34px; transform: translate(-120px, -12px); z-index: 3; }
 @media (min-width: 641px) and (max-width: 900px) {
-  .hero-email-capybara { width: 80px; bottom: 10px; right: -34px; }
+  .hero-email-capybara { width: 80px; bottom: 10px; right: -30px; transform: translate(-120px, -12px); }
 }
 @media (max-width: 640px) {
   .hero-email-wrap { margin-top: 52px; overflow: visible; }
   .hero-email-wrap .hero-email { padding-right: 58px; }
-  .hero-email-capybara { width: 80px; bottom: 10px; right: -18px; }
+  .hero-email-capybara { width: 80px; bottom: 10px; right: 10px; transform: translate(-120px, -12px); }
 }
 @media (max-width: 360px) {
   .hero-email-wrap { margin-top: 58px; overflow: visible; }
-  .hero-email-capybara { display: block; width: 72px; bottom: 9px; right: -14px; }
+  .hero-email-capybara { display: block; width: 72px; bottom: 9px; right: -1px; transform: translate(-120px, -16px); }
 }
 
 

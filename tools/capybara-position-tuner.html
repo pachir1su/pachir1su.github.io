@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>카피바라 위치 튜너</title>
+  <style>
+    /* 튜너 전체의 노트형 작업 공간을 구성한다. */
+    :root {
+      --paper: #f8f6ef;
+      --paper-deep: #eee9dc;
+      --ink: #29251e;
+      --muted: #756e62;
+      --red: #cc3e3e;
+      --red-dark: #9e2929;
+      --cyan: #cbe8ea;
+      --line: rgba(84, 116, 126, 0.15);
+      --shadow: 0 12px 28px rgba(52, 40, 26, 0.12);
+      font-family: "Arial", "Noto Sans KR", sans-serif;
+      color: var(--ink);
+      background: #ded8ca;
+    }
+
+    /* 브라우저 기본 여백과 입력 요소의 box model을 통일한다. */
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: #ded8ca; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    /* 튜너의 2열 레이아웃과 좁은 화면용 단일 열을 정의한다. */
+    .cpt-app {
+      width: min(1440px, calc(100% - 32px));
+      margin: 24px auto;
+      display: grid;
+      grid-template-columns: minmax(270px, 330px) minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .cpt-app {
+        grid-template-columns: 1fr;
+        width: min(760px, calc(100% - 24px));
+      }
+    }
+
+    /* 제어 패널과 미리보기 패널을 종이 카드처럼 보이게 한다. */
+    .cpt-panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(99, 85, 63, 0.2);
+      border-radius: 10px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+    .cpt-panel::before {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      content: "";
+      background: repeating-linear-gradient(to bottom, transparent 0 31px, var(--line) 32px);
+      opacity: 0.45;
+    }
+    .cpt-panel-inner { position: relative; z-index: 1; padding: 22px; }
+    .cpt-title { margin: 0 0 6px; font-size: 1.35rem; }
+    .cpt-lead { margin: 0 0 18px; color: var(--muted); font-size: 0.9rem; line-height: 1.55; }
+    .cpt-section { margin-top: 20px; }
+    .cpt-section-title {
+      margin: 0 0 10px;
+      color: var(--red-dark);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* 선택 컨트롤과 값 입력을 같은 행에 배치한다. */
+    .cpt-field { display: block; margin: 13px 0; }
+    .cpt-field-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .cpt-field-hint { color: var(--muted); font-weight: 400; }
+    .cpt-control-row { display: grid; grid-template-columns: minmax(0, 1fr) 78px; gap: 9px; align-items: center; }
+    .cpt-control-row input[type="range"] { width: 100%; accent-color: var(--red); }
+    .cpt-number {
+      width: 100%;
+      padding: 6px 7px;
+      border: 1px solid rgba(99, 85, 63, 0.32);
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.6);
+      color: var(--ink);
+      text-align: right;
+    }
+    .cpt-select {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid rgba(99, 85, 63, 0.32);
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.75);
+      color: var(--ink);
+    }
+
+    /* 미세 이동 버튼과 주요 동작 버튼의 공통 스타일을 정의한다. */
+    .cpt-nudge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; max-width: 190px; margin: 10px auto 0; }
+    .cpt-nudge-grid button,
+    .cpt-action {
+      min-height: 36px;
+      border: 1px solid rgba(99, 85, 63, 0.3);
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--ink);
+    }
+    .cpt-nudge-grid button:hover,
+    .cpt-action:hover { border-color: var(--red); color: var(--red-dark); }
+    .cpt-nudge-grid button:nth-child(1) { grid-column: 2; }
+    .cpt-nudge-grid button:nth-child(2) { grid-column: 1; grid-row: 2; }
+    .cpt-nudge-grid button:nth-child(3) { grid-column: 2; grid-row: 2; }
+    .cpt-nudge-grid button:nth-child(4) { grid-column: 3; grid-row: 2; }
+    .cpt-action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+    .cpt-action-primary { border-color: var(--red); background: var(--red); color: #fff; }
+    .cpt-action-primary:hover { background: var(--red-dark); color: #fff; }
+    .cpt-status { min-height: 1.3em; margin: 12px 0 0; color: var(--muted); font-size: 0.78rem; line-height: 1.45; }
+
+    /* CSS 결과를 사용자가 직접 확인하고 복사할 수 있게 한다. */
+    .cpt-output {
+      width: 100%;
+      min-height: 168px;
+      resize: vertical;
+      padding: 10px;
+      border: 1px solid rgba(99, 85, 63, 0.32);
+      border-radius: 5px;
+      background: #24231f;
+      color: #f5e8c6;
+      font: 0.76rem/1.5 Consolas, "Courier New", monospace;
+    }
+
+    /* 미리보기 영역의 스크롤·확대 컨테이너를 정의한다. */
+    .cpt-preview-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; margin-bottom: 14px; }
+    .cpt-preview-title { margin: 0; font-size: 1.1rem; }
+    .cpt-preview-help { margin: 3px 0 0; color: var(--muted); font-size: 0.78rem; line-height: 1.45; }
+    .cpt-preview-size { flex: 0 0 auto; color: var(--red-dark); font: 700 0.78rem/1.4 Consolas, monospace; }
+    .cpt-preview-viewport {
+      position: relative;
+      overflow: auto;
+      min-height: 440px;
+      padding: 10px;
+      border: 1px solid rgba(99, 85, 63, 0.2);
+      border-radius: 8px;
+      background: #c9c2b4;
+    }
+    .cpt-preview-scale { position: relative; transform-origin: top left; }
+
+    /* 실제 홈을 단순화한 노트형 미리보기의 외형을 구성한다. */
+    .cpt-site-preview {
+      position: relative;
+      width: 1200px;
+      height: 600px;
+      overflow: hidden;
+      border: 1px solid #d3cbbb;
+      background-color: var(--paper);
+      background-image: repeating-linear-gradient(to bottom, transparent 0 31px, rgba(84, 116, 126, 0.15) 32px);
+      box-shadow: 0 8px 18px rgba(52, 40, 26, 0.16);
+    }
+    .cpt-site-preview::before {
+      position: absolute;
+      inset: 0 auto 0 44px;
+      width: 1px;
+      content: "";
+      background: rgba(207, 73, 73, 0.42);
+    }
+    .cpt-site-header {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      height: 54px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 70px;
+      border-bottom: 1px solid rgba(99, 85, 63, 0.24);
+      background: rgba(248, 246, 239, 0.9);
+      color: var(--muted);
+      font: 0.76rem Consolas, monospace;
+    }
+    .cpt-site-logo { color: var(--red); font-weight: 700; }
+    .cpt-site-nav { display: flex; gap: 28px; }
+    .cpt-site-lang { white-space: nowrap; }
+    .cpt-site-hamburger {
+      display: none;
+      width: 28px;
+      height: 28px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      padding: 4px;
+    }
+    .cpt-site-hamburger span { display: block; height: 2px; border-radius: 2px; background: var(--ink); }
+    .cpt-hero-content { width: 1060px; margin: 0 auto; padding-top: 102px; }
+    .cpt-hero-tag { display: inline-block; padding: 8px 14px; border: 1px dashed rgba(204, 62, 62, 0.45); border-radius: 999px; color: var(--red); font-size: 0.78rem; }
+    .cpt-hero-name { margin: 22px 0 8px; font-size: 3.1rem; line-height: 0.95; }
+    .cpt-hero-name small { display: block; margin-top: 10px; color: var(--muted); font: 1.15rem Consolas, monospace; letter-spacing: 0.06em; }
+    .cpt-hero-role { font-size: 1.25rem; }
+    .cpt-hero-role strong { color: var(--red); }
+    .cpt-hero-desc { max-width: 510px; margin: 20px 0 28px; font-size: 1rem; line-height: 1.9; }
+    .cpt-hero-desc strong { background: linear-gradient(transparent 62%, rgba(204, 62, 62, 0.16) 0); }
+    .cpt-hero-buttons { display: flex; gap: 12px; align-items: center; }
+    .cpt-preview-button {
+      display: inline-flex;
+      min-height: 46px;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border: 1px dashed rgba(99, 85, 63, 0.32);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.58);
+      color: var(--ink);
+      font: 700 0.8rem Consolas, monospace;
+      white-space: nowrap;
+    }
+    .cpt-preview-button-primary { border: 0; border-bottom: 4px solid var(--red-dark); background: var(--red); color: #fff; }
+    .cpt-email-wrap { position: relative; display: inline-flex; min-height: 46px; align-items: center; overflow: visible; }
+    .cpt-email-button { position: relative; z-index: 1; min-width: 244px; padding-right: var(--email-padding); }
+    .cpt-capybara {
+      position: absolute;
+      right: var(--capybara-right);
+      bottom: var(--capybara-bottom);
+      z-index: var(--capybara-z);
+      width: var(--capybara-width);
+      max-width: none;
+      height: auto;
+      pointer-events: auto;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-drag: none;
+      transform: translate(var(--capybara-x), var(--capybara-y));
+    }
+    .cpt-capybara:active { cursor: grabbing; }
+    .cpt-site-stats { position: absolute; top: 112px; right: 72px; display: grid; gap: 12px; }
+    .cpt-stat { width: 112px; padding: 12px; background: #fff2a9; box-shadow: 4px 5px 0 rgba(52, 40, 26, 0.08); transform: rotate(-2deg); }
+    .cpt-stat:nth-child(2) { background: #ffe1a2; transform: rotate(1deg); }
+    .cpt-stat:nth-child(3) { background: var(--cyan); transform: rotate(-1deg); }
+    .cpt-stat strong { display: block; color: var(--red); font: 700 1.55rem Georgia, serif; }
+    .cpt-stat span { font-size: 0.65rem; }
+
+    /* 선택한 mobile viewport에서 실제 홈의 폭·간격 변화를 재현한다. */
+    .cpt-site-preview[data-breakpoint="390"],
+    .cpt-site-preview[data-breakpoint="360"] { height: 740px; }
+    .cpt-site-preview[data-breakpoint="870"] .cpt-hero-content { width: calc(100% - 120px); }
+    .cpt-site-preview[data-breakpoint="870"] .cpt-site-stats { right: 36px; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-site-header,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-site-header { height: 54px; padding: 0 16px; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-site-nav,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-site-nav { display: none; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-site-hamburger,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-site-hamburger { display: flex; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-site-lang,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-site-lang {
+      padding: 7px 8px;
+      border: 1px solid rgba(99, 85, 63, 0.28);
+      border-radius: 50%;
+    }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-hero-content,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-hero-content { width: auto; margin: 0 16px; padding-top: 26px; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-hero-name,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-hero-name { margin-top: 20px; font-size: 2rem; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-hero-name small,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-hero-name small { font-size: 0.95rem; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-hero-role,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-hero-role { font-size: 1.05rem; margin-top: 18px; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-hero-desc,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-hero-desc { margin: 22px 0 26px; font-size: 0.88rem; line-height: 2.1; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-hero-buttons,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-hero-buttons {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 44px;
+    }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-preview-button,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-preview-button { width: 100%; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-email-wrap,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-email-wrap { width: 100%; margin-top: 52px; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-email-button,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-email-button { width: 100%; min-width: 0; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-site-stats,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-site-stats {
+      position: static;
+      margin: 0 16px;
+      grid-template-columns: 1fr 1fr;
+    }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-stat,
+    .cpt-site-preview[data-breakpoint="360"] .cpt-stat { width: auto; }
+    .cpt-site-preview[data-breakpoint="390"] .cpt-stat:nth-child(3),
+    .cpt-site-preview[data-breakpoint="360"] .cpt-stat:nth-child(3) { grid-column: 1 / -1; }
+    .cpt-site-preview[data-breakpoint="360"] .cpt-email-wrap { margin-top: 58px; }
+
+    /* 미리보기에서 현재 조절값과 조작 방법을 명확히 표시한다. */
+    .cpt-preview-caption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: 10px; color: var(--muted); font-size: 0.75rem; }
+    .cpt-preview-caption strong { color: var(--red-dark); }
+  </style>
+</head>
+<body>
+  <main class="cpt-app">
+    <!-- 왼쪽 제어 패널: viewport별 위치값을 편집한다. -->
+    <section class="cpt-panel" aria-labelledby="controlsTitle">
+      <div class="cpt-panel-inner">
+        <h1 id="controlsTitle" class="cpt-title">카피바라 위치 튜너</h1>
+        <p class="cpt-lead">현재 포트폴리오 홈의 메일 버튼을 단순화해 재현했습니다. 값을 바꾸거나 미리보기의 카피바라를 드래그해 위치를 맞춰보세요.</p>
+
+        <div class="cpt-section">
+          <h2 class="cpt-section-title">Viewport</h2>
+          <label class="cpt-field" for="viewportPreset">
+            <span class="cpt-field-label">확인할 화면 폭 <span class="cpt-field-hint">CSS breakpoint 기준</span></span>
+            <select id="viewportPreset" class="cpt-select">
+              <option value="1200">1200px · desktop</option>
+              <option value="870">870px · tablet / narrow desktop</option>
+              <option value="390">390px · mobile</option>
+              <option value="360">360px · small mobile</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="cpt-section">
+          <h2 class="cpt-section-title">Position &amp; Layer</h2>
+
+          <label class="cpt-field" for="capybaraRight">
+            <span class="cpt-field-label">기준 right <span class="cpt-field-hint">CSS right 값</span></span>
+            <span class="cpt-control-row"><input id="capybaraRight" data-control="capybaraRight" type="range" min="-100" max="60" step="1" /><input class="cpt-number" data-number-for="capybaraRight" type="number" /></span>
+          </label>
+
+          <label class="cpt-field" for="capybaraBottom">
+            <span class="cpt-field-label">기준 bottom <span class="cpt-field-hint">CSS bottom 값</span></span>
+            <span class="cpt-control-row"><input id="capybaraBottom" data-control="capybaraBottom" type="range" min="-80" max="100" step="1" /><input class="cpt-number" data-number-for="capybaraBottom" type="number" /></span>
+          </label>
+
+          <label class="cpt-field" for="capybaraX">
+            <span class="cpt-field-label">가로 추가 이동 <span class="cpt-field-hint">+ 오른쪽 / − 왼쪽</span></span>
+            <span class="cpt-control-row"><input id="capybaraX" data-control="capybaraX" type="range" min="-120" max="120" step="1" /><input class="cpt-number" data-number-for="capybaraX" type="number" /></span>
+          </label>
+
+          <label class="cpt-field" for="capybaraY">
+            <span class="cpt-field-label">세로 추가 이동 <span class="cpt-field-hint">+ 아래 / − 위</span></span>
+            <span class="cpt-control-row"><input id="capybaraY" data-control="capybaraY" type="range" min="-120" max="120" step="1" /><input class="cpt-number" data-number-for="capybaraY" type="number" /></span>
+          </label>
+
+          <label class="cpt-field" for="capybaraWidth">
+            <span class="cpt-field-label">카피바라 크기 <span class="cpt-field-hint">px</span></span>
+            <span class="cpt-control-row"><input id="capybaraWidth" data-control="capybaraWidth" type="range" min="40" max="160" step="1" /><input class="cpt-number" data-number-for="capybaraWidth" type="number" /></span>
+          </label>
+
+          <label class="cpt-field" for="emailPadding">
+            <span class="cpt-field-label">메일 버튼 오른쪽 여백 <span class="cpt-field-hint">텍스트 보호 영역</span></span>
+            <span class="cpt-control-row"><input id="emailPadding" data-control="emailPadding" type="range" min="0" max="140" step="1" /><input class="cpt-number" data-number-for="emailPadding" type="number" /></span>
+          </label>
+
+          <label class="cpt-field" for="capybaraZ">
+            <span class="cpt-field-label">z-index <span class="cpt-field-hint">앞/뒤 레이어</span></span>
+            <span class="cpt-control-row"><input id="capybaraZ" data-control="capybaraZ" type="range" min="0" max="10" step="1" /><input class="cpt-number" data-number-for="capybaraZ" type="number" /></span>
+          </label>
+
+          <div class="cpt-nudge-grid" aria-label="카피바라 미세 이동">
+            <button type="button" data-nudge="y:-1" aria-label="위로 1픽셀">↑</button>
+            <button type="button" data-nudge="x:-1" aria-label="왼쪽으로 1픽셀">←</button>
+            <button type="button" data-nudge="y:1" aria-label="아래로 1픽셀">↓</button>
+            <button type="button" data-nudge="x:1" aria-label="오른쪽으로 1픽셀">→</button>
+          </div>
+        </div>
+
+        <div class="cpt-section">
+          <h2 class="cpt-section-title">Output</h2>
+          <textarea id="cssOutput" class="cpt-output" readonly spellcheck="false" aria-label="현재 CSS 적용값"></textarea>
+          <div class="cpt-action-row">
+            <button type="button" id="copyCurrentCss" class="cpt-action cpt-action-primary">현재 CSS 복사</button>
+            <button type="button" id="copyAllCss" class="cpt-action">전체 값 복사</button>
+          </div>
+          <button type="button" id="resetPreset" class="cpt-action" style="width:100%; margin-top:8px;">현재 화면 기본값으로 되돌리기</button>
+          <p id="statusMessage" class="cpt-status" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 오른쪽 미리보기 패널: 실제 화면 폭을 축소해 보여준다. -->
+    <section class="cpt-panel" aria-labelledby="previewTitle">
+      <div class="cpt-panel-inner">
+        <div class="cpt-preview-head">
+          <div>
+            <h2 id="previewTitle" class="cpt-preview-title">실시간 미리보기</h2>
+            <p class="cpt-preview-help">카피바라를 직접 드래그하거나, 미리보기 위에서 휠을 굴리세요. Shift + 휠은 가로 이동입니다.</p>
+          </div>
+          <div id="previewSize" class="cpt-preview-size">1200 × 430</div>
+        </div>
+
+        <div id="previewViewport" class="cpt-preview-viewport">
+          <div id="previewScale" class="cpt-preview-scale">
+            <div id="sitePreview" class="cpt-site-preview" data-breakpoint="1200">
+              <header class="cpt-site-header">
+                <span class="cpt-site-logo">{ GY }</span>
+                <nav class="cpt-site-nav" aria-label="미리보기 메뉴"><span>프로젝트</span><span>역량</span><span>수상</span><span>비전</span></nav>
+                <span class="cpt-site-lang">EN</span>
+                <span class="cpt-site-hamburger" aria-hidden="true"><span></span><span></span><span></span></span>
+              </header>
+              <div class="cpt-hero-content">
+                <span class="cpt-hero-tag">안녕하세요</span>
+                <h2 class="cpt-hero-name">이건영<small>Lee Geon Yeong</small></h2>
+                <div class="cpt-hero-role">혁신의 기업가 &amp; <strong>풀스택 개발자</strong></div>
+                <p class="cpt-hero-desc">이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br /><strong>월 100만 명</strong>이 사용하는 서비스를 만드는 것이 목표입니다.</p>
+                <div class="cpt-hero-buttons">
+                  <span class="cpt-preview-button cpt-preview-button-primary">▰ 프로젝트 보기</span>
+                  <span class="cpt-preview-button">◉ GitHub</span>
+                  <span class="cpt-email-wrap">
+                    <span class="cpt-preview-button cpt-email-button">✉ capybara@koreatech.ac.kr</span>
+                    <img id="capybaraPreview" class="cpt-capybara" src="../assets/capybara-mail-peek.webp" width="256" height="256" alt="카피바라 위치 조절 대상" draggable="false" />
+                  </span>
+                </div>
+              </div>
+              <div class="cpt-site-stats" aria-hidden="true">
+                <div class="cpt-stat"><strong>20+</strong><span>프로젝트</span></div>
+                <div class="cpt-stat"><strong>4</strong><span>수상 경력</span></div>
+                <div class="cpt-stat"><strong>8위</strong><span>581 팀 중</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cpt-preview-caption"><span>현재: <strong id="currentValueCaption">right -38 / bottom 10 / x 0 / y 0</strong></span><span>설정은 브라우저에 자동 저장됩니다.</span></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /* 화면별 기본값과 저장 키를 정의한다. */
+    const storageKey = 'capybara-position-tuner:v2';
+    const defaultPresets = {
+      '1200': { capybaraRight: -34, capybaraBottom: 10, capybaraX: -120, capybaraY: -12, capybaraWidth: 84, emailPadding: 58, capybaraZ: 3 },
+      '870': { capybaraRight: -30, capybaraBottom: 10, capybaraX: -120, capybaraY: -12, capybaraWidth: 80, emailPadding: 58, capybaraZ: 3 },
+      '390': { capybaraRight: 10, capybaraBottom: 10, capybaraX: -120, capybaraY: -12, capybaraWidth: 80, emailPadding: 58, capybaraZ: 3 },
+      '360': { capybaraRight: -1, capybaraBottom: 9, capybaraX: -120, capybaraY: -16, capybaraWidth: 72, emailPadding: 58, capybaraZ: 3 }
+    };
+    const previewHeights = { '1200': 600, '870': 600, '390': 740, '360': 740 };
+    let selectedViewport = '1200';
+    let savedPresets = loadPresets();
+    let isDragging = false;
+    let dragStart = null;
+
+    /* 기본 preset 객체를 저장 가능한 독립 객체로 복제한다. */
+    function cloneDefaultPresets() {
+      return Object.keys(defaultPresets).reduce((result, viewport) => {
+        result[viewport] = { ...defaultPresets[viewport] };
+        return result;
+      }, {});
+    }
+
+    /* DOM 요소를 한 곳에서 찾아 입력·미리보기를 연결한다. */
+    const viewportPreset = document.querySelector('#viewportPreset');
+    const previewViewport = document.querySelector('#previewViewport');
+    const previewScale = document.querySelector('#previewScale');
+    const sitePreview = document.querySelector('#sitePreview');
+    const capybaraPreview = document.querySelector('#capybaraPreview');
+    const previewSize = document.querySelector('#previewSize');
+    const cssOutput = document.querySelector('#cssOutput');
+    const statusMessage = document.querySelector('#statusMessage');
+    const currentValueCaption = document.querySelector('#currentValueCaption');
+
+    /* localStorage가 비어 있거나 손상된 경우에도 기본값으로 복구한다. */
+    function loadPresets() {
+      try {
+        const rawValue = window.localStorage.getItem(storageKey);
+        if (!rawValue) return cloneDefaultPresets();
+        const parsedValue = JSON.parse(rawValue);
+        return Object.keys(defaultPresets).reduce((result, viewport) => {
+          result[viewport] = { ...defaultPresets[viewport], ...(parsedValue[viewport] || {}) };
+          return result;
+        }, {});
+      } catch (error) {
+        return cloneDefaultPresets();
+      }
+    }
+
+    /* 현재 화면별 값을 브라우저에 저장하되 저장 실패는 작업을 막지 않는다. */
+    function savePresets() {
+      try {
+        window.localStorage.setItem(storageKey, JSON.stringify(savedPresets));
+      } catch (error) {
+        setStatus('자동 저장은 사용할 수 없지만 현재 화면은 계속 조절할 수 있습니다.');
+      }
+    }
+
+    /* 입력값을 해당 range의 허용 범위 안 숫자로 정규화한다. */
+    function clampNumber(input, rawValue) {
+      const parsedValue = Number(rawValue);
+      const fallbackValue = Number(input.value || input.min || 0);
+      const safeValue = Number.isFinite(parsedValue) ? parsedValue : fallbackValue;
+      const minValue = Number(input.min);
+      const maxValue = Number(input.max);
+      return Math.min(maxValue, Math.max(minValue, safeValue));
+    }
+
+    /* 선택한 화면의 값을 range와 number input에 동시에 반영한다. */
+    function loadSelectedPreset() {
+      const preset = savedPresets[selectedViewport];
+      document.querySelectorAll('[data-control]').forEach((input) => {
+        const value = preset[input.dataset.control];
+        input.value = value;
+        const numberInput = document.querySelector(`[data-number-for="${input.dataset.control}"]`);
+        if (numberInput) numberInput.value = value;
+      });
+      renderPreview();
+    }
+
+    /* 입력값을 상태에 기록하고 미리보기·CSS 출력을 다시 그린다. */
+    function updateControl(controlName, rawValue) {
+      const rangeInput = document.querySelector(`[data-control="${controlName}"]`);
+      if (!rangeInput) return;
+      const safeValue = clampNumber(rangeInput, rawValue);
+      savedPresets[selectedViewport][controlName] = safeValue;
+      rangeInput.value = safeValue;
+      const numberInput = document.querySelector(`[data-number-for="${controlName}"]`);
+      if (numberInput) numberInput.value = safeValue;
+      savePresets();
+      renderPreview();
+    }
+
+    /* 선택한 화면 폭에 맞춰 미리보기 크기와 CSS custom property를 갱신한다. */
+    function renderPreview() {
+      const preset = savedPresets[selectedViewport];
+      const previewHeight = previewHeights[selectedViewport];
+      const availableWidth = Math.max(260, previewViewport.clientWidth - 20);
+      const scale = Math.min(1, availableWidth / Number(selectedViewport));
+      sitePreview.dataset.breakpoint = selectedViewport;
+      sitePreview.style.width = `${Number(selectedViewport)}px`;
+      previewScale.style.width = `${Number(selectedViewport) * scale}px`;
+      previewScale.style.height = `${previewHeight * scale}px`;
+      previewScale.style.transform = `scale(${scale})`;
+      sitePreview.style.setProperty('--capybara-right', `${preset.capybaraRight}px`);
+      sitePreview.style.setProperty('--capybara-bottom', `${preset.capybaraBottom}px`);
+      sitePreview.style.setProperty('--capybara-x', `${preset.capybaraX}px`);
+      sitePreview.style.setProperty('--capybara-y', `${preset.capybaraY}px`);
+      sitePreview.style.setProperty('--capybara-width', `${preset.capybaraWidth}px`);
+      sitePreview.style.setProperty('--email-padding', `${preset.emailPadding}px`);
+      sitePreview.style.setProperty('--capybara-z', preset.capybaraZ);
+      previewSize.textContent = `${selectedViewport} × ${previewHeight}`;
+      currentValueCaption.textContent = `right ${preset.capybaraRight} / bottom ${preset.capybaraBottom} / x ${preset.capybaraX} / y ${preset.capybaraY}`;
+      cssOutput.value = buildCssSnippet(selectedViewport, preset);
+    }
+
+    /* 위치값만 담은 공통 CSS 본문을 만든다. */
+    function buildCssBody(preset) {
+      return `.hero-email-wrap { overflow: visible; }\n.hero-email-wrap .hero-email { padding-right: ${preset.emailPadding}px; }\n.hero-email-capybara { width: ${preset.capybaraWidth}px; bottom: ${preset.capybaraBottom}px; right: ${preset.capybaraRight}px; transform: translate(${preset.capybaraX}px, ${preset.capybaraY}px); z-index: ${preset.capybaraZ}; }`;
+    }
+
+    /* 현재 viewport의 위치값을 저장소에 바로 붙일 수 있는 CSS로 만든다. */
+    function buildCssSnippet(viewport, preset) {
+      const mediaQuery = viewport === '870'
+        ? '@media (min-width: 641px) and (max-width: 900px)'
+        : viewport === '390'
+          ? '@media (max-width: 640px)'
+          : viewport === '360'
+            ? '@media (max-width: 360px)'
+            : '';
+      const cssBody = buildCssBody(preset);
+      return mediaQuery ? `${mediaQuery} {\n${cssBody}\n}\n` : `${cssBody}\n`;
+    }
+
+    /* 네 화면의 현재 값을 한 번에 비교할 수 있는 CSS override를 만든다. */
+    function buildAllCss() {
+      const baseCss = buildCssSnippet('1200', savedPresets['1200']);
+      const tabletCss = `@media (min-width: 641px) and (max-width: 900px) {\n${buildCssBody(savedPresets['870'])}\n}\n`;
+      const mobileCss = `@media (max-width: 640px) {\n${buildCssBody(savedPresets['390'])}\n}\n`;
+      const smallMobileCss = `@media (max-width: 360px) {\n${buildCssBody(savedPresets['360'])}\n}\n`;
+      return `${baseCss}\n${tabletCss}${mobileCss}${smallMobileCss}`;
+    }
+
+    /* 상태 메시지를 짧게 표시한다. */
+    function setStatus(message) {
+      statusMessage.textContent = message;
+    }
+
+    /* Clipboard API와 선택 복사 fallback을 순서대로 시도한다. */
+    async function copyText(text, successMessage) {
+      try {
+        await navigator.clipboard.writeText(text);
+        setStatus(successMessage);
+        return;
+      } catch (error) {
+        try {
+          cssOutput.value = text;
+          cssOutput.focus();
+          cssOutput.select();
+          const copied = document.execCommand('copy');
+          setStatus(copied ? successMessage : '자동 복사에 실패했습니다. 아래 결과를 Ctrl+C로 복사하세요.');
+          return;
+        } catch (fallbackError) {
+          cssOutput.value = text;
+          cssOutput.focus();
+          cssOutput.select();
+          setStatus('자동 복사에 실패했습니다. 아래 결과를 Ctrl+C로 복사하세요.');
+        }
+      }
+    }
+
+    /* 미리보기 위의 wheel을 세로 또는 가로 위치 조절로 연결한다. */
+    function handlePreviewWheel(event) {
+      if (!event.target.closest('.cpt-site-preview')) return;
+      event.preventDefault();
+      const direction = event.deltaY > 0 ? 1 : -1;
+      const controlName = event.shiftKey ? 'capybaraX' : 'capybaraY';
+      const currentValue = savedPresets[selectedViewport][controlName];
+      updateControl(controlName, currentValue + direction * 2);
+    }
+
+    /* 카피바라 드래그 시작점을 기록한다. */
+    function startDragging(event) {
+      isDragging = true;
+      const preset = savedPresets[selectedViewport];
+      dragStart = { clientX: event.clientX, clientY: event.clientY, x: preset.capybaraX, y: preset.capybaraY };
+      capybaraPreview.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    }
+
+    /* 축소된 미리보기 배율을 보정해 드래그 이동값을 실제 CSS px로 환산한다. */
+    function dragCapybara(event) {
+      if (!isDragging || !dragStart) return;
+      const scale = sitePreview.getBoundingClientRect().width / Number(selectedViewport);
+      const nextX = dragStart.x + (event.clientX - dragStart.clientX) / Math.max(scale, 0.01);
+      const nextY = dragStart.y + (event.clientY - dragStart.clientY) / Math.max(scale, 0.01);
+      updateControl('capybaraX', nextX);
+      updateControl('capybaraY', nextY);
+    }
+
+    /* 드래그 종료 시 포인터 상태를 정리한다. */
+    function stopDragging() {
+      isDragging = false;
+      dragStart = null;
+    }
+
+    /* range, 숫자 입력, viewport 선택, 복사 버튼의 이벤트를 연결한다. */
+    document.querySelectorAll('[data-control]').forEach((input) => {
+      input.addEventListener('input', (event) => updateControl(event.target.dataset.control, event.target.value));
+    });
+    document.querySelectorAll('[data-number-for]').forEach((input) => {
+      input.addEventListener('change', (event) => updateControl(event.target.dataset.numberFor, event.target.value));
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') updateControl(event.target.dataset.numberFor, event.target.value);
+      });
+    });
+    viewportPreset.addEventListener('change', (event) => {
+      selectedViewport = event.target.value;
+      loadSelectedPreset();
+    });
+    document.querySelectorAll('[data-nudge]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const [axis, rawStep] = button.dataset.nudge.split(':');
+        const controlName = axis === 'x' ? 'capybaraX' : 'capybaraY';
+        updateControl(controlName, savedPresets[selectedViewport][controlName] + Number(rawStep));
+      });
+    });
+    document.querySelector('#copyCurrentCss').addEventListener('click', () => copyText(cssOutput.value, '현재 viewport CSS를 복사했습니다.'));
+    document.querySelector('#copyAllCss').addEventListener('click', () => copyText(buildAllCss(), '전체 viewport CSS를 복사했습니다.'));
+    document.querySelector('#resetPreset').addEventListener('click', () => {
+      savedPresets[selectedViewport] = { ...defaultPresets[selectedViewport] };
+      savePresets();
+      loadSelectedPreset();
+      setStatus(`${selectedViewport}px 기본값으로 되돌렸습니다.`);
+    });
+    previewViewport.addEventListener('wheel', handlePreviewWheel, { passive: false });
+    capybaraPreview.addEventListener('pointerdown', startDragging);
+    capybaraPreview.addEventListener('pointermove', dragCapybara);
+    capybaraPreview.addEventListener('pointerup', stopDragging);
+    capybaraPreview.addEventListener('pointercancel', stopDragging);
+    window.addEventListener('resize', renderPreview);
+
+    /* 페이지를 열 때 저장된 1200px 값을 미리보기에 표시한다. */
+    loadSelectedPreset();
+  </script>
+</body>
+</html>
