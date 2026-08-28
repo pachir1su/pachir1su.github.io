@@ -475,7 +475,7 @@
 
     const device = create('div', 'plantclock-device');
     const plant = create('div', 'plantclock-pot');
-    plant.innerHTML = '<span class="plant-stem"></span><span class="plant-leaf plant-leaf-left"></span><span class="plant-leaf plant-leaf-right"></span>';
+    plant.innerHTML = '<span class="plant-pot-body"><span class="plant-soil"></span></span><span class="plant-stem"></span><span class="plant-branch plant-branch-left"></span><span class="plant-branch plant-branch-right"></span><span class="plant-leaf plant-leaf-left"></span><span class="plant-leaf plant-leaf-right"></span>';
     plant.append(create('span', 'plant-tomato plant-tomato-a'), create('span', 'plant-tomato plant-tomato-b'), create('span', 'plant-tomato plant-tomato-c'));
     const lcd = create('div', 'plantclock-lcd');
     const soilLine = create('span');
