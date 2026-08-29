@@ -1,0 +1,1003 @@
+/* ========================================================================== 
+   Universe Observatory
+   다크 모드는 밤하늘, 라이트 모드는 인쇄된 성도 역할을 맡습니다.
+   프레임 애니메이션 없이 정적 CSS·SVG와 사용자 입력 전환만 사용합니다.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+  --universe-page: #10151e;
+  --universe-page-deep: #171c28;
+  --universe-ink: #edf0f7;
+  --universe-muted: #aeb6c8;
+  --universe-faint: rgba(237, 240, 247, 0.08);
+  --universe-line: rgba(196, 168, 102, 0.48);
+  --universe-line-dim: rgba(174, 182, 200, 0.22);
+  --universe-gold: #c4a866;
+  --universe-violet: #9c93bf;
+  --universe-proto: #a78bc8;
+  --universe-drift: #8992a5;
+  --universe-brown: #9a765e;
+  --universe-panel: rgba(24, 30, 41, 0.94);
+  --universe-panel-solid: #181e29;
+  --universe-panel-border: rgba(229, 233, 244, 0.14);
+  --universe-focus: #d8cef9;
+  --universe-danger: #df9a8d;
+  --universe-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  --universe-font-main: "Noto Sans KR", sans-serif;
+  --universe-font-serif: "Cormorant Garamond", "Noto Sans KR", serif;
+  --universe-font-mono: "Space Mono", monospace;
+  --universe-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --universe-page: #e8eaf2;
+  --universe-page-deep: #d9dce8;
+  --universe-ink: #232535;
+  --universe-muted: #616477;
+  --universe-faint: rgba(35, 37, 53, 0.07);
+  --universe-line: rgba(113, 92, 47, 0.44);
+  --universe-line-dim: rgba(64, 67, 86, 0.18);
+  --universe-gold: #756032;
+  --universe-violet: #6f678b;
+  --universe-proto: #745d91;
+  --universe-drift: #616a7c;
+  --universe-brown: #765844;
+  --universe-panel: rgba(241, 242, 247, 0.95);
+  --universe-panel-solid: #f1f2f7;
+  --universe-panel-border: rgba(42, 45, 62, 0.16);
+  --universe-focus: #574d7b;
+  --universe-danger: #8f473c;
+  --universe-shadow: 0 24px 70px rgba(38, 42, 60, 0.16);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--universe-page);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--universe-page);
+  color: var(--universe-ink);
+  font-family: var(--universe-font-main);
+  line-height: 1.6;
+}
+
+button,
+a {
+  color: inherit;
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+button,
+a[href] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--universe-focus);
+  outline-offset: 4px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  z-index: 100;
+  padding: 10px 16px;
+  transform: translate(-50%, -180%);
+  background: var(--universe-panel-solid);
+  border: 1px solid var(--universe-panel-border);
+  font-size: 0.82rem;
+  transition: transform 0.18s var(--universe-ease);
+}
+
+.skip-link:focus {
+  transform: translate(-50%, 0);
+}
+
+/* 정적 별 먼지와 성운을 문서 전체에 한 번만 그립니다. */
+.sky-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 79% 14%, rgba(156, 147, 191, 0.2), transparent 35%),
+    radial-gradient(circle at 23% 72%, rgba(196, 168, 102, 0.08), transparent 29%),
+    linear-gradient(135deg, var(--universe-page) 0%, var(--universe-page-deep) 100%);
+}
+
+.sky-field__dust,
+.sky-field__grain {
+  position: absolute;
+  inset: -12%;
+}
+
+.sky-field__dust {
+  opacity: 0.8;
+  transform: rotate(-13deg);
+  background:
+    radial-gradient(ellipse at 35% 48%, rgba(54, 59, 78, 0.28), transparent 27%),
+    radial-gradient(ellipse at 67% 54%, rgba(32, 37, 51, 0.32), transparent 30%),
+    linear-gradient(100deg, transparent 28%, rgba(0, 0, 0, 0.13) 50%, transparent 72%);
+}
+
+:root[data-theme="light"] .sky-field__dust {
+  opacity: 0.46;
+  filter: invert(1);
+}
+
+.sky-field__grain {
+  opacity: 0.62;
+  background-image:
+    radial-gradient(circle, currentColor 0 0.7px, transparent 0.9px),
+    radial-gradient(circle, currentColor 0 0.5px, transparent 0.8px),
+    radial-gradient(circle, var(--universe-gold) 0 0.55px, transparent 0.85px);
+  background-position: 0 0, 29px 37px, 13px 81px;
+  background-size: 113px 127px, 151px 139px, 173px 191px;
+  color: var(--universe-muted);
+}
+
+.observatory-shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.observatory-header {
+  position: relative;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 76px;
+  padding: 16px clamp(18px, 2.4vw, 44px);
+  border-bottom: 1px solid var(--universe-faint);
+}
+
+.return-gateway {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: var(--universe-muted);
+  font-family: var(--universe-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  transition: color 0.2s ease;
+}
+
+.return-gateway:hover {
+  color: var(--universe-ink);
+}
+
+.return-gateway__mark {
+  position: relative;
+  width: 38px;
+  height: 32px;
+  background: color-mix(in srgb, var(--universe-gold) 26%, var(--universe-panel-solid));
+  clip-path: polygon(4% 6%, 98% 0, 92% 86%, 68% 80%, 48% 100%, 27% 82%, 0 92%);
+}
+
+.return-gateway__mark::after {
+  content: "";
+  position: absolute;
+  width: 25px;
+  height: 1px;
+  top: 16px;
+  left: 7px;
+  background: var(--universe-gold);
+  transform: rotate(-41deg);
+}
+
+.observatory-identity {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  color: var(--universe-muted);
+  font-family: var(--universe-font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+}
+
+.observatory-identity strong {
+  color: var(--universe-ink);
+  font-weight: 400;
+}
+
+.observatory-controls {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.text-control {
+  min-width: 58px;
+  min-height: 44px;
+  padding: 0 9px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--universe-muted);
+  font-family: var(--universe-font-mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.08em;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.text-control:hover {
+  background: var(--universe-faint);
+  color: var(--universe-ink);
+}
+
+.observatory-main {
+  position: relative;
+  min-height: 680px;
+  overflow: hidden;
+}
+
+.zone-heading {
+  position: absolute;
+  top: clamp(24px, 4vh, 48px);
+  left: clamp(24px, 4vw, 72px);
+  z-index: 8;
+  width: min(470px, calc(100% - 48px));
+  pointer-events: none;
+}
+
+.zone-coordinate {
+  margin: 0 0 7px;
+  color: var(--universe-muted);
+  font-family: var(--universe-font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+}
+
+.zone-heading h1 {
+  margin: 0;
+  font-family: var(--universe-font-serif);
+  font-size: clamp(2.1rem, 4.2vw, 4.4rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+.zone-heading > p:last-child {
+  max-width: 48ch;
+  margin: 13px 0 0;
+  color: var(--universe-muted);
+  font-size: clamp(0.72rem, 1vw, 0.84rem);
+}
+
+.orbit-route {
+  position: absolute;
+  top: 50%;
+  right: clamp(22px, 3vw, 54px);
+  z-index: 10;
+  display: grid;
+  gap: 1px;
+  transform: translateY(-50%);
+}
+
+.orbit-route button {
+  display: grid;
+  grid-template-columns: minmax(72px, auto) 14px;
+  align-items: center;
+  justify-content: end;
+  gap: 12px;
+  min-height: 46px;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  color: var(--universe-muted);
+  text-align: right;
+  font-family: var(--universe-font-serif);
+  font-size: 1rem;
+  transition: color 0.2s ease;
+}
+
+.orbit-route button i {
+  width: 9px;
+  height: 9px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.22s var(--universe-ease);
+}
+
+.orbit-route button:hover,
+.orbit-route button[aria-selected="true"] {
+  color: var(--universe-ink);
+}
+
+.orbit-route button[aria-selected="true"] i {
+  background: var(--universe-gold);
+  border-color: var(--universe-gold);
+  box-shadow: 0 0 17px color-mix(in srgb, var(--universe-gold) 65%, transparent);
+  transform: scale(1.18);
+}
+
+.sky-map {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.constellation-lines,
+.celestial-points {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.constellation-lines {
+  overflow: visible;
+}
+
+.constellation-lines path {
+  fill: none;
+  stroke: var(--universe-line);
+  stroke-width: 0.72;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.72;
+  transition: opacity 0.32s ease;
+}
+
+.constellation-lines path.is-secondary {
+  stroke: var(--universe-line-dim);
+  stroke-dasharray: 3 7;
+}
+
+.celestial-point {
+  --point-color: var(--universe-ink);
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  z-index: 3;
+  display: inline-grid;
+  grid-template-columns: 22px auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  transform: translate(-11px, -22px);
+  cursor: pointer;
+  background: transparent;
+  text-align: left;
+}
+
+.celestial-point.is-flipped {
+  grid-template-columns: auto 22px;
+  transform: translate(calc(-100% + 11px), -22px);
+  text-align: right;
+}
+
+.celestial-point.is-flipped .celestial-point__core {
+  grid-column: 2;
+}
+
+.celestial-point.is-flipped .celestial-point__label {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.celestial-point__core {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+}
+
+.celestial-point__core::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border: 1px solid color-mix(in srgb, var(--point-color) 72%, transparent);
+  border-radius: 50%;
+  background: var(--point-color);
+  box-shadow: 0 0 11px color-mix(in srgb, var(--point-color) 46%, transparent);
+  transition: transform 0.24s var(--universe-ease), box-shadow 0.24s ease;
+}
+
+.celestial-point__core::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  transition: border-color 0.24s ease, transform 0.24s var(--universe-ease);
+}
+
+.celestial-point__label {
+  display: block;
+  max-width: min(220px, 18vw);
+  color: var(--universe-ink);
+  font-size: clamp(0.68rem, 0.82vw, 0.8rem);
+  line-height: 1.35;
+  text-wrap: balance;
+  transition: color 0.2s ease;
+}
+
+.celestial-point:hover .celestial-point__core::before,
+.celestial-point[aria-pressed="true"] .celestial-point__core::before {
+  transform: scale(1.42);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--point-color) 74%, transparent);
+}
+
+.celestial-point[aria-pressed="true"] .celestial-point__core::after {
+  border-color: color-mix(in srgb, var(--point-color) 45%, transparent);
+  transform: scale(1.42);
+}
+
+.celestial-point[aria-pressed="true"] .celestial-point__label {
+  color: var(--universe-focus);
+}
+
+.celestial-point[data-kind="rank"] {
+  --point-color: var(--universe-gold);
+}
+
+.celestial-point[data-kind="rank"] .celestial-point__core::before {
+  width: 10px;
+  height: 10px;
+}
+
+.celestial-point[data-kind="growth-record"] {
+  --point-color: var(--universe-violet);
+}
+
+.celestial-point[data-kind="growth-record"] .celestial-point__core::before {
+  width: 5px;
+  height: 5px;
+}
+
+.celestial-point[data-kind="award"] {
+  --point-color: var(--universe-gold);
+}
+
+/* 수상 천체는 네 개 모두 아래 값을 공유해 시각적 서열을 만들지 않습니다. */
+.celestial-point[data-kind="award"] .celestial-point__core::before {
+  width: 9px;
+  height: 9px;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--universe-gold) 54%, transparent);
+}
+
+.celestial-point[data-kind="wip"] {
+  --point-color: var(--universe-proto);
+}
+
+.celestial-point[data-kind="wip"] .celestial-point__core::before {
+  background: transparent;
+  border-style: dashed;
+}
+
+.celestial-point[data-kind="discontinued"] {
+  --point-color: var(--universe-drift);
+  opacity: 0.82;
+}
+
+.celestial-point[data-kind="failed"] {
+  --point-color: var(--universe-brown);
+  opacity: 0.78;
+}
+
+.celestial-point[data-kind="failed"] .celestial-point__core::before {
+  width: 6px;
+  height: 6px;
+  box-shadow: none;
+}
+
+.observation-panel {
+  position: absolute;
+  right: clamp(32px, 4vw, 76px);
+  bottom: clamp(28px, 5vh, 58px);
+  z-index: 14;
+  width: min(360px, calc(100% - 48px));
+  padding: 24px 25px 22px;
+  background: var(--universe-panel);
+  border: 1px solid var(--universe-panel-border);
+  box-shadow: var(--universe-shadow);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.observation-panel::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 24px;
+  width: 56px;
+  height: 2px;
+  background: var(--universe-gold);
+}
+
+.observation-panel__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--universe-muted);
+  font-family: var(--universe-font-mono);
+  font-size: 1.2rem;
+}
+
+.observation-panel__eyebrow {
+  margin: 0 36px 9px 0;
+  color: var(--universe-muted);
+  font-family: var(--universe-font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+}
+
+.observation-panel h2 {
+  margin: 0;
+  font-family: var(--universe-font-serif);
+  font-size: clamp(1.55rem, 2.2vw, 2rem);
+  font-weight: 600;
+  line-height: 1.08;
+}
+
+.observation-panel__role {
+  margin: 9px 0 0;
+  color: var(--universe-gold);
+  font-size: 0.72rem;
+}
+
+.observation-panel__description {
+  margin: 13px 0 0;
+  color: var(--universe-muted);
+  font-size: 0.78rem;
+  line-height: 1.75;
+}
+
+.observation-panel__tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.observation-panel__tech li {
+  padding: 3px 7px;
+  border: 1px solid var(--universe-panel-border);
+  color: var(--universe-muted);
+  font-family: var(--universe-font-mono);
+  font-size: 0.58rem;
+}
+
+.observation-panel__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 13px;
+  border-bottom: 1px solid var(--universe-line);
+  color: var(--universe-ink);
+  font-size: 0.72rem;
+}
+
+.state-legend {
+  position: absolute;
+  left: clamp(24px, 4vw, 72px);
+  bottom: clamp(22px, 4vh, 46px);
+  z-index: 8;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  color: var(--universe-muted);
+}
+
+.state-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.state-legend b {
+  font-family: var(--universe-font-mono);
+  font-size: 0.55rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+.legend-star {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--universe-ink);
+}
+
+.legend-star--proto {
+  background: transparent;
+  border: 1px dashed var(--universe-proto);
+}
+
+.legend-star--drift {
+  background: var(--universe-drift);
+}
+
+.legend-star--brown {
+  background: var(--universe-brown);
+}
+
+.unknown-star {
+  position: absolute;
+  top: 17%;
+  right: 15%;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.unknown-star span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--universe-violet);
+  box-shadow: 0 0 15px var(--universe-violet);
+}
+
+.unknown-star::after {
+  content: "?";
+  position: absolute;
+  top: 32px;
+  color: var(--universe-muted);
+  font-family: var(--universe-font-mono);
+  font-size: 0.58rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.unknown-star:hover::after,
+.unknown-star:focus-visible::after {
+  opacity: 1;
+}
+
+.map-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  background: color-mix(in srgb, var(--universe-page) 78%, transparent);
+  color: var(--universe-muted);
+  font-family: var(--universe-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+}
+
+.map-loading span {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--universe-line-dim);
+  border-top-color: var(--universe-gold);
+  border-radius: 50%;
+  animation: universe-loading 0.9s linear infinite;
+}
+
+@keyframes universe-loading {
+  to { transform: rotate(360deg); }
+}
+
+.load-error {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-content: center;
+  justify-items: start;
+  padding: 32px;
+  background: color-mix(in srgb, var(--universe-page) 92%, transparent);
+}
+
+.load-error__code {
+  margin: 0 0 10px;
+  color: var(--universe-danger);
+  font-family: var(--universe-font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.18em;
+}
+
+.load-error h2 {
+  margin: 0;
+  font-family: var(--universe-font-serif);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 500;
+}
+
+.load-error > p:not(.load-error__code) {
+  max-width: 58ch;
+  color: var(--universe-muted);
+  font-size: 0.8rem;
+}
+
+.load-error a {
+  min-height: 44px;
+  padding-top: 11px;
+  border-bottom: 1px solid var(--universe-line);
+  font-size: 0.76rem;
+}
+
+.observatory-footer {
+  position: relative;
+  z-index: 18;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 40px;
+  padding: 9px clamp(18px, 2.4vw, 44px);
+  border-top: 1px solid var(--universe-faint);
+  color: var(--universe-muted);
+  font-family: var(--universe-font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.06em;
+}
+
+.noscript-message {
+  position: fixed;
+  inset: auto 20px 20px;
+  z-index: 100;
+  padding: 18px;
+  background: var(--universe-panel-solid);
+  border: 1px solid var(--universe-panel-border);
+  color: var(--universe-ink);
+  font-size: 0.8rem;
+}
+
+.noscript-message a {
+  margin-left: 8px;
+  text-decoration: underline;
+}
+
+/* 태블릿에서는 우측 항로와 관측 패널 폭을 줄여 성도 영역을 보존합니다. */
+@media (max-width: 1100px) {
+  .zone-heading {
+    left: 28px;
+  }
+
+  .orbit-route {
+    right: 24px;
+  }
+
+  .observation-panel {
+    right: 24px;
+    width: 330px;
+  }
+
+  .state-legend {
+    left: 28px;
+  }
+}
+
+/* 모바일은 성도와 관측 기록을 세로로 쌓아 별이나 조작부가 패널에 가려지지 않게 합니다. */
+@media (max-width: 720px) {
+  .observatory-shell {
+    display: block;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .observatory-header {
+    position: relative;
+    grid-template-columns: 1fr auto;
+    min-height: 68px;
+    padding: 10px 14px;
+    background: color-mix(in srgb, var(--universe-page) 86%, transparent);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .return-gateway__copy,
+  .observatory-identity {
+    display: none;
+  }
+
+  .return-gateway__mark {
+    width: 40px;
+    height: 34px;
+  }
+
+  .observatory-main {
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .zone-heading {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: auto;
+    min-height: 132px;
+    padding: 20px 20px 12px;
+  }
+
+  .zone-heading h1 {
+    font-size: clamp(2rem, 11vw, 3rem);
+  }
+
+  .zone-heading > p:last-child {
+    max-width: 55ch;
+    margin-top: 9px;
+  }
+
+  .orbit-route {
+    position: sticky;
+    top: 0;
+    right: auto;
+    z-index: 24;
+    display: flex;
+    gap: 2px;
+    width: 100%;
+    padding: 5px 12px;
+    overflow-x: auto;
+    transform: none;
+    background: color-mix(in srgb, var(--universe-page) 88%, transparent);
+    border-top: 1px solid var(--universe-faint);
+    border-bottom: 1px solid var(--universe-faint);
+    scrollbar-width: none;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .orbit-route::-webkit-scrollbar {
+    display: none;
+  }
+
+  .orbit-route button {
+    flex: 0 0 78px;
+    grid-template-columns: auto;
+    justify-items: center;
+    gap: 3px;
+    min-height: 48px;
+    text-align: center;
+    font-family: var(--universe-font-main);
+    font-size: 0.72rem;
+  }
+
+  .orbit-route button i {
+    grid-row: 1;
+    width: 7px;
+    height: 7px;
+  }
+
+  .orbit-route button span {
+    grid-row: 2;
+  }
+
+  .sky-map {
+    position: relative;
+    inset: auto;
+    min-height: var(--map-height, 720px);
+    overflow: hidden;
+    border-bottom: 1px solid var(--universe-faint);
+  }
+
+  .celestial-point__label {
+    max-width: min(132px, 34vw);
+    font-size: 0.68rem;
+  }
+
+  .observation-panel {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: auto;
+    margin: 18px 14px 0;
+    padding: 23px 22px 21px;
+  }
+
+  .state-legend {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    padding: 18px 20px 24px;
+  }
+
+  .unknown-star {
+    top: 8%;
+    right: 7%;
+  }
+
+  .load-error {
+    position: relative;
+    min-height: 520px;
+  }
+
+  .observatory-footer {
+    min-height: 44px;
+    padding: 12px 18px;
+  }
+
+  .observatory-footer span:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 390px) {
+  .text-control {
+    min-width: 52px;
+    padding-inline: 6px;
+  }
+
+  .orbit-route button {
+    flex-basis: 72px;
+  }
+
+  .celestial-point__label {
+    max-width: 118px;
+    font-size: 0.64rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .observatory-header,
+  .orbit-route,
+  .observation-panel {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--universe-panel-solid);
+  }
+}
