@@ -1,0 +1,129 @@
+<!doctype html>
+<!-- =====================================================================
+     v3 우주 — 세로로 흐르는 하늘 (docs/v3-universe/universe.html)
+
+     이동 방식 다를 완성본으로 지은 것이다. 문서가 평범하게 세로로 스크롤되고,
+     하나의 하늘이 위에서 아래로 계속 이어진다. 깊이가 다른 층이 다른 속도로
+     지나가므로 내려갈수록 실제로 이동하고 있다는 감각이 남는다.
+
+     스크롤을 가로채지 않는다 — 스냅도, 정거장도, 진행 안내도 없다.
+     아무것도 숨기지 않는다 — 프로젝트 이름은 언제나 화면에 있다.
+
+     내려가는 순서
+       문 앞의 별자리(새로고침마다 북두칠성/전갈자리) → 2026 → 2025 → 2024
+       → 궤적 → 표류 → 기록
+
+     프로젝트 데이터는 저장소 단일 소스 ../../projects.json 하나만 읽는다.
+     로컬 확인은 file:// 이 아니라 정적 서버가 필요하다(fetch 제약).
+     ===================================================================== -->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>우주 — 세로로 흐르는 하늘</title>
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#11151d" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#e8eaf2" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="../../assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
+    <link rel="stylesheet" href="universe.css" />
+  </head>
+
+  <body>
+    <!-- 창 하나. 성운과 별과 별자리 선이 전부 여기 그려진다. -->
+    <canvas class="sky" aria-hidden="true"></canvas>
+
+    <!-- 천체 — 전부 실제 button이다. universe.js가 채운다. -->
+    <div class="stars" data-stars></div>
+
+    <!-- 문서에 길이를 주는 유일한 요소. 여기 길이가 곧 하늘의 길이다. -->
+    <div class="run" data-run></div>
+
+    <!-- 출발점. 첫 화면에서만 보이고 내려가면 조용히 물러난다. -->
+    <div class="over who" data-who data-keepout>
+      <h1>
+        <span data-ko="이건영" data-en="Lee Geon Yeong">이건영</span>
+        <span class="en">Lee Geon Yeong</span>
+      </h1>
+      <p class="lead"
+         data-ko-html="이윤을 넘어 <b>혁신</b>을 추구하는 기업가를 꿈꿉니다."
+         data-en-html="Aiming to be an entrepreneur who chases <b>innovation</b> beyond profit."
+      >이윤을 넘어 <b>혁신</b>을 추구하는 기업가를 꿈꿉니다.</p>
+      <button type="button" class="mail" data-mail="capybara@koreatech.ac.kr">
+        <span>capybara@koreatech.ac.kr</span>
+        <span class="copied" aria-live="polite"></span>
+      </button>
+    </div>
+
+    <!-- 지금 있는 곳. 구역 사이 열린 하늘에서는 비어 있다. -->
+    <div class="over here" data-here data-keepout aria-live="polite">
+      <b></b><span></span>
+    </div>
+
+    <!-- 궤적에 있을 때만 뜨는 등급. 순서대로 이어야 오른다. -->
+    <div class="over rank" data-rank aria-hidden="true" data-keepout>
+      <small>GitHub Rank</small>
+      <span class="rail" data-rank-rail></span>
+      <b data-rank-now>C</b>
+    </div>
+
+    <!-- 마주친 것 -->
+    <div class="over card" data-card role="group">
+      <button type="button" class="card-close" data-card-close
+              data-ko-label="닫기" data-en-label="Close" aria-label="닫기">&times;</button>
+      <div data-card-body></div>
+    </div>
+
+    <!-- 얼마나 내려왔는지. 스크롤바가 하는 말과 같다. -->
+    <div class="depth" aria-hidden="true"><i data-depth></i></div>
+
+    <div class="bar" data-keepout>
+      <button type="button" class="btn" data-lang>EN</button>
+      <button type="button" class="btn" data-mute hidden aria-pressed="false">&#9835;</button>
+    </div>
+
+    <!-- v2로 돌아가는 길. 들어올 때와 같은 자국이다. 글자를 쓰지 않는다. -->
+    <a
+      class="seam"
+      data-keepout
+      href="https://pachir1su.github.io/"
+      data-ko-label="포트폴리오로 돌아가기"
+      data-en-label="Back to the portfolio"
+      aria-label="포트폴리오로 돌아가기"
+    ></a>
+
+    <!-- 조건을 만족했을 때만 열린다. 화면 어디에도 조건을 적지 않는다. -->
+    <div class="vault" data-vault hidden role="dialog" aria-modal="true" aria-labelledby="vault-title">
+      <div class="vault-panel">
+        <button type="button" class="card-close" data-vault-close
+                data-ko-label="닫기" data-en-label="Close" aria-label="닫기">&times;</button>
+        <h2 id="vault-title" data-ko="제51구역" data-en="Area 51">제51구역</h2>
+        <p data-ko="격리된 기록입니다. 조롱이 아니라 시도와 배움으로 남깁니다."
+           data-en="Quarantined records. Kept as attempts and lessons, not as jokes."
+        >격리된 기록입니다. 조롱이 아니라 시도와 배움으로 남깁니다.</p>
+        <div data-vault-items></div>
+      </div>
+    </div>
+
+    <p class="mark" data-keepout>
+      <b>v3 우주</b> — 세로로 흐르는 하늘. 스크롤로 내려갑니다.
+      <a href="index.html">설계 기록</a>
+    </p>
+
+    <noscript>
+      <p style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);max-width:38ch;text-align:center">
+        이 화면은 별자리를 캔버스로 그립니다. JavaScript 없이 여는 경우
+        <a href="https://pachir1su.github.io/#projects">포트폴리오의 프로젝트 목록</a>에서
+        같은 내용을 모두 볼 수 있습니다.
+      </p>
+    </noscript>
+
+    <script src="../../universe/sky.js"></script>
+    <script src="universe.js"></script>
+  </body>
+</html>

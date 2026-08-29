@@ -1,0 +1,272 @@
+<!doctype html>
+<!-- =====================================================================
+     v3 우주 — 시각 언어 한 장 (docs/v3-universe/design-system.html)
+
+     확정된 값을 말로 적기만 하지 않고 실제로 렌더해서 본다.
+     여기서 새 결정을 하지 않는다. #114에서 고른 값을 옮겨 놓은 것뿐이다.
+
+     이 문서는 운영 시트와 엔진(/universe/universe.css · /universe/sky.js)을
+     그대로 읽는다. 값을 복사해 두지 않으므로 운영이 바뀌면 여기도 같이 바뀐다.
+     ===================================================================== -->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>v3 시각 언어</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="../../assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
+    <link rel="stylesheet" href="../../universe/universe.css" />
+    <style>
+      code { font-family: var(--u-mono); font-size: 12px; color: var(--u-gold-soft); }
+
+      .swatches { display: grid; gap: 1px; margin-top: 18px; background: var(--u-line); grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); }
+      .swatch { padding: 16px 14px 14px; background: var(--u-surface); }
+      .swatch i { display: block; height: 44px; margin-bottom: 12px; }
+      .swatch b { display: block; font-size: 12px; font-weight: 500; }
+      .swatch span { display: block; font-family: var(--u-mono); font-size: 11px; color: var(--u-subtle); }
+
+      .type-specimen { margin-top: 20px; border-top: 1px solid var(--u-line); }
+      .type-row { display: grid; gap: 4px 26px; padding: 18px 0; border-bottom: 1px solid var(--u-line); align-items: baseline; }
+      @media (min-width: 760px) { .type-row { grid-template-columns: minmax(150px, .45fr) minmax(0, 1.8fr); } }
+      .type-row > b { font-family: var(--u-mono); font-size: 11px; color: var(--u-subtle); font-weight: 400; }
+      .sp-name { font-weight: 200; font-size: clamp(34px, 6vw, 74px); letter-spacing: -.055em; line-height: 1; }
+      .sp-en { font-size: 13px; letter-spacing: .34em; text-transform: uppercase; color: var(--u-muted); }
+      .sp-scene { font-weight: 250; font-size: var(--u-t-scene); letter-spacing: -.035em; }
+      .sp-lead { font-weight: 300; font-size: var(--u-t-lead); }
+      .sp-body { font-size: var(--u-t-body); color: var(--u-muted); }
+      .sp-small { font-size: var(--u-t-small); color: var(--u-subtle); }
+      .sp-mono { font-family: var(--u-mono); font-size: 12px; color: var(--u-gold-soft); }
+
+      .plate { position: relative; margin-top: 20px; height: 260px; border: 1px solid var(--u-line); overflow: hidden; }
+      .plate canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+      .plate figcaption {
+        position: absolute; left: 0; right: 0; bottom: 0;
+        display: flex; flex-wrap: wrap; gap: 4px 0;
+      }
+      .plate figcaption span {
+        flex: 1 1 0; min-width: 96px; padding: 8px 10px 10px;
+        font-size: 11.5px; color: var(--u-ink); text-shadow: var(--u-label-halo);
+      }
+      .plate figcaption em { display: block; font-style: normal; color: var(--u-subtle); font-size: 11px; }
+
+      .bad { display: grid; gap: 1px; margin-top: 18px; background: var(--u-line); }
+      @media (min-width: 720px) { .bad { grid-template-columns: repeat(2, 1fr); } }
+      .bad div { padding: 15px 16px; background: var(--u-surface); }
+      .bad b { display: block; margin-bottom: 3px; font-size: 12.5px; font-weight: 500; color: var(--u-ink); }
+      .bad span { color: var(--u-muted); font-size: var(--u-t-small); }
+    </style>
+  </head>
+
+  <body class="v3-doc">
+    <div class="wrap">
+      <header class="masthead">
+        <a class="back-link" href="index.html">← v3 우주 작업 폴더</a>
+        <h1>시각 언어</h1>
+        <p>
+          #114의 취향 캘리브레이션에서 사용자가 직접 고른 값이다.
+          이 문서는 새로 결정하지 않고 <b>고른 값을 그대로 렌더</b>해서 확인한다.
+        </p>
+        <p>테마는 수동 토글이 없다. 지금 보고 있는 색은 운영체제 설정을 그대로 따른 것이다.</p>
+      </header>
+
+      <div class="doc" style="margin-top: 8px; border-top: 0; padding-top: 0">
+        <h2>팔레트</h2>
+        <p>라이트는 인쇄된 성도, 다크는 밤하늘이다. 역할이 반전될 뿐 좌표는 같다.</p>
+        <div class="swatches">
+          <div class="swatch"><i style="background: var(--u-page)"></i><b>page</b><span>#e8eaf2 / #11151d</span></div>
+          <div class="swatch"><i style="background: var(--u-surface)"></i><b>surface</b><span>#f1f2f7 / #181d27</span></div>
+          <div class="swatch"><i style="background: var(--u-ink)"></i><b>ink</b><span>#242636 / #e0e3eb</span></div>
+          <div class="swatch"><i style="background: var(--u-violet)"></i><b>violet</b><span>#706994 / #968dbb</span></div>
+          <div class="swatch"><i style="background: var(--u-gold)"></i><b>gold</b><span>#a9914d / #bda969</span></div>
+          <div class="swatch"><i style="background: var(--u-muted)"></i><b>muted</b><span>#606579 / #a2a8b8</span></div>
+        </div>
+        <ul class="note-list">
+          <li><b>순검정과 순백은 쓰지 않는다.</b> 가장 어두운 값이 <code>#0d1118</code>, 가장 밝은 값이 <code>#f1f2f7</code>이다.</li>
+          <li><b>컬러 배경 위 회색 텍스트를 쓰지 않는다.</b> 장식색과 텍스트색을 분리한 <code>--u-gold-soft</code>가 그 자리를 맡는다.</li>
+          <li>토큰 이름은 전부 <code>--u-</code>로 시작한다. 운영 <code>style.css</code>와 같은 페이지에 함께 실려도 v2를 물들이지 않는다.</li>
+        </ul>
+      </div>
+
+      <div class="doc">
+        <h2>타입</h2>
+        <p>IBM Plex Sans KR 하나만 쓴다. Noto Sans KR 조합은 흔해서 제외했다.</p>
+        <div class="type-specimen">
+          <div class="type-row"><b>name · 200</b><span class="sp-name">이건영</span></div>
+          <div class="type-row"><b>name-en · .34em</b><span class="sp-en">Lee Geon Yeong</span></div>
+          <div class="type-row"><b>scene · 250</b><span class="sp-scene">완성한 별들</span></div>
+          <div class="type-row"><b>lead · 300</b><span class="sp-lead">이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다.</span></div>
+          <div class="type-row"><b>body · 400</b><span class="sp-body">한 해에 끝까지 간 프로젝트만 별자리를 이룹니다.</span></div>
+          <div class="type-row"><b>small · 400</b><span class="sp-small">2026년 · 완성한 프로젝트 9개</span></div>
+          <div class="type-row"><b>mono</b><span class="sp-mono">C → C+ → B- → B → B+ → A- → A</span></div>
+        </div>
+      </div>
+
+      <div class="doc">
+        <h2>하늘</h2>
+        <p>
+          성운은 균일하게 깔지 않는다. 화면 밖 오른쪽 위에 광원이 하나 있고 모든 덩어리가 그 빛을 받는다.
+          어두운 먼지 띠가 성운을 가로지르고, 별은 세 계층으로 나뉜다.
+        </p>
+        <figure class="plate" style="margin: 20px 0 0">
+          <canvas data-sky></canvas>
+        </figure>
+        <ul class="note-list">
+          <li><b>1계층 · 먼 먼지</b> 340개. 거의 안 보이지만 표면의 재질을 만든다.</li>
+          <li><b>2계층 · 일반 별</b> 72개. 순수한 점만 쓴다. 드물게 금빛이 섞인다.</li>
+          <li><b>3계층 · 별자리 별</b> 옅은 달무리를 두른다. 라이트 모드에서는 어두운 점 둘레에 밝은 무리를 둘러 <em>종이에 뚫린 구멍</em>처럼 읽히게 한다.</li>
+          <li>하늘 한 장은 오프스크린 캔버스에 <b>한 번만</b> 그려 캐시한다. 매 프레임 다시 그리는 것은 천체 십여 개뿐이다.</li>
+        </ul>
+      </div>
+
+      <div class="doc">
+        <h2>천체 — 상태를 글자로 쓰지 않는다</h2>
+        <p>
+          <code>projects.json</code>의 실제 상태가 그대로 별의 생애에 대응한다.
+          화면에 <code>진행 중</code> · <code>실패</code> 같은 라벨을 쓰지 않고, 상태는 <code>aria-label</code>에만 남긴다.
+        </p>
+        <figure class="plate">
+          <canvas data-forms></canvas>
+          <figcaption>
+            <span>주계열성<em>완성. 선에 참여한다</em></span>
+            <span>원시성<em>기획 단계. 코어가 비어 있다</em></span>
+            <span>점화 실패<em>개발 중단. 원반이 흩어진다</em></span>
+            <span>초신성 잔해<em>실패. 중심이 비어 있다</em></span>
+            <span>궤도 이탈<em>지연. 별은 살아 있다</em></span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="doc">
+        <h2>선과 별자리</h2>
+        <p>
+          낡은 금빛 실선 하나만 쓴다. 굵기 1.1px, 불투명도 0.6 안팎이다.
+          아직 잇지 않은 구간은 점선이 아니라 <b>어두운 실선</b>으로 남긴다(LN-C 폐기).
+        </p>
+        <figure class="plate">
+          <canvas data-shapes></canvas>
+          <figcaption>
+            <span>오리온자리<em>2026 · 9점</em></span>
+            <span>카시오페이아자리<em>2025 · 5점</em></span>
+            <span>백조자리<em>2024 · 6점</em></span>
+            <span>북두칠성<em>성장 사건 7개</em></span>
+          </figcaption>
+        </figure>
+        <ul class="note-list">
+          <li><b>별자리는 절대 늘어나지 않는다.</b> 각 별자리는 실제 하늘의 종횡비(<code>ratio</code>)를 함께 가지고, <code>fitBox</code>가 그 비율을 지켜 letterbox 한다.</li>
+          <li>연도마다 다른 별자리를 쓴다. 2024와 2025가 같은 모양으로 보이던 문제를 <b>형태 자체로</b> 없앤다.</li>
+          <li>진입 연출은 새로고침마다 <b>북두칠성 / 전갈자리 50:50</b>이다. 별자리 이름 글자는 화면에 쓰지 않는다.</li>
+          <li>완성된 별만 선에 참여한다. 진행 중과 표류하는 별에는 선이 없다.</li>
+        </ul>
+      </div>
+
+      <div class="doc">
+        <h2>모션</h2>
+        <div class="rows">
+          <div class="row"><b>이징</b><span><code>cubic-bezier(.23, 1, .32, 1)</code> 하나. bounce · elastic은 쓰지 않는다</span></div>
+          <div class="row"><b>길이</b><span>UI 반응 <em>260ms</em> 이하. 진입 별자리 <em>2~3초</em>, v2 → v3 전환 <em>약 4초</em></span></div>
+          <div class="row"><b>대상</b><span><code>transform</code>과 <code>opacity</code>만 애니메이트한다. 레이아웃을 다시 계산하지 않는다</span></div>
+          <div class="row"><b>빈도</b><span>하루 수십 번 일어나는 hover 모션은 두지 않는다. 드물게 일어나는 사건만 움직인다</span></div>
+          <div class="row"><b>루프</b><span>상시 <code>rAF</code>를 돌리지 않는다. 보이는 장면이 있고 탭이 보일 때만 돈다</span></div>
+          <div class="row"><b>모션 저감</b><span><code>prefers-reduced-motion</code>이면 루프를 세우고 정지 화면 한 장만 그린다. 정보는 그대로 둔다</span></div>
+        </div>
+      </div>
+
+      <div class="doc">
+        <h2>회피 — 보드에서 "다 별로다"로 확인된 것</h2>
+        <div class="bad">
+          <div><b>네온 글로우 + 순검정 배경</b><span>가장 흔한 우주 컨셉의 실패. 배경은 <code>#11151d</code>이고 발광은 성운의 방향광으로만 만든다.</span></div>
+          <div><b>둥근 알약 · 칩 남발</b><span>모서리를 굴리지 않는다. 경계는 1px 실선이다.</span></div>
+          <div><b>같은 크기 카드 반복 배치</b><span>격자에 같은 카드를 늘어놓지 않는다. 첫 항목만 두 칸을 쓴다.</span></div>
+          <div><b>균일하게 흩뿌린 별</b><span>별은 세 계층으로 밀도가 다르다. 별자리 별만 달무리를 가진다.</span></div>
+          <div><b>영문 대문자 키커 · 좌표 문구</b><span>화면 곳곳에 작은 라벨을 흩뿌리지 않는다. 정보 위계가 무너진다.</span></div>
+          <div><b>이스터에그 사전 안내</b><span>발동 전에도 후에도 조건을 설명하지 않는다. <code>EASTER EGG</code>라고 쓰지 않는다.</span></div>
+        </div>
+      </div>
+
+      <div class="doc" style="padding-bottom: 72px"></div>
+    </div>
+
+    <script src="../../universe/sky.js"></script>
+    <script>
+      /* 이 문서에서만 쓰는 렌더 — 확정된 값을 실제로 그려 확인한다. */
+      (() => {
+        'use strict';
+        const Sky = window.V3Sky;
+        if (!Sky) return;
+
+        function fit(canvas) { return Sky.sizeCanvas(canvas); }
+
+        function drawSky() {
+          const canvas = document.querySelector('[data-sky]');
+          if (!canvas) return;
+          const s = fit(canvas);
+          Sky.paintSky(s.ctx, s.w, s.h, Sky.theme(), { seed: 21 });
+          const T = Sky.theme();
+          const shape = Sky.SHAPES.cassiopeia;
+          /* 종횡비를 지켜 letterbox 한다. 이 경로를 거치지 않고 별자리를 그리지 않는다. */
+          const region = { x: s.w * .48, y: s.h * .14, w: s.w * .46, h: s.h * .46 };
+          const box = Sky.fitBox(region.w, region.h, shape.ratio, 0.02);
+          const pts = shape.pts.map(([x, y]) => [region.x + box.x + x * box.w, region.y + box.y + y * box.h]);
+          Sky.constellation(s.ctx, pts, shape.edges, T, {
+            scale: Math.min(s.w, s.h), progress: 1, bright: shape.bright,
+            starRadius: Math.min(s.w, s.h) * .006, haloRadius: Math.min(s.w, s.h) * .04,
+          });
+        }
+
+        function drawForms(t) {
+          const canvas = document.querySelector('[data-forms]');
+          if (!canvas) return true;
+          const s = fit(canvas);
+          const T = Sky.theme();
+          s.ctx.clearRect(0, 0, s.w, s.h);
+          const R = Math.max(9, Math.min(s.w / 5, s.h) * .13);
+          const y = s.h * .40;
+          const kinds = ['main', 'proto', 'stalled', 'remnant', 'drift'];
+          kinds.forEach((kind, i) => {
+            const x = s.w * ((i + .5) / kinds.length);
+            const o = { stage: kind, phase: i * 1.3, tilt: i * .8, bright: i === 0 };
+            if (kind === 'main') Sky.forms.mainSequence(s.ctx, x, y, R, T, o, t, .3);
+            else if (kind === 'remnant') Sky.forms.remnant(s.ctx, x, y, R, T, o, t, .3);
+            else if (kind === 'drift') Sky.forms.drifted(s.ctx, x, y, R, T, o, t, .3);
+            else Sky.forms.protostar(s.ctx, x, y, R, T, o, t, .3);
+          });
+          return true;
+        }
+
+        function drawShapes() {
+          const canvas = document.querySelector('[data-shapes]');
+          if (!canvas) return;
+          const s = fit(canvas);
+          const T = Sky.theme();
+          s.ctx.clearRect(0, 0, s.w, s.h);
+          const names = ['orion', 'cassiopeia', 'cygnus', 'dipper'];
+          names.forEach((name, i) => {
+            const shape = Sky.SHAPES[name];
+            const cell = s.w / names.length;
+            const region = { x: cell * i, y: s.h * .06, w: cell, h: s.h * .62 };
+            const box = Sky.fitBox(region.w, region.h, shape.ratio, 0.10);
+            const pts = shape.pts.map(([x, y]) => [region.x + box.x + x * box.w, region.y + box.y + y * box.h]);
+            Sky.constellation(s.ctx, pts, shape.edges, T, {
+              scale: Math.min(cell, s.h), progress: 1, bright: shape.bright,
+              starRadius: 2.1, haloRadius: 11,
+            });
+          });
+        }
+
+        function paintAll() { drawSky(); drawShapes(); }
+        paintAll();
+        Sky.addPainter((t) => { drawForms(t); return true; });
+
+        let timer = 0;
+        window.addEventListener('resize', () => { clearTimeout(timer); timer = setTimeout(paintAll, 160); });
+        Sky.onThemeChange(paintAll);
+      })();
+    </script>
+  </body>
+</html>

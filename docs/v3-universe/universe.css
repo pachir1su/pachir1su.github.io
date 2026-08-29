@@ -1,0 +1,320 @@
+/* =====================================================================
+   v3 우주 — 세로로 흐르는 하늘 (docs/v3-universe/universe.css)
+
+   #114에서 확정된 값만 쓴다.
+   팔레트  라이트 #e8eaf2 + #706994 / 다크 #11151d + #968dbb / 금빛 #a9914d
+   서체    IBM Plex Sans KR. 이름은 얇은 200을 크게, 영문은 자간을 넓게
+   구도    왼쪽 아래 이름 · 오른쪽 위 별자리
+   테마    수동 토글 없음. prefers-color-scheme만 따른다
+
+   회피    네온 글로우 · 알약/칩 남발 · 같은 크기 카드 반복 ·
+           화면 위 상태 글자 · 작은 좌표/키커 문구
+
+   토큰은 --v- 로 namespace 한다. 같은 docs 폴더의 다른 시안과 섞이지 않게.
+   ===================================================================== */
+
+:root {
+  --v-page:#e8eaf2; --v-deep:#dfe2ec; --v-surface:#f1f2f7; --v-surface-2:#ffffff;
+  --v-ink:#242636; --v-muted:#606579; --v-subtle:#777c8f; --v-line:#cbd0df;
+  --v-violet:#706994; --v-violet-strong:#554d7d; --v-gold:#a9914d; --v-gold-soft:#8f7736;
+  --v-shadow:0 18px 44px -26px rgba(36,38,54,.55);
+  --v-halo:0 0 6px #e8eaf2, 0 0 14px rgba(232,234,242,.9);
+  --v-paper:linear-gradient(152deg,#f7f6f0 0%,#eceade 58%,#dcd9cb 100%);
+
+  --v-sans:"IBM Plex Sans KR","Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --v-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+
+  --v-name:clamp(40px,7.6vw,104px);
+  --v-scene:clamp(30px,5.4vw,68px);
+  --v-body:14.5px;
+  --v-small:12.5px;
+
+  --v-ease:cubic-bezier(.23,1,.32,1);
+  --v-dur:280ms;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --v-page:#11151d; --v-deep:#0d1118; --v-surface:#181d27; --v-surface-2:#1d2330;
+    --v-ink:#e0e3eb; --v-muted:#a2a8b8; --v-subtle:#858c9e; --v-line:#303848;
+    --v-violet:#968dbb; --v-violet-strong:#b0a7d0; --v-gold:#bda969; --v-gold-soft:#c9b477;
+    --v-shadow:0 20px 50px -28px rgba(0,0,0,.85);
+    --v-halo:0 0 6px #11151d, 0 0 16px rgba(17,21,29,.92);
+  }
+}
+
+*, *::before, *::after { box-sizing:border-box; }
+
+/* 문서는 진짜로 스크롤된다. 창과 천체는 고정이고 스크롤이 카메라를 정한다. */
+html { scroll-behavior:auto; }
+body {
+  margin:0; min-width:320px; overflow-x:hidden;
+  background:var(--v-deep); color:var(--v-ink);
+  font-family:var(--v-sans); font-size:var(--v-body); line-height:1.75;
+  -webkit-font-smoothing:antialiased; word-break:keep-all;
+}
+a { color:inherit; }
+:focus-visible { outline:2px solid var(--v-gold); outline-offset:3px; border-radius:2px; }
+
+/* ---------------------------------------------------------------------
+   1. 창 — 성운·별·별자리 선이 전부 여기 그려진다.
+   --------------------------------------------------------------------- */
+.sky { position:fixed; inset:0; width:100%; height:100%; z-index:0; }
+
+/* 문서에 길이를 주는 유일한 요소. 여기 길이가 곧 하늘의 길이다. */
+.run { position:relative; width:100%; pointer-events:none; }
+
+/* ---------------------------------------------------------------------
+   2. 천체 — 전부 실제 button이다. 매 프레임 transform만 옮긴다.
+   --------------------------------------------------------------------- */
+.stars { position:fixed; inset:0; z-index:1; }
+.star {
+  position:absolute; left:0; top:0; width:44px; height:44px; margin:-22px 0 0 -22px;
+  padding:0; border:0; background:none; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; will-change:transform;
+}
+.star[hidden] { display:none; }
+.star:focus-visible { outline:2px solid var(--v-gold); outline-offset:2px; border-radius:50%; }
+
+/* 이름표 자리는 universe.js가 잰다. 별에서 바깥으로 뻗고, 겹치면 비킨다. */
+.star-name {
+  position:absolute; left:22px; top:22px;
+  transform:translate(var(--ldx,26px), calc(-50% + var(--ldy,0px)));
+  white-space:nowrap; font-size:12.5px; color:var(--v-ink);
+  text-shadow:var(--v-halo); pointer-events:none;
+  transition:color var(--v-dur) var(--v-ease);
+}
+.star:hover .star-name,
+.star:focus-visible .star-name,
+.star[aria-pressed="true"] .star-name { color:var(--v-gold); }
+
+/* 이름 없는 별 — 발동 전에는 존재를 알리는 표시를 하지 않는다. 커서도 바뀌지 않는다. */
+.star-unnamed { cursor:default; }
+.star-unnamed.is-drawn { cursor:pointer; }
+
+/* ---------------------------------------------------------------------
+   3. 겹쳐 놓는 것들 — 창 위에 최소한만.
+   --------------------------------------------------------------------- */
+.over { position:fixed; z-index:3; pointer-events:none; }
+.over > * { pointer-events:auto; }
+
+/* 출발점 — 첫 화면에서만. 그래픽 70 / 정보 30 (#114) */
+.who {
+  left:clamp(20px,5vw,76px); bottom:clamp(30px,7vh,84px);
+  max-width:min(40ch,84vw);
+  transition:opacity 520ms var(--v-ease), transform 520ms var(--v-ease);
+}
+.who.is-away { opacity:0; transform:translateY(-14px); pointer-events:none; }
+.who h1 {
+  margin:0; font-weight:200; font-size:var(--v-name);
+  letter-spacing:-.055em; line-height:.95; text-shadow:var(--v-halo);
+}
+.who .en {
+  display:block; margin-top:8px; color:var(--v-muted);
+  font-size:clamp(11px,1.2vw,13.5px); letter-spacing:.34em;
+  text-transform:uppercase; text-shadow:var(--v-halo);
+}
+.who .lead {
+  margin:20px 0 0; max-width:30ch; font-weight:300;
+  font-size:clamp(15px,1.5vw,18.5px); line-height:1.6; text-shadow:var(--v-halo);
+}
+.who .lead b { font-weight:500; color:var(--v-violet-strong); }
+.mail {
+  display:inline-flex; align-items:center; gap:10px; min-height:44px; margin-top:14px;
+  padding:0; background:none; border:0; border-bottom:1px solid var(--v-line);
+  color:var(--v-muted); font:inherit; font-size:var(--v-small); cursor:pointer;
+  text-shadow:var(--v-halo);
+  transition:color var(--v-dur) var(--v-ease), border-color var(--v-dur) var(--v-ease);
+}
+.mail:hover { color:var(--v-ink); border-bottom-color:var(--v-gold); }
+.mail .copied { color:var(--v-gold); }
+
+/* 지금 있는 곳 — 구역 한가운데 근처에서만 뜬다. 사이는 열린 하늘이라 비어 있다. */
+.here { left:clamp(20px,5vw,76px); top:clamp(76px,12vh,116px); max-width:min(32ch,66vw); }
+.here b {
+  display:block; font-weight:200; font-size:var(--v-scene);
+  letter-spacing:-.05em; line-height:1; text-shadow:var(--v-halo);
+}
+.here span {
+  display:block; margin-top:9px; color:var(--v-muted);
+  font-size:var(--v-small); text-shadow:var(--v-halo);
+}
+
+/* 마주친 것 */
+.card {
+  right:clamp(16px,3vw,40px); bottom:clamp(16px,3vw,40px);
+  width:min(340px,calc(100vw - 32px)); padding:16px 18px 18px;
+  background:var(--v-surface); border:1px solid var(--v-line); box-shadow:var(--v-shadow);
+  opacity:0; transform:translateY(10px); pointer-events:none;
+  /* pointer-events:none 은 마우스만 막는다. 이것만 두면 닫힌 카드의 닫기 단추와
+     상세 링크가 페이지 어느 자리에서나 탭 순서에 남아, 키보드로는 보이지 않는 카드에
+     먼저 가 닿았다. visibility 는 탭 순서와 접근성 트리에서 함께 걷어낸다.
+     사라지는 동안에는 보여야 하므로 페이드가 끝난 뒤에 넘긴다. */
+  visibility:hidden;
+  transition:opacity 280ms var(--v-ease), transform 280ms var(--v-ease),
+             visibility 0s linear 280ms;
+}
+.card.is-open {
+  opacity:1; transform:none; pointer-events:auto; visibility:visible;
+  transition:opacity 280ms var(--v-ease), transform 280ms var(--v-ease), visibility 0s;
+}
+.card h3 { margin:0 0 2px; font-weight:500; font-size:15px; letter-spacing:-.02em; }
+.card .card-role { margin:0 0 9px; color:var(--v-gold-soft); font-size:11.5px; }
+.card .card-lineage { color:var(--v-subtle); font-size:11.5px; }
+.card p { margin:0 0 11px; color:var(--v-muted); font-size:var(--v-small); line-height:1.72; }
+.card p:last-child { margin-bottom:0; }
+.card-tech { display:flex; flex-wrap:wrap; gap:4px 12px; margin:0 0 11px; padding:0; list-style:none; }
+.card-tech li { color:var(--v-subtle); font-size:11px; }
+.card-go {
+  display:inline-flex; align-items:center; gap:8px; min-height:34px;
+  color:var(--v-ink); font-size:var(--v-small); text-decoration:none;
+  border-bottom:1px solid var(--v-gold);
+}
+.card-go:hover { color:var(--v-gold); }
+.card-close {
+  position:absolute; right:6px; top:6px; width:30px; height:30px;
+  background:none; border:0; color:var(--v-subtle); font-size:15px; line-height:1; cursor:pointer;
+}
+.card-close:hover { color:var(--v-ink); }
+
+/* 성장 등급 — 궤적에 있을 때만. 순서대로 이어야 오른다. */
+.rank {
+  right:clamp(14px,3vw,26px); top:66px;
+  display:flex; align-items:center; gap:10px;
+  opacity:0; transition:opacity 380ms var(--v-ease);
+}
+.rank.is-on { opacity:1; }
+.rank small { color:var(--v-subtle); font-size:11px; letter-spacing:.06em; text-shadow:var(--v-halo); }
+.rank .rail { position:relative; width:clamp(70px,10vw,120px); height:1px; background:var(--v-line); }
+.rank .rail::after {
+  content:""; position:absolute; inset:0 auto 0 0; width:var(--rank-progress,0%);
+  background:var(--v-gold); transition:width 560ms var(--v-ease);
+}
+.rank b {
+  min-width:3.2ch; font-family:var(--v-mono); font-size:13px; color:var(--v-gold);
+  font-variant-numeric:tabular-nums; text-shadow:var(--v-halo);
+}
+
+/* 얼마나 내려왔는지 — 스크롤바가 하는 말과 같다. 길을 정해 주지 않는다. */
+.depth {
+  position:fixed; z-index:3; right:clamp(13px,2.4vw,20px); top:66px; bottom:66px;
+  width:1px; background:var(--v-line); pointer-events:none;
+}
+.depth i { position:absolute; left:-1px; top:0; width:3px; height:var(--depth,0%); background:var(--v-gold); }
+
+/* 위쪽 단추 */
+.bar {
+  position:fixed; z-index:40; top:0; right:0;
+  display:flex; align-items:center; gap:6px; padding:14px clamp(14px,3vw,26px);
+}
+.btn {
+  min-height:34px; padding:5px 12px;
+  background:transparent; border:1px solid var(--v-line);
+  color:var(--v-muted); font:inherit; font-size:11.5px; letter-spacing:.06em; cursor:pointer;
+  transition:color var(--v-dur) var(--v-ease), border-color var(--v-dur) var(--v-ease);
+}
+.btn:hover { color:var(--v-ink); border-color:var(--v-gold); }
+.btn[aria-pressed="true"] { color:var(--v-gold); border-color:var(--v-gold); }
+
+/* v2로 돌아가는 길 — 글자를 쓰지 않는다. 들어올 때와 같은 자국이다. */
+.seam {
+  position:fixed; z-index:40; left:clamp(14px,3vw,26px); top:clamp(14px,3vw,26px);
+  display:block; width:52px; height:35px; background:var(--v-paper);
+  -webkit-mask:url("../../universe/assets/gateway/tear-wide.png") center/contain no-repeat;
+  mask:url("../../universe/assets/gateway/tear-wide.png") center/contain no-repeat;
+  filter:drop-shadow(0 7px 15px rgba(0,0,0,.42));
+  opacity:.62; transform:rotate(-4deg);
+  transition:opacity var(--v-dur) var(--v-ease), transform var(--v-dur) var(--v-ease);
+}
+.seam:hover, .seam:focus-visible { opacity:.95; transform:rotate(-2deg) translateY(-2px) scale(1.04); }
+.seam:focus-visible { outline:none; }
+
+/* ---------------------------------------------------------------------
+   4. 이스터에그 — 발동 전에 어떤 예고도 하지 않는다.
+      아래 규칙은 발동 뒤에만 의미가 생긴다.
+   --------------------------------------------------------------------- */
+.vault {
+  position:fixed; inset:0; z-index:70;
+  display:flex; align-items:center; justify-content:center;
+  padding:clamp(18px,5vw,48px);
+  background:color-mix(in srgb, var(--v-deep) 88%, transparent);
+  backdrop-filter:blur(3px);
+  animation:vault-in 520ms var(--v-ease) both;
+}
+@keyframes vault-in { from { opacity:0; } to { opacity:1; } }
+.vault[hidden] { display:none; }
+.vault-panel {
+  position:relative; width:min(520px,100%); padding:clamp(22px,4vw,34px);
+  background:var(--v-surface); border:1px solid var(--v-line); box-shadow:var(--v-shadow);
+}
+.vault-panel h2 { margin:0 0 6px; font-weight:300; font-size:21px; letter-spacing:-.03em; }
+.vault-panel > p { margin:0 0 18px; color:var(--v-muted); font-size:var(--v-small); }
+.vault-item { padding-top:14px; border-top:1px solid var(--v-line); }
+.vault-item h3 { margin:0 0 6px; font-weight:500; font-size:15px; letter-spacing:-.02em; }
+.vault-item p { margin:0 0 12px; color:var(--v-muted); font-size:var(--v-small); line-height:1.72; }
+
+/* ---------------------------------------------------------------------
+   5. 시안 표시 — 운영 화면에는 들어가지 않는다.
+   --------------------------------------------------------------------- */
+.mark {
+  position:fixed; z-index:50; left:50%; bottom:14px; transform:translateX(-50%);
+  display:flex; align-items:center; gap:10px; max-width:calc(100vw - 32px);
+  padding:7px 14px; background:var(--v-surface); border:1px solid var(--v-line);
+  color:var(--v-subtle); font-family:var(--v-mono); font-size:11px; letter-spacing:.04em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.mark b { color:var(--v-ink); font-weight:500; }
+.mark a { color:var(--v-gold-soft); text-decoration:none; border-bottom:1px solid var(--v-line); }
+.mark a:hover { border-bottom-color:var(--v-gold); }
+
+/* ---------------------------------------------------------------------
+   6. 적응형 (#10 · #123)
+
+     아이폰 SE1  320x568 / 568x320      폴드 펼친  768x1076 / 1076x768
+     아이폰 SE2  375x667 / 667x375      아이패드   768x1024 / 1024x768
+     아이폰 17   393x852 / 852x393      노트북     1280x800 · 1440x900
+     폴드 접은   344x882 / 882x344      PC         1920x1080
+
+   폭이 줄어도 정보를 줄이지 않는다. 하늘이 더 길어지고 글자리만 바뀐다.
+   조작은 어느 폭에서도 같다 — 스크롤이다.
+   --------------------------------------------------------------------- */
+@media (max-width:899px) {
+  .bar { padding:10px 14px; }
+  .rank { top:58px; }
+  .depth { top:58px; bottom:58px; }
+  .seam { width:44px; height:30px; }
+}
+@media (max-width:640px) {
+  :root { --v-body:14px; }
+  .who .lead { font-size:15.5px; margin-top:16px; }
+  /* 아래는 카드가 가로로 다 쓴다. 지금 있는 곳은 위로 올라간다. */
+  .card { right:14px; bottom:14px; left:14px; width:auto; }
+  .here { top:64px; left:66px; max-width:calc(100vw - 130px); }
+  .here b { font-size:clamp(24px,7vw,38px); }
+  .mark { left:14px; right:14px; transform:none; max-width:none; }
+  .depth { right:9px; }
+}
+@media (max-width:390px) {
+  .who { left:16px; bottom:24px; }
+  .here { left:62px; }
+}
+/* 휴대폰 가로 — 세로 공간이 없으니 겹쳐 놓는 글을 줄인다. */
+@media (max-height:600px) and (orientation:landscape) {
+  .who .lead { display:none; }
+  .who .mail { margin-top:8px; }
+  .here { top:54px; }
+  .here b { font-size:clamp(22px,4.6vw,36px); }
+  .card { max-height:66vh; overflow:auto; }
+  .depth { top:52px; bottom:16px; }
+  .mark { display:none; }
+}
+
+/* ---------------------------------------------------------------------
+   7. 모션 저감 — 움직임을 끄되 정보는 그대로 둔다.
+   --------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:.001ms !important; animation-iteration-count:1 !important;
+    transition-duration:.001ms !important; scroll-behavior:auto !important;
+  }
+  .rank .rail::after { transition:none; }
+}
