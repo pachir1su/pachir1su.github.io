@@ -692,6 +692,78 @@ p {
   transform: translateY(-1px);
 }
 
+/* v2는 그대로 유지하고 /universe/로만 연결하는 작은 관측 게이트웨이입니다. */
+.universe-gateway {
+  display: grid;
+  grid-template-columns: 42px minmax(0, auto) 28px;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 58px;
+  margin-top: -22px;
+  padding: 8px 10px 8px 8px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.2s var(--ease-out), border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.universe-gateway:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold-text);
+  box-shadow: var(--shadow-lift);
+}
+
+.universe-gateway-mark {
+  position: relative;
+  width: 42px;
+  height: 40px;
+  background: color-mix(in srgb, var(--gold) 28%, var(--paper-2));
+  clip-path: polygon(2% 8%, 96% 0, 91% 82%, 72% 78%, 52% 100%, 29% 84%, 0 92%);
+}
+
+.universe-gateway-mark::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: 8px;
+  width: 27px;
+  height: 1px;
+  background: var(--gold-text);
+  transform: rotate(-42deg);
+}
+
+.universe-gateway-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.universe-gateway-copy small {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+}
+
+.universe-gateway-copy strong {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.universe-gateway-arrow {
+  color: var(--gold-text);
+  font-size: 1rem;
+  transition: transform 0.2s var(--ease-out);
+}
+
+.universe-gateway:hover .universe-gateway-arrow {
+  transform: translate(2px, -2px);
+}
+
 @media (max-width: 640px) {
   .hero-btns > * {
     width: 100%;
@@ -699,6 +771,10 @@ p {
   }
   .hero-email {
     font-size: 0.78rem;
+  }
+  .universe-gateway {
+    width: 100%;
+    margin-top: -20px;
   }
 }
 

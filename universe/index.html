@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Universe Observatory | 이건영</title>
+    <meta
+      name="description"
+      data-ko="이건영의 프로젝트, GitHub Rank 성장 궤적과 수상 기록을 별자리로 탐험하는 Universe Observatory입니다."
+      data-en="Explore Lee Geon Yeong's projects, GitHub Rank trajectory, and award records as constellations."
+      content="이건영의 프로젝트, GitHub Rank 성장 궤적과 수상 기록을 별자리로 탐험하는 Universe Observatory입니다."
+    />
+    <meta name="theme-color" content="#10151e" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Universe Observatory | 이건영" />
+    <meta
+      property="og:description"
+      content="프로젝트와 성장 기록을 별자리로 탐험하는 이건영의 Universe Observatory"
+    />
+    <meta property="og:url" content="https://pachir1su.github.io/universe/" />
+    <meta property="og:image" content="https://pachir1su.github.io/og-image.png" />
+    <link rel="canonical" href="https://pachir1su.github.io/universe/" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&amp;family=Noto+Sans+KR:wght@400;500;600&amp;family=Space+Mono:wght@400;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="universe.css" />
+    <script>
+      /* 저장된 선택 또는 시스템 설정을 첫 페인트 전에 적용해 테마 깜빡임을 줄입니다. */
+      try {
+        const savedTheme = localStorage.getItem("v3-theme");
+        document.documentElement.dataset.theme = savedTheme ||
+          (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      } catch (error) {
+        document.documentElement.dataset.theme = "dark";
+      }
+    </script>
+    <script src="universe.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#observatory" data-ko="관측 화면으로 건너뛰기" data-en="Skip to observatory">
+      관측 화면으로 건너뛰기
+    </a>
+
+    <!-- 움직이지 않는 배경 레이어만 사용해 별이 많은 화면에서도 상시 애니메이션 비용을 만들지 않습니다. -->
+    <div class="sky-field" aria-hidden="true">
+      <span class="sky-field__dust"></span>
+      <span class="sky-field__grain"></span>
+    </div>
+
+    <div class="observatory-shell">
+      <header class="observatory-header">
+        <a class="return-gateway" href="../" aria-label="v2 포트폴리오로 돌아가기">
+          <span class="return-gateway__mark" aria-hidden="true"></span>
+          <span class="return-gateway__copy" data-ko="v2 기록으로" data-en="Back to v2">v2 기록으로</span>
+        </a>
+
+        <div class="observatory-identity" aria-label="Universe Observatory">
+          <span>OBSERVATORY</span>
+          <strong>43° / PACHIR1SU</strong>
+        </div>
+
+        <div class="observatory-controls" aria-label="Universe 설정">
+          <button class="text-control" type="button" data-language-toggle aria-label="English로 전환">
+            EN
+          </button>
+          <button class="text-control" type="button" data-theme-toggle aria-label="라이트 모드로 전환">
+            LIGHT
+          </button>
+        </div>
+      </header>
+
+      <main id="observatory" class="observatory-main">
+        <!-- 좌표명과 설명은 구역 전환 결과를 즉시 알리기 위한 라이브 영역입니다. -->
+        <section class="zone-heading" aria-live="polite" aria-atomic="true">
+          <p class="zone-coordinate" data-zone-coordinate>OBSERVATION / 2026</p>
+          <h1 data-zone-title>2026 관측 영역</h1>
+          <p data-zone-description>현재 궤도에 기록된 프로젝트를 관측합니다.</p>
+        </section>
+
+        <nav class="orbit-route" aria-label="Universe 관측 지점" role="tablist">
+          <button type="button" role="tab" aria-selected="true" aria-controls="sky-map" data-zone="2026">
+            <span>2026</span><i aria-hidden="true"></i>
+          </button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="sky-map" data-zone="2025">
+            <span>2025</span><i aria-hidden="true"></i>
+          </button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="sky-map" data-zone="2024">
+            <span>2024</span><i aria-hidden="true"></i>
+          </button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="sky-map" data-zone="growth">
+            <span data-ko="궤적" data-en="Trajectory">궤적</span><i aria-hidden="true"></i>
+          </button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="sky-map" data-zone="awards">
+            <span data-ko="기록" data-en="Records">기록</span><i aria-hidden="true"></i>
+          </button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="sky-map" data-zone="lost">
+            <span data-ko="미완성" data-en="Unfinished">미완성</span><i aria-hidden="true"></i>
+          </button>
+        </nav>
+
+        <section id="sky-map" class="sky-map" role="tabpanel" aria-label="2026 관측 영역" tabindex="0">
+          <svg class="constellation-lines" viewBox="0 0 1000 700" preserveAspectRatio="none" aria-hidden="true" data-lines></svg>
+          <div class="celestial-points" data-points></div>
+
+          <!-- 네 개 이상의 구역을 관측한 뒤에만 나타나는 첫 번째 공동 설계용 이스터에그입니다. -->
+          <button class="unknown-star" type="button" data-unknown-star aria-label="이름 없는 별" hidden>
+            <span aria-hidden="true"></span>
+          </button>
+
+          <div class="map-loading" data-loading role="status">
+            <span aria-hidden="true"></span>
+            <p data-ko="성도를 불러오는 중" data-en="Loading the star chart">성도를 불러오는 중</p>
+          </div>
+        </section>
+
+        <!-- 선택한 천체의 정보만 현재 화면 위에 펼쳐 탐험 흐름을 끊지 않습니다. -->
+        <aside class="observation-panel" data-observation aria-live="polite" aria-labelledby="observation-title" hidden>
+          <button
+            class="observation-panel__close"
+            type="button"
+            data-observation-close
+            aria-label="관측 기록 닫기"
+          >
+            ×
+          </button>
+          <p class="observation-panel__eyebrow" data-observation-eyebrow>2026 / OBSERVATION</p>
+          <h2 id="observation-title" data-observation-title></h2>
+          <p class="observation-panel__role" data-observation-role></p>
+          <p class="observation-panel__description" data-observation-description></p>
+          <ul class="observation-panel__tech" data-observation-tech></ul>
+          <a class="observation-panel__link" href="#" data-observation-link>
+            <span data-ko="관측 기록 열기" data-en="Open observation record">관측 기록 열기</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </aside>
+
+        <div class="state-legend" aria-label="천체 상태 범례">
+          <span><i class="legend-star legend-star--main" aria-hidden="true"></i><b data-ko="완료" data-en="Completed">완료</b></span>
+          <span><i class="legend-star legend-star--proto" aria-hidden="true"></i><b data-ko="진행 중" data-en="In progress">진행 중</b></span>
+          <span><i class="legend-star legend-star--drift" aria-hidden="true"></i><b data-ko="중단" data-en="Discontinued">중단</b></span>
+          <span><i class="legend-star legend-star--brown" aria-hidden="true"></i><b data-ko="실패 기록" data-en="Failed record">실패 기록</b></span>
+        </div>
+
+        <section class="load-error" data-error hidden role="alert">
+          <p class="load-error__code">SIGNAL LOST</p>
+          <h2 data-ko="관측 데이터를 불러오지 못했습니다." data-en="Observation data could not be loaded.">
+            관측 데이터를 불러오지 못했습니다.
+          </h2>
+          <p data-error-detail></p>
+          <a href="../" data-ko="v2 기록으로 돌아가기" data-en="Return to the v2 record">v2 기록으로 돌아가기</a>
+        </section>
+      </main>
+
+      <footer class="observatory-footer">
+        <span>PROJECT SOURCE / projects.json</span>
+        <span data-ko="사운드 관측은 다음 단계에서 계속됩니다." data-en="Sound exploration continues in the next phase.">
+          사운드 관측은 다음 단계에서 계속됩니다.
+        </span>
+      </footer>
+    </div>
+
+    <noscript>
+      <div class="noscript-message">
+        이 관측소는 별자리 데이터를 표시하기 위해 JavaScript가 필요합니다.
+        <a href="../">v2 포트폴리오로 돌아가기</a>
+      </div>
+    </noscript>
+  </body>
+</html>
