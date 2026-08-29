@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>v3 — 디자인 · UIUX 작업 폴더</title>
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans+KR:wght@200;300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="v3.css" />
+</head>
+<body class="v3">
+<div class="wrap doc-shell">
+  <a class="back-link" href="../../index.html">← 포트폴리오</a>
+  <p class="kicker">V3 · DESIGN &amp; UIUX</p>
+  <h1>v2는 정보를 맡고, 우주는 세계관을 맡는다</h1>
+  <p>
+    v3은 포트폴리오의 교체가 아니다. v2 노트 포트폴리오는 그대로 두고,
+    홈에 뚫린 <b>찢긴 종이 구멍</b> 하나로 이어지는 <b>별도의 우주 공간</b>을 만든다.
+    <code>docs/v3/</code>는 그 우주를 한곳에서 구현한 작업 폴더다.
+  </p>
+  <p>
+    운영 파일(<code>index.html</code> · <code>style.css</code> · <code>script.js</code>)은 이 폴더에서 수정하지 않는다.
+    데이터는 저장소 단일 소스 <code>projects.json</code>을 읽기만 한다.
+  </p>
+
+  <div class="cards">
+    <a class="card" href="gateway.html">
+      <b>진입점 — 종이에 뚫린 구멍</b>
+      <span>v2의 실제 <code>style.css</code> 위에 얹은 찢긴 종이 진입점. 새로고침마다 자산 · 위치 · 크기 · 기울기가 달라지고, 누르면 약 4초 동안 별가루가 구멍으로 빨려 들어간다.</span>
+    </a>
+    <a class="card" href="universe.html">
+      <b>우주 본편</b>
+      <span>연도 별자리 · 성장 별자리 · 궤도를 잃은 별. 은하수 연도 메뉴와 이스터에그 4종이 함께 들어 있다.</span>
+    </a>
+    <a class="card" href="README.md">
+      <b>명세</b>
+      <span>확정된 시각 언어 · UIUX 계약 · 상태별 천체 대응 · 사운드 상태. 판단 근거는 전부 이슈 #114에 있다.</span>
+    </a>
+  </div>
+
+  <section>
+    <h2>확정</h2>
+    <p>이슈 #114에 누적된 결정 중 이 폴더가 실제로 구현한 것들이다.</p>
+    <div class="rows">
+      <div class="row"><b>구조</b><span>v2 유지 + 진입점 하나로 이어지는 별도 우주 공간</span></div>
+      <div class="row"><b>배경</b><span>엷은 성운 · 방향광 · 어두운 먼지 띠 · 별 3계층</span></div>
+      <div class="row"><b>선</b><span>낡은 금빛 실선 1.1px · 불투명도 0.6</span></div>
+      <div class="row"><b>서체</b><span>IBM Plex Sans KR. 이름은 얇은 200을 크게</span></div>
+      <div class="row"><b>테마</b><span>수동 토글 없음. 시스템 설정만 따른다</span></div>
+      <div class="row"><b>언어</b><span>KO / EN 전환 유지. v2의 <code>lang</code> 저장값을 계승</span></div>
+      <div class="row"><b>정보 위계</b><span>프로젝트 이름은 항상 보이고, 역할 · 설명 · 상세 링크만 접는다</span></div>
+      <div class="row"><b>좌표 고정</b><span>카드를 열어도 별과 별자리 선은 움직이지 않는다</span></div>
+      <div class="row"><b>상태 표현</b><span>글자 라벨 없이 형태로만. 상태는 <code>aria-label</code>에만 남긴다</span></div>
+      <div class="row"><b>연도 메뉴</b><span>은하수 띠 위의 밝은 점 세 개 (#173)</span></div>
+      <div class="row"><b>성장</b><span>굵직한 사건 7개 · GitHub Rank C→A 여섯 단계 (#59)</span></div>
+      <div class="row"><b>돌아가는 길</b><span>글자 없는 작은 빈 포스트잇</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>미확정 — 사용자 판단 대기</h2>
+    <p>임의로 확정하지 않고 남겨 둔 항목이다.</p>
+    <div class="rows">
+      <div class="row open"><b>사운드 (#232)</b><span>확정된 세 자리(<code>SFX-04 A</code> 연도 전환 · <code>SFX-05 A</code> 별 선택 · <code>SFX-06 B</code> 상세 진입)만 연결했다. 해금 · 뱀주인자리 · 일식은 2차 견본을 임시로 물려 두었고, 그 외는 전부 무음이다.</span></div>
+      <div class="row open"><b>수상 밝기 등급</b><span>수상 강도를 별의 밝기로 서열화할지, 서열 기준을 무엇으로 둘지 미정이라 이번 구현에 넣지 않았다.</span></div>
+      <div class="row open"><b>버전 이름 (#120)</b><span>v2를 유지하는 구조로 바뀌었으므로 버전 이름은 사용자가 명시할 때까지 만들지 않는다.</span></div>
+      <div class="row open"><b>배너 (#137)</b><span>v3 기준 배너 교체는 이 폴더 범위 밖이다.</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>확인하지 않은 것</h2>
+    <p>
+      구현 에이전트는 검증을 실행하지 않는다. 브라우저 회귀(폴드 · 모바일 · 태블릿 · 노트북 · 데스크톱),
+      라이트 · 다크 · KO · EN 전환, 오디오 실제 재생, Lighthouse, 접근성 검사는
+      전부 <b>실행하지 않음 — 독립 검증 대기</b>다.
+    </p>
+    <p>
+      두 시안은 <code>../../projects.json</code>을 <code>fetch</code>한다.
+      파일 열기(<code>file://</code>)가 아니라 정적 서버로 열어야 한다.
+    </p>
+  </section>
+</div>
+</body>
+</html>

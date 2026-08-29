@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>v3 진입점 — 종이에 뚫린 구멍</title>
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Caveat&family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Mono&display=swap" rel="stylesheet" />
+<!-- v2의 실제 재질 위에서 확인해야 하므로 운영 style.css를 그대로 불러온다 -->
+<link rel="stylesheet" href="../../style.css" />
+<link rel="stylesheet" href="v3.css" />
+<style>
+  /* 이 페이지는 v2 홈의 축약 재현이다. 진입점 주변 맥락만 남긴다 */
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-main); margin: 0; }
+  .frame { max-width: 1080px; margin: 0 auto; padding: clamp(28px, 6vw, 72px) clamp(16px, 4vw, 40px) 120px; }
+  .frame h1 { margin: 0 0 6px; font-size: clamp(28px, 5vw, 46px); font-weight: 700; letter-spacing: -0.02em; }
+  .frame .role { margin: 0 0 10px; color: var(--red-text); font-size: 14px; letter-spacing: 0.02em; }
+  .frame .desc { margin: 0 0 24px; max-width: 56ch; color: var(--text-muted); font-size: 15px; line-height: 1.8; }
+  .stats { display: flex; gap: clamp(20px, 5vw, 52px); padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stats div { display: flex; flex-direction: column; gap: 2px; }
+  .stats b { font-family: var(--font-mono); font-size: clamp(20px, 3vw, 28px); }
+  .stats span { color: var(--text-muted); font-size: 12px; }
+  .note { margin-top: 26px; color: var(--text-muted); font-size: 12.5px; line-height: 1.9; max-width: 62ch; }
+  .note code { font-family: var(--font-mono); font-size: 11.5px; }
+</style>
+</head>
+<body>
+
+<div class="frame">
+  <h1 data-ko="이건영" data-en="Lee Geon Yeong">이건영</h1>
+  <p class="role" data-ko="풀스택 개발자 · 메이커 · 팀 리더" data-en="Full-stack developer · Maker · Team lead">풀스택 개발자 · 메이커 · 팀 리더</p>
+  <p class="desc" data-ko="이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다."
+     data-en="Aiming to be an entrepreneur who pursues innovation beyond profit.">이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다.</p>
+
+  <div class="stats">
+    <div><b>20+</b><span data-ko="프로젝트" data-en="Projects">프로젝트</span></div>
+    <div><b>4</b><span data-ko="수상" data-en="Awards">수상</span></div>
+    <div><b>8위</b><span data-ko="581팀 중 · 2024 SFPC" data-en="of 581 teams · 2024 SFPC">581팀 중 · 2024 SFPC</span></div>
+  </div>
+
+  <!-- 진입점 — 지표 열 아래. 실제 적용 시 운영 index.html에 이 블록 하나만 추가된다 -->
+  <div class="gate-slot" id="slot"></div>
+
+  <p class="note">
+    이 페이지는 <code>docs/v3/</code> 시안이다. 운영 <code>index.html</code>은 수정하지 않았다.
+    진입점은 새로고침할 때마다 자산 · 위치 · 크기 · 기울기가 달라지고, 안내 문구를 두지 않는다.
+  </p>
+</div>
+
+<div class="veil" id="veil" aria-hidden="true"><canvas id="veil-canvas"></canvas></div>
+
+<script src="v3.js"></script>
+<script>
+/* =====================================================================
+   gateway.html 페이지 스크립트
+   찢긴 종이 진입점과 약 4초 전환. 확인창을 쓰지 않는다
+   ===================================================================== */
+(function () {
+  'use strict';
+  var V3 = window.V3;
+  V3.i18n.init();
+
+  var PAPERS = [
+    { src: 'gateway/torn-portal-diagonal-v1.png', ratio: 0.66 },
+    { src: 'gateway/torn-portal-wide-v1.png', ratio: 0.48 },
+    { src: 'gateway/torn-portal-trail-v1.png', ratio: 0.58 }
+  ];
+
+  var slot = document.getElementById('slot');
+  var gate = null;
+  var busy = false;
+
+  function build() {
+    if (gate) gate.remove();
+    var paper = PAPERS[Math.floor(Math.random() * PAPERS.length)];
+    var width = 46 + Math.random() * 26;          // 슬롯 대비 46~72%
+    var left = Math.random() * (100 - width - 4);
+    var tilt = (Math.random() * 7 - 3.5).toFixed(2);
+
+    gate = document.createElement('button');
+    gate.type = 'button';
+    gate.className = 'gate';
+    gate.setAttribute('aria-label', '');          // 이름표를 두지 않는다 (#114)
+    gate.style.width = width + '%';
+    gate.style.left = left + '%';
+    gate.style.top = (Math.random() * 12) + '%';
+    gate.style.setProperty('--tilt', tilt + 'deg');
+    gate.style.transform = 'rotate(' + tilt + 'deg)';
+    gate.innerHTML = '<img src="' + V3.ASSETS + paper.src + '" alt="" />';
+    slot.appendChild(gate);
+    slot.style.minHeight = Math.round(slot.clientWidth * (width / 100) * paper.ratio + 60) + 'px';
+
+    gate.addEventListener('click', enter);
+    leak();
+  }
+
+  /* 별 · 먼지는 찢긴 경계 밖으로도 새어 나온다 */
+  function leak() {
+    var canvas = document.createElement('canvas');
+    canvas.setAttribute('aria-hidden', 'true');
+    canvas.style.position = 'absolute';
+    canvas.style.inset = '-14%';
+    canvas.style.width = '128%';
+    canvas.style.height = '128%';
+    canvas.style.pointerEvents = 'none';
+    gate.appendChild(canvas);
+    var draw = function () {
+      var rect = gate.getBoundingClientRect();
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.max(1, Math.round(rect.width * 1.28 * dpr));
+      canvas.height = Math.max(1, Math.round(rect.height * 1.28 * dpr));
+      var c = canvas.getContext('2d');
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var w = rect.width * 1.28, h = rect.height * 1.28;
+      c.clearRect(0, 0, w, h);
+      var rnd = V3.mulberry(Math.random() * 1000);
+      for (var i = 0; i < 46; i++) {
+        var x = rnd() * w, y = rnd() * h;
+        c.fillStyle = 'rgba(255,255,255,' + (0.16 + rnd() * 0.5).toFixed(3) + ')';
+        c.fillRect(x, y, 1.2, 1.2);
+      }
+    };
+    if (gate.querySelector('img').complete) draw();
+    else gate.querySelector('img').addEventListener('load', draw);
+  }
+
+  /* 전환 — 약 4초. 종이 밖 별가루가 구멍으로 빨려 들어가고 성운 막이 열린다 */
+  function enter() {
+    if (busy) return;
+    busy = true;
+    var veil = document.getElementById('veil');
+    var canvas = document.getElementById('veil-canvas');
+    veil.classList.add('on');
+
+    if (V3.reduceMotion) {                        // 모션 감소 환경은 짧은 페이드만
+      canvas.style.background = 'rgba(13,17,24,1)';
+      setTimeout(function () { location.href = 'universe.html'; }, 420);
+      return;
+    }
+
+    var rect = gate.getBoundingClientRect();
+    var cx = rect.left + rect.width / 2;
+    var cy = rect.top + rect.height / 2;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(window.innerWidth * dpr);
+    canvas.height = Math.round(window.innerHeight * dpr);
+    var c = canvas.getContext('2d');
+    c.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    var motes = [];
+    for (var i = 0; i < 180; i++) {
+      var angle = Math.random() * Math.PI * 2;
+      var radius = 120 + Math.random() * Math.max(window.innerWidth, window.innerHeight) * 0.6;
+      motes.push({ a: angle, r: radius, speed: 0.55 + Math.random() * 0.9, size: 0.8 + Math.random() * 1.4 });
+    }
+
+    var start = performance.now();
+    var DURATION = 4000;
+    (function frame(now) {
+      var t = Math.min(1, (now - start) / DURATION);
+      var w = window.innerWidth, h = window.innerHeight;
+      c.clearRect(0, 0, w, h);
+
+      // 1) 별가루가 구멍으로 빨려 들어간다
+      motes.forEach(function (mote) {
+        mote.r *= 1 - 0.012 * mote.speed;
+        var x = cx + Math.cos(mote.a) * mote.r;
+        var y = cy + Math.sin(mote.a) * mote.r;
+        c.fillStyle = 'rgba(189,169,105,' + (0.25 + 0.55 * t).toFixed(3) + ')';
+        c.fillRect(x, y, mote.size, mote.size);
+      });
+
+      // 2) 성운 막이 같은 중심에서 열린다
+      var reach = Math.max(w, h) * 1.25 * Math.pow(t, 1.7);
+      var veilGradient = c.createRadialGradient(cx, cy, 0, cx, cy, Math.max(reach, 1));
+      veilGradient.addColorStop(0, 'rgba(13,17,24,1)');
+      veilGradient.addColorStop(0.72, 'rgba(17,21,29,.96)');
+      veilGradient.addColorStop(1, 'rgba(17,21,29,0)');
+      c.fillStyle = veilGradient;
+      c.beginPath();
+      c.arc(cx, cy, Math.max(reach, 1), 0, Math.PI * 2);
+      c.fill();
+
+      if (t < 1) requestAnimationFrame(frame);
+      else location.href = 'universe.html';
+    })(start);
+  }
+
+  build();
+
+  // v2로 돌아온 뒤에도 진입점은 다시 살아 있어야 한다 (#114 회귀 항목)
+  window.addEventListener('pageshow', function (event) {
+    if (!event.persisted) return;
+    busy = false;
+    document.getElementById('veil').classList.remove('on');
+    build();
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) return;
+    busy = false;
+    document.getElementById('veil').classList.remove('on');
+  });
+})();
+</script>
+</body>
+</html>
