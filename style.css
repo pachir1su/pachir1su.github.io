@@ -1,4 +1,4 @@
-/* ========================================================================== 
+/* ===========================================================================
    노트 / 인덱스 카드 — Notebook & Index Card Aesthetic
    Tokens: 종이 크림, 빨간 마진, 줄 노트, 펀치 홀(문서 좌측 레일), 인덱스 카드
    ========================================================================== */
@@ -2015,6 +2015,7 @@ html {
 #about .section-tag { border-color: var(--cyan-text); color: var(--cyan-text); }
 #skills .section-tag { border-color: var(--gold-text); color: var(--gold-text); }
 #awards .section-tag { border-color: var(--bronze-text); color: var(--bronze-text); }
+#growth .section-tag { border-color: var(--cyan-text); color: var(--cyan-text); }
 #projects .section-tag { border-color: var(--red-text); color: var(--red-text); }
 
 /* ==========================================================================
@@ -2289,8 +2290,8 @@ html {
 }
 .year-group-discontinued .year-heading::after { border-top-color: var(--discontinued-soft); }
 
-/* 실패한 프로젝트 — 기본 접힘(collapsible) 토글 헤더 (미니멀 지향) */
-.year-group-failed .failed-toggle {
+/* 진행 중단·실패 프로젝트 — 기본 접힘(collapsible) 토글 헤더 */
+.project-group-toggle {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -2304,27 +2305,27 @@ html {
   text-align: left;
   font: inherit;
 }
-.year-group-failed .failed-toggle .year-heading {
+.project-group-toggle .year-heading {
   flex: 1;
   margin-bottom: 0;
 }
-.failed-toggle-icon {
+.project-group-toggle-icon {
   flex-shrink: 0;
   color: var(--red-text);
   font-size: 0.95rem;
   transition: transform 0.25s ease;
 }
-.failed-toggle[aria-expanded="true"] .failed-toggle-icon {
+.project-group-toggle[aria-expanded="true"] .project-group-toggle-icon {
   transform: rotate(180deg);
 }
-.year-group-failed .failed-toggle:hover .failed-toggle-icon {
+.project-group-toggle:hover .project-group-toggle-icon {
   transform: translateY(2px);
 }
-.year-group-failed .failed-toggle[aria-expanded="true"]:hover .failed-toggle-icon {
+.project-group-toggle[aria-expanded="true"]:hover .project-group-toggle-icon {
   transform: rotate(180deg) translateY(2px);
 }
 /* 접힘 상태 — 카드 그리드 숨김 */
-.failed-grid.is-collapsed {
+.project-status-grid.is-collapsed {
   display: none;
 }
 
@@ -3419,3 +3420,197 @@ html {
 .detail-youtube-embed { width:100%; aspect-ratio:16 / 9; overflow:hidden; border-radius:2px; background:#000; }
 .detail-youtube-embed > iframe.detail-video { width:100%; height:100%; display:block; border:0; }
 video.detail-video { height:auto; }
+
+/* ===========================================================================
+   #59, #194, #261-#268 — v2 growth and interaction pass
+   ========================================================================== */
+
+/* #265: the local QR remains scannable in both color schemes. */
+.hero-qr {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-width: 230px;
+  padding: 10px;
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+  transform: rotate(1deg);
+  transition: transform .2s ease, border-color .2s ease;
+}
+.hero-qr:hover,
+.hero-qr:focus-visible { transform:rotate(0) translateY(-2px); border-color:var(--red-margin); }
+.hero-qr img { display:block; width:68px; height:68px; padding:5px; background:#fff; border-radius:3px; }
+.hero-qr span { display:grid; gap:3px; min-width:0; }
+.hero-qr strong { font:700 .8rem/1.3 var(--font-mono); color:var(--red-text); }
+.hero-qr small { overflow-wrap:anywhere; font:600 .67rem/1.4 var(--font-mono); color:var(--text-muted); }
+
+/* #59/#268: 연보는 연도와 사건을 정렬하고, 작은 화면에서는 한 열로 읽힌다. */
+.growth-timeline {
+  margin:0 0 var(--sp-7);
+  padding:0;
+  list-style:none;
+}
+.growth-entry {
+  display:grid;
+  grid-template-columns:100px minmax(0,1fr);
+  gap:var(--sp-6);
+  padding-block:var(--sp-5);
+  border-top:1px solid var(--line);
+}
+.growth-entry:last-child { border-bottom:1px solid var(--line); }
+.growth-year {
+  margin:0;
+  color:var(--red-text);
+  font:700 var(--fs-lg)/1.5 var(--font-mono);
+}
+.growth-events {
+  display:grid;
+  gap:var(--sp-2);
+  min-width:0;
+  max-width:var(--measure);
+  margin:0;
+  padding-left:1.2em;
+  list-style:disc outside;
+  color:var(--ink);
+  font-size:var(--fs-base);
+  line-height:1.8;
+  word-break:keep-all;
+  overflow-wrap:anywhere;
+}
+.growth-events li::marker { color:var(--text-muted); }
+.rank-growth-title { margin:0 0 var(--sp-3); color:var(--ink); font-size:var(--fs-md); }
+
+/* GitHub Rank는 확정된 7단계와 날짜를 별도 기록으로 유지한다. */
+.rank-growth { margin-top:8px; }
+.rank-track { display:grid; grid-template-columns:repeat(7,minmax(104px,1fr)); min-width:760px; margin:0; padding:14px 4px 12px; overflow:visible; list-style:none; }
+.rank-track li { position:relative; display:grid; justify-items:center; gap:8px; text-align:center; }
+.rank-track li::before { content:""; position:absolute; z-index:0; top:19px; left:-50%; width:100%; border-top:2px dashed var(--line); }
+.rank-track li:first-child::before { display:none; }
+.rank-track strong { position:relative; z-index:1; display:grid; place-items:center; width:42px; height:42px; border:2px solid var(--line); border-radius:50%; background:var(--paper); color:var(--ink); font:800 .82rem/1 var(--font-mono); }
+.rank-track small { max-width:96px; color:var(--text-muted); font:600 .65rem/1.4 var(--font-mono); }
+.rank-track .is-current strong { border-color:var(--red-text); background:var(--red); color:var(--card); box-shadow:0 0 0 5px var(--red-soft); }
+.rank-growth { overflow-x:auto; scrollbar-width:thin; scrollbar-color:var(--red-text) var(--paper-2); }
+
+/* #194: Vision의 보조 정보로 읽히도록 MBTI 밀도를 낮춘다. */
+.mbti-profile { display:grid; grid-template-columns:minmax(128px,.32fr) minmax(300px,1.68fr); gap:18px; align-items:center; margin:18px 0 16px; padding:14px 0; border-block:1px dashed var(--line); }
+.mbti-summary { display:grid; align-content:center; gap:4px; }
+.mbti-eyebrow { color:var(--text-muted); font:700 .64rem/1 var(--font-mono); letter-spacing:.12em; }
+.mbti-summary > strong { color:var(--red-text); font:900 clamp(1.3rem,2.6vw,1.75rem)/1 var(--font-mono); letter-spacing:.04em; }
+.mbti-summary p { margin:2px 0 0; color:var(--text-muted); font-size:.68rem; line-height:1.45; }
+.mbti-stats { display:grid; gap:6px; }
+.mbti-stat { display:grid; grid-template-columns:64px minmax(100px,1fr) 64px; gap:8px; align-items:center; color:var(--ink); font:700 .66rem/1 var(--font-mono); }
+.mbti-stat > span:first-child { text-align:right; }
+.mbti-stat > span:last-child { text-align:left; }
+.mbti-stat b { color:var(--text-muted); font-weight:500; }
+.mbti-meter { display:block; height:9px; overflow:hidden; border:1px dashed var(--line); border-radius:999px; background:var(--paper-2); }
+.mbti-meter i { display:block; width:var(--mbti-score); height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--red),#e77970); }
+
+/* #262: every new U-CAST run begins at its own entry sensor without transition. */
+.ucast-channel.is-preparing:not(.is-reverse) .ucast-pedestrian { left:76px !important; transition:none !important; }
+.ucast-channel.is-preparing.is-reverse .ucast-pedestrian { left:calc(100% - 88px) !important; transition:none !important; }
+
+/* #261: only simulated cards suppress touch callouts; document text stays selectable. */
+@media (hover:none), (pointer:coarse) {
+  .berry-student-card,
+  .berry-rfid-reader { min-height:44px; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; touch-action:manipulation; cursor:pointer; }
+}
+
+/* #266: shared full-viewport image/video viewer. */
+.has-media-viewer { position:relative; }
+.media-viewer-open {
+  position:absolute;
+  z-index:3;
+  top:10px;
+  right:10px;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:44px;
+  padding:9px 12px;
+  border:1px solid rgba(255,255,255,.75);
+  border-radius:4px;
+  background:rgba(20,20,20,.84);
+  color:#fff;
+  box-shadow:0 3px 12px rgba(0,0,0,.25);
+  font:700 .72rem/1 var(--font-mono);
+  cursor:pointer;
+}
+.media-viewer-open:hover,
+.media-viewer-open:focus-visible { background:#000; outline:2px solid #fff; outline-offset:2px; }
+.media-viewer {
+  position:fixed;
+  inset:0;
+  z-index:3000;
+  width:100vw;
+  max-width:none;
+  height:100vh;
+  height:100dvh;
+  max-height:none;
+  margin:0;
+  padding:64px 24px 24px;
+  border:0;
+  background:rgba(8,9,12,.96);
+  color:#fff;
+}
+.media-viewer::backdrop { background:rgba(8,9,12,.82); }
+.media-viewer-body { display:grid; place-items:center; align-content:center; gap:14px; width:100%; height:100%; }
+.media-viewer-media { display:block; width:auto !important; max-width:100% !important; height:auto !important; max-height:calc(100dvh - 126px) !important; object-fit:contain !important; background:#050505; }
+.media-viewer-body figcaption { max-width:min(76ch,100%); color:#eee; font-size:.82rem; line-height:1.55; text-align:center; }
+.media-viewer-close { position:fixed; z-index:1; top:14px; right:16px; display:inline-flex; align-items:center; gap:7px; min-height:42px; padding:9px 13px; border:1px solid rgba(255,255,255,.62); border-radius:4px; background:#fff; color:#111; font:700 .75rem/1 var(--font-mono); cursor:pointer; }
+.media-viewer-close:focus-visible { outline:3px solid #ff8a8a; outline-offset:3px; }
+body.media-viewer-open { overflow:hidden; }
+
+/* #267: narrow screens show a scan-friendly project catalogue instead of full essays. */
+@media (max-width:600px) {
+  .growth-entry { grid-template-columns:minmax(0,1fr); gap:var(--sp-3); padding-block:var(--sp-5); }
+  .hero-qr { width:100%; grid-template-columns:58px minmax(0,1fr); transform:none; }
+  .hero-qr img { width:58px; height:58px; }
+  .rank-track { min-width:720px; }
+  .mbti-profile { grid-template-columns:1fr; gap:10px; margin:14px 0; padding:12px 0; }
+  .mbti-summary p { max-width:42ch; }
+  .mbti-stat { grid-template-columns:58px minmax(90px,1fr) 58px; gap:6px; font-size:.62rem; }
+
+  .project-filters {
+    position:sticky;
+    top:64px;
+    z-index:15;
+    flex-wrap:nowrap;
+    margin-inline:-16px;
+    padding:8px 16px 10px;
+    overflow-x:auto;
+    background:color-mix(in srgb,var(--paper) 94%,transparent);
+    border-block:1px solid var(--line);
+    scrollbar-width:thin;
+  }
+  .pfilter { flex:0 0 auto; min-height:44px; padding-inline:13px; }
+  .year-group { margin-bottom:22px; }
+  .projects-grid { gap:12px; }
+  .project-card { gap:7px; min-height:0; padding:16px 14px; }
+  .project-card > p:not(.project-subtitle):not(.project-role),
+  .project-card > .tech-stack { display:none; }
+  .project-card .project-icon { font-size:1.45rem; }
+  .project-card h3 { font-size:.98rem; line-height:1.35; }
+  .project-card .project-subtitle { margin-top:0; font-size:.9rem; line-height:1.35; }
+  .project-card .project-role { margin:0; font-size:.66rem; }
+  .project-card .wip-status,
+  .project-card .discontinued-status,
+  .project-card .failed-reason { margin-top:2px; padding-block:7px; font-size:.7rem; }
+  .project-group-toggle { min-height:44px; }
+  .media-viewer { padding:58px 12px 14px; }
+  .media-viewer-open span { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+  .media-viewer-open { width:44px; justify-content:center; padding:0; }
+  .media-viewer-media { max-height:calc(100dvh - 102px) !important; }
+}
+
+@media (max-width:640px) {
+  .ucast-channel.is-preparing:not(.is-reverse) .ucast-pedestrian { left:59px !important; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .hero-qr,
+  .media-viewer-open { transition:none; }
+}

@@ -250,12 +250,13 @@ mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click
 /* 9. Keyboard shortcuts                                        */
 /* ------------------------------------------------------------- */
 (function initShortcuts() {
-  const sections = ['#home', '#projects', '#skills', '#awards', '#about'];
+  // Keeps section shortcuts in the same order as desktop and mobile navigation.
+  const sections = ['#home', '#projects', '#skills', '#awards', '#growth', '#about'];
   document.addEventListener('keydown', (event) => {
     if (event.target?.matches('input, textarea, select, [contenteditable="true"]')) return;
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     const key = event.key.toLowerCase();
-    if (key >= '1' && key <= '5') {
+    if (key >= '1' && key <= String(sections.length)) {
       document.querySelector(sections[Number.parseInt(key, 10) - 1])?.scrollIntoView({ behavior: scrollBehavior() });
     } else if (key === 'escape') closeMobile();
     else if (key === 't') window.scrollTo({ top: 0, behavior: scrollBehavior() });
@@ -282,7 +283,7 @@ mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click
 /* ------------------------------------------------------------- */
 /* 11. Console egg — lightweight only                           */
 /* ------------------------------------------------------------- */
-console.log('%c{ GY } portfolio · 1~5 sections · T top · G GitHub', 'color:#c63b3b;font-family:monospace');
+console.log('%c{ GY } portfolio · 1~6 sections · T top · G GitHub', 'color:#c63b3b;font-family:monospace');
 
 /* ------------------------------------------------------------- */
 /* 12. Project filter                                            */
@@ -291,14 +292,17 @@ console.log('%c{ GY } portfolio · 1~5 sections · T top · G GitHub', 'color:#c
   const buttons = document.querySelectorAll('.pfilter');
   const groups = document.querySelectorAll('.year-group');
   if (!buttons.length || !groups.length) return;
-  const failedToggle = document.querySelector('.failed-toggle');
-  const failedGrid = document.getElementById('failed-grid');
+  const groupToggles = document.querySelectorAll('.project-group-toggle');
 
-  function setFailedExpanded(expanded) {
-    if (!failedToggle || !failedGrid) return;
-    failedToggle.setAttribute('aria-expanded', String(expanded));
-    failedGrid.classList.toggle('is-collapsed', !expanded);
+  // Keeps each collapsible status heading and its controlled grid in sync.
+  function setGroupExpanded(toggle, expanded) {
+    const grid = document.getElementById(toggle.getAttribute('aria-controls'));
+    if (!grid) return;
+    toggle.setAttribute('aria-expanded', String(expanded));
+    grid.classList.toggle('is-collapsed', !expanded);
   }
+
+  // Applies category visibility and reveals only matching status archives.
   function applyFilter(filter) {
     groups.forEach((group) => {
       let visible = 0;
@@ -314,13 +318,29 @@ console.log('%c{ GY } portfolio · 1~5 sections · T top · G GitHub', 'color:#c
       });
       group.style.display = visible ? '' : 'none';
     });
-    setFailedExpanded(filter !== 'all');
+    groupToggles.forEach((toggle) => {
+      const group = toggle.closest('.year-group');
+      setGroupExpanded(toggle, filter !== 'all' && group?.style.display !== 'none');
+    });
   }
+
+  groupToggles.forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      setGroupExpanded(toggle, !expanded);
+    });
+  });
+
   buttons.forEach((button) => button.addEventListener('click', () => {
-    buttons.forEach((item) => item.classList.remove('active'));
+    buttons.forEach((item) => {
+      item.classList.remove('active');
+      item.setAttribute('aria-pressed', 'false');
+    });
     button.classList.add('active');
+    button.setAttribute('aria-pressed', 'true');
     applyFilter(button.dataset.filter || 'all');
   }));
+  buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.classList.contains('active'))));
 })();
 
 /* ------------------------------------------------------------- */
@@ -371,20 +391,6 @@ window._updateProjectCount = function () {
     : `${done}개 완료 · ${wip}개 예정 · ${discontinued}개 중단`;
 };
 window._updateProjectCount();
-
-/* ------------------------------------------------------------- */
-/* 15. Failed project collapse                                   */
-/* ------------------------------------------------------------- */
-(function initFailedCollapse() {
-  const toggle = document.querySelector('.failed-toggle');
-  const grid = document.getElementById('failed-grid');
-  if (!toggle || !grid) return;
-  toggle.addEventListener('click', () => {
-    const expanded = toggle.getAttribute('aria-expanded') === 'true';
-    toggle.setAttribute('aria-expanded', String(!expanded));
-    grid.classList.toggle('is-collapsed', expanded);
-  });
-})();
 
 /* ------------------------------------------------------------- */
 /* 16. Theme — follows OS setting only (#240)                    */
