@@ -142,6 +142,7 @@
           <li><a href="#projects" data-ko="프로젝트" data-en="Projects">프로젝트</a></li>
           <li><a href="#skills" data-ko="역량" data-en="Skills">역량</a></li>
           <li><a href="#awards" data-ko="수상" data-en="Awards">수상</a></li>
+          <li><a href="#growth" data-ko="성장" data-en="Growth">성장</a></li>
           <li><a href="#about" data-ko="비전" data-en="Vision">비전</a></li>
           <li>
             <a
@@ -174,6 +175,7 @@
       <a href="#projects" onclick="closeMobile()" data-ko="프로젝트" data-en="Projects"><i class="fas fa-folder-open"></i> 프로젝트</a>
       <a href="#skills" onclick="closeMobile()" data-ko="역량" data-en="Skills"><i class="fas fa-code"></i> 역량</a>
       <a href="#awards" onclick="closeMobile()" data-ko="수상" data-en="Awards"><i class="fas fa-trophy"></i> 수상</a>
+      <a href="#growth" onclick="closeMobile()" data-ko="성장" data-en="Growth"><i class="fas fa-seedling"></i> 성장</a>
       <a href="#about" onclick="closeMobile()" data-ko="비전" data-en="Vision"><i class="fas fa-user"></i> 비전</a>
       <a href="https://github.com/pachir1su" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a>
       <div class="sidebar-utils">
@@ -186,7 +188,7 @@
 
     <!-- ============================================================
          페이지 순서 (v2.2.0, #112 §3) — 산출물 → 방법 → 사람
-         Home → Projects → Skills → Awards → Vision
+         Home → Projects → Skills → Awards → Growth → Vision
          ============================================================ -->
 
     <!-- ============================================================
@@ -243,6 +245,14 @@
             <span class="stat-num" data-suffix-ko="위" data-suffix-en="th">8위</span
             ><span class="stat-label">581 팀 중</span>
           </div>
+          <!-- #265: 화면에 표시되는 주소와 QR 목적지를 같은 공개 URL로 고정한다. -->
+          <a class="hero-qr" href="https://pachir1su.github.io/" aria-label="pachir1su.github.io 포트폴리오 열기">
+            <img src="assets/portfolio-qr.svg" width="256" height="256" alt="pachir1su.github.io로 이동하는 QR 코드" />
+            <span>
+              <strong data-ko="포트폴리오 QR" data-en="Portfolio QR">포트폴리오 QR</strong>
+              <small>pachir1su.github.io</small>
+            </span>
+          </a>
         </div>
       </div>
 
@@ -731,8 +741,11 @@
         </div>
 
         <div class="year-group year-group-discontinued" data-year="discontinued">
-          <h3 class="year-heading">진행 중단</h3>
-          <div class="projects-grid">
+          <button class="project-group-toggle discontinued-toggle" type="button" aria-expanded="false" aria-controls="discontinued-grid">
+            <h3 class="year-heading">진행 중단</h3>
+            <i class="fas fa-chevron-down project-group-toggle-icon" aria-hidden="true"></i>
+          </button>
+          <div class="projects-grid project-status-grid discontinued-grid is-collapsed" id="discontinued-grid">
 
             <!-- 승기봇 -->
             <div class="project-card project-discontinued" data-category="discord" data-card-href="projects/SG_bot/" data-tilt>
@@ -843,11 +856,11 @@
         </div>
 
         <div class="year-group year-group-failed" data-year="failed">
-          <button class="failed-toggle" type="button" aria-expanded="false" aria-controls="failed-grid">
+          <button class="project-group-toggle failed-toggle" type="button" aria-expanded="false" aria-controls="failed-grid">
             <h3 class="year-heading">실패한 프로젝트</h3>
-            <i class="fas fa-chevron-down failed-toggle-icon" aria-hidden="true"></i>
+            <i class="fas fa-chevron-down project-group-toggle-icon" aria-hidden="true"></i>
           </button>
-          <div class="projects-grid failed-grid is-collapsed" id="failed-grid">
+          <div class="projects-grid project-status-grid failed-grid is-collapsed" id="failed-grid">
 
             <!-- InfoCatch -->
             <div class="project-card project-failed" data-category="ai web" data-tilt>
@@ -1180,14 +1193,75 @@
     </section>
 
     <!-- ============================================================
+         성장 섹션 — 사용자 확정 연보와 GitHub Rank 이력을 구분해 표시한다.
+         프로젝트 생성 영역 밖의 정적 본문이며, JS 없이도 전체 이력을 읽을 수 있다.
+         ============================================================ -->
+    <!-- GROWTH -->
+    <section id="growth" class="section section-alt">
+      <div class="container">
+        <div class="section-header" data-aos="fade-right">
+          <span class="section-tag">// 04</span>
+          <h2 id="growth-title" class="section-title" data-ko="성장 기록" data-en="Growth Timeline">성장 기록</h2>
+        </div>
+        <!-- #59·#268: 확정된 연도별 문구를 보존하고 기존 data-ko/data-en 번역 흐름을 사용한다. -->
+        <ol class="growth-timeline" aria-labelledby="growth-title" role="list">
+          <li class="growth-entry">
+            <h3 class="growth-year">2023</h3>
+            <ul class="growth-events">
+              <li data-ko="Java 프로그래밍과 보안 · 해킹 입문" data-en="Began learning Java programming, information security, and hacking">Java 프로그래밍과 보안 · 해킹 입문</li>
+              <li data-ko="정보보안 동아리 ‘시큐리티’ 활동, AES256 암호화 · 복호화 프로그램 제작" data-en="Joined the information security club ‘Security’ and built an AES256 encryption and decryption program">정보보안 동아리 ‘시큐리티’ 활동, AES256 암호화 · 복호화 프로그램 제작</li>
+            </ul>
+          </li>
+          <li class="growth-entry">
+            <h3 class="growth-year">2024</h3>
+            <ul class="growth-events">
+              <li data-ko="아두이노 · 라즈베리파이를 활용한 하드웨어 프로젝트 개발" data-en="Developed hardware projects using Arduino and Raspberry Pi">아두이노 · 라즈베리파이를 활용한 하드웨어 프로젝트 개발</li>
+              <li data-ko="해안 장벽 · 졸음 방지 · 산불 감지 시스템 제작, 여러 대회 참가 및 수상" data-en="Built coastal barrier, drowsiness prevention, and wildfire detection systems; participated in competitions and received awards">해안 장벽 · 졸음 방지 · 산불 감지 시스템 제작, 여러 대회 참가 및 수상</li>
+              <li data-ko="기업가에 관심을 가지고 떠오르는 아이디어를 기록하고 구체화하기 시작함." data-en="Became interested in entrepreneurship and began recording and developing ideas as they came to mind.">기업가에 관심을 가지고 떠오르는 아이디어를 기록하고 구체화하기 시작함.</li>
+            </ul>
+          </li>
+          <li class="growth-entry">
+            <h3 class="growth-year">2025</h3>
+            <ul class="growth-events">
+              <li data-ko="NFC 출석 체크 · 헬스 케어 · 공감 AI 등 팀 프로젝트 기획 및 개발" data-en="Planned and developed team projects including NFC attendance, healthcare, and empathy AI systems">NFC 출석 체크 · 헬스 케어 · 공감 AI 등 팀 프로젝트 기획 및 개발</li>
+              <li data-ko="아두이노 · 라즈베리파이 간 시리얼 통신과 웹 · AI 연동 시스템 구현" data-en="Implemented serial communication between Arduino and Raspberry Pi and integrated web and AI systems">아두이노 · 라즈베리파이 간 시리얼 통신과 웹 · AI 연동 시스템 구현</li>
+              <li data-ko="선후배 코딩 페스티벌 진행위원 3팀 팀장, 인공지능 융합 도서 출판 프로젝트 참여" data-en="Led operations Team 3 at the senior–junior coding festival and participated in an AI-themed book publishing project">선후배 코딩 페스티벌 진행위원 3팀 팀장, 인공지능 융합 도서 출판 프로젝트 참여</li>
+            </ul>
+          </li>
+          <li class="growth-entry">
+            <h3 class="growth-year">2026</h3>
+            <ul class="growth-events">
+              <li data-ko="한국기술교육대학교 입학" data-en="Entered Korea University of Technology and Education (KOREATECH)">한국기술교육대학교 입학</li>
+              <li data-ko="다수의 프로젝트 개발" data-en="Developed numerous projects">다수의 프로젝트 개발</li>
+              <li data-ko="U-CAST 우수 운영 멘토 선정" data-en="Selected as a U-CAST Outstanding Operations Mentor">U-CAST 우수 운영 멘토 선정</li>
+            </ul>
+          </li>
+        </ol>
+        <!-- 사용자 제공 이력의 표기를 가공하지 않고 7단계 순서대로 보여준다. -->
+        <h3 id="rank-growth-title" class="rank-growth-title" data-ko="GitHub Rank 성장" data-en="GitHub Rank Growth">GitHub Rank 성장</h3>
+        <div class="rank-growth" role="region" aria-labelledby="rank-growth-title" tabindex="0">
+          <ol class="rank-track" aria-labelledby="rank-growth-title" role="list">
+            <li><strong>C</strong><small>2023.04.12</small></li>
+            <li><strong>C+</strong><small>2025.08</small></li>
+            <li><strong>B-</strong><small>2026.05</small></li>
+            <li><strong>B</strong><small>2026.05.23</small></li>
+            <li><strong>B+</strong><small>2026.05.29</small></li>
+            <li><strong>A-</strong><small>2026.06.03</small></li>
+            <li class="is-current"><strong>A</strong><small>2026.08.18</small></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
          비전 섹션 — 자기소개 및 목표 기술
          about-card: 노트 카드 스타일 / 형광펜 마커 강조 / chip 배지
          ============================================================ -->
     <!-- ABOUT -->
-    <section id="about" class="section section-alt">
+    <section id="about" class="section">
       <div class="container">
         <div class="section-header" data-aos="fade-right">
-          <span class="section-tag">// 04</span>
+          <span class="section-tag">// 05</span>
           <h2 class="section-title">비전</h2>
         </div>
         <div class="about-card" data-aos="fade-up" data-aos-delay="100">
@@ -1207,6 +1281,31 @@
   <div class="chip" data-en="Idea Bank" data-ko="아이디어 뱅크"><i class="fas fa-lightbulb"></i> 아이디어 뱅크</div>
   <div class="chip" data-en="Team Lead Experience" data-ko="팀장 경험 多"><i class="fas fa-users"></i> 팀장 경험 多</div>
 </div>
+          <!-- #194: 독립 섹션 대신 비전 카드의 프로필 근거로 상세 MBTI를 배치한다. -->
+          <div class="mbti-profile" aria-labelledby="mbti-profile-title">
+            <div class="mbti-summary">
+              <span class="mbti-eyebrow">MBTI</span>
+              <strong id="mbti-profile-title">ENTJ-A</strong>
+              <p data-ko="전략을 세우고 실행을 이끄는 방식에 대한 자기보고 지표입니다." data-en="A self-reported indicator of how I plan strategy and lead execution.">전략을 세우고 실행을 이끄는 방식에 대한 자기보고 지표입니다.</p>
+            </div>
+            <div class="mbti-stats" role="list" aria-label="ENTJ-A 상세 지표">
+              <div class="mbti-stat" role="listitem" aria-label="외향형 63%, 내향형 37%">
+                <span>E <b>63%</b></span><span class="mbti-meter"><i style="--mbti-score:63%"></i></span><span><b>37%</b> I</span>
+              </div>
+              <div class="mbti-stat" role="listitem" aria-label="직관형 88%, 현실형 12%">
+                <span>N <b>88%</b></span><span class="mbti-meter"><i style="--mbti-score:88%"></i></span><span><b>12%</b> S</span>
+              </div>
+              <div class="mbti-stat" role="listitem" aria-label="사고형 64%, 감정형 36%">
+                <span>T <b>64%</b></span><span class="mbti-meter"><i style="--mbti-score:64%"></i></span><span><b>36%</b> F</span>
+              </div>
+              <div class="mbti-stat" role="listitem" aria-label="판단형 93%, 인식형 7%">
+                <span>J <b>93%</b></span><span class="mbti-meter"><i style="--mbti-score:93%"></i></span><span><b>7%</b> P</span>
+              </div>
+              <div class="mbti-stat" role="listitem" aria-label="자기확신형 86%, 민감형 14%">
+                <span>A <b>86%</b></span><span class="mbti-meter"><i style="--mbti-score:86%"></i></span><span><b>14%</b> T</span>
+              </div>
+            </div>
+          </div>
           <!-- 학력 배지 (#41 연계) — 한국기술교육대학교 소속 표시. 로고: assets/koreatech-logo.png, 로드 실패 시 아이콘+텍스트 폴백 -->
           <div class="about-edu" aria-label="한국기술교육대학교 26학번">
             <img

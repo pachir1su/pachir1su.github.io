@@ -174,17 +174,18 @@ function renderGroup(group) {
   const heading = group.kind === "year" ? group.year : group.heading;
   const cards = group.cards.map((c) => renderCard(c, group.kind)).join("\n\n");
 
-  /* 실패 그룹은 기본 접힘(collapsible) — 버튼 헤더로 펼침/접힘 (미니멀 지향).
-     i18n(script.js)이 '.year-group-failed .year-heading' 의 textContent 를 바꾸므로
-     제목은 h3 로 유지하고 토글 아이콘은 형제 요소로 둔다. */
-  if (group.kind === "failed") {
+  /* 완료 목록의 밀도를 지키기 위해 중단·실패 그룹은 같은 접힘 구조를 쓴다.
+     i18n(script.js)이 상태별 .year-heading을 번역하므로 제목은 h3로 유지한다. */
+  const isCollapsible = group.kind === "discontinued" || group.kind === "failed";
+  if (isCollapsible) {
+    const gridId = `${group.kind}-grid`;
     return [
       `        <div class="year-group${cls}" data-year="${dataYear}">`,
-      `          <button class="failed-toggle" type="button" aria-expanded="false" aria-controls="failed-grid">`,
+      `          <button class="project-group-toggle ${group.kind}-toggle" type="button" aria-expanded="false" aria-controls="${gridId}">`,
       `            <h3 class="year-heading">${heading}</h3>`,
-      `            <i class="fas fa-chevron-down failed-toggle-icon" aria-hidden="true"></i>`,
+      `            <i class="fas fa-chevron-down project-group-toggle-icon" aria-hidden="true"></i>`,
       `          </button>`,
-      `          <div class="projects-grid failed-grid is-collapsed" id="failed-grid">`,
+      `          <div class="projects-grid project-status-grid ${group.kind}-grid is-collapsed" id="${gridId}">`,
       ``,
       cards,
       ``,

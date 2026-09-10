@@ -112,5 +112,105 @@
     $$('[data-aos]').forEach((el) => el.classList.add('is-revealed'));
   }
 
+  /* #266: adds one accessible full-viewport viewer to every local image/video figure. */
+  (function initMediaViewer() {
+    const figures = $$('.detail-figure').filter((figure) => $('img, video', figure));
+    if (!figures.length) return;
+
+    const viewer = document.createElement('dialog');
+    const viewerBody = document.createElement('div');
+    const closeButton = document.createElement('button');
+    viewer.className = 'media-viewer';
+    viewerBody.className = 'media-viewer-body';
+    closeButton.type = 'button';
+    closeButton.className = 'media-viewer-close';
+    closeButton.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i><span></span>';
+    viewer.append(closeButton, viewerBody);
+    document.body.append(viewer);
+
+    let returnFocus = null;
+
+    // Updates generated controls because they are added after the initial language pass.
+    function updateViewerLanguage() {
+      const isEnglish = document.documentElement.lang === 'en';
+      const label = isEnglish ? 'Close full screen' : '전체 화면 닫기';
+      closeButton.querySelector('span').textContent = isEnglish ? 'Close' : '닫기';
+      closeButton.setAttribute('aria-label', label);
+      figures.forEach((figure) => {
+        const button = $('.media-viewer-open', figure);
+        if (!button) return;
+        button.querySelector('span').textContent = isEnglish ? 'Full screen' : '전체 화면';
+        button.setAttribute('aria-label', isEnglish ? 'Open media full screen' : '미디어 전체 화면으로 열기');
+      });
+    }
+
+    // Stops cloned video playback and restores focus to the invoking button.
+    function closeViewer() {
+      $('video', viewerBody)?.pause();
+      if (viewer.open && typeof viewer.close === 'function') viewer.close();
+      else viewer.removeAttribute('open');
+      document.body.classList.remove('media-viewer-open');
+      viewerBody.replaceChildren();
+      returnFocus?.focus();
+      returnFocus = null;
+    }
+
+    // Clones media into the viewport while preserving its intrinsic aspect ratio.
+    function openViewer(source, figure, trigger) {
+      const media = source.cloneNode(true);
+      media.removeAttribute('id');
+      media.removeAttribute('loading');
+      media.classList.add('media-viewer-media');
+      if (media instanceof HTMLVideoElement) {
+        media.controls = true;
+        media.autoplay = false;
+        media.preload = 'metadata';
+        try {
+          media.currentTime = source.currentTime;
+        } catch (error) {
+          console.warn('Unable to copy the video position into the media viewer.', error);
+        }
+        source.pause();
+      }
+
+      viewerBody.replaceChildren(media);
+      const caption = $('figcaption', figure)?.cloneNode(true);
+      if (caption) viewerBody.append(caption);
+      returnFocus = trigger;
+      document.body.classList.add('media-viewer-open');
+      try {
+        if (typeof viewer.showModal === 'function') viewer.showModal();
+        else viewer.setAttribute('open', '');
+      } catch (error) {
+        console.warn('Native dialog failed; using the full-viewport fallback.', error);
+        viewer.setAttribute('open', '');
+      }
+      closeButton.focus();
+    }
+
+    figures.forEach((figure) => {
+      const media = $('img, video', figure);
+      const button = document.createElement('button');
+      figure.classList.add('has-media-viewer');
+      button.type = 'button';
+      button.className = 'media-viewer-open';
+      button.innerHTML = '<i class="fas fa-expand" aria-hidden="true"></i><span></span>';
+      button.addEventListener('click', () => openViewer(media, figure, button));
+      figure.append(button);
+    });
+
+    closeButton.addEventListener('click', closeViewer);
+    viewer.addEventListener('click', (event) => { if (event.target === viewer) closeViewer(); });
+    viewer.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      closeViewer();
+    });
+    addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && viewer.hasAttribute('open')) closeViewer();
+    });
+    addEventListener('portfolio:language', updateViewerLanguage);
+    updateViewerLanguage();
+  })();
+
   addEventListener('keydown', (event) => { if (event.key === 'Escape') closeMobile(); });
 })();

@@ -94,6 +94,18 @@ check(
   "#191 상태 회귀: 진행 중단 그룹은 승기봇·HTML Viewer·CentrifugeAI·마법 아카데미·DelphiRec·성현봇 6개여야 합니다."
 );
 
+/* --- 2-2) #263 상태 보관함은 중단·실패 모두 기본 접힘이어야 한다 --- */
+check(
+  regionAfter.includes('class="project-group-toggle discontinued-toggle"') &&
+    regionAfter.includes('class="projects-grid project-status-grid discontinued-grid is-collapsed"'),
+  "#263 회귀: 진행 중단 그룹의 기본 접힘 마크업이 없습니다."
+);
+check(
+  regionAfter.includes('class="project-group-toggle failed-toggle"') &&
+    regionAfter.includes('class="projects-grid project-status-grid failed-grid is-collapsed"'),
+  "#263 회귀: 실패 그룹의 기본 접힘 마크업이 없습니다."
+);
+
 /* --- 3) detail 경로 존재 + 카드 전체 클릭 연결 --- */
 for (const group of data.groups) {
   for (const card of group.cards) {
@@ -246,6 +258,8 @@ for (const htmlFile of collectHtmlFiles(projectRoot)) {
 const rootIndex = fs.readFileSync(indexPath, "utf8");
 const rootScript = fs.readFileSync(path.join(root, "script.js"), "utf8");
 const rootStyle = fs.readFileSync(path.join(root, "style.css"), "utf8");
+const detailScript = fs.readFileSync(path.join(root, "detail.js"), "utf8");
+const demoScript = fs.readFileSync(path.join(root, "assets", "project-demos.js"), "utf8");
 
 for (const match of rootIndex.matchAll(/<img\b[^>]*\bsrc="([^"]+)"[^>]*>/gi)) {
   const ref = match[1];
@@ -264,6 +278,40 @@ const retiredUiPatterns = [
 for (const [source, pattern, message] of retiredUiPatterns) {
   check(!source.includes(pattern), message);
 }
+
+/* --- 6-1) #59/#194/#261-#268 신규 v2 계약 --- */
+const rankTrack = rootIndex.match(/<ol class="rank-track"[\s\S]*?<\/ol>/)?.[0] || "";
+const rankCount = (rankTrack.match(/<li(?:\s|>)/g) || []).length;
+const mbtiStatCount = (rootIndex.match(/class="mbti-stat"/g) || []).length;
+const expectedRankLabels = ["2023.04.12", "2025.08", "2026.05", "2026.05.23", "2026.05.29", "2026.06.03", "2026.08.18"];
+const expectedMbtiScores = ["63%", "88%", "64%", "93%", "86%"];
+const qrPath = path.join(root, "assets", "portfolio-qr.svg");
+
+check(rankCount === 7, `#59/#268 회귀: GitHub Rank 궤적은 C부터 A까지 7단계여야 합니다 (현재 ${rankCount}개).`);
+check(
+  expectedRankLabels.every((label) => rankTrack.includes(`>${label}<`)),
+  "#59/#268 회귀: GitHub Rank의 시작 표기와 승급 날짜가 제공된 이력과 다릅니다."
+);
+check(
+  rootIndex.includes('class="mbti-profile"') && rootIndex.includes('id="mbti-profile-title">ENTJ-A') && mbtiStatCount === 5 && expectedMbtiScores.every((score) => rootIndex.includes(`--mbti-score:${score}`)),
+  "#194 회귀: Vision 내부 ENTJ-A와 제공된 상세 지표 5개가 필요합니다."
+);
+check(
+  rootIndex.includes('href="https://pachir1su.github.io/"') && rootIndex.includes('src="assets/portfolio-qr.svg"') && fs.existsSync(qrPath),
+  "#265 회귀: 홈의 포트폴리오 URL 또는 로컬 QR 자산이 없습니다."
+);
+check(
+  rootScript.includes("setGroupExpanded") && rootScript.includes("aria-pressed"),
+  "#263/#267 회귀: 상태 그룹 접힘 또는 모바일 필터 상태 제어가 없습니다."
+);
+check(
+  demoScript.includes("is-preparing") && demoScript.includes("supportsPointerDrag"),
+  "#261/#262 회귀: 터치 카드 분기 또는 U-CAST 출발 위치 초기화가 없습니다."
+);
+check(
+  detailScript.includes("initMediaViewer") && rootStyle.includes(".media-viewer-media") && rootStyle.includes("object-fit:contain"),
+  "#266 회귀: 상세 미디어 전체 화면 뷰어 또는 비율 유지 스타일이 없습니다."
+);
 
 
 /* #193: KGA는 유지하되 미배포 상태의 Discord 봇 초대 링크만 제거한다. */

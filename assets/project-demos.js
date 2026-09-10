@@ -255,10 +255,21 @@
       const channel = channels[index];
       const currentVersion = ++channel.version;
       setChannelDisabled(index, true);
-      channel.lane.classList.remove('is-forward-complete', 'is-reverse-complete');
+      /* 이전 횡단 종점에서 새 방향으로 애니메이션하지 않도록
+         출발 센서 위치를 transition 없이 먼저 확정한다. */
+      channel.lane.classList.remove(
+        'is-active',
+        'is-entering',
+        'is-exiting',
+        'is-reverse',
+        'is-forward-complete',
+        'is-reverse-complete',
+        'is-preparing'
+      );
       channel.lane.classList.toggle('is-reverse', reverse);
-      channel.lane.classList.remove('is-entering', 'is-exiting');
+      channel.lane.classList.add('is-preparing');
       void channel.pedestrian.offsetWidth;
+      channel.lane.classList.remove('is-preparing');
       channel.lane.classList.add('is-active', 'is-entering');
       setText(channel.state, reverse ? '역방향 경고' : '정방향 경고', reverse ? 'Reverse warning' : 'Forward warning');
       setText(
@@ -288,7 +299,7 @@
     resetButton.addEventListener('click', () => {
       channels.forEach((channel, index) => {
         channel.version += 1;
-        channel.lane.classList.remove('is-active', 'is-entering', 'is-exiting', 'is-reverse', 'is-forward-complete', 'is-reverse-complete');
+        channel.lane.classList.remove('is-active', 'is-entering', 'is-exiting', 'is-reverse', 'is-forward-complete', 'is-reverse-complete', 'is-preparing');
         setText(channel.state, '대기', 'Standby');
         setChannelDisabled(index, false);
       });
@@ -330,10 +341,12 @@
     const cards = create('div', 'berry-card-stack');
     const cardIds = ['DEMO-0001', 'DEMO-0002', 'DEMO-0003'];
     const cardElements = [];
+    const supportsPointerDrag = window.matchMedia?.('(hover: hover) and (pointer: fine)').matches ?? true;
     cardIds.forEach((id, index) => {
       const card = create('button', 'berry-student-card');
       card.type = 'button';
-      card.draggable = true;
+      /* 터치에서는 브라우저의 길게 누르기 선택/드래그 대신 탭 흐름만 제공한다. */
+      card.draggable = supportsPointerDrag;
       card.dataset.studentId = id;
       card.style.setProperty('--card-index', String(index));
       card.innerHTML = `<span aria-hidden="true">KOREATECH</span><strong>${id}</strong><small>${translate('가상 학생증', 'Demo student card')}</small>`;
