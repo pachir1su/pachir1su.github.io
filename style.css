@@ -1066,18 +1066,6 @@ p {
   border: 1.5px solid var(--line);
   color: var(--ink);
 }
-/* 터치 기기에서는 권장 최소 히트 영역 44×44px 확보 (#114).
-   정밀 포인터에서는 카드 상단 밀도를 지키기 위해 32px를 유지한다. */
-@media (pointer: coarse) {
-  .plink {
-    width: 44px;
-    height: 44px;
-    font-size: 0.95rem;
-  }
-  .project-links {
-    gap: 8px;
-  }
-}
 .plink-detail {
   border-color: var(--red-margin);
   color: var(--red-text);
@@ -3569,7 +3557,27 @@ body.media-viewer-open { overflow:hidden; }
   .growth-entry { grid-template-columns:minmax(0,1fr); gap:var(--sp-3); padding-block:var(--sp-5); }
   .hero-qr { width:100%; grid-template-columns:58px minmax(0,1fr); transform:none; }
   .hero-qr img { width:58px; height:58px; }
-  .rank-track { min-width:720px; }
+  /* 모바일에서는 7단계를 세로로 쌓아 날짜를 줄이지 않고 읽게 한다. */
+  .rank-growth { overflow-x:hidden; }
+  .rank-track { grid-template-columns:1fr; min-width:0; padding:4px 0; }
+  .rank-track li {
+    grid-template-columns:42px minmax(0,1fr);
+    align-items:center;
+    justify-items:start;
+    gap:12px;
+    min-height:58px;
+    text-align:left;
+  }
+  .rank-track li::before {
+    top:-50%;
+    left:20px;
+    width:0;
+    height:100%;
+    border-top:0;
+    border-left:2px dashed var(--line);
+  }
+  .rank-track strong { width:38px; height:38px; }
+  .rank-track small { max-width:none; font-size:.68rem; }
   .mbti-profile { grid-template-columns:1fr; gap:10px; margin:14px 0; padding:12px 0; }
   .mbti-summary p { max-width:42ch; }
   .mbti-stat { grid-template-columns:58px minmax(90px,1fr) 58px; gap:6px; font-size:.62rem; }
