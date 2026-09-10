@@ -1,0 +1,287 @@
+/* =====================================================================
+   v3 공용 스타일 — 「차가운 성운」
+   대상: index.html(허브) · gateway.html(진입점) · universe.html(우주 본편)
+
+   확정된 시각 언어(#114)
+   - 배경 : 엷은 성운 · 방향광 · 어두운 먼지 띠
+   - 선   : 낡은 금빛 실선
+   - 서체 : 산세리프. 이름은 얇은 웨이트를 크게
+   - 테마 : 수동 토글 없이 시스템 설정만 따른다
+   ===================================================================== */
+
+:root {
+  --page:#e8eaf2; --page-deep:#dfe2ec; --surface:#f1f2f7;
+  --ink:#242636; --muted:#606579; --subtle:#777c8f; --line:#cbd0df;
+  --violet:#706994; --violet-strong:#554d7d; --gold:#a9914d;
+  --halo:rgba(112,105,148,.22); --veil:rgba(232,234,242,.86);
+  --sans:"IBM Plex Sans KR","Pretendard","Malgun Gothic","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  --ease-out:cubic-bezier(.23,1,.32,1);
+  /* 성운 위에서도 라벨이 읽히도록 테마별 텍스트 그림자를 토큰으로 둔다 */
+  --label-shadow:0 1px 10px rgba(232,234,242,.9),0 0 2px rgba(232,234,242,.95);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page:#11151d; --page-deep:#0d1118; --surface:#181d27;
+    --ink:#e0e3eb; --muted:#a2a8b8; --subtle:#858c9e; --line:#303848;
+    --violet:#968dbb; --violet-strong:#b0a7d0; --gold:#bda969;
+    --halo:rgba(150,141,187,.26); --veil:rgba(13,17,24,.86);
+    --label-shadow:0 1px 12px rgba(8,11,16,.95),0 0 2px rgba(8,11,16,.9);
+  }
+}
+:root[data-theme="dark"] {
+  --page:#11151d; --page-deep:#0d1118; --surface:#181d27;
+  --ink:#e0e3eb; --muted:#a2a8b8; --subtle:#858c9e; --line:#303848;
+  --violet:#968dbb; --violet-strong:#b0a7d0; --gold:#bda969;
+  --halo:rgba(150,141,187,.26); --veil:rgba(13,17,24,.86);
+  --label-shadow:0 1px 12px rgba(8,11,16,.95),0 0 2px rgba(8,11,16,.9);
+}
+
+* { box-sizing:border-box; }
+body.v3 {
+  margin:0; min-width:320px; background:var(--page); color:var(--ink);
+  font-family:var(--sans); font-size:14px; line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+.v3 a:focus-visible, .v3 button:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
+.v3 .wrap { max-width:1240px; margin:0 auto; padding:0 clamp(16px,3.5vw,40px); }
+.v3 .sr { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+
+/* ---------------------------------------------------------------------
+   문서 셸 — 시안을 설명하는 바깥 영역
+   --------------------------------------------------------------------- */
+.doc-shell { padding:clamp(46px,8vw,88px) 0 clamp(56px,8vw,96px); }
+.kicker { margin:0 0 18px; font-family:var(--mono); font-size:11px; letter-spacing:.16em; color:var(--gold); }
+.doc-shell h1 { margin:0 0 18px; font-weight:200; font-size:clamp(30px,5vw,54px); letter-spacing:-.035em; line-height:1.14; text-wrap:balance; }
+.doc-shell h2 { margin:0 0 10px; font-weight:300; font-size:clamp(19px,2.6vw,26px); letter-spacing:-.03em; }
+.doc-shell p { max-width:64ch; margin:0 0 12px; color:var(--muted); font-size:14.5px; }
+.doc-shell b { color:var(--ink); font-weight:500; }
+.doc-shell section { margin-top:clamp(40px,5.5vw,72px); padding-top:clamp(26px,3.5vw,40px); border-top:1px solid var(--line); }
+.back-link { display:inline-block; margin-bottom:24px; color:var(--muted); font-size:12.5px; text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:2px; }
+.back-link:hover { color:var(--ink); border-bottom-color:var(--gold); }
+
+.cards { display:grid; gap:14px; margin-top:22px; }
+@media (min-width:720px) { .cards { grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); } }
+.card { display:block; padding:20px 22px; border:1px solid var(--line); background:var(--surface); text-decoration:none; color:inherit; transition:border-color .2s var(--ease-out); }
+a.card:hover { border-color:var(--gold); }
+.card b { display:block; margin-bottom:6px; font-size:14.5px; font-weight:500; }
+.card span { display:block; color:var(--muted); font-size:12.5px; line-height:1.7; }
+
+.rows { border-top:1px solid var(--line); margin-top:20px; }
+.row { display:grid; gap:3px 26px; padding:14px 0; border-bottom:1px solid var(--line); align-items:baseline; }
+@media (min-width:760px) { .row { grid-template-columns:minmax(140px,.5fr) minmax(0,1.6fr); } }
+.row > b { font-size:12.5px; font-weight:500; }
+.row > span { color:var(--muted); font-size:12.5px; }
+.row.open > b { color:var(--gold); }
+
+/* ---------------------------------------------------------------------
+   성운 하늘 — 오프스크린 캔버스 한 장을 배경으로 깐다
+   --------------------------------------------------------------------- */
+.sky { position:fixed; inset:0; z-index:0; pointer-events:none; background:var(--page); }
+.sky canvas { display:block; width:100%; height:100%; }
+.sky::after { /* 미세 입자. 성운 위 재질용, 불투명도 3% 수준 */
+  content:""; position:absolute; inset:0; opacity:.03; pointer-events:none;
+  background-image:radial-gradient(circle at 1px 1px, var(--ink) .5px, transparent 0);
+  background-size:3px 3px;
+}
+
+/* ---------------------------------------------------------------------
+   우주 본편 셸
+   --------------------------------------------------------------------- */
+.universe { position:relative; z-index:1; min-height:100vh; padding-bottom:clamp(80px,12vh,140px); }
+.uni-top { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:16px clamp(14px,3vw,32px) 0; }
+.ctl {
+  min-width:44px; min-height:32px; padding:5px 12px; border:1px solid var(--line);
+  background:transparent; color:var(--muted); font-family:var(--mono); font-size:11px;
+  letter-spacing:.1em; cursor:pointer; transition:color .2s var(--ease-out), border-color .2s var(--ease-out);
+}
+.ctl:hover { color:var(--ink); border-color:var(--gold); }
+.ctl[hidden] { display:none; }
+
+.uni-head { padding:clamp(26px,5vw,54px) clamp(16px,4vw,40px) clamp(10px,2vw,20px); max-width:1240px; margin:0 auto; }
+.uni-head h1 { margin:0 0 8px; font-weight:200; font-size:clamp(26px,4.4vw,46px); letter-spacing:-.04em; line-height:1.15; }
+.uni-head p { margin:0; max-width:56ch; color:var(--muted); font-size:13.5px; }
+
+/* 은하수 연도 메뉴 (#173) — 버튼 나열이 아니라 띠 위의 밝은 점 */
+.milkyway { position:relative; max-width:1240px; margin:clamp(18px,3vw,34px) auto 0; padding:0 clamp(16px,4vw,40px); }
+.milkyway .band {
+  position:absolute; left:clamp(16px,4vw,40px); right:clamp(16px,4vw,40px); top:50%; height:56px; transform:translateY(-50%);
+  background:linear-gradient(90deg,transparent,var(--halo) 18%,var(--halo) 82%,transparent);
+  filter:blur(9px); pointer-events:none;
+}
+.milkyway .points { position:relative; display:flex; align-items:center; justify-content:center; gap:clamp(18px,6vw,72px); min-height:64px; }
+.year-point {
+  position:relative; display:flex; flex-direction:column; align-items:center; gap:7px;
+  min-width:56px; min-height:44px; padding:6px 10px; border:0; background:transparent;
+  color:var(--subtle); font-family:var(--mono); font-size:12.5px; letter-spacing:.14em; cursor:pointer;
+  transition:color .28s var(--ease-out);
+}
+.year-point::before {
+  content:""; width:5px; height:5px; border-radius:50%; background:currentColor;
+  box-shadow:0 0 0 0 var(--halo); transition:box-shadow .32s var(--ease-out), transform .32s var(--ease-out);
+}
+.year-point:hover { color:var(--muted); }
+.year-point[aria-selected="true"] { color:var(--ink); }
+.year-point[aria-selected="true"]::before { transform:scale(1.5); box-shadow:0 0 0 7px var(--halo); }
+
+/* ---------------------------------------------------------------------
+   성도 — 별 좌표는 개폐와 무관하게 고정된다
+   --------------------------------------------------------------------- */
+.chart-wrap { position:relative; max-width:1240px; margin:0 auto; padding:0 clamp(12px,3vw,32px); }
+.chart { position:relative; width:100%; }
+.chart .lines { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }
+.chart .lines polyline, .chart .lines line {
+  fill:none; stroke:var(--gold); stroke-width:1.1; opacity:.6; stroke-linecap:round;
+}
+.chart .lines .dim { opacity:.22; }
+
+.star {
+  position:absolute; left:var(--x); top:var(--y); transform:translate(-50%,-50%);
+  display:flex; align-items:center; gap:9px; min-height:44px; padding:6px 10px;
+  border:0; background:transparent; color:var(--ink); font-family:var(--sans);
+  font-size:13px; text-align:left; cursor:pointer; white-space:nowrap;
+}
+.star.flip { flex-direction:row-reverse; }
+.star .glyph { position:relative; flex:0 0 auto; width:16px; height:16px; }
+.star .glyph::before {
+  content:""; position:absolute; left:50%; top:50%; width:5px; height:5px; margin:-2.5px 0 0 -2.5px;
+  border-radius:50%; background:var(--ink);
+}
+.star .glyph::after { /* 옅은 달무리 — 별자리에 참여하는 별에만 */
+  content:""; position:absolute; left:50%; top:50%; width:16px; height:16px; margin:-8px 0 0 -8px;
+  border-radius:50%; background:radial-gradient(circle, var(--halo), transparent 68%);
+  transition:transform .3s var(--ease-out);
+}
+.star .name { text-shadow:var(--label-shadow); letter-spacing:-.01em; transition:color .2s var(--ease-out); }
+.star:hover .name, .star[aria-expanded="true"] .name { color:var(--violet-strong); }
+.star:hover .glyph::after, .star[aria-expanded="true"] .glyph::after { transform:scale(1.5); }
+
+/* 상태별 형태 — 글자 라벨 대신 형태로만 구분한다 */
+.star.protostar .glyph::before { background:transparent; border:1px solid var(--muted); width:9px; height:9px; margin:-4.5px 0 0 -4.5px; }
+.star.protostar .glyph::after {
+  background:none; border:1px dashed var(--gold); width:20px; height:20px; margin:-10px 0 0 -10px; opacity:.55;
+  animation:spin 14s linear infinite;
+}
+.star.stalled .glyph::before { background:var(--subtle); animation:pulse-dim 3.4s ease-in-out infinite; }
+.star.stalled .glyph::after { background:radial-gradient(circle, var(--halo), transparent 60%); opacity:.4; }
+.star.remnant .glyph::before { background:transparent; border:1px solid var(--subtle); width:4px; height:4px; margin:-2px 0 0 -2px; }
+.star.remnant .glyph::after {
+  background:none; border:1px solid var(--gold); border-left-color:transparent; border-bottom-color:transparent;
+  width:22px; height:22px; margin:-11px 0 0 -11px; opacity:.5; animation:spread 5.5s ease-out infinite;
+}
+.star.strayed .glyph::after {
+  background:none; border:1px solid var(--violet); border-right-color:transparent;
+  width:22px; height:22px; margin:-11px 0 0 -11px; opacity:.55; transform:rotate(-24deg);
+}
+.star.unnamed { color:var(--subtle); }
+.star.unnamed .glyph::before { width:3px; height:3px; margin:-1.5px 0 0 -1.5px; background:var(--subtle); }
+.star.dragging { cursor:grabbing; }
+
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes pulse-dim { 0%,100% { opacity:.35; } 50% { opacity:.9; } }
+@keyframes spread { 0% { transform:scale(.6); opacity:.7; } 100% { transform:scale(1.35); opacity:0; } }
+
+/* 메모 레이어 — 별 버튼 바깥에 그린다. 열려도 성도가 움직이지 않는다 */
+.memos { position:absolute; inset:0; pointer-events:none; }
+.memo {
+  position:absolute; left:var(--x); top:var(--y); width:min(300px,74vw);
+  padding:14px 16px; border:1px solid var(--line); background:var(--surface);
+  box-shadow:0 14px 34px rgba(10,12,20,.16); pointer-events:auto;
+}
+.memo .role { margin:0 0 6px; font-family:var(--mono); font-size:11px; letter-spacing:.08em; color:var(--gold); }
+.memo .desc { margin:0 0 10px; color:var(--muted); font-size:12.5px; line-height:1.7; }
+.memo .tech { display:flex; flex-wrap:wrap; gap:5px 10px; margin:0 0 12px; padding:0; list-style:none; }
+.memo .tech li { font-family:var(--mono); font-size:10.5px; color:var(--subtle); letter-spacing:.04em; }
+.memo .go {
+  display:inline-block; color:var(--ink); font-size:12.5px; text-decoration:none;
+  border-bottom:1px solid var(--gold); padding-bottom:2px;
+}
+.memo .go:hover { color:var(--violet-strong); }
+.memo .none { margin:0; color:var(--subtle); font-size:12px; }
+
+/* ---------------------------------------------------------------------
+   성장 별자리 (#59) · 궤도를 잃은 별
+   --------------------------------------------------------------------- */
+.stage { position:relative; z-index:1; margin-top:clamp(56px,9vw,110px); }
+.stage-head { max-width:1240px; margin:0 auto; padding:0 clamp(16px,4vw,40px) clamp(14px,2.5vw,26px); }
+.stage-head h2 { margin:0 0 6px; font-weight:200; font-size:clamp(21px,3.2vw,32px); letter-spacing:-.035em; }
+.stage-head p { margin:0; max-width:56ch; color:var(--muted); font-size:13px; }
+
+.rank-chain { display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; margin-top:14px; }
+.rank-chain span { font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; color:var(--subtle); }
+.rank-chain span:last-child { color:var(--gold); }
+.rank-chain i { width:14px; height:1px; background:var(--gold); opacity:.5; font-style:normal; }
+
+/* ---------------------------------------------------------------------
+   v2로 돌아가는 길 — 글자 없는 작은 빈 포스트잇
+   --------------------------------------------------------------------- */
+.postit {
+  position:fixed; right:clamp(14px,3vw,30px); bottom:clamp(14px,3vw,30px); z-index:6;
+  width:46px; height:46px; padding:0; border:0; cursor:pointer;
+  background:linear-gradient(160deg,#f3e6a8,#e8d68c);
+  box-shadow:0 8px 18px rgba(10,12,20,.22);
+  transform:rotate(-3deg); transition:transform .24s var(--ease-out);
+}
+.postit::after { content:""; position:absolute; right:0; bottom:0; border-width:0 0 12px 12px; border-style:solid; border-color:transparent transparent var(--page) transparent; }
+.postit:hover { transform:rotate(-1deg) translateY(-2px); }
+
+/* ---------------------------------------------------------------------
+   진입점 — v2 홈에 뚫린 찢긴 종이 구멍
+   --------------------------------------------------------------------- */
+.gate-slot { position:relative; margin:clamp(26px,5vw,48px) 0; min-height:230px; }
+.gate {
+  position:absolute; padding:0; border:0; background:transparent; cursor:pointer; line-height:0;
+  filter:drop-shadow(0 16px 26px rgba(10,12,20,.22));
+  transition:transform .3s var(--ease-out);
+}
+.gate img { display:block; width:100%; height:auto; pointer-events:none; user-select:none; }
+.gate canvas { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.gate:hover { transform:translateY(-2px) rotate(var(--tilt,0deg)) scale(1.012); }
+
+/* 전환 막 — 약 4초. 종이 밖 별가루가 구멍으로 빨려 들어간다 */
+.veil { position:fixed; inset:0; z-index:40; pointer-events:none; opacity:0; }
+.veil.on { pointer-events:auto; opacity:1; }
+.veil canvas { display:block; width:100%; height:100%; }
+
+/* ---------------------------------------------------------------------
+   숨은 아카이브 — 이름을 어디에도 노출하지 않는다
+   --------------------------------------------------------------------- */
+.vault { position:fixed; inset:0; z-index:30; display:none; background:var(--veil); backdrop-filter:blur(3px); }
+.vault.on { display:flex; align-items:center; justify-content:center; padding:clamp(18px,5vw,50px); }
+.vault-inner { width:min(620px,100%); max-height:82vh; overflow:auto; padding:clamp(22px,4vw,36px); border:1px solid var(--gold); background:var(--surface); }
+.vault-inner h2 { margin:0 0 6px; font-weight:200; font-size:clamp(20px,3vw,28px); letter-spacing:-.03em; }
+.vault-inner > p { margin:0 0 20px; color:var(--muted); font-size:12.5px; }
+.vault-item { padding:14px 0; border-top:1px solid var(--line); }
+.vault-item button { width:100%; min-height:44px; padding:0; border:0; background:transparent; color:var(--ink); font-family:var(--sans); font-size:14px; text-align:left; cursor:pointer; }
+.vault-item p { margin:8px 0 0; color:var(--muted); font-size:12.5px; line-height:1.7; }
+.vault-close { margin-top:22px; }
+
+/* 이스터에그 표시 — 사전 안내를 두지 않으므로 발견 후에만 보인다 */
+.eggs { position:fixed; left:clamp(14px,3vw,30px); bottom:clamp(14px,3vw,30px); z-index:6; display:flex; gap:8px; }
+.egg-mark { width:8px; height:8px; border:1px solid var(--gold); border-radius:50%; opacity:.85; }
+.egg-mark.filled { background:var(--gold); }
+
+.eclipse { position:fixed; inset:0; z-index:20; pointer-events:none; opacity:0; background:radial-gradient(circle at 50% 42%, transparent 8%, rgba(6,8,14,.82) 46%); transition:opacity 1.4s var(--ease-out); }
+.eclipse.on { opacity:1; }
+
+.comet { position:fixed; z-index:5; width:64px; height:44px; padding:0; border:0; background:transparent; cursor:pointer; opacity:0; }
+.comet::before { content:""; position:absolute; left:6px; top:20px; width:3px; height:3px; border-radius:50%; background:var(--ink); box-shadow:0 0 8px var(--halo); }
+.comet::after { content:""; position:absolute; left:9px; top:21px; width:46px; height:1px; background:linear-gradient(90deg,var(--gold),transparent); opacity:.6; }
+.comet.run { animation:comet-pass var(--dur,7s) linear 1; }
+@keyframes comet-pass { 0% { opacity:0; transform:translate(0,0); } 12% { opacity:1; } 88% { opacity:1; } 100% { opacity:0; transform:translate(-46vw,26vh); } }
+
+.capybara { position:fixed; left:50%; top:50%; z-index:22; transform:translate(-50%,-50%); max-width:min(320px,72vw); opacity:0; transition:opacity .7s var(--ease-out); pointer-events:none; }
+.capybara.on { opacity:1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .v3 *, .v3 *::before, .v3 *::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
+
+/* 좁은 화면 — 띠를 세우고 라벨을 줄인다 */
+@media (max-width:640px) {
+  .milkyway .points { flex-direction:column; gap:12px; }
+  .milkyway .band { top:50%; left:50%; right:auto; width:56px; height:100%; transform:translate(-50%,-50%);
+    background:linear-gradient(180deg,transparent,var(--halo) 18%,var(--halo) 82%,transparent); }
+  .star { font-size:12.5px; }
+  .memo { width:min(280px,86vw); }
+}

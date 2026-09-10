@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>v3 우주 — 별자리로 읽는 기록</title>
+<link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans+KR:wght@200;300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="v3.css" />
+</head>
+<body class="v3">
+
+<div class="sky" aria-hidden="true"><canvas id="sky"></canvas></div>
+
+<div class="universe">
+  <div class="uni-top">
+    <button type="button" class="ctl" id="lang" data-lang-toggle aria-label="Language">EN</button>
+    <button type="button" class="ctl" id="mute" hidden>SOUND ON</button>
+  </div>
+
+  <header class="uni-head">
+    <h1 data-ko="이건영" data-en="Lee Geon Yeong">이건영</h1>
+    <p data-ko="이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다."
+       data-en="Aiming to be an entrepreneur who pursues innovation beyond profit.">이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다.</p>
+  </header>
+
+  <!-- 은하수 연도 메뉴 (#173) — 버튼 나열이 아니라 띠 위의 밝은 점 -->
+  <nav class="milkyway" aria-label="연도">
+    <span class="band" aria-hidden="true"></span>
+    <div class="points" id="years" role="tablist"></div>
+  </nav>
+
+  <section class="stage" aria-labelledby="years-title">
+    <div class="stage-head">
+      <h2 id="years-title" data-ko="연도 별자리" data-en="Year constellations">연도 별자리</h2>
+      <p data-ko="완성된 별만 선으로 이어진다. 이름을 누르면 그 자리에서 역할과 설명이 펼쳐지고, 성도는 움직이지 않는다."
+         data-en="Only completed stars are linked. Selecting a name opens its role and summary in place; the chart never moves.">완성된 별만 선으로 이어진다. 이름을 누르면 그 자리에서 역할과 설명이 펼쳐지고, 성도는 움직이지 않는다.</p>
+    </div>
+    <div class="chart-wrap"><div class="chart" id="chart-years"></div></div>
+  </section>
+
+  <section class="stage" aria-labelledby="growth-title">
+    <div class="stage-head">
+      <h2 id="growth-title" data-ko="성장 별자리" data-en="Growth constellation">성장 별자리</h2>
+      <p data-ko="월별 기록을 전부 나열하지 않고 굵직한 사건만 잇는다. 사건 7개를 잇는 선 6개가 GitHub Rank의 여섯 단계와 맞물린다."
+         data-en="Only major events are linked. The six lines joining seven events match the six GitHub Rank steps.">월별 기록을 전부 나열하지 않고 굵직한 사건만 잇는다. 사건 7개를 잇는 선 6개가 GitHub Rank의 여섯 단계와 맞물린다.</p>
+      <p class="rank-chain" aria-label="GitHub Rank C to A">
+        <span>C</span><i></i><span>C+</span><i></i><span>B-</span><i></i><span>B</span><i></i><span>B+</span><i></i><span>A-</span><i></i><span>A</span>
+      </p>
+    </div>
+    <div class="chart-wrap"><div class="chart" id="chart-growth"></div></div>
+  </section>
+
+  <section class="stage" aria-labelledby="lost-title">
+    <div class="stage-head">
+      <h2 id="lost-title" data-ko="궤도를 잃은 별" data-en="Stars off orbit">궤도를 잃은 별</h2>
+      <p data-ko="아직 켜지지 않은 별과 끝내 켜지지 못한 별. 선을 잇지 않고, 상태를 글자로 쓰지 않는다."
+         data-en="Stars not yet lit and stars that never lit. No lines, no status labels.">아직 켜지지 않은 별과 끝내 켜지지 못한 별. 선을 잇지 않고, 상태를 글자로 쓰지 않는다.</p>
+    </div>
+    <div class="chart-wrap"><div class="chart" id="chart-lost"></div></div>
+  </section>
+</div>
+
+<!-- v2로 돌아가는 길 — 글자를 쓰지 않는다 -->
+<button type="button" class="postit" id="back" aria-label="포트폴리오로 돌아가기"></button>
+
+<div class="eggs" id="eggs" aria-hidden="true"></div>
+<div class="eclipse" id="eclipse" aria-hidden="true"></div>
+<button type="button" class="comet" id="comet" aria-label="지나가는 천체"></button>
+<img class="capybara" id="capybara" src="../../assets/capybara-mail-peek.webp" alt="" aria-hidden="true" />
+
+<!-- 조건을 만족했을 때만 열리는 격리 기록. 이름을 어디에도 예고하지 않는다 -->
+<div class="vault" id="vault" role="dialog" aria-modal="true" aria-labelledby="vault-title" aria-hidden="true">
+  <div class="vault-inner">
+    <h2 id="vault-title" data-ko="제51구역" data-en="Area 51">제51구역</h2>
+    <p data-ko="격리된 실험 기록. 실패 원인은 항목을 연 뒤에만 보인다."
+       data-en="Quarantined experiments. Reasons appear only after opening an entry.">격리된 실험 기록. 실패 원인은 항목을 연 뒤에만 보인다.</p>
+    <div id="vault-list"></div>
+    <button type="button" class="ctl vault-close" id="vault-close" data-ko="닫기" data-en="Close">닫기</button>
+  </div>
+</div>
+
+<script src="v3.js"></script>
+<script>
+/* =====================================================================
+   universe.html 페이지 스크립트
+   연도 별자리 · 성장 별자리 · 궤도를 잃은 별 · 이스터에그 4종을 배선한다
+   ===================================================================== */
+(function () {
+  'use strict';
+  var V3 = window.V3;
+
+  V3.i18n.init();
+  V3.sound.init(document.getElementById('mute'));
+  new V3.Sky(document.getElementById('sky'));
+
+  document.getElementById('lang').addEventListener('click', function () { V3.i18n.toggle(); });
+  document.getElementById('back').addEventListener('click', function () { location.href = 'gateway.html'; });
+
+  var yearsChart = new V3.Chart(document.getElementById('chart-years'));
+  var growthChart = new V3.Chart(document.getElementById('chart-growth'));
+  var lostChart = new V3.Chart(document.getElementById('chart-lost'));
+
+  /* --- 성장 별자리 (#59) ------------------------------------------------
+     사건은 전부 저장소 근거가 있는 것만 쓴다. 근거는 source에 남긴다 */
+  var GROWTH = [
+    { title: { ko: '처음 팀을 맡다', en: 'First time leading' },
+      role:  { ko: '2024 · 비밀번호 도어락', en: '2024 · Password door lock' },
+      desc:  { ko: '팀장 · 4인 팀. 저장소에 기록된 첫 팀 리드.', en: 'Team lead of four. First recorded team lead.' },
+      tech:  ['projects.json · Master_Creator_Challenge.role'], detail: 'projects/Master_Creator_Challenge/' },
+    { title: { ko: '전국 8위', en: '8th nationwide' },
+      role:  { ko: '2024 · SFPC', en: '2024 · SFPC' },
+      desc:  { ko: '581팀 / 1,661명 중 전체 8위.', en: '8th of 581 teams and 1,661 participants.' },
+      tech:  ['index.html · 수상 섹션'], detail: 'projects/2024_SFPC/' },
+    { title: { ko: '대회에서 두 번 부름을 받다', en: 'Called twice by contests' },
+      role:  { ko: '2024 · 수상 2건', en: '2024 · Two awards' },
+      desc:  { ko: '디지털새싹 AI 어벤져스상(산불 조기 감지) · 천안 학생 로봇 대회 동상(졸음 방지).',
+               en: 'AI Avengers award (wildfire detection) and a bronze at the Cheonan student robot contest (drowsiness alert).' },
+      tech:  ['index.html · 수상 섹션'], detail: 'projects/nonofire/' },
+    { title: { ko: '가장 큰 팀', en: 'The largest team' },
+      role:  { ko: '2025 · NFC 출석 체크 시스템', en: '2025 · NFC attendance system' },
+      desc:  { ko: '팀장 · 6인 팀. 저장소에 기록된 최대 규모.', en: 'Team lead of six. Largest recorded team.' },
+      tech:  ['projects.json · BerryIno.role'], detail: 'projects/BerryIno/' },
+    { title: { ko: '실패를 지우지 않다', en: 'Keeping the failures' },
+      role:  { ko: '2025 · 실패 그룹', en: '2025 · Failed group' },
+      desc:  { ko: 'InfoCatch · InvestAI · 건영운세를 삭제하지 않고 실패 그룹으로 남겼다.',
+               en: 'InfoCatch, InvestAI and Geonyeong Fortune were kept as a failed group instead of being deleted.' },
+      tech:  ['projects.json · failed 그룹'] },
+    { title: { ko: '혼자 끝까지', en: 'Alone, end to end' },
+      role:  { ko: '2026 · 1인 개발 3건', en: '2026 · Three solo builds' },
+      desc:  { ko: '코리아텍 통합 알림 시스템 · MultiMind · GitHub Rank Insight를 기획부터 배포까지 혼자 했다.',
+               en: 'KOREATECH notification agent, MultiMind and GitHub Rank Insight — planned and shipped solo.' },
+      tech:  ['projects.json · role "1인 개발"'], detail: 'projects/koreatechGongjiAgent/' },
+    { title: { ko: '가르치는 쪽으로', en: 'Toward teaching' },
+      role:  { ko: '2026 · U-CAST', en: '2026 · U-CAST' },
+      desc:  { ko: '5팀 멘토 · 로컬임팩트상.', en: 'Mentored five teams; Local Impact award.' },
+      tech:  ['projects.json · 2026_U-CAST.role'], detail: 'projects/2026_U-CAST/' }
+  ];
+
+  /* --- 연도 메뉴 -------------------------------------------------------- */
+  var state = { year: null, seen: {}, eggs: { serpent: false, capybara: false, eclipse: false, vault: false } };
+
+  V3.loadProjects().then(function (data) {
+    var sorted = V3.classify(data);
+    var years = Object.keys(sorted.years).sort().reverse();
+
+    var menu = document.getElementById('years');
+    years.forEach(function (year) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'year-point';
+      button.setAttribute('role', 'tab');
+      button.setAttribute('aria-selected', 'false');
+      button.textContent = year;
+      button.addEventListener('click', function () { selectYear(year); });
+      menu.appendChild(button);
+    });
+
+    function selectYear(year) {
+      if (state.year === year) return;
+      state.year = year;
+      state.seen[year] = true;
+      Array.prototype.forEach.call(menu.children, function (button) {
+        button.setAttribute('aria-selected', button.textContent === year ? 'true' : 'false');
+      });
+      yearsChart.render(sorted.years[year], year, true);
+      V3.sound.play('year');
+      maybeRevealSerpent();
+    }
+
+    selectYear(years[0]);
+    growthChart.render(GROWTH, 'growth', true);
+    lostChart.render(sorted.wip.concat(sorted.failed), 'lost', false);
+    plantUnstableStar(data);
+
+    /* --- 이스터에그 1. 뱀주인자리 -------------------------------------
+       세 연도를 모두 본 뒤에만 이름 없는 13번째 별이 나타난다 */
+    function maybeRevealSerpent() {
+      if (state.eggs.serpent) return;
+      if (years.some(function (year) { return !state.seen[year]; })) return;
+      if (document.getElementById('serpent')) return;
+      var star = document.createElement('button');
+      star.type = 'button';
+      star.id = 'serpent';
+      star.className = 'star unnamed';
+      star.style.setProperty('--x', '86%');
+      star.style.setProperty('--y', '12%');
+      star.setAttribute('aria-label', '이름 없는 별');
+      star.innerHTML = '<span class="glyph" aria-hidden="true"></span>';
+      star.addEventListener('click', function () {
+        state.eggs.serpent = true;
+        star.remove();
+        V3.sound.play('serpent');
+        markEgg();
+        drawSerpent();
+      });
+      document.getElementById('chart-years').appendChild(star);
+    }
+
+    function drawSerpent() {
+      // 열세 번째 별자리를 성도 위에 한 번만 그린다
+      var chart = document.getElementById('chart-years');
+      var svg = chart.querySelector('.lines');
+      if (!svg) return;
+      var width = chart.clientWidth, height = chart.clientHeight;
+      var pts = [[.62, .06], [.70, .12], [.79, .10], [.86, .18], [.90, .30], [.83, .38], [.74, .34]];
+      var line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+      line.setAttribute('class', 'dim');
+      line.setAttribute('points', pts.map(function (p) {
+        return Math.round(p[0] * width) + ',' + Math.round(p[1] * height);
+      }).join(' '));
+      svg.appendChild(line);
+    }
+
+    /* --- 이스터에그 2. 제51구역 ---------------------------------------
+       이름 없는 불안정한 별을 끌어서 경계 밖 깨진 궤도에 놓아야 열린다.
+       클릭만으로는 열리지 않고, 힌트도 두지 않는다 */
+    function plantUnstableStar(raw) {
+      var host = document.getElementById('chart-lost');
+      var star = document.createElement('button');
+      star.type = 'button';
+      star.className = 'star unnamed';
+      star.setAttribute('aria-label', '이름 없는 불안정한 별');
+      star.innerHTML = '<span class="glyph" aria-hidden="true"></span>';
+      star.style.setProperty('--x', '92%');
+      star.style.setProperty('--y', '92%');
+      host.appendChild(star);
+
+      var dragging = false, originX = 0, originY = 0, offsetX = 0, offsetY = 0;
+      function down(event) {
+        dragging = true;
+        star.classList.add('dragging');
+        var point = event.touches ? event.touches[0] : event;
+        var rect = star.getBoundingClientRect();
+        originX = rect.left + rect.width / 2;
+        originY = rect.top + rect.height / 2;
+        offsetX = point.clientX; offsetY = point.clientY;
+      }
+      function move(event) {
+        if (!dragging) return;
+        var point = event.touches ? event.touches[0] : event;
+        var hostRect = host.getBoundingClientRect();
+        star.style.setProperty('--x', (originX - hostRect.left + point.clientX - offsetX) + 'px');
+        star.style.setProperty('--y', (originY - hostRect.top + point.clientY - offsetY) + 'px');
+        if (event.cancelable) event.preventDefault();
+      }
+      function up(event) {
+        if (!dragging) return;
+        dragging = false;
+        star.classList.remove('dragging');
+        var hostRect = host.getBoundingClientRect();
+        var rect = star.getBoundingClientRect();
+        var out = rect.left + rect.width / 2 > hostRect.right - 4 || rect.top + rect.height / 2 > hostRect.bottom - 4;
+        if (out) {
+          openVault(raw);
+        } else {                     // 조건을 못 채우면 제자리로 돌아간다
+          star.style.setProperty('--x', '92%');
+          star.style.setProperty('--y', '92%');
+        }
+      }
+      star.addEventListener('mousedown', down);
+      star.addEventListener('touchstart', down, { passive: true });
+      document.addEventListener('mousemove', move);
+      document.addEventListener('touchmove', move, { passive: false });
+      document.addEventListener('mouseup', up);
+      document.addEventListener('touchend', up);
+      // 키보드로도 같은 조건을 만들 수 있게 방향키를 연다
+      star.addEventListener('keydown', function (event) {
+        if (event.key !== 'ArrowRight' && event.key !== 'ArrowDown') return;
+        var hostRect = host.getBoundingClientRect();
+        var rect = star.getBoundingClientRect();
+        var x = rect.left + rect.width / 2 - hostRect.left + (event.key === 'ArrowRight' ? 26 : 0);
+        var y = rect.top + rect.height / 2 - hostRect.top + (event.key === 'ArrowDown' ? 26 : 0);
+        star.style.setProperty('--x', x + 'px');
+        star.style.setProperty('--y', y + 'px');
+        if (x > hostRect.width - 4 || y > hostRect.height - 4) openVault(raw);
+        event.preventDefault();
+      });
+    }
+
+    function openVault(raw) {
+      if (state.eggs.vault) return;
+      state.eggs.vault = true;
+      var quarantined = [];
+      raw.groups.forEach(function (group) {
+        group.cards.forEach(function (card) {
+          var title = (card.title && (card.title.ko || card.title)) || '';
+          if (title.indexOf('BrawlCraft') !== -1) quarantined.push(card);
+        });
+      });
+      var list = document.getElementById('vault-list');
+      list.innerHTML = '';
+      quarantined.forEach(function (card) {
+        var item = document.createElement('div');
+        item.className = 'vault-item';
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = V3.i18n.pick(card.title);
+        var reason = document.createElement('p');
+        reason.hidden = true;
+        reason.innerHTML = card.failedReason ? V3.i18n.pick(card.failedReason) : '';
+        button.addEventListener('click', function () { reason.hidden = !reason.hidden; });
+        item.appendChild(button);
+        item.appendChild(reason);
+        list.appendChild(item);
+      });
+      var vault = document.getElementById('vault');
+      vault.classList.add('on');
+      vault.setAttribute('aria-hidden', 'false');
+      V3.sound.play('unlock');
+      markEgg();
+    }
+
+    document.getElementById('vault-close').addEventListener('click', function () {
+      var vault = document.getElementById('vault');
+      vault.classList.remove('on');
+      vault.setAttribute('aria-hidden', 'true');
+    });
+  }).catch(function (error) {
+    // 데이터를 못 읽으면 조용히 실패하지 않고 이유를 남긴다
+    var head = document.querySelector('.uni-head p');
+    head.textContent = 'projects.json을 읽지 못했습니다 (' + error.message + '). 정적 서버로 열어야 합니다.';
+  });
+
+  /* --- 이스터에그 3. 카피바라 ------------------------------------------
+     5–11초에 한 번 혜성이 지나간다. 지나가는 동안 누르면 나타난다 */
+  var comet = document.getElementById('comet');
+  var capybara = document.getElementById('capybara');
+  function passComet() {
+    var delay = 5000 + Math.random() * 6000;
+    setTimeout(function () {
+      if (document.hidden || V3.reduceMotion) { passComet(); return; }
+      comet.style.left = (60 + Math.random() * 30) + 'vw';
+      comet.style.top = (10 + Math.random() * 40) + 'vh';
+      comet.style.setProperty('--dur', (6 + Math.random() * 2).toFixed(1) + 's');
+      comet.classList.remove('run');
+      void comet.offsetWidth;
+      comet.classList.add('run');
+      passComet();
+    }, delay);
+  }
+  comet.addEventListener('click', function () {
+    if (!comet.classList.contains('run')) return;
+    if (state.eggs.capybara) return;
+    state.eggs.capybara = true;
+    capybara.classList.add('on');
+    markEgg();
+    setTimeout(function () { capybara.classList.remove('on'); }, 4200);
+  });
+  passComet();
+
+  /* --- 이스터에그 4. 일식 ----------------------------------------------
+     성운의 달무리 쪽에 포인터를 3초간 멈춘다 */
+  var restTimer = null;
+  document.addEventListener('pointermove', function (event) {
+    clearTimeout(restTimer);
+    if (state.eggs.eclipse) return;
+    var nearGlow = event.clientX > window.innerWidth * 0.62 && event.clientY < window.innerHeight * 0.34;
+    if (!nearGlow) return;
+    restTimer = setTimeout(function () {
+      state.eggs.eclipse = true;
+      var eclipse = document.getElementById('eclipse');
+      eclipse.classList.add('on');
+      V3.sound.play('eclipse');
+      markEgg();
+      setTimeout(function () { eclipse.classList.remove('on'); }, 6000);
+    }, 3000);
+  });
+
+  // 발견한 이스터에그만 표시한다. 사전 안내를 두지 않는 원칙 때문이다
+  function markEgg() {
+    var found = Object.keys(state.eggs).filter(function (key) { return state.eggs[key]; }).length;
+    var box = document.getElementById('eggs');
+    box.innerHTML = '';
+    for (var i = 0; i < found; i++) {
+      var mark = document.createElement('span');
+      mark.className = 'egg-mark filled';
+      box.appendChild(mark);
+    }
+  }
+})();
+</script>
+</body>
+</html>
