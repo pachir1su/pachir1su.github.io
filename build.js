@@ -51,6 +51,7 @@ function renderCard(card, kind) {
       : kind === "failed"
       ? " project-failed"
       : "";
+  const previewClass = card.preview ? " project-card-previewable" : "";
   const lines = [];
 
   if (card.comment) lines.push(`            <!-- ${card.comment} -->`);
@@ -59,7 +60,7 @@ function renderCard(card, kind) {
      링크로 같은 페이지에 도달하므로 접근 경로가 사라지지 않는다. */
   const cardHref = card.detail ? ` data-card-href="${esc(card.detail)}"` : "";
   lines.push(
-    `            <div class="project-card${extraClass}" data-category="${card.category}"${cardHref} data-tilt>`
+    `            <div class="project-card${extraClass}${previewClass}" data-category="${card.category}"${cardHref} data-tilt>`
   );
   lines.push(`${I}<div class="project-top">`);
   lines.push(`                <i class="${card.icon} project-icon"></i>`);
@@ -90,6 +91,15 @@ function renderCard(card, kind) {
   }
   lines.push(`                </div>`);
   lines.push(`${I}</div>`);
+
+  /* 클릭 전 미디어 프리뷰 — projects.json에 실제 로컬 자산이 지정된 카드만 렌더한다.
+     장식적 미리보기이므로 중복 스크린리더 낭독을 피하고 카드 자체가 클릭 경로를 유지한다. */
+  if (card.preview?.src) {
+    const fitClass = card.preview.fit === "contain" ? " project-preview-contain" : "";
+    lines.push(`${I}<figure class="project-preview${fitClass}" aria-hidden="true">`);
+    lines.push(`                <img src="${esc(card.preview.src)}" alt="" loading="lazy" decoding="async" />`);
+    lines.push(`${I}</figure>`);
+  }
 
   if (card.badge) {
     const badgeCls =
