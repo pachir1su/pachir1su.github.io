@@ -1066,18 +1066,6 @@ p {
   border: 1.5px solid var(--line);
   color: var(--ink);
 }
-/* 좁은 터치 화면에서는 권장 최소 히트 영역 44×44px 확보 (#114).
-   터치 센서가 있는 데스크톱은 coarse 포인터로 오인될 수 있어 32px를 유지한다. */
-@media (pointer: coarse) and (max-width: 900px) {
-  .plink {
-    width: 44px;
-    height: 44px;
-    font-size: 0.95rem;
-  }
-  .project-links {
-    gap: 8px;
-  }
-}
 .plink-detail {
   border-color: var(--red-margin);
   color: var(--red-text);
