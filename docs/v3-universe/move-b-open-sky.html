@@ -1,0 +1,316 @@
+<!doctype html>
+<!-- =====================================================================
+     이동 방식 나 · 이어진 하늘 (docs/v3-universe/move-b-open-sky.html)
+
+     하늘이 상하좌우로 이어진다. 끌면 끌린다.
+     휠·트랙패드·방향키·+/- 가 전부 같은 카메라를 민다.
+     스냅도, 정거장도, 진행 표시도 없다. 하늘이 그냥 이어져 있다.
+
+     로컬 확인에는 정적 서버가 필요하다(projects.json fetch).
+     ===================================================================== -->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>나 · 이어진 하늘 — 이동 방식 시안</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="../../assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="move.css" />
+    <style>
+      body.move { height:100svh; overflow:hidden; }
+      /* 하늘 전체가 손잡이다. 브라우저가 제스처를 가로채지 않게 한다. */
+      .stars { touch-action:none; cursor:grab; }
+      .stars.is-dragging { cursor:grabbing; }
+      .stars .star { cursor:pointer; }
+
+      /* 지금 어디쯤인지 — 하늘 전체 안에서 화면이 어디 있는지만 보여 준다.
+         길을 강제하지 않는다. 눌러서 이동하지도 않는다. */
+      .minimap {
+        position:fixed; z-index:3; right:clamp(14px,3vw,26px); bottom:clamp(14px,3vw,26px);
+        width:clamp(96px,11vw,140px); border:1px solid var(--m-line);
+        background:color-mix(in srgb, var(--m-surface) 72%, transparent);
+        pointer-events:none;
+      }
+      .minimap canvas { display:block; width:100%; height:auto; }
+      @media (max-height:600px) and (orientation:landscape) { .minimap { width:88px; } }
+    </style>
+  </head>
+
+  <body class="move">
+    <canvas class="sky" aria-hidden="true"></canvas>
+    <div class="stars" data-stars></div>
+
+    <div class="over who" data-who data-keepout>
+      <h1>이건영<span class="en">Lee Geon Yeong</span></h1>
+      <p class="lead">이윤을 넘어 <b>혁신</b>을 추구하는 기업가를 꿈꿉니다.</p>
+      <button type="button" class="mail" data-mail="capybara@koreatech.ac.kr">
+        <span>capybara@koreatech.ac.kr</span><span class="copied" aria-live="polite"></span>
+      </button>
+    </div>
+
+    <div class="over here" data-here data-keepout aria-live="polite"><b></b><span></span></div>
+
+    <div class="over rank" data-rank aria-hidden="true" data-keepout>
+      <small>GitHub Rank</small><span class="rail" data-rank-rail></span><b data-rank-now>C</b>
+    </div>
+
+    <div class="over card" data-card role="group">
+      <button type="button" class="card-close" data-card-close aria-label="닫기">&times;</button>
+      <div data-card-body></div>
+    </div>
+
+    <div class="minimap" aria-hidden="true"><canvas data-map width="280" height="200"></canvas></div>
+
+    <div class="bar">
+      <button type="button" class="btn" data-zoom-out aria-label="물러나기">&minus;</button>
+      <button type="button" class="btn" data-zoom-in aria-label="다가가기">+</button>
+      <button type="button" class="btn" data-mute hidden aria-pressed="false">&#9835;</button>
+    </div>
+
+    <a class="seam" href="../../index.html" aria-label="포트폴리오로 돌아가기"></a>
+
+    <p class="mark">
+      <b>나 · 이어진 하늘</b> — 끌어서 옮긴다. 휠·방향키·<code>+</code>/<code>−</code>도 같은 카메라를 민다.
+      <a href="index.html">시안 목록</a>
+    </p>
+
+    <noscript>
+      <p style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);max-width:38ch;text-align:center">
+        이 시안은 별자리를 캔버스로 그립니다.
+        <a href="https://pachir1su.github.io/#projects">포트폴리오의 프로젝트 목록</a>에서 같은 내용을 볼 수 있습니다.
+      </p>
+    </noscript>
+
+    <script src="../../universe/sky.js"></script>
+    <script src="move.js"></script>
+    <script>
+      (() => {
+        'use strict';
+        const Move = window.V3Move;
+        if (!Move) return;
+        const clamp = window.V3Sky.clamp;
+
+        const layer = document.querySelector('[data-stars]');
+        const stage = Move.Stage({
+          canvas: document.querySelector('.sky'),
+          stars: layer,
+          card: document.querySelector('[data-card]'),
+          cardBody: document.querySelector('[data-card-body]'),
+        });
+        stage.setVisibleArea(() => true);
+
+        const cam = stage.cam;
+        let minZ = 1, maxZ = 1;
+        const target = { x: 0, y: 0, z: 1 };
+        let easing = false;
+
+        function fitAll() {
+          const box = stage.worldBox();
+          const W = stage.W, H = stage.H;
+          const narrow = W < 900;
+          /* 왼쪽 아래는 이름이 쓴다. 좁은 화면은 위쪽을 하늘이 쓴다. */
+          const f = narrow
+            ? { x: W * .05, y: H * .12, w: W * .90, h: H * .50 }
+            : { x: W * .26, y: H * .07, w: W * .70, h: H * .74 };
+          return stage.fitInto({ cx: box.cx, cy: box.cy, w: box.w * 1.04, h: box.h * 1.04 }, f);
+        }
+
+        /* 하늘 밖으로 완전히 빠져나가지 않게만 잡는다. 길을 정해 주지는 않는다. */
+        function reinCam() {
+          const b = stage.worldBox();
+          const mx = (stage.W / 2) / cam.z, my = (stage.H / 2) / cam.z;
+          cam.x = clamp(cam.x, b.x0 - mx * .5, b.x1 + mx * .5);
+          cam.y = clamp(cam.y, b.y0 - my * .5, b.y1 + my * .5);
+        }
+
+        function step() {
+          if (!easing) return false;
+          let moving = false;
+          ['x', 'y', 'z'].forEach((k) => {
+            const d = target[k] - cam[k];
+            const eps = k === 'z' ? 0.00002 : 0.4;
+            if (Math.abs(d) > eps) { cam[k] += d * 0.18; moving = true; } else cam[k] = target[k];
+          });
+          if (!moving) easing = false;
+          reinCam();
+          drawMap(); markHere();
+          return moving;
+        }
+        stage.setStepHook(step);
+
+        /* 도착은 프레임이 아니라 시계가 보장한다. 탭이 뒤에 있거나 기기가 느려
+           rAF가 굶어도 카메라는 반드시 목적지에 선다. */
+        let settleTm = 0;
+        function ease() {
+          easing = true;
+          stage.kick();
+          clearTimeout(settleTm);
+          settleTm = setTimeout(() => {
+            if (!easing) return;
+            cam.x = target.x; cam.y = target.y; cam.z = target.z;
+            easing = false;
+            reinCam(); stage.paintNow(); drawMap(); markHere();
+          }, 620);
+        }
+
+        function nudge(dx, dy) {
+          target.x = cam.x + dx / cam.z;
+          target.y = cam.y + dy / cam.z;
+          ease();
+        }
+        function zoomTo(z, ax, ay) {
+          const nz = clamp(z, minZ, maxZ);
+          const cx = ax == null ? stage.W / 2 : ax;
+          const cy = ay == null ? stage.H / 2 : ay;
+          /* 커서 아래 지점을 고정한 채로 배율만 바꾼다. */
+          const wx = cam.x + (cx - stage.W / 2) / cam.z;
+          const wy = cam.y + (cy - stage.H / 2) / cam.z;
+          target.z = nz;
+          target.x = wx - (cx - stage.W / 2) / nz;
+          target.y = wy - (cy - stage.H / 2) / nz;
+          ease();
+        }
+
+        /* --- 끌기 — 끄는 동안에는 가속도, 관성, 스냅을 넣지 않는다.
+               손가락이 간 만큼만 하늘이 간다. --- */
+        let drag = null;
+        layer.addEventListener('pointerdown', (e) => {
+          if (e.target.closest('.star')) return;
+          drag = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: 0 };
+          layer.setPointerCapture(e.pointerId);
+          layer.classList.add('is-dragging');
+          easing = false; clearTimeout(settleTm);
+        });
+        layer.addEventListener('pointermove', (e) => {
+          if (!drag || e.pointerId !== drag.id) return;
+          const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+          drag.x = e.clientX; drag.y = e.clientY;
+          drag.moved += Math.abs(dx) + Math.abs(dy);
+          cam.x -= dx / cam.z; cam.y -= dy / cam.z;
+          reinCam();
+          stage.paintNow(); drawMap(); markHere();
+        });
+        const endDrag = (e) => {
+          if (!drag || (e && e.pointerId !== drag.id)) return;
+          layer.classList.remove('is-dragging');
+          drag = null;
+        };
+        layer.addEventListener('pointerup', endDrag);
+        layer.addEventListener('pointercancel', endDrag);
+
+        /* 휠은 하늘을 민다. ctrl/⌘와 함께면 배율이다(브라우저 확대와 같은 결). */
+        layer.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          if (e.ctrlKey || e.metaKey) { zoomTo(cam.z * (e.deltaY < 0 ? 1.16 : 1 / 1.16), e.clientX, e.clientY); return; }
+          easing = false; clearTimeout(settleTm);
+          cam.x += e.deltaX / cam.z; cam.y += e.deltaY / cam.z;
+          reinCam();
+          stage.paintNow(); drawMap(); markHere();
+        }, { passive: false });
+
+        addEventListener('keydown', (e) => {
+          const k = e.key;
+          if (k === 'Escape') { stage.closeCard(); return; }
+          const s = stage.H * .28;
+          if (k === 'ArrowLeft') nudge(-s, 0);
+          else if (k === 'ArrowRight') nudge(s, 0);
+          else if (k === 'ArrowUp') nudge(0, -s);
+          else if (k === 'ArrowDown') nudge(0, s);
+          else if (k === '+' || k === '=') zoomTo(cam.z * 1.3);
+          else if (k === '-' || k === '_') zoomTo(cam.z / 1.3);
+          else return;
+          e.preventDefault();
+        });
+        document.querySelector('[data-zoom-in]').addEventListener('click', () => zoomTo(cam.z * 1.35));
+        document.querySelector('[data-zoom-out]').addEventListener('click', () => zoomTo(cam.z / 1.35));
+
+        /* --- 지금 어디쯤인지 — 화면 중앙에 가장 가까운 구역의 이름만 --- */
+        const here = document.querySelector('[data-here]');
+        function markHere() {
+          let best = null, bd = Infinity;
+          stage.areas.forEach((a) => {
+            const d = Math.hypot(a.x - cam.x, a.y - cam.y) / Math.max(a.e.w, a.e.h);
+            if (d < bd) { bd = d; best = a; }
+          });
+          /* 물러나서 하늘 전체를 보는 중이라면 아직 어디에도 도착하지 않은 것이다. */
+          const near = best && bd < 1.1 && cam.z > minZ * 1.2;
+          here.querySelector('b').textContent = near ? best.title : '';
+          here.querySelector('span').textContent = near ? best.note : '';
+          document.querySelector('[data-rank]').classList.toggle('is-on', !!near && best.kind === 'growth');
+        }
+
+        /* --- 작은 지도 — 지금 화면이 하늘의 어디인지. 조작하지 않는다. --- */
+        const map = document.querySelector('[data-map]');
+        function drawMap() {
+          const T = window.V3Sky.theme();
+          const c = map.getContext('2d');
+          const w = map.width, h = map.height;
+          const b = stage.worldBox();
+          const pad = 10;
+          const k = Math.min((w - pad * 2) / b.w, (h - pad * 2) / b.h);
+          const ox = (w - b.w * k) / 2 - b.x0 * k;
+          const oy = (h - b.h * k) / 2 - b.y0 * k;
+          c.clearRect(0, 0, w, h);
+          stage.areas.forEach((a) => {
+            c.fillStyle = window.V3Sky.rgba(T.ink, .30);
+            c.beginPath();
+            c.ellipse(a.x * k + ox, a.y * k + oy, Math.max(3, a.e.w * k / 2), Math.max(3, a.e.h * k / 2), 0, 0, 7);
+            c.fill();
+          });
+          /* 화면 테두리 — 물러나면 하늘보다 커진다. 지도 안으로 잘라서 늘 보이게 한다. */
+          const vw = (stage.W / cam.z) * k, vh = (stage.H / cam.z) * k;
+          const l = Math.max(1, cam.x * k + ox - vw / 2);
+          const t = Math.max(1, cam.y * k + oy - vh / 2);
+          const r = Math.min(w - 1, cam.x * k + ox + vw / 2);
+          const bm = Math.min(h - 1, cam.y * k + oy + vh / 2);
+          c.strokeStyle = T.gold; c.lineWidth = 2;
+          c.strokeRect(l, t, Math.max(2, r - l), Math.max(2, bm - t));
+        }
+
+        function reset(instant) {
+          const v = fitAll();
+          minZ = v.z; maxZ = v.z * 3.4;
+          cam.x = target.x = v.x; cam.y = target.y = v.y; cam.z = target.z = v.z;
+          stage.state.baseZ = v.z;
+          if (!instant) stage.startIntro();
+          markHere(); drawMap();
+          stage.paintNow(); stage.kick();
+        }
+
+        stage.measure();
+        stage.initMute();
+        stage.onCardClose();
+
+        const mail = document.querySelector('[data-mail]');
+        mail.addEventListener('click', () => {
+          if (!navigator.clipboard) return;
+          navigator.clipboard.writeText(mail.dataset.mail).then(() => {
+            const out = mail.querySelector('.copied');
+            out.textContent = '복사됨';
+            setTimeout(() => { out.textContent = ''; }, 1600);
+          }, () => {});
+        });
+
+        let tm = 0;
+        addEventListener('resize', () => {
+          clearTimeout(tm);
+          tm = setTimeout(() => { stage.measure(); stage.relabel(); reset(true); }, 140);
+        });
+        window.V3Sky.onThemeChange(() => { stage.paintNow(); drawMap(); });
+
+        Move.load().then((data) => {
+          stage.build(data, 'spread');
+          stage.startIntro();
+          reset(true);
+          setTimeout(() => { stage.state.intro = 1; stage.paintNow(); }, 2800);
+        }).catch((err) => {
+          console.error('[시안 나] projects.json', err);
+          here.querySelector('span').textContent = 'projects.json을 읽지 못했습니다. 정적 서버로 열어 주세요.';
+        });
+      })();
+    </script>
+  </body>
+</html>

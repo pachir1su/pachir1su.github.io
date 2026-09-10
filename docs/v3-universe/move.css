@@ -1,0 +1,248 @@
+/* =====================================================================
+   이동 방식 시안 — 공용 스타일 (docs/v3-universe/move.css)
+
+   #114에서 확정된 값만 쓴다. 세 시안이 같은 시각 언어를 공유하고,
+   다른 것은 카메라를 무엇이 미느냐뿐이다.
+   토큰은 --m- 로 namespace 한다. 운영 시트와 같은 페이지에 실릴 일은 없지만
+   docs 안에서도 다른 시안과 섞이지 않게 한다.
+   ===================================================================== */
+
+:root {
+  --m-page:#e8eaf2; --m-page-deep:#dfe2ec; --m-surface:#f1f2f7; --m-surface-2:#ffffff;
+  --m-ink:#242636; --m-muted:#606579; --m-subtle:#777c8f; --m-line:#cbd0df;
+  --m-violet:#706994; --m-violet-strong:#554d7d; --m-gold:#a9914d; --m-gold-soft:#8f7736;
+  --m-shadow:0 18px 44px -26px rgba(36,38,54,.55);
+  --m-halo:0 0 6px #e8eaf2, 0 0 14px rgba(232,234,242,.9);
+
+  --m-sans:"IBM Plex Sans KR","Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --m-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+
+  --m-name:clamp(38px,7.4vw,96px);
+  --m-scene:clamp(28px,5.2vw,64px);
+  --m-body:14.5px;
+  --m-small:12.5px;
+
+  --m-ease:cubic-bezier(.23,1,.32,1);
+  --m-dur:260ms;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --m-page:#11151d; --m-page-deep:#0d1118; --m-surface:#181d27; --m-surface-2:#1d2330;
+    --m-ink:#e0e3eb; --m-muted:#a2a8b8; --m-subtle:#858c9e; --m-line:#303848;
+    --m-violet:#968dbb; --m-violet-strong:#b0a7d0; --m-gold:#bda969; --m-gold-soft:#c9b477;
+    --m-shadow:0 20px 50px -28px rgba(0,0,0,.85);
+    --m-halo:0 0 6px #11151d, 0 0 16px rgba(17,21,29,.92);
+  }
+}
+
+*, *::before, *::after { box-sizing:border-box; }
+
+body.move {
+  margin:0; min-width:320px;
+  background:var(--m-page-deep); color:var(--m-ink);
+  font-family:var(--m-sans); font-size:var(--m-body); line-height:1.75;
+  -webkit-font-smoothing:antialiased; word-break:keep-all;
+}
+body.move a { color:inherit; }
+body.move :focus-visible { outline:2px solid var(--m-gold); outline-offset:3px; border-radius:2px; }
+
+/* ---------------------------------------------------------------------
+   1. 창 — 성운·별·별자리 선이 전부 여기 그려진다.
+   --------------------------------------------------------------------- */
+.sky { position:fixed; inset:0; width:100%; height:100%; z-index:0; }
+
+/* 천체는 실제 button이다. 매 프레임 transform만 옮긴다. */
+.stars { position:fixed; inset:0; z-index:1; }
+.star {
+  position:absolute; left:0; top:0; width:44px; height:44px; margin:-22px 0 0 -22px;
+  padding:0; border:0; background:none; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; will-change:transform;
+}
+.star[hidden] { display:none; }
+.star:focus-visible { outline:2px solid var(--m-gold); outline-offset:2px; border-radius:50%; }
+
+/* 이름표 자리는 move.js가 잰다. 별에서 바깥으로 뻗고, 겹치면 비킨다. */
+.star-name {
+  position:absolute; left:22px; top:22px;
+  transform:translate(var(--ldx,26px), calc(-50% + var(--ldy,0px)));
+  white-space:nowrap; font-size:12.5px; color:var(--m-ink);
+  text-shadow:var(--m-halo); pointer-events:none;
+  transition:color var(--m-dur) var(--m-ease);
+}
+.star:hover .star-name,
+.star:focus-visible .star-name,
+.star[aria-pressed="true"] .star-name { color:var(--m-gold); }
+
+/* ---------------------------------------------------------------------
+   2. 겹쳐 놓는 것들 — 창 위에 최소한만.
+   --------------------------------------------------------------------- */
+.over { position:fixed; z-index:3; pointer-events:none; }
+.over > * { pointer-events:auto; }
+
+/* 출발점 */
+.who {
+  left:clamp(20px,5vw,72px); bottom:clamp(28px,6vh,72px);
+  max-width:min(40ch,84vw);
+  transition:opacity 460ms var(--m-ease);
+}
+.who h1 {
+  margin:0; font-weight:200; font-size:var(--m-name);
+  letter-spacing:-.055em; line-height:.96; text-shadow:var(--m-halo);
+}
+.who .en {
+  display:block; margin-top:6px; color:var(--m-muted);
+  font-size:clamp(11px,1.2vw,13.5px); letter-spacing:.34em;
+  text-transform:uppercase; text-shadow:var(--m-halo);
+}
+.who .lead {
+  margin:18px 0 0; max-width:30ch; font-weight:300;
+  font-size:clamp(15px,1.5vw,18px); line-height:1.6; text-shadow:var(--m-halo);
+}
+.who .lead b { font-weight:500; color:var(--m-violet-strong); }
+.who .mail {
+  display:inline-flex; align-items:center; gap:10px; min-height:44px; margin-top:12px;
+  padding:0; background:none; border:0; border-bottom:1px solid var(--m-line);
+  color:var(--m-muted); font:inherit; font-size:var(--m-small); cursor:pointer;
+  text-shadow:var(--m-halo);
+  transition:color var(--m-dur) var(--m-ease), border-color var(--m-dur) var(--m-ease);
+}
+.who .mail:hover { color:var(--m-ink); border-bottom-color:var(--m-gold); }
+.who .mail .copied { color:var(--m-gold); }
+
+/* 지금 있는 곳 */
+.here { left:clamp(20px,5vw,72px); top:clamp(74px,11vh,104px); max-width:min(34ch,70vw); }
+.here b {
+  display:block; font-weight:200; font-size:var(--m-scene);
+  letter-spacing:-.05em; line-height:1; text-shadow:var(--m-halo);
+}
+.here span {
+  display:block; margin-top:8px; color:var(--m-muted);
+  font-size:var(--m-small); text-shadow:var(--m-halo);
+}
+
+/* 마주친 것 */
+.card {
+  right:clamp(16px,3vw,40px); bottom:clamp(16px,3vw,40px);
+  width:min(330px,calc(100vw - 32px)); padding:16px 18px 18px;
+  background:var(--m-surface); border:1px solid var(--m-line);
+  box-shadow:var(--m-shadow);
+  opacity:0; transform:translateY(10px); pointer-events:none;
+  transition:opacity 280ms var(--m-ease), transform 280ms var(--m-ease);
+}
+.card.is-open { opacity:1; transform:none; pointer-events:auto; }
+.card h3 { margin:0 0 2px; font-weight:500; font-size:15px; letter-spacing:-.02em; }
+.card .card-role { margin:0 0 9px; color:var(--m-gold-soft); font-size:11.5px; }
+.card .card-lineage { color:var(--m-subtle); font-size:11.5px; }
+.card p { margin:0 0 11px; color:var(--m-muted); font-size:var(--m-small); line-height:1.72; }
+.card p:last-child { margin-bottom:0; }
+.card-tech { display:flex; flex-wrap:wrap; gap:4px 12px; margin:0 0 11px; padding:0; list-style:none; }
+.card-tech li { color:var(--m-subtle); font-size:11px; }
+.card-go {
+  display:inline-flex; align-items:center; gap:8px; min-height:34px;
+  color:var(--m-ink); font-size:var(--m-small); text-decoration:none;
+  border-bottom:1px solid var(--m-gold);
+}
+.card-go:hover { color:var(--m-gold); }
+.card-close {
+  position:absolute; right:6px; top:6px; width:30px; height:30px;
+  background:none; border:0; color:var(--m-subtle); font-size:15px; line-height:1; cursor:pointer;
+}
+.card-close:hover { color:var(--m-ink); }
+
+/* 성장 등급 — 궤적에 있을 때만 */
+.rank {
+  right:clamp(14px,3vw,26px); top:66px;
+  display:flex; align-items:center; gap:10px;
+  opacity:0; transition:opacity 380ms var(--m-ease);
+}
+.rank.is-on { opacity:1; }
+.rank small { color:var(--m-subtle); font-size:11px; letter-spacing:.06em; text-shadow:var(--m-halo); }
+.rank .rail { position:relative; width:clamp(70px,10vw,120px); height:1px; background:var(--m-line); }
+.rank .rail::after {
+  content:""; position:absolute; inset:0 auto 0 0; width:var(--rank-progress,0%);
+  background:var(--m-gold); transition:width 560ms var(--m-ease);
+}
+.rank b {
+  min-width:3.2ch; font-family:var(--m-mono); font-size:13px; color:var(--m-gold);
+  font-variant-numeric:tabular-nums; text-shadow:var(--m-halo);
+}
+
+/* 위쪽 단추 */
+.bar {
+  position:fixed; z-index:40; top:0; right:0;
+  display:flex; align-items:center; gap:6px; padding:14px clamp(14px,3vw,26px);
+}
+.btn {
+  min-height:34px; padding:5px 12px;
+  background:transparent; border:1px solid var(--m-line);
+  color:var(--m-muted); font:inherit; font-size:11.5px; letter-spacing:.06em; cursor:pointer;
+  transition:color var(--m-dur) var(--m-ease), border-color var(--m-dur) var(--m-ease);
+}
+.btn:hover { color:var(--m-ink); border-color:var(--m-gold); }
+.btn[aria-pressed="true"] { color:var(--m-gold); border-color:var(--m-gold); }
+
+/* v2로 돌아가는 길 — 글자를 쓰지 않는다. 들어올 때와 같은 자국이다. */
+.seam {
+  position:fixed; z-index:40; left:clamp(14px,3vw,26px); top:clamp(14px,3vw,26px);
+  display:block; width:52px; height:35px;
+  background:linear-gradient(152deg,#f7f6f0 0%,#eceade 58%,#dcd9cb 100%);
+  -webkit-mask:url("../../universe/assets/gateway/tear-wide.png") center/contain no-repeat;
+  mask:url("../../universe/assets/gateway/tear-wide.png") center/contain no-repeat;
+  filter:drop-shadow(0 7px 15px rgba(0,0,0,.42));
+  opacity:.62; transform:rotate(-4deg);
+  transition:opacity var(--m-dur) var(--m-ease), transform var(--m-dur) var(--m-ease);
+}
+.seam:hover, .seam:focus-visible { opacity:.95; transform:rotate(-2deg) translateY(-2px) scale(1.04); }
+.seam:focus-visible { outline:none; }
+
+/* 시안임을 알리는 띠 — 운영 화면에는 들어가지 않는다. */
+.mark {
+  position:fixed; z-index:50; left:50%; bottom:14px; transform:translateX(-50%);
+  display:flex; align-items:center; gap:10px; max-width:calc(100vw - 32px);
+  padding:7px 14px; background:var(--m-surface); border:1px solid var(--m-line);
+  color:var(--m-subtle); font-family:var(--m-mono); font-size:11px; letter-spacing:.04em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.mark b { color:var(--m-ink); font-weight:500; }
+.mark a { color:var(--m-gold-soft); text-decoration:none; border-bottom:1px solid var(--m-line); }
+.mark a:hover { border-bottom-color:var(--m-gold); }
+
+/* ---------------------------------------------------------------------
+   3. 적응형 (#10 · #123)
+       폭이 줄어도 정보를 줄이지 않는다. 겹쳐 놓은 글의 자리만 바뀐다.
+   --------------------------------------------------------------------- */
+@media (max-width:899px) {
+  .bar { padding:10px 14px; }
+  .rank { top:58px; }
+  .seam { width:44px; height:30px; }
+}
+@media (max-width:640px) {
+  :root { --m-body:14px; }
+  .who .lead { font-size:15.5px; margin-top:14px; }
+  .card { right:14px; bottom:14px; left:14px; width:auto; }
+  .here { top:66px; left:16px; max-width:calc(100vw - 120px); }
+  .mark { left:14px; right:14px; transform:none; max-width:none; }
+}
+@media (max-width:390px) {
+  .who { left:16px; bottom:22px; }
+  .here { left:16px; }
+}
+/* 휴대폰 가로 — 세로 공간이 없으니 겹쳐 놓은 글을 줄인다. */
+@media (max-height:600px) and (orientation:landscape) {
+  .who .lead, .who .mail { display:none; }
+  .here { top:56px; }
+  .here b { font-size:clamp(22px,4.4vw,34px); }
+  .card { max-height:64vh; overflow:auto; }
+  .mark { display:none; }
+}
+
+/* ---------------------------------------------------------------------
+   4. 모션 저감 — 움직임을 끄되 정보는 그대로 둔다.
+   --------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:.001ms !important; animation-iteration-count:1 !important;
+    transition-duration:.001ms !important; scroll-behavior:auto !important;
+  }
+  .rank .rail::after { transition:none; }
+}

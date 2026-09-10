@@ -1,0 +1,86 @@
+/* =====================================================================
+   v3 우주 진입점 — v2 홈에 얹는 최소 스타일 (universe/gate.css)
+
+   운영 index.html이 로드하는 유일한 v3 스타일이다.
+   토큰과 전역 규칙을 두지 않는다. style.css의 --ink · --gold · --line 같은
+   v2 토큰을 덮지 않도록, 여기서는 .v3-gate 계열 선택자만 쓴다.
+
+   실제 적용 범위: 홈 히어로 안의 <div class="v3-gate-host" data-gate-host>
+   ===================================================================== */
+
+/* 히어로 전체를 덮는 좌표계. 스스로는 아무것도 가로채지 않는다. */
+.v3-gate-host {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 찢긴 구멍. 위치 · 크기 · 기울기는 gate.js가 매번 다시 정한다. */
+.v3-gate {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  /* 기울기는 인라인 transform이 아니라 변수로 준다.
+     인라인으로 주면 아래 hover 규칙을 덮어써서 반응이 사라진다. */
+  transform: rotate(var(--gate-rot, 0deg));
+  transition: transform 420ms cubic-bezier(0.23, 1, 0.32, 1),
+              filter 420ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.v3-gate canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.v3-gate:hover,
+.v3-gate:focus-visible {
+  transform: rotate(var(--gate-rot, 0deg)) translateY(-4px) scale(1.014);
+}
+
+.v3-gate:focus-visible {
+  outline: 2px solid #a9914d;
+  outline-offset: 6px;
+}
+
+/* 들어가는 중에는 두 번 눌리지 않는다. */
+.v3-gate[data-entering="true"] {
+  pointer-events: none;
+}
+
+/* v2 → v3 전환막. 구멍이 있던 자리에서 화면 전체로 열린다. */
+.gate-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 320ms linear;
+}
+
+.gate-veil.is-open {
+  opacity: 1;
+}
+
+.gate-veil canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 모션을 줄이면 4초 연출 대신 짧은 페이드만 쓴다. */
+@media (prefers-reduced-motion: reduce) {
+  .v3-gate {
+    transition-duration: 0.001ms;
+  }
+  .v3-gate:hover,
+  .v3-gate:focus-visible {
+    transform: rotate(var(--gate-rot, 0deg));
+  }
+}

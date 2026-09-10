@@ -1,0 +1,144 @@
+<!doctype html>
+<!-- =====================================================================
+     v3 우주 — 별자리 공간 (universe/index.html)   ·   https://pachir1su.github.io/universe/
+
+     이동 방식 B · 날아가기 (2026-08-26 확정)
+     스크롤이 없다. 멀리서 하늘 전체가 보이고, 구역을 누르면 카메라가 그리로
+     날아가 이름이 켜진다. 빈 곳이나 Esc로 물러난다.
+
+     화면에 놓이는 것은 창 하나와 그 위에 겹친 최소한의 글뿐이다.
+     별과 구역은 전부 universe.js가 실제 button으로 만든다.
+
+     프로젝트 데이터는 저장소 단일 소스 ../projects.json 하나만 읽는다.
+     로컬 확인은 file:// 이 아니라 정적 서버가 필요하다(fetch 제약).
+     ===================================================================== -->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>별자리 공간 | 이건영</title>
+    <meta
+      name="description"
+      data-ko="이건영 포트폴리오의 별자리 공간 — 연도별 프로젝트, 성장 궤적, 아직 켜지지 않은 별을 별자리로 읽습니다."
+      data-en="The constellation space of Lee Geon Yeong's portfolio — projects by year, a growth trace, and the stars not yet lit."
+      content="이건영 포트폴리오의 별자리 공간 — 연도별 프로젝트, 성장 궤적, 아직 켜지지 않은 별을 별자리로 읽습니다."
+    />
+    <meta name="author" content="이건영 (Lee Geon Yeong)" />
+    <meta name="theme-color" content="#11151d" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#e8eaf2" media="(prefers-color-scheme: light)" />
+    <link rel="canonical" href="https://pachir1su.github.io/universe/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="이건영 포트폴리오" />
+    <meta property="og:title" data-ko="별자리 공간 | 이건영" data-en="Constellation Space | Lee Geon Yeong" content="별자리 공간 | 이건영" />
+    <meta
+      property="og:description"
+      data-ko="연도별 프로젝트, 성장 궤적, 아직 켜지지 않은 별을 별자리로 읽는 공간."
+      data-en="Projects by year, a growth trace, and the stars not yet lit — read as constellations."
+      content="연도별 프로젝트, 성장 궤적, 아직 켜지지 않은 별을 별자리로 읽는 공간."
+    />
+    <meta property="og:url" content="https://pachir1su.github.io/universe/" />
+    <meta property="og:image" content="https://pachir1su.github.io/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="../assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
+    <link rel="stylesheet" href="universe.css" />
+  </head>
+
+  <body class="universe">
+    <!-- 창 하나. 성운과 별과 별자리 선이 전부 여기 그려진다. -->
+    <canvas class="sky-canvas" aria-hidden="true"></canvas>
+
+    <!-- 구역과 천체 — 전부 실제 button이다. universe.js가 채운다. -->
+    <div class="stage" data-stage>
+      <div data-regions></div>
+      <div data-stars></div>
+    </div>
+
+    <!-- 멀리 있을 때 보이는 출발점 -->
+    <div class="overlay identity" data-identity>
+      <h1>
+        <span data-ko="이건영" data-en="Lee Geon Yeong">이건영</span>
+        <span class="name-en">Lee Geon Yeong</span>
+      </h1>
+      <p class="lead"
+         data-ko-html="이윤을 넘어 <b>혁신</b>을 추구하는 기업가를 꿈꿉니다."
+         data-en-html="Aiming to be an entrepreneur who chases <b>innovation</b> beyond profit."
+      >이윤을 넘어 <b>혁신</b>을 추구하는 기업가를 꿈꿉니다.</p>
+      <button type="button" class="contact" data-copy-email="capybara@koreatech.ac.kr">
+        <span>capybara@koreatech.ac.kr</span>
+        <span class="copied" aria-live="polite"></span>
+      </button>
+      <p class="tally">
+        <span><b>20+</b> <span data-ko="프로젝트" data-en="projects">프로젝트</span></span>
+        <span><b>4</b> <span data-ko="수상" data-en="awards">수상</span></span>
+        <span data-ko="한국기술교육대학교 26학번" data-en="KOREATECH, class of 26">한국기술교육대학교 26학번</span>
+      </p>
+    </div>
+
+    <!-- 가까이 갔을 때 보이는 도착지 -->
+    <div class="overlay here" data-here aria-live="polite">
+      <span class="here-title"></span>
+      <span class="here-note"></span>
+    </div>
+
+    <!-- 물러나기. 글자를 쓰지 않는다. -->
+    <button type="button" class="overlay back" data-back
+            data-ko-label="하늘 전체로 물러나기" data-en-label="Pull back to the whole sky"
+            aria-label="하늘 전체로 물러나기"></button>
+
+    <!-- 성장 궤적 구역에서만 뜨는 등급 -->
+    <div class="overlay rank" data-rank aria-hidden="true">
+      <small>GitHub Rank</small>
+      <span class="rail" data-rank-rail></span>
+      <b data-rank-now>C</b>
+    </div>
+
+    <!-- 마주친 것 -->
+    <div class="overlay card" data-card role="group">
+      <button type="button" class="card-close" data-card-close aria-label="닫기">&times;</button>
+      <div data-card-body></div>
+    </div>
+
+    <div class="u-bar">
+      <button type="button" class="u-btn" data-lang-toggle>EN</button>
+      <button type="button" class="u-btn" data-mute hidden aria-pressed="false">&#9835;</button>
+    </div>
+
+    <!-- v2로 돌아가는 길. 들어올 때와 같은 자국이다. 글자를 쓰지 않는다. -->
+    <a
+      class="seam"
+      href="../"
+      data-ko-label="포트폴리오로 돌아가기"
+      data-en-label="Back to the portfolio"
+      aria-label="포트폴리오로 돌아가기"
+    ></a>
+
+    <!-- 조건을 만족했을 때만 열린다. 화면 어디에도 조건을 적지 않는다. -->
+    <div class="vault" data-vault hidden role="dialog" aria-modal="true" aria-labelledby="vault-title">
+      <div class="vault-panel">
+        <button type="button" class="card-close" data-vault-close aria-label="닫기">&times;</button>
+        <h2 id="vault-title" data-ko="제51구역" data-en="Area 51">제51구역</h2>
+        <p data-ko="격리된 기록입니다. 조롱이 아니라 시도와 배움으로 남깁니다."
+           data-en="Quarantined records. Kept as attempts and lessons, not as jokes.">격리된 기록입니다. 조롱이 아니라 시도와 배움으로 남깁니다.</p>
+        <div data-vault-items></div>
+      </div>
+    </div>
+
+    <noscript>
+      <p style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);max-width:38ch;text-align:center">
+        이 화면은 별자리를 캔버스로 그립니다. JavaScript 없이 여는 경우
+        <a href="../#projects">포트폴리오의 프로젝트 목록</a>에서 같은 내용을 모두 볼 수 있습니다.
+      </p>
+    </noscript>
+
+    <script src="sky.js"></script>
+    <script src="universe.js"></script>
+  </body>
+</html>

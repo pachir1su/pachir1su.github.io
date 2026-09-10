@@ -1,0 +1,122 @@
+<!doctype html>
+<!-- =====================================================================
+     v3 우주 — 들어가는 문 (docs/v3-universe/gateway.html)
+
+     v2 홈에 뚫린 찢긴 종이 구멍 하나가 우주로 이어진다.
+     여기서는 그 문만 떼어 놓고 본다 — 종이 판은 v2 홈의 재질만 흉내 낸 것이고,
+     구멍과 전환은 운영 파일(universe/gate.css · gate.js)을 그대로 쓴다.
+
+     #114 확정
+     - 새로고침마다 자산 · 위치 · 크기 · 기울기가 달라지는 실제 찢김
+     - 별 · 먼지 · 궤적이 찢긴 경계 밖으로 조금 새어 나온다
+     - 화면에 이름표를 두지 않는다. 목적지는 aria-label에만 있다
+     - 누르면 약 4초 동안 별가루가 구멍으로 빨려 들어가며 문이 열린다. 확인창 없음
+     - 스크립트가 실패하면 이 칸은 비어 있고 종이 판은 그대로 동작한다
+     ===================================================================== -->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>들어가는 문 — v3 우주</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="../../assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500&family=Noto+Sans+KR:wght@300;400;500;700&family=Caveat:wght@600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
+    <!-- 운영 진입점 시트를 그대로 읽는다. -->
+    <link rel="stylesheet" href="../../universe/gate.css" />
+    <style>
+      /* 아래는 이 시안 전용이다. 운영 v2에는 들어가지 않는다.
+         종이 판은 v2 홈의 재질만 흉내 낸 것이라 픽셀 단위로 같은 화면이 아니다. */
+      :root {
+        --g-paper:#faf7ee; --g-ink:#1f1c14; --g-soft:#4a4538;
+        --g-mute:#6b6453; --g-red:#c63b3b; --g-line:rgba(31,28,20,.22);
+      }
+      *, *::before, *::after { box-sizing:border-box; }
+      html, body { height:100%; }
+      body {
+        margin:0; overflow:hidden;
+        font-family:"Noto Sans KR","IBM Plex Sans KR",system-ui,sans-serif;
+        color:var(--g-ink); word-break:keep-all;
+        background:
+          repeating-linear-gradient(180deg, transparent 0 31px, rgba(31,28,20,.055) 31px 32px),
+          var(--g-paper);
+      }
+      .hero {
+        position:relative; height:100%; overflow:hidden;
+        display:flex; align-items:center;
+        padding:clamp(24px,5vw,60px) clamp(20px,5vw,64px) min(34vh,260px);
+      }
+      .hero::before {
+        content:""; position:absolute; left:clamp(30px,6vw,84px); top:0; bottom:0;
+        width:1px; background:rgba(198,59,59,.32);
+      }
+      .hero-main { position:relative; z-index:1; max-width:56ch; margin-left:clamp(30px,7vw,110px); }
+      .hero-tag { font-family:"Caveat",cursive; font-size:26px; color:var(--g-red); margin-bottom:4px; }
+      .hero-name { margin:0 0 2px; font-weight:700; font-size:clamp(30px,6vw,58px); letter-spacing:-.03em; line-height:1.05; }
+      .hero-name span {
+        display:block; font-weight:400; font-size:clamp(12px,1.4vw,15px);
+        letter-spacing:.22em; color:var(--g-mute); margin-top:6px;
+      }
+      .hero-role { margin:14px 0 12px; font-size:clamp(15px,1.8vw,19px); font-weight:500; }
+      .hero-desc { margin:0 0 20px; color:var(--g-soft); font-size:14.5px; line-height:1.85; }
+      .hero-desc strong { color:var(--g-red); }
+      .hero-btns { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:22px; }
+      .hero-btns span {
+        min-height:44px; display:inline-flex; align-items:center; padding:10px 18px;
+        border:1px solid var(--g-line); background:#fffdf6; font-size:13.5px; border-radius:2px;
+      }
+      .hero-btns span:first-child { background:var(--g-red); border-color:var(--g-red); color:#fffdf6; }
+      .hero-stats { display:flex; flex-wrap:wrap; gap:6px 22px; font-size:12.5px; color:var(--g-mute); }
+      .hero-stats b { font-size:19px; font-weight:700; color:var(--g-ink); font-variant-numeric:tabular-nums; margin-right:5px; }
+
+      /* 시안임을 알리는 띠 — 운영 화면에는 들어가지 않는다. */
+      .mark {
+        position:fixed; z-index:50; left:50%; bottom:14px; transform:translateX(-50%);
+        display:flex; align-items:center; gap:10px; max-width:calc(100vw - 32px);
+        padding:7px 14px; background:#fffdf6; border:1px solid var(--g-line);
+        color:var(--g-mute); font-family:"IBM Plex Mono",monospace; font-size:11px;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      }
+      .mark b { color:var(--g-ink); font-weight:500; }
+      .mark a { color:#8f7736; text-decoration:none; border-bottom:1px solid var(--g-line); }
+      .mark a:hover { border-bottom-color:#a9914d; }
+      @media (max-width:640px) { .mark { left:14px; right:14px; transform:none; max-width:none; } }
+      @media (max-height:600px) and (orientation:landscape) { .mark { display:none; } .hero { padding-bottom:18vh; } }
+    </style>
+  </head>
+
+  <body>
+    <section class="hero">
+      <div class="hero-main">
+        <div class="hero-tag">안녕하세요</div>
+        <h1 class="hero-name">이건영<span>Lee Geon Yeong</span></h1>
+        <p class="hero-role">혁신의 기업가 &amp; 풀스택 개발자</p>
+        <p class="hero-desc">
+          이윤을 넘어 <strong>혁신</strong>을 추구하는 기업가를 꿈꿉니다.<br />
+          <strong>월 100만 명</strong>이 사용하는 서비스를 만드는 것이 목표입니다.
+        </p>
+        <div class="hero-btns">
+          <span>프로젝트 보기</span><span>GitHub</span><span>capybara@koreatech.ac.kr</span>
+        </div>
+        <div class="hero-stats">
+          <span><b>20+</b>프로젝트</span><span><b>4</b>수상 경력</span><span><b>8위</b>581 팀 중</span>
+        </div>
+      </div>
+
+      <!-- 진입점이 들어가는 칸. 안에 들어가는 것은 전부 gate.js가 만든다.
+           운영 홈은 기본 목적지 /universe/ 를 쓰고, 이 시안은 자기 목적지를 준다. -->
+      <div class="v3-gate-host" data-gate-host data-gate-to="universe.html"></div>
+    </section>
+
+    <p class="mark">
+      <b>들어가는 문</b> — 찢긴 구멍을 누르면 약 4초 뒤 하늘로 넘어갑니다. 새로고침마다 달라집니다.
+      <a href="index.html">설계 기록</a>
+    </p>
+
+    <script defer src="../../universe/gate.js"></script>
+  </body>
+</html>

@@ -1,0 +1,208 @@
+<!doctype html>
+<!-- =====================================================================
+     이동 방식 다 · 세로로 흐르는 하늘 (docs/v3-universe/move-c-falling-sky.html)
+
+     문서가 평범하게 세로로 스크롤된다. 다만 섹션이 끊겨 있는 게 아니라
+     하나의 하늘이 위에서 아래로 계속 이어진다. 별밭과 성운이 경계에서 끊기지 않는다.
+
+     스크롤을 가로채지 않는다 — 스냅도, 정거장도, 진행 표시도, `다음` 안내도 없다.
+     내가 굴린 만큼만 하늘이 지나간다.
+
+     로컬 확인에는 정적 서버가 필요하다(projects.json fetch).
+     ===================================================================== -->
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>다 · 세로로 흐르는 하늘 — 이동 방식 시안</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="../../assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+    <link rel="stylesheet" href="move.css" />
+    <style>
+      /* 문서는 진짜로 스크롤된다. 창(캔버스)과 천체는 고정이고,
+         스크롤 위치가 카메라의 세로 좌표를 정한다. */
+      html { scroll-behavior:auto; }
+      body.move { overflow-x:hidden; }
+      .run { position:relative; width:100%; pointer-events:none; }
+
+      /* 출발점은 첫 화면에서만 보인다. 내려가면 조용히 물러난다. */
+      .who { opacity:1; }
+      .who.is-away { opacity:0; pointer-events:none; }
+
+      /* 얼마나 내려왔는지 — 스크롤바가 하는 말과 같다. 길을 정해 주지 않는다. */
+      .depth {
+        position:fixed; z-index:3; right:clamp(13px,2.4vw,20px); top:64px; bottom:64px;
+        width:1px; background:var(--m-line); pointer-events:none;
+      }
+      .depth i {
+        position:absolute; left:-1px; width:3px; background:var(--m-gold);
+        top:0; height:var(--depth,0%); transition:none;
+      }
+      @media (max-height:600px) and (orientation:landscape) { .depth { top:52px; bottom:20px; } }
+      @media (max-width:640px) { .depth { right:10px; } }
+    </style>
+  </head>
+
+  <body class="move">
+    <canvas class="sky" aria-hidden="true"></canvas>
+    <div class="stars" data-stars></div>
+
+    <!-- 문서에 실제 길이를 주는 유일한 요소. 여기 길이가 하늘의 길이다. -->
+    <div class="run" data-run></div>
+
+    <div class="over who" data-who data-keepout>
+      <h1>이건영<span class="en">Lee Geon Yeong</span></h1>
+      <p class="lead">이윤을 넘어 <b>혁신</b>을 추구하는 기업가를 꿈꿉니다.</p>
+      <button type="button" class="mail" data-mail="capybara@koreatech.ac.kr">
+        <span>capybara@koreatech.ac.kr</span><span class="copied" aria-live="polite"></span>
+      </button>
+    </div>
+
+    <div class="over here" data-here data-keepout aria-live="polite"><b></b><span></span></div>
+
+    <div class="over rank" data-rank aria-hidden="true" data-keepout>
+      <small>GitHub Rank</small><span class="rail" data-rank-rail></span><b data-rank-now>C</b>
+    </div>
+
+    <div class="over card" data-card role="group">
+      <button type="button" class="card-close" data-card-close aria-label="닫기">&times;</button>
+      <div data-card-body></div>
+    </div>
+
+    <div class="depth" aria-hidden="true"><i data-depth></i></div>
+
+    <div class="bar">
+      <button type="button" class="btn" data-mute hidden aria-pressed="false">&#9835;</button>
+    </div>
+
+    <a class="seam" href="../../index.html" aria-label="포트폴리오로 돌아가기"></a>
+
+    <p class="mark">
+      <b>다 · 세로로 흐르는 하늘</b> — 평범한 스크롤. 하늘이 끊기지 않고 이어진다.
+      <a href="index.html">시안 목록</a>
+    </p>
+
+    <noscript>
+      <p style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);max-width:38ch;text-align:center">
+        이 시안은 별자리를 캔버스로 그립니다.
+        <a href="https://pachir1su.github.io/#projects">포트폴리오의 프로젝트 목록</a>에서 같은 내용을 볼 수 있습니다.
+      </p>
+    </noscript>
+
+    <script src="../../universe/sky.js"></script>
+    <script src="move.js"></script>
+    <script>
+      (() => {
+        'use strict';
+        const Move = window.V3Move;
+        if (!Move) return;
+
+        const stage = Move.Stage({
+          canvas: document.querySelector('.sky'),
+          stars: document.querySelector('[data-stars]'),
+          card: document.querySelector('[data-card]'),
+          cardBody: document.querySelector('[data-card-body]'),
+        });
+        stage.setVisibleArea(() => true);
+
+        const cam = stage.cam;
+        const run = document.querySelector('[data-run]');
+        const who = document.querySelector('[data-who]');
+        const here = document.querySelector('[data-here]');
+        const depth = document.querySelector('[data-depth]');
+
+        /* 하늘의 세로 길이를 문서 길이로 옮긴다.
+           스크롤 1px이 하늘 1/z px이므로 배율이 바뀌어도 손맛이 같다. */
+        function fitRun() {
+          const z = stage.columnZoom();
+          cam.z = z;
+          stage.state.baseZ = z;
+          const top = stage.state.skyTop, bottom = stage.state.skyBottom;
+          const worldH = bottom - top;
+          run.style.height = Math.round(worldH * z) + 'px';
+          return { z, top, worldH };
+        }
+
+        /* 스크롤 위치 → 카메라. 이것이 이 시안의 전부다. */
+        function follow() {
+          const y = window.scrollY || document.documentElement.scrollTop || 0;
+          cam.x = 0;
+          cam.y = stage.state.skyTop + (y + stage.H / 2) / cam.z;
+          const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+          depth.style.setProperty('--depth', ((y / max) * 100).toFixed(2) + '%');
+          who.classList.toggle('is-away', y > stage.H * .42);
+          markHere();
+          stage.paintNow();
+        }
+
+        /* 어디쯤인지는 구역의 크기가 아니라 구역 사이 간격으로 잰다.
+           그래야 큰 별자리든 작은 무리든 같은 지점에서 이름이 바뀐다.
+           구역과 구역 사이 짧은 구간에는 아무 이름도 없다 — 아직 열린 하늘이다. */
+        function markHere() {
+          const band = stage.state.band || 1;
+          let best = null, bd = Infinity;
+          stage.areas.forEach((a) => {
+            const d = Math.abs(a.y - cam.y) / band;
+            if (d < bd) { bd = d; best = a; }
+          });
+          const near = best && bd < .42;
+          here.querySelector('b').textContent = near ? best.title : '';
+          here.querySelector('span').textContent = near ? best.note : '';
+          document.querySelector('[data-rank]').classList.toggle('is-on', !!near && best.kind === 'growth');
+        }
+
+        function reset(instant) {
+          stage.applyLayout('column');
+          fitRun();
+          if (!instant) stage.startIntro();
+          follow();
+          stage.kick();
+        }
+
+        stage.measure();
+        stage.initMute();
+        stage.onCardClose();
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') stage.closeCard(); });
+
+        const mail = document.querySelector('[data-mail]');
+        mail.addEventListener('click', () => {
+          if (!navigator.clipboard) return;
+          navigator.clipboard.writeText(mail.dataset.mail).then(() => {
+            const out = mail.querySelector('.copied');
+            out.textContent = '복사됨';
+            setTimeout(() => { out.textContent = ''; }, 1600);
+          }, () => {});
+        });
+
+        /* 스크롤은 가로채지 않는다. 브라우저가 굴린 그대로 따라간다. */
+        addEventListener('scroll', follow, { passive: true });
+
+        let tm = 0;
+        addEventListener('resize', () => {
+          clearTimeout(tm);
+          tm = setTimeout(() => {
+            const before = window.scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight);
+            stage.measure(); stage.relabel(); reset(true);
+            const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+            window.scrollTo(0, before * max);
+            follow();
+          }, 140);
+        });
+        window.V3Sky.onThemeChange(() => stage.paintNow());
+
+        Move.load().then((data) => {
+          stage.build(data, 'column');
+          stage.startIntro();
+          reset(true);
+          setTimeout(() => { stage.state.intro = 1; stage.paintNow(); }, 2800);
+        }).catch((err) => {
+          console.error('[시안 다] projects.json', err);
+          here.querySelector('span').textContent = 'projects.json을 읽지 못했습니다. 정적 서버로 열어 주세요.';
+        });
+      })();
+    </script>
+  </body>
+</html>

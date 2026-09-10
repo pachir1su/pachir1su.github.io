@@ -1,0 +1,501 @@
+<!doctype html>
+<!-- =====================================================================
+     v3 방향 실험 — 항해 (docs/v3-universe/voyage.html)
+
+     "너무 포트폴리오 느낌이잖아. v2는 포트폴리오고 v3은 이쁘게 꾸몄으면
+     좋겠어. 여행하는 느낌이 들게" (2026-08-26)에 대한 실험이다.
+
+     모델 A(관측창 + 목록)에서 목록을 버리고, 항로를 따라 기항지를 지나는
+     구성으로 바꿨다. 스크롤이 카메라를 밀고, 별은 깊이별로 다른 속도로
+     흘러가며, 기항지에 닿으면 그 해의 별자리가 그어진다.
+
+     아직 확정된 방향이 아니다. 운영 /universe/ 에는 반영하지 않았다.
+     ?cam=0~1 로 항로 위 한 지점을 바로 열 수 있다.
+     ===================================================================== -->
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>항해</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500&family=IBM+Plex+Mono:wght@400&display=swap">
+
+<style>
+:root{
+  --ground:#e8eaf2; --deep:#dfe2ec; --ink:#242636; --muted:#606579; --subtle:#7a7f92;
+  --violet:#706994; --gold:#8f7736; --line:#cbd0df; --pane:#f1f2f7;
+  --halo:0 0 8px #e8eaf2,0 0 20px rgba(232,234,242,.92);
+  --sans:"IBM Plex Sans KR","Pretendard","Apple SD Gothic Neo",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace;
+  --ease:cubic-bezier(.23,1,.32,1);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0d1118; --deep:#11151d; --ink:#e0e3eb; --muted:#a2a8b8; --subtle:#8b92a4;
+  --violet:#968dbb; --gold:#c9b477; --line:#2b3242; --pane:#161b25;
+  --halo:0 0 8px #0d1118,0 0 22px rgba(13,17,24,.94);
+}}
+:root[data-theme="dark"]{
+  --ground:#0d1118; --deep:#11151d; --ink:#e0e3eb; --muted:#a2a8b8; --subtle:#8b92a4;
+  --violet:#968dbb; --gold:#c9b477; --line:#2b3242; --pane:#161b25;
+  --halo:0 0 8px #0d1118,0 0 22px rgba(13,17,24,.94);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:auto}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+     font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:2px}
+
+/* 창 — 여행 내내 이 한 장만 본다 */
+#port{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* 스크롤 길이만 만드는 빈 구간 */
+#track{position:relative;z-index:1;pointer-events:none}
+.leg{height:96vh}
+
+/* 기항지 표지 — 창 위에 겹치는 고정 레이어 */
+#deck{position:fixed;inset:0;z-index:2;pointer-events:none}
+.plate{position:absolute;opacity:0;transition:opacity 620ms var(--ease)}
+.plate.is-here{opacity:1}
+
+.mark{left:clamp(20px,5vw,72px);bottom:clamp(48px,9vh,110px);max-width:min(40ch,80vw)}
+.mark .year{display:block;font-weight:200;font-size:clamp(48px,8.4vw,118px);letter-spacing:-.055em;
+            line-height:.86;color:var(--ink);text-shadow:var(--halo)}
+.mark .place{display:block;margin-top:10px;color:var(--muted);font-size:clamp(12px,1.4vw,15px);
+             letter-spacing:.12em;text-shadow:var(--halo)}
+.mark .note{margin:14px 0 0;color:var(--muted);font-size:13.5px;text-shadow:var(--halo)}
+
+.hail{left:clamp(20px,5vw,72px);bottom:clamp(48px,9vh,110px);max-width:min(44ch,84vw)}
+.hail h1{margin:0;font-weight:200;font-size:clamp(46px,9vw,116px);letter-spacing:-.055em;line-height:.94;text-shadow:var(--halo)}
+.hail .en{display:block;margin-top:6px;color:var(--muted);font-size:clamp(11px,1.3vw,14px);letter-spacing:.34em;text-transform:uppercase;text-shadow:var(--halo)}
+.hail p{margin:22px 0 0;max-width:32ch;font-weight:300;font-size:clamp(15px,1.7vw,19px);line-height:1.6;text-shadow:var(--halo)}
+.hail .mail{display:inline-block;margin-top:18px;color:var(--muted);font-size:13px;
+            border-bottom:1px solid var(--line);padding-bottom:2px;text-shadow:var(--halo);pointer-events:auto;
+            background:none;border-left:0;border-right:0;border-top:0;font-family:inherit;cursor:pointer}
+.hail .mail:hover{color:var(--ink);border-bottom-color:var(--gold)}
+
+/* 항로 진행 — 글자 없이 선과 점만 (#114: 작은 좌표 문구 금지) */
+#gauge{position:fixed;left:clamp(12px,2.4vw,26px);top:50%;transform:translateY(-50%);z-index:3;
+       width:1px;height:min(46vh,320px);background:var(--line);pointer-events:none}
+#gauge i{position:absolute;left:-3px;width:7px;height:7px;border-radius:50%;
+         background:var(--ground);border:1px solid var(--line);transition:background 400ms var(--ease),border-color 400ms var(--ease)}
+#gauge i.is-passed{background:var(--gold);border-color:var(--gold)}
+#gauge b{position:absolute;left:-2px;width:5px;height:5px;border-radius:50%;background:var(--gold);
+         box-shadow:0 0 0 4px color-mix(in srgb,var(--gold) 20%,transparent);transition:top 220ms linear}
+
+/* 마주친 것 — 별을 누르면 나오는 관측 메모 */
+#note{position:fixed;right:clamp(16px,3vw,40px);bottom:clamp(16px,3vw,40px);z-index:4;
+      width:min(330px,calc(100vw - 32px));padding:16px 18px 18px;
+      background:var(--pane);border:1px solid var(--line);
+      box-shadow:0 20px 44px -30px rgba(0,0,0,.6);
+      opacity:0;transform:translateY(10px);pointer-events:none;
+      transition:opacity 300ms var(--ease),transform 300ms var(--ease)}
+#note.is-open{opacity:1;transform:none;pointer-events:auto}
+#note h3{margin:0 0 2px;font-weight:500;font-size:15px;letter-spacing:-.02em}
+#note .role{margin:0 0 9px;color:var(--gold);font-size:11.5px}
+#note p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.7}
+#note button{position:absolute;right:6px;top:6px;width:30px;height:30px;background:none;border:0;
+             color:var(--subtle);font-size:15px;line-height:1;cursor:pointer}
+#note button:hover{color:var(--ink)}
+
+/* 키보드·스크린리더 경로 — 화면에는 목록을 두지 않는다 */
+.sr-nav{position:absolute;left:-9999px;top:0}
+.sr-nav:focus-within{position:fixed;left:12px;top:12px;z-index:9;width:min(300px,80vw);
+  max-height:70vh;overflow:auto;background:var(--pane);border:1px solid var(--line);padding:10px}
+.sr-nav button{display:block;width:100%;text-align:left;background:none;border:0;
+  color:var(--ink);font:inherit;font-size:13px;padding:7px 6px;cursor:pointer}
+.sr-nav button:hover{color:var(--gold)}
+
+.end{position:fixed;left:50%;bottom:clamp(28px,6vh,64px);transform:translateX(-50%);z-index:3;
+     opacity:0;transition:opacity 620ms var(--ease);pointer-events:none}
+.end.is-here{opacity:1;pointer-events:auto}
+.end a{display:block;width:44px;height:48px;background:linear-gradient(160deg,#f6e79f,#e7cd6c);
+       box-shadow:0 10px 22px -14px rgba(0,0,0,.7);transform:rotate(-3deg);
+       transition:transform 300ms var(--ease)}
+.end a:hover{transform:rotate(-1deg) translateY(-3px)}
+
+@media (prefers-reduced-motion:reduce){
+  .plate,.end,#note{transition-duration:.001ms}
+}
+</style>
+
+</head><body><canvas id="port" aria-hidden="true"></canvas>
+<div id="track"></div>
+
+<div id="deck">
+  <div class="plate hail" data-plate="0">
+    <h1>이건영<span class="en">Lee Geon Yeong</span></h1>
+    <p>이윤을 넘어 혁신을 추구하는 기업가를 꿈꿉니다.</p>
+    <button class="mail" type="button" data-mail="capybara@koreatech.ac.kr">capybara@koreatech.ac.kr</button>
+  </div>
+</div>
+
+<div id="gauge" aria-hidden="true"><b></b></div>
+
+<div id="note" role="status">
+  <button type="button" aria-label="닫기">&times;</button>
+  <h3></h3><p class="role"></p><p class="body"></p>
+</div>
+
+<nav class="sr-nav" aria-label="기항지와 프로젝트"></nav>
+
+<div class="end"><a href="https://pachir1su.github.io/" target="_blank" rel="noopener" aria-label="포트폴리오로 돌아가기"></a></div>
+
+<script>
+(() => {
+'use strict';
+const DATA = {"y2026": [{"n": "한기대 26학번 신입생 가이드", "r": "1인 개발", "d": "한기대 26학번 신입생을 위한 노션 사이트", "s": "", "f": ""}, {"n": "Swordmaster", "r": "1인 개발", "d": "두 개의 Gradio 웹 툴을 하나로 File Swordmaster(PDF·오디오) · Media Swordmaster(이미지·영상)", "s": "", "f": ""}, {"n": "기술과사회", "r": "팀장 · 5인 팀", "d": "델파이 기법을 이용한 일·직업과 삶의 미래 예측 AI 시뮬레이션 델파이 조사 · 발표 프로젝트", "s": "", "f": ""}, {"n": "데일리 리포트 AI", "r": "팀장 · 3인 팀", "d": "매일 정해진 시간에 Gemini가 날씨·뉴스·미세먼지를 종합해 Discord로 자동 브리핑", "s": "", "f": ""}, {"n": "MultiMind", "r": "1인 개발", "d": "API 없이 pyautogui로 여러 LLM을 동시에 조작 Head LLM이 결과를 종합하는 멀티 LLM 오케스트레이터", "s": "", "f": ""}, {"n": "GitHub Rank Insight", "r": "1인 개발 · 전 과정", "d": "username 입력하면 즉시 등급 분석 자동/수동 모드 · 지표별 기여도 차트", "s": "", "f": ""}, {"n": "코리아텍 통합 알림 시스템", "r": "1인 개발", "d": "공지·개인 메일·캠퍼스 생활을 묶은 디스코드 통합 구독·조회 실시간 셔틀 지도 · 실시간 진단 지원 SQLite 저장소 · 웹/GUI 대시보드 · 라즈베리파이 운영", "s": "", "f": ""}, {"n": "라즈베리파이 마인크래프트 서버", "r": "1인 개발", "d": "Pi 4B PaperMC + 선택형 Geyser/Floodgate 크로스플레이와 오너 전용 관리 친구 포털 · 검증형 HDD 백업 · 복구 도구 · 자체 Paper 플러그인", "s": "", "f": ""}, {"n": "멈춰 ! — 2026 U-CAST 돌발 보행자 감지 경고 시스템", "r": "5팀 멘토", "d": "구간마다 시작·끝 IR 센서와 네오픽셀 스트립을 하나로 묶은 독립 채널 구조 5팀의 요구사항 정리 · 채널별 상태 설계 · 배선 디버깅 · 사이렌 부저 시연 준비 멘토링 2026 천안시 청소년 도시재생 챌린지 로컬임팩트상 수상", "s": "", "f": ""}], "y2025": [{"n": "헬스 케어 시스템", "r": "팀장 · 4인 팀", "d": "사용자 맞춤형 헬스케어 시스템 건강 데이터를 기록하고 모니터링하는 기능 구현", "s": "", "f": ""}, {"n": "공감 봇 & 레시피 AI", "r": "팀장 · 4인 팀", "d": "감정 공감 챗봇과 보유 식재료 기반 요리 레시피 추천 AI 서비스", "s": "", "f": ""}, {"n": "식물 타이머", "r": "1인 개발", "d": "2025 선후배와 함께하는 코딩 페스티벌 해커톤 참가작 식물 관리를 돕는 스마트 타이머 시스템", "s": "", "f": ""}, {"n": "NFC 출석 체크 시스템", "r": "팀장 · 6인 팀", "d": "NFC 태그를 활용한 효율적인 출석 체크 시스템 아두이노와 라즈베리파이 연동으로 데이터 처리", "s": "", "f": ""}, {"n": "면진봇", "r": "1인 개발", "d": "디스코드 경제 게임 봇", "s": "", "f": ""}], "y2024": [{"n": "해안 장벽 프로젝트", "r": "팀원 (아두이노 개발 총괄) · 4인 팀", "d": "2024 지속 가능한 발전 프로젝트 해수면 상승에 대비한 해안 장벽 MVP", "s": "", "f": ""}, {"n": "비밀번호 도어락", "r": "팀장 · 4인 팀", "d": "2024 마스터 크리에이터 챌린지 참가 프로젝트 4x4 매트릭스 키패드를 활용한 도어락 시스템", "s": "", "f": ""}, {"n": "졸음 방지 시스템", "r": "아두이노 개발 · 2인 팀", "d": "2024 제 5회 천안학생로봇대회 동상 수상 프로젝트 허스키렌즈를 이용한 실시간 졸음 감지 시스템", "s": "", "f": ""}, {"n": "산불 조기 감지 알림 시스템", "r": "팀원 (엔지니어) · 4인 팀", "d": "2024 디지털새싹 'AI 어벤져스상' 수상작 라즈베리파이와 OpenCV로 산불을 실시간 감지합니다.", "s": "", "f": ""}, {"n": "2024 SFPC", "r": "팀원 · 4인 팀", "d": "총 581팀 중 8위를 기록한 알고리즘 대회 코드 아카이브.", "s": "", "f": ""}, {"n": "급식 줄 혼잡도 신호등 계수기", "r": "팀원 · 2인 팀", "d": "mBlock·고릴라셀·아두이노로 제작 버튼으로 인원을 세고 약 20명 누적 시 빨간불로 추가 유입을 잠시 제한", "s": "", "f": ""}], "adrift": [{"n": "한맵 (Koreatech Map)", "r": "", "d": "한기대 캠퍼스 지도 서비스 건물 내부 지도 및 호실 정보 등의 모든 정보를 담은 웹 인터랙티브 지도", "s": "기획 단계", "f": ""}, {"n": "승기봇", "r": "1인 개발", "d": "기존 면진봇의 개편 버전 라이어게임, 양세찬게임, 마피아게임 등의 미니게임 봇", "s": "개발 중단", "f": ""}, {"n": "HTML Viewer", "r": "1인 개발", "d": "HTML 코드를 붙여넣으면 실시간으로 결과물을 보여주는 웹 뷰어", "s": "개발 중단", "f": ""}, {"n": "CentrifugeAI", "r": "1인 개발", "d": "가상 실험 장치(원심분리기·현미경·가속기 등)에 재료를 넣고 Gemini AI로 결과를 예측·시각화하는 실험 시뮬레이터", "s": "개발 중단", "f": ""}, {"n": "마법 아카데미", "r": "", "d": "원소를 조합해 마법을 만들고 시각화하는 인터랙티브 시뮬레이션", "s": "개발 중단", "f": ""}, {"n": "DelphiRec", "r": "", "d": "생기부 분석 & 질의응답 AI 멀티 전문가 페르소나와 델파이 기법으로 생기부를 심층 분석", "s": "개발 중단", "f": ""}, {"n": "성현봇 (면진봇2)", "r": "1인 개발", "d": "면진봇 후속작, 한글 슬래시 커맨드 지원 코인·도박·주식·강화·맞짱(PvP) 경제 시스템", "s": "개발 중단", "f": ""}, {"n": "InfoCatch", "r": "", "d": "Google Gemini API를 활용한 뉴스 요약 및 실시간 증시 정보 제공 웹앱", "s": "", "f": "AI 구현 실패 · 당시 웹서버 구축 몰랐음"}, {"n": "InvestAI", "r": "", "d": "뉴스·소셜 미디어 분석으로 시장 Fear/Greed 지표를 제공하는 실시간 위젯", "s": "", "f": "API 연동 실패"}, {"n": "건영운세", "r": "", "d": "이름·생년월일 입력 시 날짜 고정 시드 기반으로 운세를 생성하는 서비스", "s": "", "f": "운세 로직 구현 실패"}, {"n": "한기대 지도 (초기 버전)", "r": "", "d": "대피도 기반 실내 지도 변환 시도 · 데이터 수집의 현실적 한계에 부딪힘", "s": "", "f": "데이터 수집 난이도 · AI 지도 변환 실패"}]};
+const GROWTH = [{"when": "2024", "t": "처음 팀을 맡다", "f": "비밀번호 도어락 — 팀장 · 4인 팀. 저장소에 기록된 첫 팀 리드."}, {"when": "2024", "t": "전국 8위", "f": "2024 SFPC — 581팀 · 1,661명 중 전체 8위."}, {"when": "2024", "t": "대회에서 두 번 불리다", "f": "디지털새싹 AI 어벤져스상 · 천안 학생 로봇 대회 동상."}, {"when": "2025", "t": "가장 큰 팀", "f": "NFC 출석 체크 시스템 — 팀장 · 6인 팀. 저장소에 기록된 최대 규모."}, {"when": "2025", "t": "실패를 지우지 않다", "f": "InfoCatch · InvestAI · 건영운세를 실패 기록으로 남겼다."}, {"when": "2026", "t": "혼자 끝까지", "f": "코리아텍 통합 알림 시스템 · MultiMind · GitHub Rank Insight — 기획부터 배포까지 1인."}, {"when": "2026", "t": "가르치는 쪽으로", "f": "2026 U-CAST — 5팀 멘토, 로컬임팩트상."}];
+const AWARDS = [{"t": "2024 SFPC", "p": "전체 8위", "d": "581팀 · 1,661명 참가"}, {"t": "디지털새싹 AI 메이커톤", "p": "AI 어벤져스상", "d": "산불 조기 감지 알림 시스템"}, {"t": "제5회 천안 학생 로봇 대회", "p": "동상", "d": "해커톤 분야 · 97팀"}, {"t": "2026 U-CAST", "p": "로컬임팩트상", "d": "「멈춰 !」 · 5팀 멘토"}];
+
+/* ---- 별자리 : 자기 bbox를 채우도록 정규화 + 실제 하늘의 종횡비 ---- */
+const SHAPES = {
+  orion:{ratio:.62,pts:[[.451,0],[0,.191],[.912,.165],[.209,.540],[.462,.572],[.714,.601],[.411,.759],[.110,.991],[1,1]],
+    edges:[[0,1],[0,2],[1,3],[2,5],[3,4],[4,5],[4,6],[3,7],[5,8]],bright:[1,8]},
+  cassiopeia:{ratio:2.20,pts:[[0,1],[.258,.103],[.503,.910],[.761,0],[1,.808]],edges:[[0,1],[1,2],[2,3],[3,4]],bright:[1,3]},
+  cygnus:{ratio:1.55,pts:[[.500,0],[.500,.412],[0,.339],[1,.291],[.500,.679],[.500,1]],edges:[[0,1],[1,2],[1,3],[1,4],[4,5]],bright:[0,5]},
+  dipper:{ratio:2.30,pts:[[0,.659],[.182,.448],[.350,.606],[.518,.369],[.766,0],[1,.502],[.723,1]],
+    edges:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,3]],bright:[4,5]},
+};
+
+/* ---- 기항지 : 항로 위의 좌표(하늘 단위) ---- */
+const SPAN = 1500;
+const STOPS = [
+  {id:'hail', x:0,          y:0,    kind:'hail'},
+  {id:'2026', x:SPAN*1,     y:-190, kind:'year', shape:'orion',      cards:DATA.y2026, place:'첫 번째 기항지', note:'한 해에 끝까지 간 아홉'},
+  {id:'2025', x:SPAN*2,     y:150,  kind:'year', shape:'cassiopeia', cards:DATA.y2025, place:'두 번째 기항지', note:'다섯 점이 그리는 W'},
+  {id:'2024', x:SPAN*3,     y:-120, kind:'year', shape:'cygnus',     cards:DATA.y2024, place:'세 번째 기항지', note:'북십자, 여섯'},
+  {id:'adrift',x:SPAN*4.1,  y:210,  kind:'adrift', cards:DATA.adrift, year:'표류', place:'항로를 벗어난 구역', note:'닿지 못했거나, 아직 닿지 않은'},
+  {id:'trace', x:SPAN*5.2,  y:-170, kind:'growth', shape:'dipper',  cards:GROWTH, year:'궤적', place:'지나온 항로', note:'저장소에 근거가 남은 일곱'},
+  {id:'log',   x:SPAN*6.2,  y:90,   kind:'log',   cards:AWARDS, year:'기록', place:'바깥에서 확인된 것', note:''},
+  {id:'home',  x:SPAN*7,    y:0,    kind:'home'},
+];
+const PATH_END = STOPS[STOPS.length-1].x;
+
+const dark = matchMedia('(prefers-color-scheme: dark)');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+const T = () => {
+  const d = document.documentElement.dataset.theme;
+  const isDark = d === 'dark' || (d !== 'light' && dark.matches);
+  return isDark
+    ? {L:false, g0:'#12161f',g1:'#0d1118',neb:'#4a4468',neb2:'#6d648f',ink:'#e6e9f1',gold:'#c9b477',glow:'#cfd3e4',vig:'#05070c'}
+    : {L:true,  g0:'#eceef5',g1:'#dfe2ec',neb:'#706994',neb2:'#8d86ab',ink:'#242636',gold:'#8f7736',glow:'#ffffff',vig:'#c9cdda'};
+};
+const rgba=(h,a)=>{const n=parseInt(h.slice(1),16);return`rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`};
+const rng=s=>()=>((s=(s*1664525+1013904223)>>>0)/4294967296);
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+/* 표지판은 짧게 — 긴 이름은 메모에서 온전히 읽는다. 항로에서는 알아볼 만큼만. */
+function sign(name){
+  let s=String(name).split(/\s*[—(]/)[0].trim();
+  if(!s) s=String(name).trim();
+  return s.length>16 ? s.slice(0,15)+'…' : s;
+}
+const ease=k=>1-Math.pow(1-clamp(k,0,1),3);
+
+function fitBox(w,h,ratio,inset){
+  const aw=w*(1-inset*2), ah=h*(1-inset*2);
+  let bw=aw, bh=bw/ratio;
+  if(bh>ah){bh=ah;bw=bh*ratio}
+  return {x:(w-bw)/2,y:(h-bh)/2,w:bw,h:bh};
+}
+
+/* ---- 흘러가는 것들 : 깊이별로 다른 속도 ---- */
+const LAYERS = [
+  {n:520, depth:5.0, r:[.25,.6],  a:[.10,.22]},   /* 먼 먼지 */
+  {n:210, depth:2.4, r:[.4,1.0],  a:[.22,.5]},    /* 중간 별 */
+  {n:70,  depth:1.35,r:[.7,1.6],  a:[.4,.8]},     /* 가까운 별 */
+];
+const FIELD = LAYERS.map((L,li)=>{
+  const r=rng(1201+li*77), out=[];
+  for(let i=0;i<L.n;i++) out.push({
+    x:r()*(PATH_END+SPAN*2)-SPAN, y:(r()-.5)*2400,
+    r:L.r[0]+r()*(L.r[1]-L.r[0]), a:L.a[0]+r()*(L.a[1]-L.a[0]), gold:r()>.94
+  });
+  return {depth:L.depth, stars:out};
+});
+/* 마주치는 것들 — 반복 장식이 아니라 항로 위의 사건 */
+const CLOUDS = (()=>{const r=rng(88),o=[];for(let i=0;i<14;i++)o.push({
+  x:r()*(PATH_END+SPAN)-SPAN*.5, y:(r()-.5)*1500, rx:280+r()*620, rot:r()*3.14, a:.12+r()*.22, depth:3.2+r()*1.6});return o})();
+const MOON = {x:SPAN*4.62, y:-330, r:64, depth:1.9};
+
+const canvas=document.getElementById('port');
+let ctx=null, W=0, H=0, dpr=1;
+function size(){
+  dpr=Math.min(devicePixelRatio||1,2);
+  W=innerWidth; H=innerHeight;
+  canvas.width=Math.round(W*dpr); canvas.height=Math.round(H*dpr);
+  ctx=canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+size();
+
+/* 스크롤 길이 */
+const track=document.getElementById('track');
+STOPS.forEach(()=>{const d=document.createElement('div');d.className='leg';track.appendChild(d)});
+
+/* ?cam=0..1 로 항로 위 한 지점을 바로 열 수 있다. 스크롤 없이 그 장면을 본다. */
+const FORCED = (()=>{const v=new URLSearchParams(location.search).get('cam');
+  return v===null?null:clamp(parseFloat(v)||0,0,1)})();
+function camera(){
+  const max=Math.max(1,document.documentElement.scrollHeight-innerHeight);
+  const p=FORCED!==null?FORCED:clamp(scrollY/max,0,1);
+  return {p, x:p*PATH_END, y:Math.sin(p*Math.PI*2.1)*120};
+}
+
+function project(x,y,cam,depth){
+  return [W*.5+(x-cam.x)/depth, H*.5+(y-cam.y)/depth];
+}
+
+function star(c,x,y,r,col,alpha,haloR,haloA,t){
+  if(haloR>0){
+    const hc=t.L?t.glow:col;
+    const g=c.createRadialGradient(x,y,0,x,y,haloR);
+    g.addColorStop(0,rgba(hc,haloA));g.addColorStop(.45,rgba(hc,haloA*.38));g.addColorStop(1,rgba(hc,0));
+    c.fillStyle=g;c.beginPath();c.arc(x,y,haloR,0,7);c.fill();
+  }
+  c.globalAlpha=alpha;c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,7);c.fill();c.globalAlpha=1;
+}
+
+/* 기항지의 별 화면 좌표 — 클릭 판정과 라벨이 같은 값을 쓴다 */
+let hits=[];
+
+function draw(){
+  const t=T(), cam=camera();
+  const g=ctx.createLinearGradient(W,0,0,H);
+  g.addColorStop(0,t.g0);g.addColorStop(1,t.g1);
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+  /* 성운 — 지나가는 구름 */
+  CLOUDS.forEach(cl=>{
+    const [sx,sy]=project(cl.x,cl.y,cam,cl.depth);
+    const rr=cl.rx/cl.depth;
+    if(sx<-rr*1.4||sx>W+rr*1.4) return;
+    ctx.save();ctx.translate(sx,sy);ctx.rotate(cl.rot);ctx.scale(1,.6);
+    const rg=ctx.createRadialGradient(rr*.2,-rr*.24,rr*.04,0,0,rr);
+    const a=cl.a*(t.L?.62:1.5);
+    rg.addColorStop(0,rgba(t.neb,a));rg.addColorStop(.28,rgba(t.neb,a*.62));
+    rg.addColorStop(.55,rgba(t.neb2,a*.3));rg.addColorStop(.8,rgba(t.neb2,a*.09));rg.addColorStop(1,rgba(t.neb2,0));
+    ctx.fillStyle=rg;ctx.beginPath();ctx.arc(0,0,rr,0,7);ctx.fill();ctx.restore();
+  });
+
+  /* 별 3계층 */
+  FIELD.forEach(layer=>{
+    layer.stars.forEach(s=>{
+      const [sx,sy]=project(s.x,s.y,cam,layer.depth);
+      if(sx<-20||sx>W+20||sy<-20||sy>H+20) return;
+      ctx.globalAlpha=s.a*(t.L?.85:1);
+      ctx.fillStyle=s.gold?t.gold:t.ink;
+      ctx.beginPath();ctx.arc(sx,sy,s.r,0,7);ctx.fill();
+    });
+  });
+  ctx.globalAlpha=1;
+
+  /* 항로 — 기항지를 잇는 낡은 금빛 실선 */
+  ctx.save();ctx.lineCap='round';ctx.lineWidth=1;ctx.setLineDash([2,10]);
+  ctx.strokeStyle=rgba(t.gold,t.L?.34:.4);
+  ctx.beginPath();
+  STOPS.forEach((s,i)=>{const[p,q]=project(s.x,s.y,cam,1.35);i?ctx.lineTo(p,q):ctx.moveTo(p,q)});
+  ctx.stroke();ctx.restore();
+
+  /* 달 — 항로 중간에 한 번 마주친다 */
+  {
+    const [mx,my]=project(MOON.x,MOON.y,cam,MOON.depth);
+    const R=MOON.r/MOON.depth;
+    if(mx>-R*4&&mx<W+R*4){
+      const gg=ctx.createRadialGradient(mx-R*.25,my-R*.3,R*.1,mx,my,R*2.6);
+      gg.addColorStop(0,rgba(t.glow,t.L?.26:.2));gg.addColorStop(1,rgba(t.glow,0));
+      ctx.fillStyle=gg;ctx.beginPath();ctx.arc(mx,my,R*2.6,0,7);ctx.fill();
+      ctx.save();ctx.beginPath();ctx.arc(mx,my,R,0,7);ctx.clip();
+      ctx.fillStyle=rgba(t.L?t.ink:t.glow,t.L?.26:.66);ctx.fillRect(mx-R,my-R,R*2,R*2);
+      const r2=rng(9);ctx.fillStyle=rgba(t.L?t.ink:t.neb,t.L?.14:.28);
+      for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(mx+(r2()-.5)*R*1.2,my+(r2()-.5)*R*1.2,R*(.14+r2()*.22),0,7);ctx.fill()}
+      ctx.restore();
+    }
+  }
+
+  /* 기항지 */
+  hits=[];
+  ctx.font='400 12.5px "IBM Plex Sans KR", sans-serif';
+  ctx.textBaseline='middle';
+  STOPS.forEach(stop=>{
+    if(!stop.cards) return;
+    const near=1-clamp(Math.abs(cam.x-stop.x)/(SPAN*.62),0,1);
+    if(near<=0.001) return;
+    const arrive=ease(near);
+    let [ox,oy]=project(stop.x,stop.y,cam,1.35);
+    const boxW=Math.min(W*.52,620), boxH=Math.min(H*.56,470);
+    /* 기항지가 화면 위아래로 잘리지 않게 붙든다. 항로의 높낮이는 배경이 대신 전한다. */
+    oy=clamp(oy,boxH*.5+56,H-boxH*.5-150);
+    ox=clamp(ox,boxW*.5+24,W-boxW*.5-24);
+
+    let pts;
+    if(stop.shape){
+      const sh=SHAPES[stop.shape];
+      const b=fitBox(boxW,boxH,sh.ratio,0.02);
+      pts=sh.pts.map(([x,y])=>[ox-boxW/2+b.x+x*b.w, oy-boxH/2+b.y+y*b.h]);
+      ctx.save();ctx.lineCap='round';ctx.lineWidth=1.1;
+      ctx.strokeStyle=rgba(t.gold,(t.L?.52:.6)*arrive);
+      const n=stop.cards.length;
+      sh.edges.filter(([a,b2])=>a<n&&b2<n).forEach(([a,b2],i,arr)=>{
+        const k=clamp(arrive*arr.length*1.15-i,0,1);
+        if(k<=0) return;
+        ctx.beginPath();ctx.moveTo(pts[a][0],pts[a][1]);
+        ctx.lineTo(pts[a][0]+(pts[b2][0]-pts[a][0])*ease(k),pts[a][1]+(pts[b2][1]-pts[a][1])*ease(k));
+        ctx.stroke();
+      });
+      ctx.restore();
+    }else{
+      const r=rng(stop.id.length*131+7);
+      pts=stop.cards.map(()=>[ox-boxW/2+ (0.06+r()*0.88)*boxW, oy-boxH/2+(0.08+r()*0.84)*boxH]);
+    }
+
+    const signs=[];
+    stop.cards.forEach((card,i)=>{
+      const p=pts[i]; if(!p) return;
+      const [sx,sy]=p;
+      const sel=(selected&&selected.stop===stop.id&&selected.i===i);
+      const app=clamp(arrive*2.2-i*0.06,0,1);
+      if(app<=0) return;
+      const R=(sel?4.2:2.6);
+      star(ctx,sx,sy,R*app,sel?t.gold:t.ink,(t.L?.82:.94)*app,(sel?30:16)*app,(t.L?.34:.16)*app,t);
+      const la=clamp((arrive-0.35)/0.4,0,1)*app;
+      if(la>0.02) signs.push({sx,sy,ly:sy,text:sign(card.n||card.t),left:sx<W*.5,a:la,sel});
+      hits.push({stop:stop.id,i,x:sx,y:sy,card});
+    });
+
+    /* 표지판 — 도착했을 때만 켜진다. 같은 쪽끼리 겹치면 아래로 밀어낸다.
+       라벨을 캔버스에 그리므로 여기서 한 번에 풀 수 있다. */
+    signs.forEach(s=>{
+      const w=ctx.measureText(s.text).width;
+      s.x0=s.left? s.sx+16 : s.sx-16-w;
+      s.x1=s.x0+w;
+    });
+    const placed=[];
+    signs.sort((a,b)=>a.sy-b.sy).forEach(s=>{
+      for(let guard=0;guard<26;guard++){
+        const hit=placed.find(o=>Math.abs(o.ly-s.ly)<16 && s.x1>o.x0-10 && s.x0<o.x1+10);
+        if(!hit) break;
+        s.ly=hit.ly+16;
+      }
+      placed.push(s);
+    });
+    signs.forEach(s=>{
+      ctx.globalAlpha=s.a*(s.sel?1:.84);
+      ctx.fillStyle=s.sel?t.gold:t.ink;
+      ctx.textAlign=s.left?'left':'right';
+      ctx.shadowColor=t.L?'#e8eaf2':'#0d1118';ctx.shadowBlur=9;
+      if(Math.abs(s.ly-s.sy)>2){
+        ctx.strokeStyle=rgba(t.ink,.16*s.a);ctx.lineWidth=.8;
+        ctx.beginPath();ctx.moveTo(s.sx+(s.left?9:-9),s.sy);
+        ctx.lineTo(s.sx+(s.left?13:-13),s.ly);ctx.stroke();
+      }
+      ctx.fillText(s.text,s.sx+(s.left?16:-16),s.ly);
+      ctx.shadowBlur=0;ctx.globalAlpha=1;
+    });
+  });
+  ctx.textAlign='left';
+
+  /* 비네트 */
+  const S=Math.min(W,H);
+  const v=ctx.createRadialGradient(W*.58,H*.4,S*.24,W*.44,H*.56,S*1.25);
+  v.addColorStop(0,rgba(t.vig,0));v.addColorStop(1,rgba(t.vig,t.L?.24:.5));
+  ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+}
+
+/* ---- 기항지 표지 ---- */
+const deck=document.getElementById('deck');
+STOPS.forEach((s,i)=>{
+  if(s.kind==='hail'||s.kind==='home') return;
+  const el=document.createElement('div');
+  el.className='plate mark';
+  el.dataset.plate=String(i);
+  el.innerHTML='<span class="year"></span><span class="place"></span><p class="note"></p>';
+  el.querySelector('.year').textContent=s.year||s.id;
+  el.querySelector('.place').textContent=s.place||'';
+  el.querySelector('.note').textContent=s.note||'';
+  deck.appendChild(el);
+});
+const plates=[...document.querySelectorAll('.plate')];
+const endEl=document.querySelector('.end');
+
+/* ---- 항로 게이지 ---- */
+const gauge=document.getElementById('gauge');
+const pin=gauge.querySelector('b');
+STOPS.forEach(s=>{const d=document.createElement('i');d.style.top=((s.x/PATH_END)*100)+'%';gauge.appendChild(d)});
+const pips=[...gauge.querySelectorAll('i')];
+
+/* ---- 관측 메모 ---- */
+let selected=null;
+const note=document.getElementById('note');
+note.querySelector('button').addEventListener('click',()=>{selected=null;note.classList.remove('is-open');kick()});
+function open(hit){
+  selected={stop:hit.stop,i:hit.i};
+  const c=hit.card;
+  note.querySelector('h3').textContent=c.n||c.t;
+  note.querySelector('.role').textContent=c.r||c.when||c.p||'';
+  note.querySelector('.body').textContent=c.f||c.d||'';
+  note.classList.add('is-open');
+  kick();
+}
+canvas.parentElement.addEventListener('click',()=>{},false);
+addEventListener('click',e=>{
+  if(e.target.closest('#note')||e.target.closest('.sr-nav')||e.target.closest('.end')||e.target.closest('.mail'))return;
+  let best=null,bd=1e9;
+  hits.forEach(h=>{const d=Math.hypot(e.clientX-h.x,e.clientY-h.y);if(d<bd){bd=d;best=h}});
+  if(best&&bd<44) open(best);
+});
+
+/* ---- 키보드·스크린리더 경로 ---- */
+const nav=document.querySelector('.sr-nav');
+STOPS.forEach((s,si)=>{
+  if(!s.cards) return;
+  s.cards.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.textContent=(s.year||s.id)+' · '+(c.n||c.t);
+    b.addEventListener('click',()=>{
+      const max=document.documentElement.scrollHeight-innerHeight;
+      scrollTo({top:(s.x/PATH_END)*max,behavior:reduced.matches?'auto':'smooth'});
+      setTimeout(()=>{const h=hits.find(x=>x.stop===s.id&&x.i===i);if(h)open(h)},reduced.matches?60:700);
+    });
+    nav.appendChild(b);
+  });
+});
+
+/* 이메일 복사 */
+const mail=document.querySelector('.mail');
+mail.addEventListener('click',()=>{
+  if(!navigator.clipboard)return;
+  navigator.clipboard.writeText(mail.dataset.mail).then(()=>{
+    const old=mail.textContent;mail.textContent='복사됨';setTimeout(()=>{mail.textContent=old},1500);
+  },()=>{});
+});
+
+/* ---- 프레임 : 스크롤 중과 도착 전환 중에만 돈다 ---- */
+let raf=0, until=0;
+function paint(){
+  draw();
+  const cam=camera();
+  plates.forEach(el=>{
+    const s=STOPS[+el.dataset.plate];
+    el.classList.toggle('is-here',Math.abs(cam.x-s.x)<SPAN*.42);
+  });
+  endEl.classList.toggle('is-here',cam.p>0.955);
+  pin.style.top=(cam.p*100)+'%';
+  pips.forEach((d,i)=>d.classList.toggle('is-passed',cam.x>=STOPS[i].x-SPAN*.42));
+}
+function frame(){
+  raf=0;
+  paint();
+  if(performance.now()<until) raf=requestAnimationFrame(frame);
+}
+/* 캔버스를 지운 채로 두지 않는다. kick은 먼저 한 장을 그리고 나서 루프를 건다.
+   resize는 캔버스를 지우므로 그 자리에서 다시 그린다. */
+function kick(ms){
+  until=performance.now()+(ms||420);
+  paint();
+  if(!raf) raf=requestAnimationFrame(frame);
+}
+addEventListener('scroll',()=>kick(260),{passive:true});
+addEventListener('resize',()=>{size();kick(300)},{passive:true});
+dark.addEventListener('change',()=>kick(60));
+document.fonts&&document.fonts.ready.then(()=>kick(120));
+kick(1400);
+})();
+</script>
+</body></html>

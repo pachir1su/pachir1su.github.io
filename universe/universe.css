@@ -1,0 +1,431 @@
+/* =====================================================================
+   v3 우주 — 공용 시각 언어 (universe.css)
+
+   #114에서 확정된 값만 쓴다.
+   팔레트  라이트 #e8eaf2 + #706994 / 다크 #11151d + #968dbb / 금빛 #a9914d
+   서체    IBM Plex Sans KR. 이름은 얇은 200을 크게, 영문은 자간을 넓게
+   테마    수동 토글 없음. prefers-color-scheme만 따른다
+
+   회피    네온 글로우 · 알약/칩 남발 · 같은 크기 카드 반복 ·
+           화면 위 상태 글자 · 작은 좌표/키커 문구
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   1. 토큰
+   --------------------------------------------------------------------- */
+:root {
+  --u-page:#e8eaf2; --u-page-deep:#dfe2ec; --u-surface:#f1f2f7; --u-surface-2:#ffffff;
+  --u-ink:#242636; --u-muted:#606579; --u-subtle:#777c8f; --u-line:#cbd0df;
+  --u-violet:#706994; --u-violet-strong:#554d7d; --u-gold:#a9914d; --u-gold-soft:#8f7736;
+  --u-memo-shadow:0 18px 44px -26px rgba(36,38,54,.55);
+  --u-label-halo:0 0 6px #e8eaf2, 0 0 14px rgba(232,234,242,.9);
+
+  --u-sans:"IBM Plex Sans KR","Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --u-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+
+  /* 타입 스케일 — 이름 하나만 크게 두고 나머지는 좁은 폭에 모은다. */
+  --u-t-name:clamp(38px,7.4vw,96px);
+  --u-t-lead:clamp(15px,1.5vw,19px);
+  --u-t-scene:clamp(21px,2.6vw,30px);
+  --u-t-body:14.5px;
+  --u-t-small:12.5px;
+
+  --u-ease-out:cubic-bezier(.23,1,.32,1);
+  --u-dur:260ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --u-page:#11151d; --u-page-deep:#0d1118; --u-surface:#181d27; --u-surface-2:#1d2330;
+    --u-ink:#e0e3eb; --u-muted:#a2a8b8; --u-subtle:#858c9e; --u-line:#303848;
+    --u-violet:#968dbb; --u-violet-strong:#b0a7d0; --u-gold:#bda969; --u-gold-soft:#c9b477;
+    --u-memo-shadow:0 20px 50px -28px rgba(0,0,0,.85);
+    --u-label-halo:0 0 6px #11151d, 0 0 16px rgba(17,21,29,.92);
+  }
+}
+
+*, *::before, *::after { box-sizing:border-box; }
+
+/* 이 시트는 운영 style.css와 같은 페이지에 함께 실릴 수 있다(gateway).
+   그래서 토큰은 전부 --u- 로 namespace 하고, 전역 요소 규칙은
+   .universe / .v3-doc 안으로만 건다. v2 화면을 물들이지 않기 위해서다. */
+body.universe, body.v3-doc {
+  margin:0; min-width:320px;
+  background:var(--u-page); color:var(--u-ink);
+  font-family:var(--u-sans); font-size:var(--u-t-body); line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+
+.universe a, .v3-doc a { color:inherit; }
+.universe :focus-visible, .v3-doc :focus-visible,
+.v3-gate:focus-visible {
+  outline:2px solid var(--u-gold); outline-offset:3px; border-radius:2px;
+}
+
+/* ---------------------------------------------------------------------
+   2. 문서 셸 — 허브·디자인 시스템 페이지처럼 '시안을 설명하는' 바깥 영역.
+      우주 화면 안에는 이 문법을 쓰지 않는다.
+   --------------------------------------------------------------------- */
+.wrap { max-width:1180px; margin:0 auto; padding:0 clamp(18px,4vw,44px); }
+
+.masthead { padding:clamp(48px,8vw,92px) 0 clamp(20px,3vw,32px); }
+.masthead h1 {
+  margin:0 0 16px; font-weight:200; font-size:clamp(30px,5vw,54px);
+  letter-spacing:-.035em; line-height:1.14; text-wrap:balance;
+}
+.masthead p { max-width:66ch; margin:0 0 10px; color:var(--u-muted); font-size:15px; }
+.masthead p:last-child { margin-bottom:0; }
+.masthead b { color:var(--u-ink); font-weight:500; }
+
+.back-link {
+  display:inline-block; margin-bottom:24px; padding-bottom:2px;
+  color:var(--u-muted); font-size:var(--u-t-small); text-decoration:none;
+  border-bottom:1px solid var(--u-line);
+}
+.back-link:hover { color:var(--u-ink); border-bottom-color:var(--u-gold); }
+
+.doc { margin-top:clamp(44px,6vw,80px); padding-top:clamp(28px,4vw,44px); border-top:1px solid var(--u-line); }
+.doc h2 { margin:0 0 8px; font-weight:300; font-size:clamp(20px,2.8vw,26px); letter-spacing:-.03em; }
+.doc > p { max-width:66ch; margin:0 0 22px; color:var(--u-muted); }
+
+.rows { border-top:1px solid var(--u-line); }
+.row { display:grid; gap:3px 26px; padding:14px 0; border-bottom:1px solid var(--u-line); align-items:baseline; }
+@media (min-width:760px) { .row { grid-template-columns:minmax(140px,.5fr) minmax(0,1.7fr); } }
+.row > b { font-size:var(--u-t-small); font-weight:500; letter-spacing:-.01em; }
+.row > span { color:var(--u-muted); font-size:var(--u-t-small); }
+.row > span em { font-style:normal; color:var(--u-ink); font-weight:500; }
+.row.is-dropped > b { color:var(--u-subtle); text-decoration:line-through; text-decoration-thickness:1px; }
+
+.v3-doc .cards { display:grid; gap:14px; margin-top:20px; }
+@media (min-width:720px) { .v3-doc .cards { grid-template-columns:repeat(auto-fit,minmax(258px,1fr)); } }
+/* 같은 크기 카드를 반복해 늘어놓지 않는다(#114 안티패턴 3).
+   첫 항목만 두 칸을 쓰고 나머지는 한 칸이다. */
+@media (min-width:900px) { .v3-doc .cards > :first-child { grid-column:span 2; } }
+/* 우주 화면에도 .card가 있다(겹쳐 놓는 메모). 이름이 겹치므로 문서 쪽은 .v3-doc 안에 가둔다.
+   가두지 않으면 나중에 선언된 우주 카드가 문서 카드를 통째로 숨긴다. */
+.v3-doc .card {
+  position:static; display:block; padding:18px 20px 20px; text-decoration:none;
+  background:var(--u-surface); border:1px solid var(--u-line);
+  opacity:1; transform:none; pointer-events:auto; box-shadow:none; width:auto;
+}
+.v3-doc a.card:hover { border-color:var(--u-gold); }
+.v3-doc .card h3 { margin:0 0 6px; font-weight:500; font-size:15.5px; letter-spacing:-.02em; }
+.v3-doc .card p { margin:0 0 0; color:var(--u-muted); font-size:var(--u-t-small); }
+.v3-doc .card em { font-style:normal; color:var(--u-gold-soft); font-weight:400; }
+
+.note-list { margin:18px 0 0; padding:0; list-style:none; display:grid; gap:9px; }
+.note-list li { position:relative; padding-left:16px; color:var(--u-muted); font-size:var(--u-t-small); }
+.note-list li::before { content:""; position:absolute; left:0; top:.72em; width:5px; height:1px; background:var(--u-gold); }
+.note-list b { color:var(--u-ink); font-weight:500; }
+
+/* ---------------------------------------------------------------------
+   3. 우주 셸
+   --------------------------------------------------------------------- */
+body.universe { background:var(--u-page-deep); overflow-x:hidden; }
+
+.sky-canvas {
+  position:fixed; inset:0; width:100%; height:100%;
+  z-index:0; pointer-events:none;
+}
+
+/* 혜성은 장면에 매이지 않는다. 화면 어디로든 지나갈 수 있어야 하므로
+   문서에 고정된 층 하나를 따로 쓴다. 클릭 판정은 문서 전체에서 한다. */
+.u-bar {
+  position:fixed; z-index:40; top:0; right:0;
+  display:flex; align-items:center; gap:6px;
+  padding:14px clamp(14px,3vw,26px);
+}
+.u-btn {
+  min-height:34px; padding:5px 12px;
+  background:transparent; border:1px solid var(--u-line); border-radius:0;
+  color:var(--u-muted); font:inherit; font-size:11.5px; letter-spacing:.06em;
+  cursor:pointer; transition:color var(--u-dur) var(--u-ease-out), border-color var(--u-dur) var(--u-ease-out);
+}
+.u-btn:hover { color:var(--u-ink); border-color:var(--u-gold); }
+.u-btn[aria-pressed="true"] { color:var(--u-gold); border-color:var(--u-gold); }
+.u-btn[hidden] { display:none; }
+
+/* v2로 돌아가는 길 — 글자를 쓰지 않는다. 빈 포스트잇 하나만 둔다. */
+/* v2로 돌아가는 길. 들어올 때 찢어진 구멍과 같은 자국을 쓴다.
+   여기서는 종잇조각 쪽이 남는다 — 종이의 세계로 돌아가는 문이라서다.
+   글자를 쓰지 않는다. 설명은 aria-label에만 있다. */
+.seam {
+  position:fixed; z-index:40; left:clamp(14px,3vw,26px); top:clamp(14px,3vw,26px);
+  display:block; width:52px; height:35px;
+  background:linear-gradient(152deg,#f7f6f0 0%,#eceade 58%,#dcd9cb 100%);
+  -webkit-mask:url("assets/gateway/tear-wide.png") center/contain no-repeat;
+  mask:url("assets/gateway/tear-wide.png") center/contain no-repeat;
+  filter:drop-shadow(0 7px 15px rgba(0,0,0,.42));
+  opacity:.62; transform:rotate(-4deg);
+  transition:opacity var(--u-dur) var(--u-ease-out), transform var(--u-dur) var(--u-ease-out);
+}
+.seam:hover, .seam:focus-visible { opacity:.95; transform:rotate(-2deg) translateY(-2px) scale(1.04); }
+.seam:focus-visible { outline:none; }
+
+/* ---------------------------------------------------------------------
+   4. 무대 — 스크롤이 없다. 한 화면이 곧 창이다.
+
+   모델 B · 날아가기 (2026-08-26 확정)
+   멀리서 하늘 전체가 보이고, 구역을 누르면 카메라가 그리로 간다.
+   빈 곳이나 Esc로 물러난다. 문서가 흐르지 않으므로 body는 스크롤하지 않는다.
+   --------------------------------------------------------------------- */
+body.universe { height:100svh; overflow:hidden; background:var(--u-page-deep); }
+
+.sky-canvas { position:fixed; inset:0; width:100%; height:100%; z-index:0; }
+
+/* 천체와 구역은 실제 button이다. 매 프레임 transform으로만 옮긴다. */
+.stage { position:fixed; inset:0; z-index:1; }
+.stage > div { position:absolute; inset:0; }
+
+.region, .star {
+  position:absolute; left:0; top:0;
+  padding:0; border:0; background:none; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  will-change:transform;
+}
+.region { transform-origin:center; }
+.region[hidden], .star[hidden] { display:none; }
+.region:focus-visible, .star:focus-visible { outline:2px solid var(--u-gold); outline-offset:2px; border-radius:50%; }
+
+/* 구역 이름 — 멀리 있을 때만 뜬다. 가까이 가면 상단 표지로 옮겨 간다. */
+.region-name {
+  position:absolute; left:50%; bottom:-2px; transform:translate(-50%,100%);
+  white-space:nowrap; font-size:13px; letter-spacing:-.01em;
+  color:var(--u-muted); text-shadow:var(--u-label-halo); pointer-events:none;
+  transition:color var(--u-dur) var(--u-ease-out);
+}
+.region:hover .region-name, .region:focus-visible .region-name { color:var(--u-gold); }
+
+.star { width:44px; height:44px; margin:-22px 0 0 -22px; }
+/* 이름표의 자리는 universe.js가 잰다. 별에서 바깥쪽으로 뻗고,
+   서로 겹치면 위아래로 비킨다(--u-ldx / --u-ldy). */
+.star-name {
+  position:absolute; left:22px; top:22px;
+  transform:translate(var(--u-ldx,26px), calc(-50% + var(--u-ldy,0px)));
+  white-space:nowrap; font-size:12.5px; color:var(--u-ink);
+  text-shadow:var(--u-label-halo); pointer-events:none; opacity:0;
+  transition:opacity 420ms var(--u-ease-out), color var(--u-dur) var(--u-ease-out);
+}
+.stage[data-level="region"] .star-name { opacity:1; }
+.star:hover .star-name, .star:focus-visible .star-name, .star[aria-pressed="true"] .star-name { color:var(--u-gold); }
+
+/* ---------------------------------------------------------------------
+   5. 겹쳐 놓는 것들 — 창 위에 최소한만 얹는다.
+   --------------------------------------------------------------------- */
+.overlay { position:fixed; z-index:3; pointer-events:none; }
+.overlay > * { pointer-events:auto; }
+
+/* 출발점 — 멀리 있을 때만 보인다 */
+.identity {
+  left:clamp(20px,5vw,72px); bottom:clamp(38px,7vh,86px);
+  max-width:min(42ch,84vw);
+  opacity:1; transition:opacity 520ms var(--u-ease-out);
+}
+.stage-far-off .identity { opacity:0; pointer-events:none; }
+.identity h1 { margin:0; font-weight:200; font-size:var(--u-t-name); letter-spacing:-.055em; line-height:.96; text-shadow:var(--u-label-halo); }
+.identity .name-en {
+  display:block; margin-top:6px; color:var(--u-muted);
+  font-size:clamp(11px,1.2vw,13.5px); letter-spacing:.34em; text-transform:uppercase; text-shadow:var(--u-label-halo);
+}
+.identity .lead {
+  margin:20px 0 0; max-width:32ch; font-weight:300;
+  font-size:var(--u-t-lead); line-height:1.6; text-shadow:var(--u-label-halo);
+  word-break:keep-all; text-wrap:pretty;
+}
+.identity .lead b { font-weight:500; color:var(--u-violet-strong); }
+.contact {
+  display:inline-flex; align-items:center; gap:10px; min-height:44px; margin-top:14px;
+  padding:0; background:none; border:0; border-bottom:1px solid var(--u-line);
+  color:var(--u-muted); font:inherit; font-size:var(--u-t-small); cursor:pointer;
+  text-shadow:var(--u-label-halo);
+  transition:color var(--u-dur) var(--u-ease-out), border-color var(--u-dur) var(--u-ease-out);
+}
+.contact:hover { color:var(--u-ink); border-bottom-color:var(--u-gold); }
+.contact .copied { color:var(--u-gold); }
+.tally { display:flex; flex-wrap:wrap; gap:5px 18px; margin-top:20px; color:var(--u-subtle); font-size:11.5px; text-shadow:var(--u-label-halo); }
+.tally b { color:var(--u-muted); font-weight:500; font-variant-numeric:tabular-nums; }
+
+/* 도착한 곳 — 가까이 갔을 때만 보인다 */
+.here {
+  left:clamp(20px,5vw,72px); bottom:clamp(38px,7vh,86px);
+  max-width:min(40ch,84vw);
+  opacity:0; transform:translateY(10px);
+  transition:opacity 520ms var(--u-ease-out), transform 520ms var(--u-ease-out);
+}
+.stage-far-off .here { opacity:1; transform:none; }
+.here .here-title { display:block; font-weight:200; font-size:clamp(44px,8vw,104px); letter-spacing:-.055em; line-height:.92; text-shadow:var(--u-label-halo); }
+.here .here-note { display:block; margin-top:12px; color:var(--u-muted); font-size:13px; word-break:keep-all; text-shadow:var(--u-label-halo); }
+
+/* 물러나기 — 글자 없이 얇은 표시 하나 */
+.back {
+  left:clamp(20px,5vw,72px); top:clamp(20px,4vh,44px);
+  width:44px; height:44px; background:none; border:0; cursor:pointer;
+  opacity:0; pointer-events:none; transition:opacity 400ms var(--u-ease-out);
+}
+.stage-far-off .back { opacity:1; pointer-events:auto; }
+.back::before, .back::after {
+  content:""; position:absolute; left:13px; top:21px; width:15px; height:1px;
+  background:var(--u-muted); transform-origin:left center;
+  transition:background var(--u-dur) var(--u-ease-out);
+}
+.back::before { transform:rotate(-38deg); }
+.back::after  { transform:rotate(38deg); }
+.back:hover::before, .back:hover::after { background:var(--u-gold); }
+
+/* 마주친 것 */
+.card {
+  right:clamp(16px,3vw,40px); bottom:clamp(16px,3vw,40px);
+  width:min(330px,calc(100vw - 32px)); padding:16px 18px 18px;
+  background:var(--u-surface); border:1px solid var(--u-line);
+  box-shadow:var(--u-memo-shadow);
+  opacity:0; transform:translateY(10px); pointer-events:none;
+  transition:opacity 300ms var(--u-ease-out), transform 300ms var(--u-ease-out);
+}
+.card.is-open { opacity:1; transform:none; pointer-events:auto; }
+.card h3 { margin:0 0 2px; font-weight:500; font-size:15px; letter-spacing:-.02em; }
+.card .card-role { margin:0 0 9px; color:var(--u-gold-soft); font-size:11.5px; }
+.card p { margin:0 0 11px; color:var(--u-muted); font-size:var(--u-t-small); line-height:1.72; }
+.card p:last-child { margin-bottom:0; }
+.card .card-lineage { color:var(--u-subtle); font-size:11.5px; }
+.card-tech { display:flex; flex-wrap:wrap; gap:4px 12px; margin:0 0 11px; padding:0; list-style:none; }
+.card-tech li { color:var(--u-subtle); font-size:11px; }
+.card-go {
+  display:inline-flex; align-items:center; gap:8px; min-height:34px;
+  color:var(--u-ink); font-size:var(--u-t-small); text-decoration:none; border-bottom:1px solid var(--u-gold);
+}
+.card-go:hover { color:var(--u-gold); }
+.card-close {
+  position:absolute; right:6px; top:6px; width:30px; height:30px;
+  background:none; border:0; color:var(--u-subtle); font-size:15px; line-height:1; cursor:pointer;
+}
+.card-close:hover { color:var(--u-ink); }
+
+/* 성장 궤적의 등급 — 그 구역에 있을 때만 */
+/* 오른쪽 위는 언어·소리 단추가 먼저 쓴다. 등급은 그 아래 줄에 놓는다. */
+.rank {
+  right:clamp(14px,3vw,26px); top:66px;
+  display:flex; align-items:center; gap:10px;
+  opacity:0; transition:opacity 400ms var(--u-ease-out);
+}
+.rank.is-on { opacity:1; }
+.rank small { color:var(--u-subtle); font-size:11px; letter-spacing:.06em; text-shadow:var(--u-label-halo); }
+.rank .rail { position:relative; width:clamp(70px,10vw,120px); height:1px; background:var(--u-line); }
+.rank .rail::after { content:""; position:absolute; inset:0 auto 0 0; width:var(--u-rank-progress,0%); background:var(--u-gold); transition:width 620ms var(--u-ease-out); }
+.rank b { min-width:3.2ch; font-family:var(--u-mono); font-size:13px; color:var(--u-gold); font-variant-numeric:tabular-nums; text-shadow:var(--u-label-halo); }
+
+/* ---------------------------------------------------------------------
+   6. 이스터에그 — 발동 전에 어떤 예고도 하지 않는다.
+       아래 규칙은 발동 뒤에만 의미가 생긴다.
+   --------------------------------------------------------------------- */
+.vault {
+  position:fixed; inset:0; z-index:70;
+  display:flex; align-items:center; justify-content:center;
+  padding:clamp(18px,5vw,48px);
+  background:color-mix(in srgb, var(--u-page-deep) 88%, transparent);
+  backdrop-filter:blur(3px);
+  animation:vault-in 520ms var(--u-ease-out) both;
+}
+@keyframes vault-in { from { opacity:0; } to { opacity:1; } }
+.vault[hidden] { display:none; }
+.vault-panel {
+  position:relative; width:min(520px,100%); padding:clamp(22px,4vw,34px);
+  background:var(--u-surface); border:1px solid var(--u-line); box-shadow:var(--u-memo-shadow);
+}
+.vault-panel h2 { margin:0 0 6px; font-weight:300; font-size:21px; letter-spacing:-.03em; }
+.vault-panel > p { margin:0 0 18px; color:var(--u-muted); font-size:var(--u-t-small); }
+.vault-item { padding-top:14px; border-top:1px solid var(--u-line); }
+.vault-item h3 { margin:0 0 6px; font-weight:500; font-size:15px; letter-spacing:-.02em; }
+.vault-item p { margin:0 0 12px; color:var(--u-muted); font-size:var(--u-t-small); line-height:1.72; word-break:keep-all; }
+
+/* 이름 없는 별 — 발동 전에는 존재를 알리는 어떤 표시도 하지 않는다.
+   커서조차 바뀌지 않는다. 그려진 뒤에도 이름표가 붙지 않는다. */
+.star-unnamed { cursor:default; }
+.star-unnamed.is-drawn { cursor:pointer; }
+
+/* ---------------------------------------------------------------------
+   7. v2 홈 위의 우주 진입점 (gateway)
+       운영 index.html에 들어갈 블록은 이 .v3-gate 하나뿐이다.
+   --------------------------------------------------------------------- */
+/* 기울기는 인라인 transform이 아니라 변수로 준다. 인라인으로 주면
+   hover 규칙을 덮어써서 들리는 반응이 사라진다. */
+.v3-gate {
+  position:absolute; z-index:3;
+  padding:0; border:0; background:none; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  filter:drop-shadow(0 14px 26px rgba(0,0,0,.24));
+  transform:rotate(var(--gate-rot,0deg));
+  transition:transform 420ms var(--u-ease-out), filter 420ms var(--u-ease-out);
+}
+.v3-gate canvas { display:block; width:100%; height:100%; }
+.v3-gate:hover, .v3-gate:focus-visible {
+  transform:rotate(var(--gate-rot,0deg)) translateY(-4px) scale(1.014);
+  filter:drop-shadow(0 20px 34px rgba(0,0,0,.3));
+}
+.v3-gate[data-entering="true"] { pointer-events:none; }
+
+.gate-veil {
+  position:fixed; inset:0; z-index:9999; pointer-events:none;
+  opacity:0; transition:opacity 320ms linear;
+}
+.gate-veil.is-open { opacity:1; }
+.gate-veil canvas { position:absolute; inset:0; width:100%; height:100%; }
+
+/* ---------------------------------------------------------------------
+   8. 적응형 (#10 · #123)
+
+     아이폰 SE1  320x568 / 568x320      폴드 펼친  768x1076 / 1076x768
+     아이폰 SE2  375x667 / 667x375      아이패드   768x1024 / 1024x768
+     아이폰 17   393x852 / 852x393      노트북     1280x800 · 1440x900
+     폴드 접은   344x882 / 882x344      PC         1920x1080
+
+   창 하나가 전부이므로 폭이 줄어도 잘라 낼 단이 없다. 카메라가 더 물러날 뿐이고,
+   조작(누르면 날아간다)은 어느 폭에서도 같다(#10).
+   --------------------------------------------------------------------- */
+@media (max-width:899px) {
+  .u-bar { padding:10px 14px; }
+  .rank { top:58px; }
+  .seam { width:44px; height:30px; }
+  .card { width:min(330px,calc(100vw - 28px)); }
+}
+@media (max-width:640px) {
+  :root { --u-t-body:14px; }
+  .identity .lead { font-size:16px; margin-top:16px; }
+  .tally { margin-top:14px; }
+  /* 아래는 카드가 가로로 다 쓴다. 도착지 이름은 위로 올라가 한 줄이 된다. */
+  .here {
+    left:66px; right:auto; top:13px; bottom:auto;
+    max-width:calc(100vw - 170px); transform:none;
+  }
+  .stage-far-off .here { transform:none; }
+  .here .here-title { font-size:clamp(21px,6.4vw,30px); line-height:1.2; }
+  .here .here-note { margin-top:1px; font-size:11.5px; }
+  .card { right:14px; bottom:14px; left:14px; width:auto; }
+}
+@media (max-width:390px) {
+  .identity { left:16px; bottom:26px; }
+  .here { left:16px; bottom:26px; }
+  .back { left:16px; }
+}
+@media (max-width:340px) {
+  :root { --u-t-name:clamp(34px,10vw,44px); }
+  .tally { gap:4px 12px; font-size:11px; }
+}
+/* 휴대폰 가로 — 세로 공간이 없으니 겹쳐 놓는 글을 줄인다. */
+@media (max-height:600px) and (orientation:landscape) {
+  .identity .lead { display:none; }
+  .tally { margin-top:12px; }
+  .here .here-title { font-size:clamp(34px,7vw,54px); }
+  .rank { top:52px; }
+  .card { max-height:62vh; overflow:auto; }
+}
+
+/* ---------------------------------------------------------------------
+   9. 모션 저감 — 움직임을 끄되 정보는 그대로 둔다.
+   --------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:.001ms !important; animation-iteration-count:1 !important;
+    transition-duration:.001ms !important; scroll-behavior:auto !important;
+  }
+  .rank .rail::after { transition:none; }
+}
