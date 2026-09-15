@@ -1,0 +1,201 @@
+{
+  "growth": {
+    "title": {
+      "ko": "GitHub Rank 성장 궤적",
+      "en": "GitHub Rank trajectory"
+    },
+    "description": {
+      "ko": "GitHub Rank를 중심축으로 두고, 등급 사이에 실제 성장 기록을 연결합니다.",
+      "en": "GitHub Rank forms the main axis, with real growth records connected between grades."
+    },
+    "ranks": [
+      "C",
+      "C+",
+      "B-",
+      "B",
+      "B+",
+      "A-",
+      "A"
+    ],
+    "records": [
+      {
+        "id": "first-team-lead",
+        "between": ["C", "C+"],
+        "title": {
+          "ko": "처음 팀을 맡다",
+          "en": "First time leading"
+        },
+        "period": {
+          "ko": "2024 · 비밀번호 도어락",
+          "en": "2024 · Password door lock"
+        },
+        "description": {
+          "ko": "4인 팀의 팀장을 맡아 설계·제작·발표를 처음부터 끝까지 조율했습니다.",
+          "en": "Led a four-person team and coordinated design, fabrication, and presentation end to end."
+        },
+        "detail": "projects/Master_Creator_Challenge/"
+      },
+      {
+        "id": "national-eighth",
+        "between": ["C+", "B-"],
+        "title": {
+          "ko": "전국 8위",
+          "en": "8th nationwide"
+        },
+        "period": {
+          "ko": "2024 · SFPC",
+          "en": "2024 · SFPC"
+        },
+        "description": {
+          "ko": "581팀·1,661명이 참가한 알고리즘 대회에서 전체 8위를 기록했습니다.",
+          "en": "Placed 8th overall in an algorithm contest with 581 teams and 1,661 participants."
+        },
+        "detail": "projects/2024_SFPC/"
+      },
+      {
+        "id": "two-award-signals",
+        "between": ["B-", "B"],
+        "title": {
+          "ko": "두 번의 수상 신호",
+          "en": "Two award signals"
+        },
+        "period": {
+          "ko": "2024 · AI와 하드웨어",
+          "en": "2024 · AI and hardware"
+        },
+        "description": {
+          "ko": "산불 조기 감지 프로젝트와 졸음 방지 시스템이 각각 AI 어벤져스상과 동상을 받았습니다.",
+          "en": "The wildfire detection and drowsiness alert projects received an AI Avengers Award and a bronze award."
+        },
+        "detail": "projects/nonofire/"
+      },
+      {
+        "id": "largest-team",
+        "between": ["B", "B+"],
+        "title": {
+          "ko": "가장 큰 팀을 이끌다",
+          "en": "Leading the largest team"
+        },
+        "period": {
+          "ko": "2025 · NFC 출석 체크 시스템",
+          "en": "2025 · NFC attendance system"
+        },
+        "description": {
+          "ko": "저장소 기록상 가장 큰 6인 팀을 이끌며 하드웨어와 소프트웨어 작업을 연결했습니다.",
+          "en": "Led the largest recorded team of six, connecting hardware and software work."
+        },
+        "detail": "projects/BerryIno/"
+      },
+      {
+        "id": "solo-systems",
+        "between": ["B+", "A-"],
+        "title": {
+          "ko": "혼자 끝까지 만들다",
+          "en": "Building end to end"
+        },
+        "period": {
+          "ko": "2026 · 1인 개발",
+          "en": "2026 · Solo development"
+        },
+        "description": {
+          "ko": "코리아텍 통합 알림 시스템·MultiMind·GitHub Rank Insight를 기획부터 공개까지 진행했습니다.",
+          "en": "Took the KOREATECH alert system, MultiMind, and GitHub Rank Insight from planning to release."
+        },
+        "detail": "projects/koreatechGongjiAgent/"
+      },
+      {
+        "id": "mentor-five-teams",
+        "between": ["A-", "A"],
+        "title": {
+          "ko": "만드는 사람에서 멘토로",
+          "en": "From builder to mentor"
+        },
+        "period": {
+          "ko": "2026 · U-CAST",
+          "en": "2026 · U-CAST"
+        },
+        "description": {
+          "ko": "5팀의 요구사항·센서 구조·배선 디버깅을 멘토링했고 로컬임팩트상으로 이어졌습니다.",
+          "en": "Mentored Team 5 on requirements, sensor structure, and wiring; the project received a Local Impact Award."
+        },
+        "detail": "projects/2026_U-CAST/"
+      }
+    ]
+  },
+  "awards": {
+    "title": {
+      "ko": "동등한 수상 기록",
+      "en": "Equal award records"
+    },
+    "description": {
+      "ko": "네 개의 수상을 크기와 밝기 차이 없이 같은 무게로 기록합니다.",
+      "en": "Four awards are recorded with equal size, brightness, and visual weight."
+    },
+    "items": [
+      {
+        "id": "sfpc-2024",
+        "title": {
+          "ko": "2024 SFPC",
+          "en": "2024 SFPC"
+        },
+        "result": {
+          "ko": "전체 8위 · Top 1.3%",
+          "en": "8th overall · Top 1.3%"
+        },
+        "description": {
+          "ko": "총 581팀·1,661명이 참가한 알고리즘 대회 기록입니다.",
+          "en": "An algorithm contest record among 581 teams and 1,661 participants."
+        },
+        "detail": "projects/2024_SFPC/"
+      },
+      {
+        "id": "ai-avengers-2024",
+        "title": {
+          "ko": "AI 어벤져스상",
+          "en": "AI Avengers Award"
+        },
+        "result": {
+          "ko": "디지털새싹 인공지능 메이커톤",
+          "en": "Digital Saessak AI Makerthon"
+        },
+        "description": {
+          "ko": "라즈베리파이와 OpenCV를 활용한 산불 조기 감지 프로젝트입니다.",
+          "en": "A wildfire early-detection project using Raspberry Pi and OpenCV."
+        },
+        "detail": "projects/nonofire/"
+      },
+      {
+        "id": "robot-bronze-2024",
+        "title": {
+          "ko": "동상",
+          "en": "Bronze Award"
+        },
+        "result": {
+          "ko": "제5회 천안 학생 로봇 대회",
+          "en": "5th Cheonan Student Robot Contest"
+        },
+        "description": {
+          "ko": "97팀이 참가한 해커톤 분야의 졸음 방지 시스템 기록입니다.",
+          "en": "A drowsiness alert system entered in the hackathon category with 97 teams."
+        },
+        "detail": "projects/2024_5th_CSRC/"
+      },
+      {
+        "id": "local-impact-2026",
+        "title": {
+          "ko": "로컬임팩트상",
+          "en": "Local Impact Award"
+        },
+        "result": {
+          "ko": "2026 천안시 청소년 도시재생 챌린지",
+          "en": "2026 Cheonan Youth Urban Regeneration Challenge"
+        },
+        "description": {
+          "ko": "돌발 보행자 감지 경고 시스템 「멈춰!」의 5팀 멘토링 기록입니다.",
+          "en": "A mentoring record for Team 5's pedestrian alert system, Stop!"
+        },
+        "detail": "projects/2026_U-CAST/"
+      }
+    ]
+  }
+}
